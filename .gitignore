@@ -1,2 +1,4 @@
-obj\*
-obj\
+glimpse\obj\*
+glimpse\obj\
+glimpse/obj/*
+glimpse/obj/
