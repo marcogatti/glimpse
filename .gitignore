@@ -1,4 +1,5 @@
-glimpse\obj\*
-glimpse\obj\
-glimpse/obj/*
-glimpse/obj/
+/bin
+/obj
+*.user
+*.suo
+*.sln.cache
