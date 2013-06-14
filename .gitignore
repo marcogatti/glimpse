@@ -1,5 +1,5 @@
-/bin
-/obj
-*.user
-*.suo
-*.sln.cache
+glimpse/bin
+glimpse/obj
+glimpse/*.user
+glimpse/*.suo
+glimpse/*.sln.cache
