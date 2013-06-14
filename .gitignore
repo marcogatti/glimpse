@@ -3,3 +3,5 @@ glimpse/obj
 glimpse/*.user
 glimpse/*.suo
 glimpse/*.sln.cache
+*.suo
+*.sln
