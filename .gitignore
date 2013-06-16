@@ -3,5 +3,6 @@ glimpse/obj
 glimpse/*.user
 glimpse/*.suo
 glimpse/*.sln.cache
+glimpse/App_data
 *.suo
 *.sln
