@@ -71,13 +71,11 @@ namespace glimpse.Models
             Mailbox mailbox = Client.SelectMailbox(mailBox);
             foreach (Message message in mailbox.SearchParse(searchPhrase))
             {
-
                 mails.Add(new Mail(message.Subject,
                                    message.From.Name + " - " + message.From.Email,
                                    message.To.First().Name + " - " + message.To.First().Email,
                                    message.ReceivedDate.ToString(),
                                    message.BodyText.Text));
-
             }
 
             return mails;
