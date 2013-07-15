@@ -1,5 +1,4 @@
-﻿@using System.Web.Mvc.Html5
-@{Html.EnableClientValidation(true); }
+﻿@{Html.EnableClientValidation(true); }
 @model glimpse.Models.User
 
 @{
@@ -8,22 +7,16 @@
 
 
 <div class="container">
-    <form class="form-signin">
-        @*@using (Html.BeginForm(new { ReturnUrl = ViewBag.ReturnUrl}))*@
-        @using (Html.BeginForm("Index", "Account")) {
+        @using (Html.BeginForm("Index", "Account", FormMethod.Post, new {@class = "form-signin"})) 
         {
             @Html.AntiForgeryToken()
             <h2 class="form-signin-heading">Please sign in</h2>
 
             @Html.TextBoxFor(m => m.Email, new { type = "email", placeholder = "address@example.com", @class = "input-block-level" })
             @Html.ValidationMessageFor(m => m.Email)
-            @Html.PasswordFor(m => m.Password, new {  type = "password", placeholder = "password", @class = "input-block-level" })
+            @Html.PasswordFor(m => m.Password, new { placeholder = "Password...", @class = "input-block-level" })
             @Html.ValidationMessageFor(m => m.Password)
             <input class="btn btn-large btn-primary" type="submit" value="Entrar" />
     
         }
-    </form>
 </div>
-   
-    
-
