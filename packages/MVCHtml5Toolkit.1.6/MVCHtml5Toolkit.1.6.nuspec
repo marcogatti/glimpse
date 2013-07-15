@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>MVCHtml5Toolkit</id>
+    <version>1.6</version>
+    <authors>Dean Hume</authors>
+    <owners>Dean Hume</owners>
+    <licenseUrl>http://mvchtml5.codeplex.com/</licenseUrl>
+    <projectUrl>http://mvchtml5.codeplex.com/</projectUrl>
+    <iconUrl>http://c512615.r15.cf3.rackcdn.com/html5.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>The ASP.net MVC HTML5 Toolkit contains a rich set of controls that you can use to build ASP.net websites using HTML5. Harness the power of HTML5 and start using it in your applications. It's lightweight and can be a great step in getting your website up to speed with HTML5.</description>
+  </metadata>
+</package>
