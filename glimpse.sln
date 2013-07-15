@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "glimpse", "glimpse\glimpse.csproj", "{42209687-FE29-4378-8D77-80D5DB3FE1AE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "glimpse", "glimpse\glimpse.csproj", "{AB9066B7-F89F-40ED-94EF-8692C5D03A52}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "glimpse.Tests", "glimpse.Tests\glimpse.Tests.csproj", "{1AE7FCC5-CC81-460E-A9FE-B9FB8913C1A2}"
 EndProject
@@ -11,10 +11,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{42209687-FE29-4378-8D77-80D5DB3FE1AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{42209687-FE29-4378-8D77-80D5DB3FE1AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{42209687-FE29-4378-8D77-80D5DB3FE1AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{42209687-FE29-4378-8D77-80D5DB3FE1AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB9066B7-F89F-40ED-94EF-8692C5D03A52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB9066B7-F89F-40ED-94EF-8692C5D03A52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB9066B7-F89F-40ED-94EF-8692C5D03A52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB9066B7-F89F-40ED-94EF-8692C5D03A52}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1AE7FCC5-CC81-460E-A9FE-B9FB8913C1A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1AE7FCC5-CC81-460E-A9FE-B9FB8913C1A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1AE7FCC5-CC81-460E-A9FE-B9FB8913C1A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
