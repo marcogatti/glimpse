@@ -6,7 +6,7 @@
     ViewBag.Title = "Index";
 }
 
-@using (Html.BeginForm(new { ReturnUrl = ViewBag.ReturnUrl })) {
+@using (Html.BeginForm("Index", "Account")) {
     @Html.AntiForgeryToken()
 
 <h2>Index</h2>
