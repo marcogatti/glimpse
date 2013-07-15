@@ -6,20 +6,23 @@
     ViewBag.Title = "Index";
 }
 
-@using (Html.BeginForm(new { ReturnUrl = ViewBag.ReturnUrl })) {
-    @Html.AntiForgeryToken()
+<div class="container">
+    <form class="form-signin">
+        @using (Html.BeginForm(new { ReturnUrl = ViewBag.ReturnUrl, @class = "form-signin" }))
+        {
+            @Html.AntiForgeryToken()
+            <h2 class="form-signin-heading">Please sign in</h2>
 
-<h2>Index</h2>
-<br />
-@Html.LabelFor(m => m.Email)
-@Html.TextBoxFor(m => m.Email, new { @type="email", placeholder="address@example.com"} )
-@Html.ValidationMessageFor(m => m.Email)
-<br />
-@Html.LabelFor(m => m.Password)
-@Html.PasswordFor(m => m.Password)
-@Html.ValidationMessageFor(m => m.Password)
-<br />
-<input type="submit" value="Entrar"/>
+            @Html.TextBoxFor(m => m.Email, new { type = "email", placeholder = "address@example.com", @class = "input-block-level" })
+            @Html.ValidationMessageFor(m => m.Email)
+            @Html.PasswordFor(m => m.Password, new {  type = "password", placeholder = "password", @class = "input-block-level" })
+            @Html.ValidationMessageFor(m => m.Password)
+            <br />
+            <input class="btn btn-large btn-primary" type="submit" value="Entrar" />
     
-}
+        }
+    </form>
+</div>
+   
+    
 
