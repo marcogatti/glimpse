@@ -4,6 +4,6 @@ glimpse/*.user
 glimpse/*.suo
 glimpse/*.sln.cache
 glimpse/App_data
+glimpse.Tests/bin/
 obj
 *.suo
-*.sln

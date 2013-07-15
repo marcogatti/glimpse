@@ -1,7 +1,25 @@
-﻿@model glimpse.Models.User
+﻿@using System.Web.Mvc.Html5
+@{Html.EnableClientValidation(true); }
+@model glimpse.Models.User
 
 @{
     ViewBag.Title = "Index";
 }
 
+@using (Html.BeginForm(new { ReturnUrl = ViewBag.ReturnUrl })) {
+    @Html.AntiForgeryToken()
+
 <h2>Index</h2>
+<br />
+@Html.LabelFor(m => m.Email)
+@Html.TextBoxFor(m => m.Email, new { @type="email", placeholder="address@example.com"} )
+@Html.ValidationMessageFor(m => m.Email)
+<br />
+@Html.LabelFor(m => m.Password)
+@Html.PasswordFor(m => m.Password)
+@Html.ValidationMessageFor(m => m.Password)
+<br />
+<input type="submit" value="Entrar"/>
+    
+}
+
