@@ -9,16 +9,20 @@ namespace glimpse.Helpers
     public class CookieHelper
     {
 
-        private HttpCookieCollection _responseCookies = HttpContext.Current.Response.Cookies;
-        private HttpCookieCollection _requestCookies = HttpContext.Current.Request.Cookies;
+        private HttpCookieCollection ResponseCookies;
+        private HttpCookieCollection RequestCookies;
 
 
-        public CookieHelper() { }
+        public CookieHelper()
+        {
+            ResponseCookies = HttpContext.Current.Response.Cookies;
+            RequestCookies = HttpContext.Current.Request.Cookies;
+        }
 
         public CookieHelper(HttpCookieCollection requestCookies, HttpCookieCollection responseCookies)
         {
-            this._requestCookies = requestCookies;
-            this._responseCookies = responseCookies;
+            this.RequestCookies = requestCookies;
+            this.ResponseCookies = responseCookies;
         }
 
 
@@ -29,30 +33,27 @@ namespace glimpse.Helpers
 
         public void addMailAddressCookie(UserViewModel user, DateTime expirationDate)
         {
-            HttpCookie myCookie = this._responseCookies["Login"] ?? new HttpCookie("Login");
+            HttpCookie myCookie = this.ResponseCookies["Login"] ?? new HttpCookie("Login");
             myCookie.Values["Email"] = user.Email;
             myCookie.Values["Password"] = CryptoHelper.EncryptDefaultKey(user.Password);
             myCookie.Expires = expirationDate;
-            this._responseCookies.Add(myCookie);
+            this.ResponseCookies.Add(myCookie);
         }
 
         public UserViewModel getLoginCookie()
         {
-            HttpCookie myCookie = this._requestCookies["Login"];
-            UserViewModel user = new UserViewModel();
-
-            user.Email = myCookie.Values["Email"];
-            user.Password = myCookie.Values["Password"];
+            HttpCookie myCookie = this.RequestCookies["Login"];
+            UserViewModel user = new UserViewModel(myCookie.Values["Email"], CryptoHelper.DecryptDefaultKey(myCookie.Values["Password"]));
 
             return user;
         }
 
         public void clearLoginCookie(String cookieName)
         {
-            HttpCookie myCookie = this._requestCookies["Login"];
+            HttpCookie myCookie = this.RequestCookies["Login"];
             UserViewModel user = new UserViewModel(myCookie.Values["Email"], CryptoHelper.DecryptDefaultKey(myCookie.Values["Password"]));
 
-            this._responseCookies.Remove(cookieName);
+            this.ResponseCookies.Remove(cookieName);
             this.addMailAddressCookie(user, DateTime.Now.AddMonths(-1));
 
         }

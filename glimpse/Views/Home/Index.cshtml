@@ -12,12 +12,11 @@
 <br /><br />
 
 <p>Dirección de Correo: @ViewBag.Email</p><br />S
-<p>Contraseña (cifrada): @ViewBag.PasswordEncrypted</p>
 <p>Contraseña sin cifrar: @ViewBag.Password</p>
 
 @foreach (Message inboxMail in ViewBag.InboxMessages)
 {
-    <p>Email de: @inboxMail.Sender.Email</p>
+    <p>Email de: @inboxMail.From.Email.ToString()</p>
     <p>Asunto: @inboxMail.Subject</p>
-    <p>Fecha: @inboxMail.DateString</p>
+    <p>Fecha: @inboxMail.Date.ToString()</p>
 }

@@ -19,10 +19,9 @@ namespace glimpse.Controllers
 
             UserViewModel user = new CookieHelper().getLoginCookie();
             ViewBag.Email = user.Email;
-            ViewBag.PasswordEncrypted = user.Password;
-            ViewBag.Password = CryptoHelper.DecryptDefaultKey(user.Password);
+            ViewBag.Password= user.Password;
 
-            MailAccount mailAccount = new MailAccount(user.Email, CryptoHelper.DecryptDefaultKey(user.Password));
+            MailAccount mailAccount = new MailAccount(user.Email, user.Password);
             ViewBag.InboxMessages = mailAccount.getInboxMessages();
 
             return View();
