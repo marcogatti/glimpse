@@ -12,19 +12,19 @@ namespace glimpse.Controllers
     public class AccountController : Controller
     {
         //
-        // GET: /Account/
+        // GET: /Account/Login
         [AllowAnonymous]
-        public ActionResult Index(string returnUrl)
+        public ActionResult Login(string returnUrl)
         {        
             return View();
         }
 
         //
-        // POST: /Account/
+        // POST: /Account/Login
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public ActionResult Index(UserViewModel user, string returnUrl)
+        public ActionResult Login(UserViewModel user, string returnUrl)
         {
             if (ModelState.IsValid)
             {
