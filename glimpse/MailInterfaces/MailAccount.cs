@@ -20,5 +20,10 @@ namespace glimpse.MailInterfaces
             this.Fetcher = new Fetcher(username, password);            
         }
 
+        public MessageCollection getInboxMessages()
+        {
+            return this.Fetcher.getInboxMails();
+        }
+
     }
 }

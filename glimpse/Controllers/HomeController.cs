@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Mvc;
 using glimpse.Helpers;
 using glimpse.ViewModels;
+using glimpse.MailInterfaces;
 
 namespace glimpse.Controllers
 {
@@ -19,6 +20,11 @@ namespace glimpse.Controllers
             UserViewModel user = CookieHelper.getMailAddressCookie();
             ViewBag.Email = user.Email;
             ViewBag.PasswordEncrypted = user.Password;
+            ViewBag.Password = CryptoHelper.DecryptDefaultKey(user.Password);
+
+            MailAccount mailAccount = new MailAccount(user.Email, CryptoHelper.DecryptDefaultKey(user.Password));
+            ViewBag.InboxMessages = mailAccount.getInboxMessages();
+
             return View();
         }
 
