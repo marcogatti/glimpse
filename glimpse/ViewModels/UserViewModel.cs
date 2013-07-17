@@ -4,9 +4,9 @@ using System.Linq;
 using System.Web;
 using System.ComponentModel.DataAnnotations;
 
-namespace glimpse.Models
+namespace glimpse.ViewModels
 {
-    public class User
+    public class UserViewModel
     {
         [Required]
         [DataType(DataType.EmailAddress)]
@@ -17,5 +17,9 @@ namespace glimpse.Models
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
         public string Password { get; set; }
+
+        [Display(Name = "Remember me?")]
+        public bool rememberMe { get; set; }
+
     }
 }

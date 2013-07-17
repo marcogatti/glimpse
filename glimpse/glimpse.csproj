@@ -166,10 +166,12 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\CookieHelper.cs" />
+    <Compile Include="Helpers\CryptoHelper.cs" />
     <Compile Include="MailInterfaces\Connector.cs" />
     <Compile Include="MailInterfaces\Fetcher.cs" />
     <Compile Include="MailInterfaces\MailAccount.cs" />
-    <Compile Include="Models\User.cs" />
+    <Compile Include="ViewModels\UserViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -263,6 +265,7 @@
     <Folder Include="App_Data\" />
     <Folder Include="Exceptions\ControllersExceptions\" />
     <Folder Include="Exceptions\ModelsExceptions\" />
+    <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
