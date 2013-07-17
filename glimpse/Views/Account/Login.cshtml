@@ -1,13 +1,12 @@
-﻿@{Html.EnableClientValidation(true); }
-@model glimpse.ViewModels.UserViewModel
+﻿@model glimpse.ViewModels.UserViewModel
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Login";
 }
 
 
 <div class="container">
-        @using (Html.BeginForm("Index", "Account", FormMethod.Post, new {@class = "form-signin"})) 
+        @using (Html.BeginForm("Login", "Account", FormMethod.Post, new {@class = "form-signin"})) 
         {
             @Html.AntiForgeryToken()
             <h2 class="form-signin-heading">Please sign in</h2>
