@@ -4,9 +4,14 @@
     ViewBag.Title = "Index";
 }
 
+
 <h2>Página principal!</h2>
 
-<p>Dirección de Correo: @ViewBag.Email</p><br />
+@Html.ActionLink("Logout", "Logout", "Account")
+
+<br /><br />
+
+<p>Dirección de Correo: @ViewBag.Email</p><br />S
 <p>Contraseña (cifrada): @ViewBag.PasswordEncrypted</p>
 <p>Contraseña sin cifrar: @ViewBag.Password</p>
 
