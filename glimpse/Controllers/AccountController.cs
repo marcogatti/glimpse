@@ -30,13 +30,25 @@ namespace glimpse.Controllers
             {
                 FormsAuthentication.SetAuthCookie(user.Email, user.rememberMe);
 
-                CookieHelper.addMailAddressCookie(user);
+                new CookieHelper().addMailAddressCookie(user);
 
                 return RedirectToLocal(returnUrl);
             }
             ModelState.AddModelError("", "The user name or password provided is incorrect.");
             return View(user);
         }
+
+        //
+        // GET: /Account/
+        [Authorize]
+        public ActionResult Logout()
+        {
+            FormsAuthentication.SignOut();
+            new CookieHelper().clearLoginCookie("Login");
+
+            return Redirect("/");
+        }
+
 
         #region Helpers
 

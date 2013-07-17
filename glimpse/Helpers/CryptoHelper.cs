@@ -13,12 +13,12 @@ namespace glimpse.Helpers
         private static byte[] _salt = Encoding.ASCII.GetBytes("g57kAdgCdfJ52sdgHh");
 
 
-        public static string EncryptDefaultKey(string plainText)
+        public static String EncryptDefaultKey(String plainText)
         {
             return EncryptStringAES(plainText, "PasswordDefault1234");
         }
 
-        public static string DecryptDefaultKey(string cipherText)
+        public static String DecryptDefaultKey(String cipherText)
         {
             return DecryptStringAES(cipherText, "PasswordDefault1234");
         }
@@ -30,7 +30,7 @@ namespace glimpse.Helpers
         /// </summary>
         /// <param name="plainText">The text to encrypt.</param>
         /// <param name="sharedSecret">A password used to generate a key for encryption.</param>
-        public static string EncryptStringAES(string plainText, string sharedSecret)
+        public static String EncryptStringAES(String plainText, String sharedSecret)
         {
             if (string.IsNullOrEmpty(plainText))
                 throw new ArgumentNullException("plainText");
@@ -86,11 +86,11 @@ namespace glimpse.Helpers
         /// </summary>
         /// <param name="cipherText">The text to decrypt.</param>
         /// <param name="sharedSecret">A password used to generate a key for decryption.</param>
-        public static string DecryptStringAES(string cipherText, string sharedSecret)
+        public static String DecryptStringAES(String cipherText, String sharedSecret)
         {
-            if (string.IsNullOrEmpty(cipherText))
+            if (String.IsNullOrEmpty(cipherText))
                 throw new ArgumentNullException("cipherText");
-            if (string.IsNullOrEmpty(sharedSecret))
+            if (String.IsNullOrEmpty(sharedSecret))
                 throw new ArgumentNullException("sharedSecret");
 
             // Declare the RijndaelManaged object
@@ -99,7 +99,7 @@ namespace glimpse.Helpers
 
             // Declare the string used to hold
             // the decrypted text.
-            string plaintext = null;
+            String plaintext = null;
 
             try
             {
