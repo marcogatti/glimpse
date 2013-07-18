@@ -24,7 +24,14 @@ namespace glimpse.MailInterfaces
         private MessageCollection GetMails(string mailBox, string searchPhrase)
         {
             Mailbox mails = this.receiver.SelectMailbox(mailBox);
-            MessageCollection messages = mails.SearchParse(searchPhrase);
+            Int32[] localMailsID = mails.Search("ALL");
+            MessageCollection messages = new MessageCollection();
+
+            for (int i = 0; i <= 1; i++)
+            {
+                messages.Add(mails.Fetch.MessageObject(localMailsID[i]));
+            }
+
             return messages;
         }
 

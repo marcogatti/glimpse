@@ -171,7 +171,7 @@
     </Compile>
     <Compile Include="Helpers\CookieHelper.cs" />
     <Compile Include="Helpers\CryptoHelper.cs" />
-    <Compile Include="Helpers\LocalizationHelper.cs" />
+    <Compile Include="Helpers\InternationalizationHelper.cs" />
     <Compile Include="MailInterfaces\Connector.cs" />
     <Compile Include="MailInterfaces\Fetcher.cs" />
     <Compile Include="MailInterfaces\MailAccount.cs" />
