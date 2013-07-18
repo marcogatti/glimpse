@@ -8,26 +8,23 @@ namespace glimpse.Helpers
 {
     public class LocalizationHelper
     {
-
         private XmlTextReader localization;
-
-
-
+        
         public LocalizationHelper()
         {
             String relFilePath = System.Configuration.ConfigurationManager.AppSettings["LocalizationFilePath"];
             this.localization = new XmlTextReader(HttpContext.Current.Server.MapPath(relFilePath));
         }
 
-        public String getString(LocSearchCriteria criteria)
+        public String getString(SearchCriteria criteria)
         {
-            while (this.moreTagsComming("module"))
+            while (this.moreTagsComing("module"))
             {
                 if (!this.currentAttributeHasValue(criteria.ModuleId)) continue;
-                while (this.moreTagsComming("texts"))
+                while (this.moreTagsComing("texts"))
                 {
                     if (!this.currentAttributeHasValue(criteria.Key)) continue;
-                    while (this.moreTagsComming("text"))
+                    while (this.moreTagsComing("text"))
                     {
                         if (!this.currentAttributeHasValue(criteria.Lang)) continue;
                         return this.getNextElement();
@@ -35,15 +32,16 @@ namespace glimpse.Helpers
 
                     throw new ItemNotFoundException(searchToString(criteria));
                 }
-
             }
-
             throw new ItemNotFoundException(searchToString(criteria));
-
         }
 
+        private bool moreTagsComing(String tag)
+        {
+            return this.localization.ReadToFollowing(tag);
+        }
 
-        private static string searchToString(LocSearchCriteria criteria)
+        private static string searchToString(SearchCriteria criteria)
         {
             return "Module: " + criteria.ModuleId + " Texts: " + criteria.Key + " Text: " + criteria.Lang;
         }
@@ -52,12 +50,7 @@ namespace glimpse.Helpers
         {
             this.localization.MoveToElement();
             return this.localization.ReadElementContentAsString();
-        }
-
-        private bool moreTagsComming(String tag)
-        {
-            return this.localization.ReadToFollowing(tag);
-        }
+        }       
 
         private bool currentAttributeHasValue(String value)
         {
@@ -65,16 +58,14 @@ namespace glimpse.Helpers
             return localization.ReadContentAsString().Equals(value);
         }
     }
-
-
-
-    public class LocSearchCriteria
+    
+    public class SearchCriteria
     {
         public String ModuleId { set; get; }
         public String Key { set; get; }
         public String Lang { set; get; }
 
-        public LocSearchCriteria(String moduleId, String key, String lang)
+        public SearchCriteria(String moduleId, String key, String lang)
         {
             this.ModuleId = moduleId;
             this.Key = key;

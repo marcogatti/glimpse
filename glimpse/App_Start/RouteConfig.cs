@@ -11,18 +11,10 @@ namespace glimpse
     {
         public static void RegisterRoutes(RouteCollection routes)
         {
-            routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
-
             routes.MapRoute(
-                name: "Login",
-                url: "Login",
-                defaults: new { controller = "Account", action = "Login" }
-            );
-
-            routes.MapRoute(
-                name: "Logout",
-                url: "Logout",
-                defaults: new { controller = "Account", action = "Logout" }
+                name: "Account",
+                url: "{action}",
+                defaults: new { controller = "Account" }
             );
 
             routes.MapRoute(
