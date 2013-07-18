@@ -178,6 +178,7 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Exceptions\GlimpseException.cs" />
+    <Compile Include="Exceptions\MailInterfacesExceptions\InvalidAuthenticationException.cs" />
     <Compile Include="Exceptions\MailInterfacesExceptions\InvalidConnectionException.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Global.asax.cs">

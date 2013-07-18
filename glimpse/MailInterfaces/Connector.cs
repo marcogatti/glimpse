@@ -14,13 +14,13 @@ namespace glimpse.MailInterfaces
 
         public Connector()
         {
-            this.Client = new Imap4Client();
+            this.Client = new Imap4Client();            
         }
 
         public Imap4Client Login(String username, String password)
         {
             this.Connect(true);
-            this.Client.Login(username, password);
+            this.AttemptLogin(username, password);
 
             return this.Client;
         }
@@ -34,6 +34,18 @@ namespace glimpse.MailInterfaces
             else
             {
                 throw new InvalidConnectionException("No se puede realizar conexion a Gmail sin SSL");
+            }
+        }
+
+        private void AttemptLogin(String username, String password)
+        {
+            try
+            {
+                this.Client.Login(username, password);
+            }
+            catch(Imap4Exception imapException)
+            {
+                throw new InvalidAuthenticationException(imapException.Message, "El usuario o la contraseña son inválidos");
             }
         }
 
