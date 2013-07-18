@@ -1,4 +1,5 @@
-﻿@model glimpse.ViewModels.UserViewModel
+﻿@using glimpse.Helpers
+@model glimpse.ViewModels.UserViewModel
 
 @{
     ViewBag.Title = "Login";
@@ -9,7 +10,7 @@
         @using (Html.BeginForm("Login", "Account", FormMethod.Post, new {@class = "form-signin"})) 
         {
             @Html.AntiForgeryToken()
-            <h2 class="form-signin-heading">Please sign in</h2>
+            <h2 class="form-signin-heading">@(new LocalizationHelper().getString(new LocSearchCriteria("dummy","Login","en")))</h2>
 
             @Html.TextBoxFor(m => m.Email, new { type = "email", placeholder = "address@example.com", @class = "input-block-level" })
             @Html.ValidationMessageFor(m => m.Email)

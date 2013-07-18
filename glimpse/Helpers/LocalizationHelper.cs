@@ -11,9 +11,12 @@ namespace glimpse.Helpers
 
         private XmlTextReader localization;
 
-        public LocalizationHelper(String localizationFileName)
+
+
+        public LocalizationHelper()
         {
-            this.localization = new XmlTextReader(HttpContext.Current.Server.MapPath("/App_LocalResources/" + localizationFileName));
+            String relFilePath = System.Configuration.ConfigurationManager.AppSettings["LocalizationFilePath"];
+            this.localization = new XmlTextReader(HttpContext.Current.Server.MapPath(relFilePath));
         }
 
         public String getString(LocSearchCriteria criteria)
@@ -26,8 +29,11 @@ namespace glimpse.Helpers
                     if (!this.currentAttributeHasValue(criteria.Key)) continue;
                     while (this.moreTagsComming("text"))
                     {
-                        return textInLanguage(criteria.Lang, criteria);
+                        if (!this.currentAttributeHasValue(criteria.Lang)) continue;
+                        return this.getNextElement();
                     }
+
+                    throw new ItemNotFoundException(searchToString(criteria));
                 }
 
             }
@@ -36,14 +42,6 @@ namespace glimpse.Helpers
 
         }
 
-        private string textInLanguage(String lang, LocSearchCriteria criteria)
-        {
-            if (this.currentAttributeHasValue(lang))
-            {
-                return this.getNextElement();
-            }
-            throw new ItemNotFoundException(searchToString(criteria));
-        }
 
         private static string searchToString(LocSearchCriteria criteria)
         {
