@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using glimpse.ViewModels;
 using glimpse.Helpers;
 using System.Web.Security;
+using System.Xml;
 
 namespace glimpse.Controllers
 {

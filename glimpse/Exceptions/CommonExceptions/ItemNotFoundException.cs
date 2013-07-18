@@ -6,9 +6,9 @@ using glimpse.Exceptions;
 
 namespace glimpse.Exceptions.CommonExceptions
 {
-    public class ItemNotFoundException : GlimpseException
+    public class LanguageElementNotFoundException : GlimpseException
     {
-        public ItemNotFoundException(String glimpseMessage) : base(glimpseMessage)
+        public LanguageElementNotFoundException(String glimpseMessage) : base(glimpseMessage)
         {
         }
     }
