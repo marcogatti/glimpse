@@ -112,6 +112,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Internationalization\TextsTest.cs" />
     <Compile Include="MailInterfaces\ConnectorTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MailInterfaces\FetcherTest.cs" />
