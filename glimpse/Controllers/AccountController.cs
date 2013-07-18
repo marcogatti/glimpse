@@ -15,7 +15,7 @@ namespace glimpse.Controllers
         // GET: /Account/Login
         [AllowAnonymous]
         public ActionResult Login(string returnUrl)
-        {        
+        {
             return View();
         }
 

@@ -16,7 +16,8 @@
             @Html.PasswordFor(m => m.Password, new { placeholder = "Password...", @class = "input-block-level" })
             @Html.ValidationMessageFor(m => m.Password)
             @Html.CheckBoxFor(m => m.rememberMe, new { @class = "input-block-level" })
-            @Html.DisplayTextFor(m => m.rememberMe)
+            @Html.LabelFor(m => m.rememberMe)
+         
             <br />
             <input class="btn btn-large btn-primary" type="submit" value="Entrar" />
     
