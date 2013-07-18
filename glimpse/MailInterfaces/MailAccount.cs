@@ -8,21 +8,21 @@ namespace glimpse.MailInterfaces
 {
     public class MailAccount
     {
+        private Fetcher fetcher { get; set; }
+
         public String Username { get; set; }
         public String Password { get; set; }
-
-        private Fetcher Fetcher { get; set; }           
 
         public MailAccount(String username, String password)
         {
             this.Username = username;
             this.Password = password;
-            this.Fetcher = new Fetcher(username, password);            
+            this.fetcher = new Fetcher(username, password);            
         }
 
-        public MessageCollection getInboxMessages()
+        public MessageCollection GetInboxMessages()
         {
-            return this.Fetcher.getInboxMails();
+            return this.fetcher.GetInboxMails();
         }
 
     }

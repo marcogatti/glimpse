@@ -22,7 +22,7 @@ namespace glimpse.Controllers
             ViewBag.Password= user.Password;
 
             MailAccount mailAccount = new MailAccount(user.Email, user.Password);
-            ViewBag.InboxMessages = mailAccount.getInboxMessages();
+            ViewBag.InboxMessages = mailAccount.GetInboxMessages();
 
             return View();
         }

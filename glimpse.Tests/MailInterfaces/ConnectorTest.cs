@@ -1,8 +1,9 @@
 ﻿using System;
+using NUnit.Framework;
 using ActiveUp.Net.Imap4;
 using glimpse.MailInterfaces;
 using glimpse.Exceptions.MailInterfacesExceptions;
-using NUnit.Framework;
+
 
 namespace glimpse.Tests.MailInterfaces
 {
@@ -12,13 +13,13 @@ namespace glimpse.Tests.MailInterfaces
         private Connector myConnector;
 
         [SetUp]
-        public void SetUp()
+        public void Set_Up()
         {
             myConnector = new Connector();
         }
 
         [Test]
-        public void LoginReturnsAConnectedImapClient()
+        public void Login_Returns_A_Connected_Imap_Client()
         {
             
             Assert.AreEqual(true, myConnector.Login("test.imap.506@gmail.com", "ytrewq123").IsConnected);
@@ -26,16 +27,16 @@ namespace glimpse.Tests.MailInterfaces
 
         [Test]
         [ExpectedException(typeof(InvalidAuthenticationException))]
-        public void LoginWithWrongPasswordThrowsAuthenticationException()
+        public void Login_With_Wrong_Password_Throws_Authentication_Exception()
         {
             myConnector.Login("test.imap.506@gmail.com", "wrongPassword");            
         }
 
         [Test]
         [ExpectedException(typeof(InvalidAuthenticationException))]
-        public void LoginWithWrongUsernameThrowsAuthenticationException()
+        public void Login_With_Wrong_Username_Throws_Authentication_Exception()
         {
-            myConnector.Login("test.imap.506@gmailcom", "ytrewq123");
+            myConnector.Login("wrongLogin", "ytrewq123");
         }
     }
 }

@@ -1,14 +1,25 @@
 ﻿using System;
 using NUnit.Framework;
+using ActiveUp.Net.Imap4;
+using glimpse.MailInterfaces;
 
 namespace glimpse.Tests
 {
     [TestFixture]
     public class FetcherTest
     {
-        [Test]
-        public void TestNumberOne()
+        Fetcher myFetcher;
+
+        [SetUp]
+        public void SetUp()
         {
+            myFetcher = new Fetcher("test.imap.506@gmail.com", "ytrewq123");
+        }
+
+        [Test]
+        public void Get_Inbox_Mails_Retrieves_Inbox_From_Account()
+        {
+            Assert.IsNotEmpty(myFetcher.GetInboxMails());
         }
     }
 }

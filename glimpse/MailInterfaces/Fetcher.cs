@@ -16,9 +16,9 @@ namespace glimpse.MailInterfaces
             this.receiver = new Connector().Login(username, password);
         }
 
-        public MessageCollection getInboxMails()
+        public MessageCollection GetInboxMails()
         {
-            return GetMails("INBOX", "ALL");
+            return this.GetMails("INBOX", "ALL");
         }
 
         private MessageCollection GetMails(string mailBox, string searchPhrase)
