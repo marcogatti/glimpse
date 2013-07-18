@@ -6,10 +6,9 @@
     <title>@ViewBag.Title</title>
     @Styles.Render("~/Content/css")
     @Styles.Render("~/bootstrap/css")
-    @Styles.Render("~/login/css")
-    @Styles.Render("~/home/css")
     @Styles.Render("~/bootstrap-responsive/css")
     @Scripts.Render("~/bundles/modernizr")
+    @RenderSection("css", required: false)
 </head>
 <body>
     @RenderBody()
@@ -17,5 +16,6 @@
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
     @RenderSection("scripts", required: false)
+
 </body>
 </html>
