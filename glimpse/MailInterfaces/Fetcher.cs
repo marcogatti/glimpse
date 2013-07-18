@@ -27,5 +27,7 @@ namespace glimpse.MailInterfaces
             MessageCollection messages = mails.SearchParse(searchPhrase);
             return messages;
         }
+
+        
     }
 }
