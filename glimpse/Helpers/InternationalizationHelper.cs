@@ -8,29 +8,24 @@ namespace glimpse.Helpers
 {
     public class InternationalizationHelper
     {
-
-        private XmlDocument localization;
-
-
+        private XmlDocument languageSource;
 
         public InternationalizationHelper()
         {
-            String relFilePath = System.Configuration.ConfigurationManager.AppSettings["LocalizationFilePath"];
-            this.localization = new XmlDocument();
-            this.localization.Load(HttpContext.Current.Server.MapPath(relFilePath));
+            String relFilePath = System.Configuration.ConfigurationManager.AppSettings["InternationalizationFilePath"];
+            this.languageSource = new XmlDocument();
+            this.languageSource.Load(HttpContext.Current.Server.MapPath(relFilePath));
         }
 
         public InternationalizationHelper(String languageFilePath)
         {
-            this.localization = new XmlDocument();
-            this.localization.Load(languageFilePath);
+            this.languageSource = new XmlDocument();
+            this.languageSource.Load(languageFilePath);
         }
 
-
-        public String getLanguageElement(String moduleId, String key, String lang)
+        public String GetLanguageElement(String moduleId, String key, String lang)
         {
-
-            XmlNodeList nodeList = this.localization.SelectNodes("//module[@id='" + moduleId +
+            XmlNodeList nodeList = this.languageSource.SelectNodes("//module[@id='" + moduleId +
                                                                  "']/texts[@id='" + key +
                                                                  "']/text[@lang='" + lang + "']");
 
@@ -42,11 +37,9 @@ namespace glimpse.Helpers
             {
                 throw new LanguageElementNotFoundException(searchCriteriaToString(moduleId, key, lang));
             }
-
         }
 
-
-        private static string searchCriteriaToString(String moduleId, String key, String lang)
+        private string searchCriteriaToString(String moduleId, String key, String lang)
         {
             return "Module: " + moduleId + " Texts: " + key + " Text: " + lang;
         }
