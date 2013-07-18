@@ -1,22 +1,107 @@
 ﻿@using ActiveUp.Net.Mail
 
+@section css {
+    @Styles.Render("~/home/css")}
+
 @{
     ViewBag.Title = "Index";
 }
 
 
-<h2>Página principal!</h2>
+<div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container-fluid">
+            <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="brand" href="#">glimpse</a>
+            <div class="nav-collapse collapse">
+                <p class="navbar-text pull-right">
+                    Logged in as <a href="#" class="navbar-link">@ViewBag.Email</a>
+                    @Html.ActionLink("Logout", "Logout", "Account", null, new { @class= "navbar-link"})
+                </p>
+                <ul class="nav">
+                    <li class="active"><a href="#">Home</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </div>
+            <!--/.nav-collapse -->
+        </div>
+    </div>
+</div>
 
-@Html.ActionLink("Logout", "Logout", "Account")
+<div class="container-fluid">
 
-<br /><br />
+    <div class="row-fluid">
+        <div class="span2">
+            <div class="well sidebar-nav">
+                <ul class="nav nav-list">
+                    <li class="nav-header">Sidebar</li>
+                    <li class="active"><a href="#">Link</a></li>
+                    <li><a href="#">Link</a></li>
+                    <li class="nav-header">Sidebar</li>
+                    <li><a href="#">Link</a></li>
+                    <li class="nav-header">Sidebar</li>
+                    <li><a href="#">Link</a></li>
 
-<p>Dirección de Correo: @ViewBag.Email</p><br />S
-<p>Contraseña sin cifrar: @ViewBag.Password</p>
+                </ul>
+            </div>
+            <!--/.well -->
+        </div>
+        <!--/span-->
+        <div class="span10">
+            <div class="hero-unit">
+                <h1>Página principal</h1>
+                <br />
+                <p>Dirección de Correo: @ViewBag.Email</p>
+                <p>Contraseña sin cifrar: @ViewBag.Password</p>
+            </div>
 
-@foreach (Message inboxMail in ViewBag.InboxMessages)
-{
-    <p>Email de: @inboxMail.From.Email.ToString()</p>
-    <p>Asunto: @inboxMail.Subject</p>
-    <p>Fecha: @inboxMail.Date.ToString()</p>
-}
+            <div id="example" class="modal hide fade in" style="display: none;">
+                <div class="modal-header">
+                    <a class="close" data-dismiss="modal">×</a>
+                    <h3>This is a Modal Heading</h3>
+                </div>
+                <div class="modal-body">
+                    <h4>Text in a modal</h4>
+                    <p>You can add some text here.</p>
+                </div>
+                <div class="modal-footer">
+                    <a href="#" class="btn btn-success">Call to action</a>
+                    <a href="#" class="btn" data-dismiss="modal">Close</a>
+                </div>
+            </div>
+
+            <div class="row-fluid">
+
+                @foreach (Message inboxMail in ViewBag.InboxMessages)
+                {
+                    <a data-toggle="modal" href="#example" data-body-text="@inboxMail.BodyText.Text">
+                        <div class="circle">
+                            <h4>@inboxMail.Subject</h4>
+                            <h5>@inboxMail.Date.ToString()</h5>
+                            <p>@inboxMail.From.Email.ToString()</p>
+                        </div>
+                    </a>
+                }
+
+            </div>
+            <!--/row-->
+        </div>
+        <!--/span-->
+    </div>
+    <!--/row-->
+
+    <hr>
+
+    <footer>
+        <p>&copy; glimpse 2013</p>
+    </footer>
+
+</div>
+
+
+<!--/.fluid-container-->
