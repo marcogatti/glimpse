@@ -17,7 +17,7 @@
             <div class="nav-collapse collapse">
                 <p class="navbar-text pull-right">
                     Logged in as <a href="#" class="navbar-link">@ViewBag.Email</a>
-                    @Html.ActionLink("Logout", "Logout", "Account", new { @class= "navbar-link"})
+                    @Html.ActionLink("Logout", "Logout", "Account", null, new { @class= "navbar-link"})
                 </p>
                 <ul class="nav">
                     <li class="active"><a href="#">Home</a></li>
@@ -59,7 +59,7 @@
 
                 @foreach (Message inboxMail in ViewBag.InboxMessages)
                 {
-                    <div class="span4">
+                    <div class="circle">
                         <h4>@inboxMail.Subject</h4>
                         <h5>@inboxMail.Date.ToString()</h5>
                         <p>@inboxMail.From.Email.ToString()</p>
