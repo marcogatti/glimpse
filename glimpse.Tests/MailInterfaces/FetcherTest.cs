@@ -7,7 +7,7 @@ namespace glimpse.Tests
     public class FetcherTest
     {
         [Test]
-        public void Test1()
+        public void TestNumberOne()
         {
         }
     }

@@ -15,6 +15,12 @@ namespace glimpse.Exceptions
             this.GlimpseMessage = glimpseMessage;
         }
 
+        public GlimpseException(String systemMessage, String glimpseMessage)
+        {
+            this.GlimpseMessage = glimpseMessage;
+            this.SystemMessage = systemMessage;
+        }
+
         public GlimpseException(SystemException exception, String glimpseMessage)
         {
             this.GlimpseMessage = glimpseMessage;
