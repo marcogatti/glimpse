@@ -17,7 +17,7 @@ namespace glimpse.Tests
         }
 
         [Test]
-        public void Get_Inbox_Mails_Retrieves_Inbox_From_Account()
+        public void Get_Inbox_Retrieves_Mails_From_Account()
         {
             Assert.IsNotEmpty(myFetcher.GetInboxMails());
         }
