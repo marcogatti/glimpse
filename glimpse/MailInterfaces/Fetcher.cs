@@ -75,6 +75,30 @@ namespace glimpse.MailInterfaces
             return targetMailbox.MessageCount;
         }
 
+        public String getBodyFromMail(String mailbox, Int32 uniqueMailID)
+        {
+            Mailbox targetMailbox = this.getMailbox(mailbox);
+            //Devuelve el texto con los tags HTML del mail
+            return targetMailbox.Fetch.UidMessageObject(uniqueMailID).BodyHtml.Text;
+        }
+        public byte[] getAttachmentFromMail(String mailbox, Int32 uniqueMailID, String attachmentName)
+        {
+            Mailbox targetMailbox = this.getMailbox(mailbox);
+            AttachmentCollection attachmentsInMail = targetMailbox.Fetch.UidMessageObject(uniqueMailID).Attachments;
+            Attachment desiredAttachment;
+            try
+            {
+                desiredAttachment = attachmentsInMail.Cast<Attachment>()
+                                              .Where<Attachment>(x => x.Filename == attachmentName)
+                                              .Single<Attachment>();
+            }
+            catch (System.InvalidOperationException systemException)
+            {
+                throw new InvalidAttachmentException(systemException.Message ,"Se pide un archivo adjunto que no existe, o más de un adjunto posee el mismo nombre.");
+            }
+            return desiredAttachment.BinaryContent;
+        }
+
         private Mailbox getMailbox(String targetMailboxName)
         {
             if (this.currentOpenedMailbox == null)
