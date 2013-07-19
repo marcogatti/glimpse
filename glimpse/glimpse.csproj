@@ -171,7 +171,6 @@
     </Compile>
     <Compile Include="Helpers\CookieHelper.cs" />
     <Compile Include="Helpers\CryptoHelper.cs" />
-    <Compile Include="Helpers\LocalizationHelper.cs" />
     <Compile Include="MailInterfaces\Connector.cs" />
     <Compile Include="MailInterfaces\Fetcher.cs" />
     <Compile Include="MailInterfaces\MailAccount.cs" />
@@ -182,8 +181,8 @@
     <Content Include="App_LocalResources\Texts.xml" />
     <Content Include="Content\bootstrap-responsive.css" />
     <Content Include="Content\bootstrap.css" />
-    <Content Include="Content\home.css" />
-    <Content Include="Content\login.css" />
+    <Content Include="Content\Home.css" />
+    <Content Include="Content\Login.css" />
     <Content Include="Content\themes\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />
     <Content Include="Content\themes\base\images\ui-bg_flat_75_ffffff_40x100.png" />
     <Content Include="Content\themes\base\images\ui-bg_glass_55_fbf9ee_1x400.png" />
