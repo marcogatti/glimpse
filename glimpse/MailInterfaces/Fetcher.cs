@@ -21,33 +21,36 @@ namespace glimpse.MailInterfaces
 
         public MessageCollection getInboxMails()
         {
-            return this.getMails("INBOX", "ALL");
+            return this.getAllMailsFrom("INBOX");
         }
-        private MessageCollection getMails(String mailBox, String searchPhrase)
+        public MessageCollection getAllMailsFrom(String mailbox)
         {
-            Mailbox mails = this.receiver.SelectMailbox(mailBox);
-            Int32[] localMailsID = mails.Search("ALL");
+            Mailbox targetMail = this.getMailbox(mailbox);
+            Int32 amountOfMails = targetMail.MessageCount;
             MessageCollection messages = new MessageCollection();
 
-            for (int i = 0; i <= (localMailsID.Length -1); i++)
+            for (int i = amountOfMails; i > 0; i--)
             {
-                //messages.Add(mails.Fetch.MessageObject(localMailsID[i]));
-                System.Diagnostics.Debug.WriteLine(mails.Fetch.MessageObject(localMailsID[i]).DateString);
+                messages.Add(targetMail.Fetch.MessageObject(i));
             }
 
-            this.receiver.Close();
             return messages;
         }
 
-        public MessageCollection getAllMailsFrom(String mailbox)
+        public Int32 getAmountOfMailsFrom(String mailbox)
         {
-            return this.getLastXMailsFrom(mailbox, this.getAmountOfMailsFrom(mailbox));
+            Mailbox targetMailbox = this.getMailbox(mailbox);
+            return targetMailbox.MessageCount;
         }
-        public MessageCollection getLastXMailsFrom(String mailbox, Int32 amountToRetrieve)
+        public HeaderCollection getAllHeadersFrom(String mailbox)
         {
-            return this.getMiddleMailsFrom(mailbox,amountToRetrieve, 0);
+            return this.getLastXHeadersFrom(mailbox, this.getAmountOfMailsFrom(mailbox));
         }
-        public MessageCollection getMiddleMailsFrom(String mailbox, Int32 amountToRetrieve, Int32 startingMailOrdinal)
+        public HeaderCollection getLastXHeadersFrom(String mailbox, Int32 amountToRetrieve)
+        {
+            return this.getMiddleHeadersFrom(mailbox,amountToRetrieve, 0);
+        }
+        public HeaderCollection getMiddleHeadersFrom(String mailbox, Int32 amountToRetrieve, Int32 startingMailOrdinal)
         {
             Mailbox targetMailbox = this.getMailbox(mailbox);
             Int32 amountOfMails = targetMailbox.MessageCount;
@@ -57,22 +60,16 @@ namespace glimpse.MailInterfaces
                 throw new MailReadingOverflowException("Se está pidiendo obtener más mails de los que posee el mailbox o leer más allá del último mail.");
             }
 
-            MessageCollection mailsRetrieved = new MessageCollection();
+            HeaderCollection headersRetrieved = new HeaderCollection();
 
             //startingMailOrdinal: 0 representa el más reciente, a mayor valor, más antigüedad
             for (Int32 currentMail = amountOfMails - startingMailOrdinal;
                        currentMail > amountOfMails - startingMailOrdinal - amountToRetrieve;
                        currentMail--)
             {
-                mailsRetrieved.Add(targetMailbox.Fetch.MessageObject(currentMail));
+                headersRetrieved.Add(targetMailbox.Fetch.HeaderObject(currentMail));
             }
-
-            return mailsRetrieved;
-        }
-        public Int32 getAmountOfMailsFrom(String mailbox)
-        {
-            Mailbox targetMailbox = this.getMailbox(mailbox);
-            return targetMailbox.MessageCount;
+            return headersRetrieved;
         }
 
         public String getBodyFromMail(String mailbox, Int32 uniqueMailID)
@@ -80,6 +77,11 @@ namespace glimpse.MailInterfaces
             Mailbox targetMailbox = this.getMailbox(mailbox);
             //Devuelve el texto con los tags HTML del mail
             return targetMailbox.Fetch.UidMessageObject(uniqueMailID).BodyHtml.Text;
+        }
+        public Header getHeaderFromMail(String mailbox, Int32 uniqueMailID)
+        {
+            Mailbox targetMailbox = this.getMailbox(mailbox);
+            return targetMailbox.Fetch.UidHeaderObject(uniqueMailID);
         }
         public byte[] getAttachmentFromMail(String mailbox, Int32 uniqueMailID, String attachmentName)
         {

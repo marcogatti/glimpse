@@ -19,7 +19,7 @@ namespace glimpse.Tests
         [Test]
         public void Get_Inbox_Retrieves_Mails_From_Account()
         {
-            Assert.IsNotEmpty(myFetcher.GetInboxMails());
+            Assert.IsNotEmpty(myFetcher.getInboxMails());
         }
     }
 }
