@@ -174,7 +174,9 @@
     <Compile Include="Helpers\InternationalizationHelper.cs" />
     <Compile Include="MailInterfaces\Connector.cs" />
     <Compile Include="MailInterfaces\Fetcher.cs" />
+    <Compile Include="Exceptions\MailInterfacesExceptions\InvalidAttachmentException.cs" />
     <Compile Include="MailInterfaces\MailAccount.cs" />
+    <Compile Include="Exceptions\MailInterfacesExceptions\MailReadingOverflowException.cs" />
     <Compile Include="ViewModels\UserViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

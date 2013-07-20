@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
+using System.Text;
 
 namespace glimpse.Exceptions.MailInterfacesExceptions
 {
-    public class InvalidConnectionException : GlimpseException
+    public class MailReadingOverflowException : GlimpseException
     {
-        public InvalidConnectionException(String glimpseMessage)
+        public MailReadingOverflowException(String glimpseMessage)
             : base(glimpseMessage)
         {
         }
