@@ -8,7 +8,8 @@ namespace glimpse.Exceptions.CommonExceptions
 {
     public class LanguageElementNotFoundException : GlimpseException
     {
-        public LanguageElementNotFoundException(String glimpseMessage) : base(glimpseMessage)
+        public LanguageElementNotFoundException(String glimpseMessage)
+            : base(glimpseMessage)
         {
         }
     }

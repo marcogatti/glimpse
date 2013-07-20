@@ -9,30 +9,40 @@ namespace glimpse.Helpers
     public class InternationalizationHelper
     {
 
-        private XmlDocument localization;
+        private XmlDocument localizationDocument;
+        private String defaultLanguage;
 
 
-
-        public InternationalizationHelper()
+        public static InternationalizationHelper buildForLanguage(String defaultLanguage = null)
         {
             String relFilePath = System.Configuration.ConfigurationManager.AppSettings["LocalizationFilePath"];
-            this.localization = new XmlDocument();
-            this.localization.Load(HttpContext.Current.Server.MapPath(relFilePath));
+            return buildForLanguage(HttpContext.Current.Server.MapPath(relFilePath), defaultLanguage);
         }
 
-        public InternationalizationHelper(String languageFilePath)
+        public static InternationalizationHelper buildForLanguage(String languageFilePath, String defaultLanguage = null)
         {
-            this.localization = new XmlDocument();
-            this.localization.Load(languageFilePath);
+            return new InternationalizationHelper(languageFilePath, defaultLanguage);
+        }
+
+        public String getLanguageElement(String moduleId, String key)
+        {
+            if (this.defaultLanguage != null)
+            {
+                return this.getLanguageElement(moduleId, key, this.defaultLanguage);
+            }
+            else
+            {
+                throw new LanguageElementNotFoundException("Lang not presetted");
+            }
         }
 
 
         public String getLanguageElement(String moduleId, String key, String lang)
         {
 
-            XmlNodeList nodeList = this.localization.SelectNodes("//module[@id='" + moduleId +
-                                                                 "']/texts[@id='" + key +
-                                                                 "']/text[@lang='" + lang + "']");
+            String searchString = "//module[@id='" + moduleId + "']/texts[@id='" + key + "']/text[@lang='" + lang + "']";
+
+            XmlNodeList nodeList = this.localizationDocument.SelectNodes(searchString);
 
             if (nodeList.Count > 0)
             {
@@ -40,15 +50,22 @@ namespace glimpse.Helpers
             }
             else
             {
-                throw new LanguageElementNotFoundException(searchCriteriaToString(moduleId, key, lang));
+                throw new LanguageElementNotFoundException("Search string: " + searchString);
             }
 
         }
 
-
-        private static string searchCriteriaToString(String moduleId, String key, String lang)
+        private InternationalizationHelper(String languageFilePath, String language)
         {
-            return "Module: " + moduleId + " Texts: " + key + " Text: " + lang;
+            loadLanguageFile(languageFilePath);
+            this.defaultLanguage = language;
+        }
+
+        private void loadLanguageFile(String filePath)
+
+        {
+            this.localizationDocument = new XmlDocument();
+            this.localizationDocument.Load(filePath);
         }
     }
 }
