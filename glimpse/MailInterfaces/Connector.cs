@@ -33,10 +33,9 @@ namespace glimpse.MailInterfaces
             }
             else
             {
-                throw new InvalidConnectionException("No se puede realizar conexion a Gmail sin SSL");
+                throw new InvalidConnectionException("No se puede realizar conexion a Gmail sin SSL.");
             }
         }
-
         private void AttemptLogin(String username, String password)
         {
             try
@@ -45,7 +44,7 @@ namespace glimpse.MailInterfaces
             }
             catch(Imap4Exception imapException)
             {
-                throw new InvalidAuthenticationException(imapException.Message, "El usuario o la contraseña son inválidos");
+                throw new InvalidAuthenticationException(imapException.Message, "El usuario o la contraseña son inválidos.");
             }
         }
 
