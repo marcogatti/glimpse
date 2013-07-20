@@ -62,7 +62,7 @@ namespace glimpse.MailInterfaces
 
             HeaderCollection headersRetrieved = new HeaderCollection();
 
-            //startingMailOrdinal: 0 representa el más reciente, a mayor valor, más antigüedad
+            //startingMailOrdinal: 0 representa el más reciente. A mayor valor, más antigüedad.
             for (Int32 currentMail = amountOfMails - startingMailOrdinal;
                        currentMail > amountOfMails - startingMailOrdinal - amountToRetrieve;
                        currentMail--)
@@ -70,6 +70,18 @@ namespace glimpse.MailInterfaces
                 headersRetrieved.Add(targetMailbox.Fetch.HeaderObject(currentMail));
             }
             return headersRetrieved;
+        }
+        public Int32[] getAllUIDsFrom(String mailbox)
+        {
+            Mailbox targetMailbox = this.getMailbox(mailbox);
+            Int32 amountOfMails = targetMailbox.MessageCount;
+            Int32[] UIDList = new Int32[amountOfMails];
+
+            for (Int32 currentMail = amountOfMails; currentMail > 0; currentMail--)
+            {
+                UIDList[amountOfMails-currentMail] = targetMailbox.Fetch.Uid(currentMail);
+            }
+            return UIDList; //UIDList[0] representa el mail más reciente. A mayor valor, mayor antigüedad.
         }
 
         public String getBodyFromMail(String mailbox, Int32 uniqueMailID)
@@ -83,16 +95,21 @@ namespace glimpse.MailInterfaces
             Mailbox targetMailbox = this.getMailbox(mailbox);
             return targetMailbox.Fetch.UidHeaderObject(uniqueMailID);
         }
+        public Message getSpecificMail(String mailbox, Int32 uniqueMailID)
+        {
+            Mailbox targetMailbox = this.getMailbox(mailbox);
+            return targetMailbox.Fetch.UidMessageObject(uniqueMailID);
+        }
         public byte[] getAttachmentFromMail(String mailbox, Int32 uniqueMailID, String attachmentName)
         {
             Mailbox targetMailbox = this.getMailbox(mailbox);
             AttachmentCollection attachmentsInMail = targetMailbox.Fetch.UidMessageObject(uniqueMailID).Attachments;
-            Attachment desiredAttachment;
+            MimePart desiredAttachment;
             try
             {
-                desiredAttachment = attachmentsInMail.Cast<Attachment>()
-                                              .Where<Attachment>(x => x.Filename == attachmentName)
-                                              .Single<Attachment>();
+                desiredAttachment = attachmentsInMail.Cast<MimePart>()
+                                              .Where<MimePart>(x => x.Filename == attachmentName)
+                                              .Single<MimePart>();
             }
             catch (System.InvalidOperationException systemException)
             {
@@ -130,7 +147,5 @@ namespace glimpse.MailInterfaces
             this.receiver.Close();
             this.currentOpenedMailbox = null;
         }
-
-        
     }
 }

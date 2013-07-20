@@ -6,7 +6,7 @@ using glimpse.Exceptions;
 
 namespace glimpse.Exceptions.MailInterfacesExceptions
 {
-    class InvalidAttachmentException : GlimpseException
+    public class InvalidAttachmentException : GlimpseException
     {
         public InvalidAttachmentException(String systemMessage, String glimpseMessage)
             : base(systemMessage, glimpseMessage)
