@@ -22,7 +22,7 @@ namespace glimpse.MailInterfaces
 
         public MessageCollection GetInboxMessages()
         {
-            return this.fetcher.GetInboxMails();
+            return this.fetcher.getInboxMails();
         }
 
     }
