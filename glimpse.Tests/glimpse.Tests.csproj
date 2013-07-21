@@ -145,12 +145,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Internationalization\InternationalizationTest.cs" />
     <Compile Include="MailInterfaces\ConnectorTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MailInterfaces\FetcherTest.cs" />
+    <Compile Include="Global\AutoTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="App.config" />
+    <Content Include="Internationalization\LanguageElements.xml" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -161,9 +164,7 @@
       <Name>glimpse</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Internationalization\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

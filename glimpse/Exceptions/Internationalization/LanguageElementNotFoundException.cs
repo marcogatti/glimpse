@@ -4,11 +4,11 @@ using System.Linq;
 using System.Web;
 using glimpse.Exceptions;
 
-namespace glimpse.Exceptions.CommonExceptions
+namespace glimpse.Exceptions.Internationalization
 {
-    public class DefaultLanguageNotSettedException : GlimpseException
+    public class LanguageElementNotFoundException : GlimpseException
     {
-        public DefaultLanguageNotSettedException(String glimpseMessage)
+        public LanguageElementNotFoundException(String glimpseMessage)
             : base(glimpseMessage)
         {
         }

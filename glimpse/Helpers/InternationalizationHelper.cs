@@ -2,12 +2,17 @@
 using System.Collections.Generic;
 using System.Web;
 using System.Xml;
-using glimpse.Exceptions.CommonExceptions;
+using glimpse.Exceptions.Internationalization;
 
 namespace glimpse.Helpers
 {
     public class InternationalizationHelper
     {
+
+        public const String SPANISH = "es";
+        public const String ENGLISH = "en";
+        public const String NO_LANG = null;
+
         private String defaultLanguage;
         private XmlDocument languageSource;
 
@@ -31,7 +36,7 @@ namespace glimpse.Helpers
             }
             else
             {
-                throw new LanguageElementNotFoundException("Lang not presetted");
+                throw new DefaultLanguageNotSettedException("Lang not presetted");
             }
 
         }

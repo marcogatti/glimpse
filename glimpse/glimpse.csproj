@@ -163,8 +163,8 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
-    <Compile Include="Exceptions\CommonExceptions\DefaultLanguageNotSettedException.cs" />
-    <Compile Include="Exceptions\CommonExceptions\LanguageElementNotFoundException.cs" />
+    <Compile Include="Exceptions\Internationalization\DefaultLanguageNotSettedException.cs" />
+    <Compile Include="Exceptions\Internationalization\LanguageElementNotFoundException.cs" />
     <Compile Include="Exceptions\GlimpseException.cs" />
     <Compile Include="Exceptions\MailInterfacesExceptions\InvalidAuthenticationException.cs" />
     <Compile Include="Exceptions\MailInterfacesExceptions\InvalidConnectionException.cs" />
@@ -184,7 +184,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="App_LocalResources\Texts.xml" />
+    <Content Include="App_LocalResources\LanguageElements.xml" />
     <Content Include="Content\bootstrap-responsive.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\home.css" />
@@ -281,6 +281,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Exceptions\CommonExceptions\" />
     <Folder Include="Exceptions\ControllersExceptions\" />
     <Folder Include="Exceptions\ModelsExceptions\" />
     <Folder Include="Models\" />
