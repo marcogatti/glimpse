@@ -5,6 +5,7 @@ using glimpse.MailInterfaces;
 using glimpse.Exceptions.MailInterfacesExceptions;
 using ActiveUp.Net.Mail;
 using System.IO;
+using glimpse.Tests.global;
 
 namespace glimpse.Tests
 {
@@ -27,7 +28,7 @@ namespace glimpse.Tests
 
         [Test]
         public void get_Amount_Of_Mails_Returns_Correct_Amount()
-        {        
+        {
             Assert.AreEqual(13, this.myFetcher.getAmountOfMailsFrom("INBOX"));
             Assert.AreEqual(11, this.myFetcher.getAmountOfMailsFrom("[Gmail]/Importantes"));
         }
@@ -75,11 +76,12 @@ namespace glimpse.Tests
         [Test]
         public void get_Attachment_Downloads_Full_File()
         {
+            String tempFilePath = AutoTests.getProjectRootDirectory() + "/MailInterfaces/DownloadedEagles.bmp";
             Int32[] inboxUIDs = this.myFetcher.getAllUIDsFrom("INBOX");
             Message mail = this.myFetcher.getSpecificMail("INBOX", inboxUIDs[2]);
             Byte[] downloadedAttachment = this.myFetcher.getAttachmentFromMail("INBOX", inboxUIDs[2], "Eagles.bmp");
-            File.WriteAllBytes("C:\\DownloadedEagles.bmp", downloadedAttachment);
-            FileInfo fileOnDisk = new FileInfo("C:\\DownloadedEagles.bmp");
+            File.WriteAllBytes(tempFilePath, downloadedAttachment);
+            FileInfo fileOnDisk = new FileInfo(tempFilePath);
             Int64 sizeOfFile = fileOnDisk.Length;
             fileOnDisk.Delete();
             Assert.AreEqual(mail.Attachments[0].Size, sizeOfFile);
