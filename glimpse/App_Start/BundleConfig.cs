@@ -21,6 +21,9 @@ namespace glimpse
             bundles.Add(new ScriptBundle("~/bundles/bootstrap").Include(
                         "~/Scripts/bootstrap.js"));
 
+            bundles.Add(new ScriptBundle("~/bundles/emails-modal").Include(
+                        "~/Scripts/emails-modal.js"));
+
             // Use the development version of Modernizr to develop with and learn from. Then, when you're
             // ready for production, use the build tool at http://modernizr.com to pick only the tests you need.
             bundles.Add(new ScriptBundle("~/bundles/modernizr").Include(
@@ -34,11 +37,11 @@ namespace glimpse
             bundles.Add(new StyleBundle("~/bootstrap-responsive/css").Include(
                        "~/Content/bootstrap-responsive.css"));
 
-            bundles.Add(new StyleBundle("~/home/css").Include(
-                       "~/Content/home.css"));
+            bundles.Add(new StyleBundle("~/Home/css").Include(
+                       "~/Content/Home.css"));
 
-            bundles.Add(new StyleBundle("~/login/css").Include(
-                       "~/Content/login.css"));
+            bundles.Add(new StyleBundle("~/Login/css").Include(
+                       "~/Content/Login.css"));
 
             bundles.Add(new StyleBundle("~/Content/themes/base/css").Include(
                         "~/Content/themes/base/jquery.ui.core.css",

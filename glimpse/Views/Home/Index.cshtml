@@ -1,7 +1,9 @@
 ﻿@using ActiveUp.Net.Mail
 
 @section css {
-    @Styles.Render("~/home/css")}
+    @Styles.Render("~/Home/css")}
+@section scripts {
+    @Scripts.Render("~/bundles/emails-modal")}
 
 @{
     ViewBag.Title = "Index";
@@ -79,8 +81,11 @@
 
                 @foreach (Message inboxMail in ViewBag.InboxMessages)
                 {
-                    <a data-toggle="modal" href="#example" data-body-text="@inboxMail.BodyText.Text">
-                        <div class="circle">
+                    <a data-toggle="modal" href="#example" >
+                        <div class="circle" data-body="@inboxMail.BodyHtml.Text"
+                                            data-subject="@inboxMail.Subject.ToString()"
+                                            data-date="@inboxMail.Date.ToString()"
+                                            data-from="@inboxMail.From.Email.ToString()">
                             <h4>@inboxMail.Subject</h4>
                             <h5>@inboxMail.Date.ToString()</h5>
                             <p>@inboxMail.From.Email.ToString()</p>
