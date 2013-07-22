@@ -12,16 +12,23 @@ namespace glimpse.Controllers
 {
     public class AccountController : Controller
     {
-        //
-        // GET: /Account/Login
+        // GET: /Login
         [AllowAnonymous]
-        public ActionResult Login(string returnUrl)
+        public ActionResult Login()
         {
+            if (this.Request.UserLanguages.Count() > 0)
+            {
+                Session["Language"] = this.Request.UserLanguages[0].Substring(0, 2);
+            }
+            else
+            {
+                Session["Language"] = "en";
+            }
+
             return View();
         }
 
-        //
-        // POST: /Account/Login
+        // POST: /Login
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -39,8 +46,7 @@ namespace glimpse.Controllers
             return View(user);
         }
 
-        //
-        // GET: /Account/
+        // GET: /Logout
         [Authorize]
         public ActionResult Logout()
         {
@@ -50,8 +56,6 @@ namespace glimpse.Controllers
             return Redirect("/");
         }
 
-
-        #region Helpers
 
         private ActionResult RedirectToLocal(string returnUrl)
         {
@@ -64,9 +68,6 @@ namespace glimpse.Controllers
                 return RedirectToAction("Index", "Home");
             }
         }
-
-        #endregion Helpers
-
     }
 
 }

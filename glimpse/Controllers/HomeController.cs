@@ -16,7 +16,6 @@ namespace glimpse.Controllers
         // GET: /Home/
         public ActionResult Index()
         {
-
             UserViewModel user = new CookieHelper().getLoginCookie();
             ViewBag.Email = user.Email;
             ViewBag.Password= user.Password;
