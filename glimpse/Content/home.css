@@ -16,10 +16,13 @@
     }
 }
 
+.row-fluid > a {
+    padding: 20px;
+}
+
 .circle {
-    width: 300px;
-    height: 300px;
-    display: inline-block;
+    width: 200px;
+    height: 200px;
     border-radius: 50%;
     margin: 5px;
     float: left;
@@ -32,12 +35,19 @@
     background-image: radial-gradient(45px 45px 45deg, circle cover, yellow 0%, orange 100%, red 95%);
 
     border: 3px solid orange;
-			-webkit-box-shadow: 0 6px 16px rgba(0, 0, 0, .3);
-			box-shadow: 0 6px 16px rgba(0, 0, 0, .3);
+    -webkit-box-shadow: 0 6px 16px rgba(0, 0, 0, .3);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, .3);
+
+    -webkit-transition: width .2s ease, height .2s ease;
+    -moz-transition: width .2s ease, height .2s ease;
+    -o-transition: width .2s ease, height .2s ease;
+    transition: width .2s ease, height .2s ease;
 }
 
     .circle:hover {
-        background-image: -moz-radial-gradient(45px 45px 45deg, circle cover, yellow 0%, orange 100%, red 95%);
+        width: 210px;
+        height: 210px;
+        /*background-image: -moz-radial-gradient(45px 45px 45deg, circle cover, yellow 0%, orange 100%, red 95%);
         background-image: -webkit-radial-gradient(45px 45px, circle cover, orange, yellow);
-        background-image: radial-gradient(45px 45px 45deg, circle cover, yellow 0%, orange 100%, red 95%);
+        background-image: radial-gradient(45px 45px 45deg, circle cover, yellow 0%, orange 100%, red 95%);*/
     }
