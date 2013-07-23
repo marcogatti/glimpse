@@ -78,13 +78,20 @@
 
             <div class="row-fluid">
 
+                @{Int64 maxAge = 0;}
+
                 @foreach (Message inboxMail in ViewBag.InboxMessages)
                 {
+                    Int64 age = DateTime.Now.Ticks - inboxMail.Date.Ticks;
+
+                    if (age >= maxAge) { maxAge = age; }
+                    
                     <a data-toggle="modal" href="#example" >
                         <div class="circle" data-body="@inboxMail.BodyHtml.Text"
                                             data-subject="@inboxMail.Subject.ToString()"
                                             data-date="@inboxMail.Date.ToString()"
-                                            data-from="@inboxMail.From.Email.ToString()">
+                                            data-from="@inboxMail.From.Email.ToString()"
+                                            data-age="@age">
                             <h4>@inboxMail.Subject</h4>
                             <h5>@inboxMail.Date.ToString()</h5>
                             <p>@inboxMail.From.Email.ToString()</p>
