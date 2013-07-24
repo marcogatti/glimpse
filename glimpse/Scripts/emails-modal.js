@@ -29,6 +29,13 @@ function calculateEmailsPosition(maxAge) {
         });
 
         $(this).css('left', function (index) { return $(this).attr('data-age') * 700 + 'px' });
+
+        $(this).css('top', function (index) {
+
+            var top = ($(this).attr('data-from').charCodeAt(0) - "a".charCodeAt(0)) * 480 / 26;
+
+            return top + 'px'
+        });
     })
 }
 
