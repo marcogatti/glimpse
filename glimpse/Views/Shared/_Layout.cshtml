@@ -12,12 +12,11 @@
 </head>
 <body>
 
+    @RenderBody()
+
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
     @RenderSection("scripts", required: false)
-
-@*    Volver a cambiar el orden!*@
-    @RenderBody()
 
 </body>
 </html>

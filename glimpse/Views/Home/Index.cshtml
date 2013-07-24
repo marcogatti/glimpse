@@ -7,6 +7,8 @@
 
 @{
     ViewBag.Title = "Index";
+    ViewBag.MaxAge = 0;
+        
 }
 
 
@@ -18,7 +20,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="brand" href="#">glimpse</a>
+            <a id="logo" class="brand" href="#">glimpse</a>
             <div class="nav-collapse collapse">
                 <p class="navbar-text pull-right">
                     Logged in as <a href="#" class="navbar-link">@ViewBag.Email</a>
@@ -68,48 +70,35 @@
             <!--/.well -->
         </div>
         <!--/span-->
-        <div class="span10">
-            <div class="hero-unit">
-                <h1>Página principal</h1>
-                <br />
-                <p>Dirección de Correo: @ViewBag.Email</p>
-                <p>Contraseña sin cifrar: @ViewBag.Password</p>
-            </div>
 
+        <div id="email-container" class="span10">
 
-            @*<div class="row-fluid">*@
+            @foreach (Message inboxMail in ViewBag.InboxMessages)
+            {
+                Int64 age = DateTime.Now.Ticks - inboxMail.Date.Ticks;
 
-                <div class="email-container span10">
-
-                    @foreach (Message inboxMail in ViewBag.InboxMessages)
-                    {
-                        Int64 age = DateTime.Now.Ticks - inboxMail.Date.Ticks;
-
-                        ViewBag.MaxAge = age;
+                if (age > ViewBag.MaxAge) {
+                    ViewBag.MaxAge = age;  
+                }
                     
-                        <a data-toggle="modal" href="#example">
-                            <div class="circle" data-body="@inboxMail.BodyHtml.Text"
+                <a data-toggle="modal" href="#example">
+                    <div class="circle" data-body="@inboxMail.BodyHtml.Text"
                                             data-subject="@inboxMail.Subject.ToString()"
                                             data-date="@inboxMail.Date.ToString()"
                                             data-from="@inboxMail.From.Email.ToString()"
                                             data-age="@age">
-                                <h4>@inboxMail.Subject</h4>
-                                <h5>@inboxMail.Date.ToString()</h5>
-                                <p>@inboxMail.From.Email.ToString()</p>
-                            </div>
-                        </a>
-                    }
+                        <h4>@inboxMail.Subject</h4>
+                        <p>@inboxMail.From.Email.ToString()</p>
+                    </div>
+                </a>
+            }
 
-                </div>
-
-                <script>
-                    calculateEmailsPosition(@ViewBag.MaxAge);
-                </script>
-
-           @* </div>*@
-            <!--/row-->
         </div>
-        <!--/span-->
+
+        <script>
+            var maxAge = @ViewBag.MaxAge;
+        </script>
+
     </div>
     <!--/row-->
 
