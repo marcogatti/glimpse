@@ -35,6 +35,20 @@
     </div>
 </div>
 
+<div id="example" class="modal hide fade in" style="display: none;">
+    <div class="modal-header">
+        <a class="close" data-dismiss="modal">×</a>
+        @*<h3>This is a Modal Heading</h3>*@
+    </div>
+    <div class="modal-body">
+        @*<h4>Text in a modal</h4>  *@
+    </div>
+    <div class="modal-footer">
+        <a href="#" class="btn btn-success">Call to action</a>
+        <a href="#" class="btn" data-dismiss="modal">Close</a>
+    </div>
+</div>
+
 <div class="container-fluid">
 
     <div class="row-fluid">
@@ -62,44 +76,37 @@
                 <p>Contraseña sin cifrar: @ViewBag.Password</p>
             </div>
 
-            <div id="example" class="modal hide fade in" style="display: none;">
-                <div class="modal-header">
-                    <a class="close" data-dismiss="modal">×</a>
-                    @*<h3>This is a Modal Heading</h3>*@
-                </div>
-                <div class="modal-body">
-                    @*<h4>Text in a modal</h4>  *@  
-                </div>
-                <div class="modal-footer">
-                    <a href="#" class="btn btn-success">Call to action</a>
-                    <a href="#" class="btn" data-dismiss="modal">Close</a>
-                </div>
-            </div>
 
-            <div class="row-fluid">
+            @*<div class="row-fluid">*@
 
-                @{Int64 maxAge = 0;}
+                <div class="email-container span10">
 
-                @foreach (Message inboxMail in ViewBag.InboxMessages)
-                {
-                    Int64 age = DateTime.Now.Ticks - inboxMail.Date.Ticks;
+                    @foreach (Message inboxMail in ViewBag.InboxMessages)
+                    {
+                        Int64 age = DateTime.Now.Ticks - inboxMail.Date.Ticks;
 
-                    if (age >= maxAge) { maxAge = age; }
+                        ViewBag.MaxAge = age;
                     
-                    <a data-toggle="modal" href="#example" >
-                        <div class="circle" data-body="@inboxMail.BodyHtml.Text"
+                        <a data-toggle="modal" href="#example">
+                            <div class="circle" data-body="@inboxMail.BodyHtml.Text"
                                             data-subject="@inboxMail.Subject.ToString()"
                                             data-date="@inboxMail.Date.ToString()"
                                             data-from="@inboxMail.From.Email.ToString()"
                                             data-age="@age">
-                            <h4>@inboxMail.Subject</h4>
-                            <h5>@inboxMail.Date.ToString()</h5>
-                            <p>@inboxMail.From.Email.ToString()</p>
-                        </div>
-                    </a>
-                }
+                                <h4>@inboxMail.Subject</h4>
+                                <h5>@inboxMail.Date.ToString()</h5>
+                                <p>@inboxMail.From.Email.ToString()</p>
+                            </div>
+                        </a>
+                    }
 
-            </div>
+                </div>
+
+                <script>
+                    calculateEmailsPosition(@ViewBag.MaxAge);
+                </script>
+
+           @* </div>*@
             <!--/row-->
         </div>
         <!--/span-->

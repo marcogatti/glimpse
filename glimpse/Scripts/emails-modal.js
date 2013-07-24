@@ -14,4 +14,21 @@
         $(".modal-body").append(body);
         $(".modal-header").append(subject);
     })
+
+
+    //$(".circle").on("mouseenter", function () {
+    //    $(this).css('left', function (index) { return $(this).attr("data-age") + 'px' })
+    //})
 })
+
+function calculateEmailsPosition(maxAge) {
+    $(".circle").each(function () {
+
+        $(this).attr('data-age', function () {
+            return $(this).attr('data-age') / maxAge;
+        });
+
+        $(this).css('left', function (index) { return $(this).attr('data-age') * 700 + 'px' });
+    })
+}
+
