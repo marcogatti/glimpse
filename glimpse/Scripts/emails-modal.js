@@ -6,15 +6,16 @@ function calculateEmailsPosition(maxAge) {
 
     $(".circle").each(function () {
 
+        var maxSize = parseInt($(this).css('max-width'), 10);
         var left = $(this).attr('data-age') / maxAge;
         var top = ($(this).attr('data-from').charCodeAt(0) - "a".charCodeAt(0)) / 26;    
 
         $(this).css('top', function (index) {
-            return (top * containerHeight * 0.9) + 'px';
+            return top * (containerHeight - (maxSize * 1.1)) + 'px';
         });
 
         $(this).css('left', function (index) {
-            return (left * containerWidth * 0.9) + 'px';
+            return left * (containerWidth - (maxSize * 1.1)) + 'px';
         });
     })
 }

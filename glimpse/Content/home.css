@@ -13,9 +13,16 @@
     position: relative;
 }
 
+.brand {
+    font-family: 'Freestyle Script';
+    font-size: 32px !important;
+}
+
 .circle {
-    width: 100px;
-    height: 100px;
+    width: 120px;
+    height: 120px;
+    max-width: 120px;
+    max-height: 120px;
     border-radius: 50%;
     float: left;
     overflow: hidden;
@@ -26,18 +33,19 @@
     background-image: -webkit-radial-gradient(45px 45px, circle cover, yellow, orange);
     background-image: radial-gradient(45px 45px 45deg, circle cover, yellow 0%, orange 100%, red 95%);
 
-    border: 1px solid orange;
-    -webkit-box-shadow: 0 6px 16px rgba(0, 0, 0, .3);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, .3);
+    border: 1px solid black;
+    -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, .3);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, .3);
 
-    -webkit-transition: border-radius .5s ease, width .2s ease, height .2s ease, left 2s ease, top 2s ease;
-    -moz-transition: border-radius .5s ease, width .2s ease, height .2s ease, left 2s ease, top 2s ease;
-    -o-transition: border-radius .5s ease, width .2s ease, height .2s ease, left 2s ease, top 2s ease;
-    transition: border-radius .5s ease, width .2s ease, height .2s ease, left 2s ease, top 2s ease;
+    -webkit-transition: border-radius .2s ease, width .2s ease, height .2s ease, left 2s ease, top 2s ease;
+    -moz-transition: border-radius .2s ease, width .2s ease, height .2s ease, left 2s ease, top 2s ease;
+    -o-transition: border-radius .2s ease, width .2s ease, height .2s ease, left 2s ease, top 2s ease;
+    transition: border-radius .2s ease, width .2s ease, height .2s ease, left 2s ease, top 2s ease;
 }
 
     .circle:hover {
-        width: 120px;
-        height: 120px;
-        border-radius: 25%;
+        /*width: 120px;
+        height: 120px;*/
+        z-index: 99;
+        border-radius: 10%;
     }
