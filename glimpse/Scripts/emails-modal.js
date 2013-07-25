@@ -11,16 +11,16 @@ function calculateEmailsPosition(maxAge) {
         var top = ($(this).attr('data-from').charCodeAt(0) - "a".charCodeAt(0)) / 26;    
 
         $(this).css('top', function (index) {
-            return top * (containerHeight - (maxSize * 1.1)) + 'px';
+            return top * (containerHeight - (maxSize * 0.6)) + 'px';
         });
 
         $(this).css('left', function (index) {
-            return left * (containerWidth - (maxSize * 1.1)) + 'px';
+            return left * (containerWidth - (maxSize * 0.6)) + 'px';
         });
     })
 }
 
-$(document).ready(function () {
+function setModal() {
 
     $(".circle").on("click", function () {
 
@@ -36,7 +36,11 @@ $(document).ready(function () {
         $(".modal-body").append(body);
         $(".modal-header").append(subject);
     });
+}
 
+$(document).ready(function () {
+
+    setModal();
     calculateEmailsPosition(maxAge);
 
 })
