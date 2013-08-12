@@ -7,10 +7,8 @@ namespace glimpse.Tests.global
     [TestFixture]
     public class AutoTests
     {
-
         private static String PROJECT_ROOT_DIRECTORY_NAME = "glimpse.Tests";
-
-
+        
         public static String getProjectRootDirectory()
         {
             return Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.FullName;
