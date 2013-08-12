@@ -36,6 +36,7 @@ namespace glimpse.MailInterfaces
                 throw new InvalidConnectionException("No se puede realizar conexion a Gmail sin SSL.");
             }
         }
+
         private void AttemptLogin(String username, String password)
         {
             try

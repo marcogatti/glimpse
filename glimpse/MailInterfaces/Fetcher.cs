@@ -19,13 +19,14 @@ namespace glimpse.MailInterfaces
             this.currentOpenedMailbox = null;
         }
 
-        public MessageCollection getInboxMails()
+        public MessageCollection GetInboxMails()
         {
-            return this.getAllMailsFrom("INBOX");
+            return this.GetAllMailsFrom("INBOX");
         }
-        public MessageCollection getAllMailsFrom(String mailbox)
+
+        public MessageCollection GetAllMailsFrom(String mailbox)
         {
-            Mailbox targetMail = this.getMailbox(mailbox);
+            Mailbox targetMail = this.GetMailbox(mailbox);
             Int32 amountOfMails = targetMail.MessageCount;
             MessageCollection messages = new MessageCollection();
 
@@ -37,22 +38,25 @@ namespace glimpse.MailInterfaces
             return messages;
         }
 
-        public Int32 getAmountOfMailsFrom(String mailbox)
+        public Int32 GetAmountOfMailsFrom(String mailbox)
         {
-            Mailbox targetMailbox = this.getMailbox(mailbox);
+            Mailbox targetMailbox = this.GetMailbox(mailbox);
             return targetMailbox.MessageCount;
         }
-        public HeaderCollection getAllHeadersFrom(String mailbox)
+
+        public HeaderCollection GetAllHeadersFrom(String mailbox)
         {
-            return this.getLastXHeadersFrom(mailbox, this.getAmountOfMailsFrom(mailbox));
+            return this.GetLastXHeadersFrom(mailbox, this.GetAmountOfMailsFrom(mailbox));
         }
-        public HeaderCollection getLastXHeadersFrom(String mailbox, Int32 amountToRetrieve)
+
+        public HeaderCollection GetLastXHeadersFrom(String mailbox, Int32 amountToRetrieve)
         {
-            return this.getMiddleHeadersFrom(mailbox,amountToRetrieve, 0);
+            return this.GetMiddleHeadersFrom(mailbox,amountToRetrieve, 0);
         }
-        public HeaderCollection getMiddleHeadersFrom(String mailbox, Int32 amountToRetrieve, Int32 startingMailOrdinal)
+
+        public HeaderCollection GetMiddleHeadersFrom(String mailbox, Int32 amountToRetrieve, Int32 startingMailOrdinal)
         {
-            Mailbox targetMailbox = this.getMailbox(mailbox);
+            Mailbox targetMailbox = this.GetMailbox(mailbox);
             Int32 amountOfMails = targetMailbox.MessageCount;
 
             if (amountToRetrieve > amountOfMails - startingMailOrdinal)
@@ -69,11 +73,13 @@ namespace glimpse.MailInterfaces
             {
                 headersRetrieved.Add(targetMailbox.Fetch.HeaderObject(currentMail));
             }
+
             return headersRetrieved;
         }
-        public Int32[] getAllUIDsFrom(String mailbox)
+
+        public Int32[] GetAllUIDsFrom(String mailbox)
         {
-            Mailbox targetMailbox = this.getMailbox(mailbox);
+            Mailbox targetMailbox = this.GetMailbox(mailbox);
             Int32 amountOfMails = targetMailbox.MessageCount;
             Int32[] UIDList = new Int32[amountOfMails];
 
@@ -81,28 +87,32 @@ namespace glimpse.MailInterfaces
             {
                 UIDList[amountOfMails-currentMail] = targetMailbox.Fetch.Uid(currentMail);
             }
+
             return UIDList; //UIDList[0] representa el mail más reciente. A mayor valor, mayor antigüedad.
         }
 
-        public String getBodyFromMail(String mailbox, Int32 uniqueMailID)
+        public String GetBodyFromMail(String mailbox, Int32 uniqueMailID)
         {
-            Mailbox targetMailbox = this.getMailbox(mailbox);
+            Mailbox targetMailbox = this.GetMailbox(mailbox);
             //Devuelve el texto con los tags HTML del mail
             return targetMailbox.Fetch.UidMessageObject(uniqueMailID).BodyHtml.Text;
         }
-        public Header getHeaderFromMail(String mailbox, Int32 uniqueMailID)
+
+        public Header GetHeaderFromMail(String mailbox, Int32 uniqueMailID)
         {
-            Mailbox targetMailbox = this.getMailbox(mailbox);
+            Mailbox targetMailbox = this.GetMailbox(mailbox);
             return targetMailbox.Fetch.UidHeaderObject(uniqueMailID);
         }
-        public Message getSpecificMail(String mailbox, Int32 uniqueMailID)
+
+        public Message GetSpecificMail(String mailbox, Int32 uniqueMailID)
         {
-            Mailbox targetMailbox = this.getMailbox(mailbox);
+            Mailbox targetMailbox = this.GetMailbox(mailbox);
             return targetMailbox.Fetch.UidMessageObject(uniqueMailID);
         }
-        public byte[] getAttachmentFromMail(String mailbox, Int32 uniqueMailID, String attachmentName)
+
+        public byte[] GetAttachmentFromMail(String mailbox, Int32 uniqueMailID, String attachmentName)
         {
-            Mailbox targetMailbox = this.getMailbox(mailbox);
+            Mailbox targetMailbox = this.GetMailbox(mailbox);
             AttachmentCollection attachmentsInMail = targetMailbox.Fetch.UidMessageObject(uniqueMailID).Attachments;
             MimePart desiredAttachment;
             try
@@ -118,11 +128,11 @@ namespace glimpse.MailInterfaces
             return desiredAttachment.BinaryContent;
         }
 
-        private Mailbox getMailbox(String targetMailboxName)
+        private Mailbox GetMailbox(String targetMailboxName)
         {
             if (this.currentOpenedMailbox == null)
             {
-                return this.openMailbox(targetMailboxName);
+                return this.OpenMailbox(targetMailboxName);
             }
             else
             {
@@ -132,17 +142,19 @@ namespace glimpse.MailInterfaces
                 }
                 else
                 {
-                    this.closeMailbox();
-                    return this.openMailbox(targetMailboxName);
+                    this.CloseMailbox();
+                    return this.OpenMailbox(targetMailboxName);
                 }
             }
         }
-        private Mailbox openMailbox(String mailbox)
+
+        private Mailbox OpenMailbox(String mailbox)
         {
             this.currentOpenedMailbox = this.receiver.SelectMailbox(mailbox);
             return this.currentOpenedMailbox;
         }
-        private void closeMailbox()
+
+        private void CloseMailbox()
         {
             this.receiver.Close();
             this.currentOpenedMailbox = null;
