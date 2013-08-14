@@ -4,7 +4,7 @@ using System.Linq;
 using System.Web;
 using System.ComponentModel.DataAnnotations;
 
-namespace glimpse.ViewModels
+namespace Glimpse.ViewModels
 {
     public class UserViewModel
     {

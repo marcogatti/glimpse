@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Web;
 using System.Xml;
-using glimpse.Exceptions.Internationalization;
+using Glimpse.Exceptions.Internationalization;
 
-namespace glimpse.Helpers
+namespace Glimpse.Helpers
 {
     public class InternationalizationHelper
     {

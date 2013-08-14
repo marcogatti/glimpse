@@ -1,10 +1,10 @@
 ﻿using System;
 using NUnit.Framework;
-using glimpse.Tests.global;
-using glimpse.Helpers;
-using glimpse.Exceptions.Internationalization;
+using Glimpse.Tests.global;
+using Glimpse.Helpers;
+using Glimpse.Exceptions.Internationalization;
 
-namespace glimpse.Tests.Internationalization
+namespace Glimpse.Tests.Internationalization
 {
     [TestFixture]
     public class InternationalizationTest

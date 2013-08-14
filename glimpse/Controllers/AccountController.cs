@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using glimpse.ViewModels;
-using glimpse.Helpers;
+using Glimpse.ViewModels;
+using Glimpse.Helpers;
 using System.Web.Security;
 using System.Xml;
 
-namespace glimpse.Controllers
+namespace Glimpse.Controllers
 {
     public class AccountController : Controller
     {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Web;
 using ActiveUp.Net.Mail;
 
-namespace glimpse.MailInterfaces
+namespace Glimpse.MailInterfaces
 {
     public class MailAccount
     {

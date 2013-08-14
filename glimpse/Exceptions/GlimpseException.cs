@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace glimpse.Exceptions
+namespace Glimpse.Exceptions
 {
     public class GlimpseException:Exception
     {

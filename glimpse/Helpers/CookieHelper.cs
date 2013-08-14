@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using glimpse.ViewModels;
+using Glimpse.ViewModels;
 
-namespace glimpse.Helpers
+namespace Glimpse.Helpers
 {
     public class CookieHelper
     {

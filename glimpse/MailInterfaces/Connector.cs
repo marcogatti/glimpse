@@ -4,9 +4,9 @@ using System.Linq;
 using System.Web;
 using ActiveUp.Net.Mail;
 using ActiveUp.Net.Imap4;
-using glimpse.Exceptions.MailInterfacesExceptions;
+using Glimpse.Exceptions.MailInterfacesExceptions;
 
-namespace glimpse.MailInterfaces
+namespace Glimpse.MailInterfaces
 {
     public class Connector
     {

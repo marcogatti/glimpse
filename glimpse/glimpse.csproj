@@ -11,7 +11,7 @@
     <ProjectTypeGuids>{E3E379DF-F4C6-4180-9B81-6769533ABE47};{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>glimpse</RootNamespace>
+    <RootNamespace>Glimpse</RootNamespace>
     <AssemblyName>glimpse</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
@@ -174,6 +174,11 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="DataAccessLayer\Entities\Address.cs" />
+    <Compile Include="DataAccessLayer\Entities\Mail.cs" />
+    <Compile Include="DataAccessLayer\Mappings\AddressMap.cs" />
+    <Compile Include="DataAccessLayer\Mappings\MailMap.cs" />
+    <Compile Include="DataAccessLayer\NHibernateManager.cs" />
     <Compile Include="Exceptions\Internationalization\DefaultLanguageNotSettedException.cs" />
     <Compile Include="Exceptions\Internationalization\LanguageElementNotFoundException.cs" />
     <Compile Include="Exceptions\GlimpseException.cs" />
@@ -291,7 +296,6 @@
     <Content Include="Views\Home\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="App_Data\" />
     <Folder Include="Exceptions\CommonExceptions\" />
     <Folder Include="Exceptions\ControllersExceptions\" />
     <Folder Include="Exceptions\ModelsExceptions\" />

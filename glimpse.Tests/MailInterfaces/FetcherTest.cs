@@ -1,13 +1,13 @@
 ﻿using System;
 using NUnit.Framework;
 using ActiveUp.Net.Imap4;
-using glimpse.MailInterfaces;
-using glimpse.Exceptions.MailInterfacesExceptions;
+using Glimpse.MailInterfaces;
+using Glimpse.Exceptions.MailInterfacesExceptions;
 using ActiveUp.Net.Mail;
 using System.IO;
-using glimpse.Tests.global;
+using Glimpse.Tests.global;
 
-namespace glimpse.Tests
+namespace Glimpse.Tests
 {
     [TestFixture]
     public class FetcherTest
