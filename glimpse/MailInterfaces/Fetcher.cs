@@ -5,6 +5,7 @@ using System.Web;
 using ActiveUp.Net.Imap4;
 using ActiveUp.Net.Mail;
 using glimpse.Exceptions.MailInterfacesExceptions;
+using System.Collections.Specialized;
 
 namespace glimpse.MailInterfaces
 {
@@ -12,6 +13,7 @@ namespace glimpse.MailInterfaces
     {
         private Imap4Client receiver;
         private Mailbox currentOpenedMailbox;
+        const int MAIL_DATA_FIELDS_AMOUNT = 13;
 
         public Fetcher(String username, String password)
         {
@@ -23,7 +25,6 @@ namespace glimpse.MailInterfaces
         {
             return this.GetAllMailsFrom("INBOX");
         }
-
         public MessageCollection GetAllMailsFrom(String mailbox)
         {
             Mailbox targetMail = this.GetMailbox(mailbox);
@@ -43,17 +44,14 @@ namespace glimpse.MailInterfaces
             Mailbox targetMailbox = this.GetMailbox(mailbox);
             return targetMailbox.MessageCount;
         }
-
         public HeaderCollection GetAllHeadersFrom(String mailbox)
         {
             return this.GetLastXHeadersFrom(mailbox, this.GetAmountOfMailsFrom(mailbox));
         }
-
         public HeaderCollection GetLastXHeadersFrom(String mailbox, Int32 amountToRetrieve)
         {
             return this.GetMiddleHeadersFrom(mailbox,amountToRetrieve, 0);
         }
-
         public HeaderCollection GetMiddleHeadersFrom(String mailbox, Int32 amountToRetrieve, Int32 startingMailOrdinal)
         {
             Mailbox targetMailbox = this.GetMailbox(mailbox);
@@ -76,7 +74,6 @@ namespace glimpse.MailInterfaces
 
             return headersRetrieved;
         }
-
         public Int32[] GetAllUIDsFrom(String mailbox)
         {
             Mailbox targetMailbox = this.GetMailbox(mailbox);
@@ -97,19 +94,11 @@ namespace glimpse.MailInterfaces
             //Devuelve el texto con los tags HTML del mail
             return targetMailbox.Fetch.UidMessageObject(uniqueMailID).BodyHtml.Text;
         }
-
-        public Header GetHeaderFromMail(String mailbox, Int32 uniqueMailID)
-        {
-            Mailbox targetMailbox = this.GetMailbox(mailbox);
-            return targetMailbox.Fetch.UidHeaderObject(uniqueMailID);
-        }
-
         public Message GetSpecificMail(String mailbox, Int32 uniqueMailID)
         {
             Mailbox targetMailbox = this.GetMailbox(mailbox);
             return targetMailbox.Fetch.UidMessageObject(uniqueMailID);
         }
-
         public byte[] GetAttachmentFromMail(String mailbox, Int32 uniqueMailID, String attachmentName)
         {
             Mailbox targetMailbox = this.GetMailbox(mailbox);
@@ -128,6 +117,39 @@ namespace glimpse.MailInterfaces
             return desiredAttachment.BinaryContent;
         }
 
+        public Dictionary<Int32, NameValueCollection> GetMailsDataFrom(String mailbox)
+        {
+            Mailbox targetMailbox = this.GetMailbox(mailbox);
+            Int32 amountOfMails = targetMailbox.MessageCount;
+            Message retrievedMessage = new Message();
+            NameValueCollection mailData = new NameValueCollection(MAIL_DATA_FIELDS_AMOUNT);
+            Dictionary<Int32, NameValueCollection> mailsFromMailbox = new Dictionary<int, NameValueCollection>(amountOfMails);
+
+            for (int currentMail = amountOfMails; currentMail > 0; currentMail--)
+            {
+                retrievedMessage = targetMailbox.Fetch.MessageObjectPeekWithGMailExtensions(currentMail);
+                mailData["UID"] = targetMailbox.Fetch.Uid(currentMail).ToString();
+                mailData["threadID"] = this.CleanIMAPResponse(receiver.Command("FETCH " + currentMail + " (X-GM-THRID)"), "X-GM-THRID");
+                mailData["gmID"] = this.CleanIMAPResponse(receiver.Command("FETCH " + currentMail + " (X-GM-MSGID)"), "X-GM-MSGID");
+
+                mailData["subject"] = retrievedMessage.Subject;
+                mailData["flags"] = retrievedMessage.Flag;
+                mailData["date"] = retrievedMessage.DateString;
+                mailData["from"] = retrievedMessage.From.Email;
+                mailData["body"] = retrievedMessage.BodyHtml.Text;
+                mailData["hasAttachments"] = retrievedMessage.Attachments.Count == 0 ? "0" : "1";
+                
+                mailData["to"] = this.GetAddressNames(retrievedMessage.To);
+                mailData["bcc"] = this.GetAddressNames(retrievedMessage.Bcc);
+                mailData["cc"] = this.GetAddressNames(retrievedMessage.Cc);
+                mailData["labels"] = this.CleanLabels(retrievedMessage.HeaderFields["x-gm-labels"]);
+               
+                //mailsFromMailbox representa el mail más reciente mientras más bajo sea el índice
+                mailsFromMailbox.Add(currentMail, mailData);
+            }
+            return mailsFromMailbox;
+        }
+
         private Mailbox GetMailbox(String targetMailboxName)
         {
             if (this.currentOpenedMailbox == null)
@@ -136,7 +158,7 @@ namespace glimpse.MailInterfaces
             }
             else
             {
-                if (this.currentOpenedMailbox.ShortName == targetMailboxName)
+                if (this.currentOpenedMailbox.Name == targetMailboxName)
                 {
                     return this.currentOpenedMailbox;
                 }
@@ -147,17 +169,55 @@ namespace glimpse.MailInterfaces
                 }
             }
         }
-
         private Mailbox OpenMailbox(String mailbox)
         {
             this.currentOpenedMailbox = this.receiver.SelectMailbox(mailbox);
             return this.currentOpenedMailbox;
         }
-
         private void CloseMailbox()
         {
             this.receiver.Close();
             this.currentOpenedMailbox = null;
+        }
+
+        private String GetFlagsNames (FlagCollection flags)
+        {
+            String flagsNames = "";
+            if (flags.Count == 0) return flagsNames;
+            for (int currentFlag = 0; currentFlag < flags.Count; currentFlag++)
+            {
+                flagsNames += flags[currentFlag].Name + ", ";
+            }
+            flagsNames.Remove(flagsNames.Length - 2);
+            return flagsNames;
+        }
+        private String GetAddressNames(AddressCollection addresses)
+        {
+            String addressesNames = "";
+            if (addresses.Count == 0) return addressesNames;
+            for (int currentAddress = 0; currentAddress < addresses.Count; currentAddress++)
+            {
+                addressesNames += addresses[currentAddress].Name + " " + addresses[currentAddress].Email + ", ";
+            }
+            addressesNames.Remove(addressesNames.Length - 2);
+            return addressesNames;
+        }
+        private String CleanLabels(String labels)
+        {
+
+            labels = labels.Replace("\\", string.Empty);
+            labels = labels.Replace("\"", string.Empty);
+            //Gmail no agrega el label del mailbox IMAP donde se encuentra el mail analizado
+            labels += " " + this.currentOpenedMailbox.Name;
+
+            return labels;
+        }
+        private String CleanIMAPResponse(String imapResponse, String imapParameter)
+        {
+            //Respuesta del tipo: "* 1 FETCH (X-GM-MSGID 1278455344230334865)\r\na006 OK FETCH (Success)"
+            imapResponse = imapResponse.Remove(0, imapResponse.IndexOf(imapParameter) + imapParameter.Length + 1);
+            imapResponse = imapResponse.Remove(imapResponse.IndexOf(")"));
+            return imapResponse;
         }
     }
 }
