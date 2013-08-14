@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace glimpse.Exceptions.MailInterfacesExceptions
+namespace Glimpse.Exceptions.MailInterfacesExceptions
 {
     public class MailReadingOverflowException : GlimpseException
     {

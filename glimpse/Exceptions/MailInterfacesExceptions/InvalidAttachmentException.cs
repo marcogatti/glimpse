@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using glimpse.Exceptions;
+using Glimpse.Exceptions;
 
-namespace glimpse.Exceptions.MailInterfacesExceptions
+namespace Glimpse.Exceptions.MailInterfacesExceptions
 {
     public class InvalidAttachmentException : GlimpseException
     {

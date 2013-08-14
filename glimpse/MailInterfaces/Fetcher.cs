@@ -4,10 +4,10 @@ using System.Linq;
 using System.Web;
 using ActiveUp.Net.Imap4;
 using ActiveUp.Net.Mail;
-using glimpse.Exceptions.MailInterfacesExceptions;
 using System.Collections.Specialized;
+using Glimpse.Exceptions.MailInterfacesExceptions;
 
-namespace glimpse.MailInterfaces
+namespace Glimpse.MailInterfaces
 {
     public class Fetcher
     {

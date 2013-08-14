@@ -6,7 +6,7 @@ using System.Security.Cryptography;
 using System.IO;
 using System.Text;
 
-namespace glimpse.Helpers
+namespace Glimpse.Helpers
 {
     public class CryptoHelper
     {

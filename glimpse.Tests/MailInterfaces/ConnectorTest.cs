@@ -1,11 +1,11 @@
 ﻿using System;
 using NUnit.Framework;
 using ActiveUp.Net.Imap4;
-using glimpse.MailInterfaces;
-using glimpse.Exceptions.MailInterfacesExceptions;
+using Glimpse.MailInterfaces;
+using Glimpse.Exceptions.MailInterfacesExceptions;
 
 
-namespace glimpse.Tests.MailInterfaces
+namespace Glimpse.Tests.MailInterfaces
 {
     [TestFixture]
     public class ConnectorTest

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using glimpse.Exceptions;
+using Glimpse.Exceptions;
 
-namespace glimpse.Exceptions.Internationalization
+namespace Glimpse.Exceptions.Internationalization
 {
     public class DefaultLanguageNotSettedException : GlimpseException
     {

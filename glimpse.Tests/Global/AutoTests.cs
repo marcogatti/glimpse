@@ -2,12 +2,12 @@
 using NUnit.Framework;
 using System.IO;
 
-namespace glimpse.Tests.global
+namespace Glimpse.Tests.global
 {
     [TestFixture]
     public class AutoTests
     {
-        private static String PROJECT_ROOT_DIRECTORY_NAME = "glimpse.Tests";
+        private static String PROJECT_ROOT_DIRECTORY_NAME = "Glimpse.Tests";
         
         public static String getProjectRootDirectory()
         {

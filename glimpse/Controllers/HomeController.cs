@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using glimpse.Helpers;
-using glimpse.ViewModels;
-using glimpse.MailInterfaces;
+using Glimpse.Helpers;
+using Glimpse.ViewModels;
+using Glimpse.MailInterfaces;
 
-namespace glimpse.Controllers
+namespace Glimpse.Controllers
 {
     [Authorize]
     public class HomeController : Controller

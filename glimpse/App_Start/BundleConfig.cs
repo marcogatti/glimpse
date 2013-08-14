@@ -1,7 +1,7 @@
 ﻿using System.Web;
 using System.Web.Optimization;
 
-namespace glimpse
+namespace Glimpse
 {
     public class BundleConfig
     {

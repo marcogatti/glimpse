@@ -2,7 +2,7 @@
 using System.Web.Mvc;
 
 
-namespace glimpse
+namespace Glimpse
 {
     public class FilterConfig
     {
