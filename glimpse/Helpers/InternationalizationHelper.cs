@@ -11,7 +11,7 @@ namespace Glimpse.Helpers
 
         public const String SPANISH = "es";
         public const String ENGLISH = "en";
-        public const String NO_LANG = null;
+        public const String NO_LANG = "nolang";
 
         private String defaultLanguage;
         private XmlDocument languageSource;
