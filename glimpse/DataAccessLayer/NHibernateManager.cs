@@ -8,14 +8,15 @@ using FluentNHibernate.Cfg.Db;
 using NHibernate;
 using NHibernate.Cfg;
 using NHibernate.Tool.hbm2ddl;
+using Glimpse.DataAccessLayer.Mappings;
 
 namespace Glimpse.DataAccessLayer
 {
     public class NHibernateManager
-    {
+    {        
         private static ISessionFactory _sessionFactory;
 
-       private static ISessionFactory SessionFactory
+        private static ISessionFactory SessionFactory
         {
             get
             {
@@ -29,13 +30,9 @@ namespace Glimpse.DataAccessLayer
         private static void InitializeSessionFactory()
         {
             _sessionFactory = Fluently.Configure()
-                .Database(MySQLConfiguration.Standard
-                              .ConnectionString(
-                                  c => c.FromConnectionStringWithKey("ConnectionString"))                              
-                )
-                .Mappings(m =>
-                          m.FluentMappings
-                              .AddFromAssemblyOf<ISessionFactory>())
+                .Database(MySQLConfiguration.Standard.ConnectionString(c => c.FromConnectionStringWithKey("ConnectionString")))
+                .Mappings(m => m.FluentMappings
+                                .AddFromAssemblyOf<AddressMap>())
                 .BuildSessionFactory();
         } 
 

@@ -7,7 +7,7 @@ namespace Glimpse.Tests.global
     [TestFixture]
     public class AutoTests
     {
-        private static String PROJECT_ROOT_DIRECTORY_NAME = "Glimpse.Tests";
+        private static String PROJECT_ROOT_DIRECTORY_NAME = "glimpse.Tests";
         
         public static String getProjectRootDirectory()
         {
