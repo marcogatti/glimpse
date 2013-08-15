@@ -182,6 +182,7 @@
     <Compile Include="Exceptions\Internationalization\DefaultLanguageNotSettedException.cs" />
     <Compile Include="Exceptions\Internationalization\LanguageElementNotFoundException.cs" />
     <Compile Include="Exceptions\GlimpseException.cs" />
+    <Compile Include="Exceptions\MailInterfacesExceptions\NoRecipientsException.cs" />
     <Compile Include="Exceptions\MailInterfacesExceptions\InvalidAuthenticationException.cs" />
     <Compile Include="Exceptions\MailInterfacesExceptions\InvalidConnectionException.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -196,6 +197,7 @@
     <Compile Include="Exceptions\MailInterfacesExceptions\InvalidAttachmentException.cs" />
     <Compile Include="MailInterfaces\MailAccount.cs" />
     <Compile Include="Exceptions\MailInterfacesExceptions\MailReadingOverflowException.cs" />
+    <Compile Include="MailInterfaces\Sender.cs" />
     <Compile Include="ViewModels\UserViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

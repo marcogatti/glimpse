@@ -17,7 +17,7 @@ namespace Glimpse.MailInterfaces
 
         public Fetcher(String username, String password)
         {
-            this.receiver = new Connector().Login(username, password);
+            this.receiver = new Connector().ImapLogin(username, password);
             this.currentOpenedMailbox = null;
         }
 
@@ -148,6 +148,10 @@ namespace Glimpse.MailInterfaces
                 mailsFromMailbox.Add(currentMail, mailData);
             }
             return mailsFromMailbox;
+        }
+        public void closeClient()
+        {
+            this.receiver.Disconnect();
         }
 
         private Mailbox GetMailbox(String targetMailboxName)

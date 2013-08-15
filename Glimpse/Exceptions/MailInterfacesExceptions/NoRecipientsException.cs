@@ -6,9 +6,9 @@ using Glimpse.Exceptions;
 
 namespace Glimpse.Exceptions.MailInterfacesExceptions
 {
-    public class MailReadingOverflowException : GlimpseException
+    public class NoRecipientsException : GlimpseException
     {
-        public MailReadingOverflowException(String glimpseMessage)
+        public NoRecipientsException(String glimpseMessage)
             : base(glimpseMessage)
         {
         }
