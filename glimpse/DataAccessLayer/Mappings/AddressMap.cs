@@ -11,9 +11,9 @@ namespace Glimpse.DataAccessLayer.Mappings
     {
         public AddressMap()
         {
-            Id(x => x.Id);
-            Map(x => x.MailAddress);
-            Map(x => x.Name);
+            Id(x => x.Id).Column("ID_Address");
+            Map(x => x.MailAddress).Column("Address");
+            Map(x => x.Name).Column("Name");
 
             Table("Address");
         }

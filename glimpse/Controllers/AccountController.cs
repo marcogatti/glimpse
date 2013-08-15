@@ -24,7 +24,7 @@ namespace Glimpse.Controllers
             {
                 Session["Language"] = "en";
             }
-
+            
             return View();
         }
 

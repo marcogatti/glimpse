@@ -1,7 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Data;
+using System.Configuration;
 using System.Linq;
 using System.Web;
+using System.Web.Security;
+using System.Web.UI;
+using System.Web.UI.HtmlControls;
+using System.Web.UI.WebControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Xml.Linq;
 using FluentNHibernate;
 using FluentNHibernate.Cfg;
 using FluentNHibernate.Cfg.Db;
@@ -29,8 +36,9 @@ namespace Glimpse.DataAccessLayer
 
         private static void InitializeSessionFactory()
         {
+            String connectionString = ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString;
             _sessionFactory = Fluently.Configure()
-                .Database(MySQLConfiguration.Standard.ConnectionString(c => c.FromConnectionStringWithKey("ConnectionString")))
+                .Database(MySQLConfiguration.Standard.ConnectionString(connectionString))
                 .Mappings(m => m.FluentMappings
                                 .AddFromAssemblyOf<AddressMap>())
                 .BuildSessionFactory();

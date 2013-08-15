@@ -17,20 +17,20 @@ namespace Glimpse.Helpers
         private XmlDocument languageSource;
 
 
-        public static InternationalizationHelper buildForLanguage(String defaultLanguage = null)
+        public static InternationalizationHelper buildForLanguage(String defaultLanguage = NO_LANG)
         {
             String relFilePath = System.Configuration.ConfigurationManager.AppSettings["LocalizationFilePath"];
             return buildForLanguage(HttpContext.Current.Server.MapPath(relFilePath), defaultLanguage);
         }
 
-        public static InternationalizationHelper buildForLanguage(String languageFilePath, String defaultLanguage = null)
+        public static InternationalizationHelper buildForLanguage(String languageFilePath, String defaultLanguage = NO_LANG)
         {
             return new InternationalizationHelper(languageFilePath, defaultLanguage);
         }
 
         public String getLanguageElement(String moduleId, String key)
         {
-            if (this.defaultLanguage != null)
+            if (this.defaultLanguage != NO_LANG)
             {
                 return this.getLanguageElement(moduleId, key, this.defaultLanguage);
             }
