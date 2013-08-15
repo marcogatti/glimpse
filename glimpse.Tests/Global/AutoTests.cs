@@ -17,7 +17,7 @@ namespace Glimpse.Tests.global
         [Test]
         public void projectRootDirectoryNameIsExpected()
         {
-            Assert.AreEqual(PROJECT_ROOT_DIRECTORY_NAME, new DirectoryInfo(getProjectRootDirectory()).Name);
+            Assert.AreEqual(PROJECT_ROOT_DIRECTORY_NAME.ToLower(), new DirectoryInfo(getProjectRootDirectory()).Name.ToLower());
         }
     }
 }
