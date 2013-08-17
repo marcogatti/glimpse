@@ -15,7 +15,7 @@ using Glimpse.DataAccessLayer.Mappings;
 namespace Glimpse.Tests.DAL
 {
     [TestFixture]
-    public class NHibernateConnectionTest
+    public class NHibernateTest
     {
         public ISession session;
 
@@ -24,11 +24,11 @@ namespace Glimpse.Tests.DAL
         {
             session = NHibernateManager.OpenSession();
 
-            Address myAddress = session.CreateCriteria<Address>()
+            Mail myMail = session.CreateCriteria<Mail>()
                                 .Add(Restrictions.Eq("Id", -1))
-                                .UniqueResult<Address>();
+                                .UniqueResult<Mail>();
 
-            Assert.IsNull(myAddress);
+            Assert.IsNull(myMail);
         }
     }
 }

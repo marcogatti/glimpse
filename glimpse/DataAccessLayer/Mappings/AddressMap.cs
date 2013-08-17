@@ -17,7 +17,5 @@ namespace Glimpse.DataAccessLayer.Mappings
 
             Table("Address");
         }
-
-
     }
 }

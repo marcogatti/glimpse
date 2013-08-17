@@ -154,7 +154,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DAL\NHibernateConnectionTest.cs" />
+    <Compile Include="DAL\NHibernateTest.cs" />
     <Compile Include="Internationalization\InternationalizationTest.cs" />
     <Compile Include="MailInterfaces\ConnectorTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
