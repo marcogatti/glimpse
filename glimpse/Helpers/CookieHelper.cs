@@ -37,6 +37,7 @@ namespace Glimpse.Helpers
             myCookie.Values["Email"] = user.Email;
             myCookie.Values["Password"] = CryptoHelper.EncryptDefaultKey(user.Password);
             myCookie.Expires = expirationDate;
+            myCookie.HttpOnly = true;
             this.responseCookies.Add(myCookie);
         }
 

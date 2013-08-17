@@ -7,7 +7,7 @@ namespace Glimpse.Tests.global
     [TestFixture]
     public class AutoTests
     {
-        private static String PROJECT_ROOT_DIRECTORY_NAME = "glimpse.Tests";
+        private static String PROJECT_ROOT_DIRECTORY_NAME = "Glimpse.Tests";
         
         public static String getProjectRootDirectory()
         {
@@ -17,7 +17,7 @@ namespace Glimpse.Tests.global
         [Test]
         public void projectRootDirectoryNameIsExpected()
         {
-            Assert.AreEqual(PROJECT_ROOT_DIRECTORY_NAME, new DirectoryInfo(getProjectRootDirectory()).Name);
+            Assert.AreEqual(PROJECT_ROOT_DIRECTORY_NAME.ToLower(), new DirectoryInfo(getProjectRootDirectory()).Name.ToLower());
         }
     }
 }

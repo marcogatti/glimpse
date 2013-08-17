@@ -8,8 +8,8 @@ namespace Glimpse.DataAccessLayer.Entities
 {
     public class Mail
     {
-        public virtual UInt64 Id { get; set; }
-        //public virtual MailAccount IdMailAccount { get; set; }
+        public virtual int Id { get; set; }
+        public virtual int IdMailAccount { get; set; }
         public virtual Address From { get; set; }
         public virtual DateTime Date { get; set; }
         public virtual String To { get; set; }
