@@ -6,6 +6,7 @@ using Glimpse.Exceptions.MailInterfacesExceptions;
 using ActiveUp.Net.Mail;
 using System.IO;
 using Glimpse.Tests.global;
+using Glimpse.DataAccessLayer.Entities;
 
 namespace Glimpse.Tests
 {
@@ -15,94 +16,52 @@ namespace Glimpse.Tests
         Fetcher myFetcher;
 
         [SetUp]
-        public void setUp()
+        public void SetUp()
         {
-            myFetcher = new Fetcher("imap.sealed@gmail.com", "imapsealed");
+            this.myFetcher = new Fetcher("imap.sealed@gmail.com", "imapsealed");
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            this.myFetcher.CloseClient();
         }
 
         [Test]
-        public void get_Inbox_Retrieves_Mails_From_Account()
+        public void Get_Inbox_Retrieves_Mails_From_Account()
         {
             Assert.IsNotEmpty(myFetcher.GetInboxMails());
         }
 
         [Test]
-        public void get_Amount_Of_Mails_Returns_Correct_Amount()
+        public void Get_Amount_Of_Mails_Returns_Correct_Amount()
         {
             Assert.AreEqual(13, this.myFetcher.GetAmountOfMailsFrom("INBOX"));
             Assert.AreEqual(11, this.myFetcher.GetAmountOfMailsFrom("[Gmail]/Importantes"));
         }
 
         [Test]
-        public void get_Body_Returns_Full_Text()
+        public void Get_Last_UID_Returns_Correct_Number()
         {
-            Int32[] mailsUIDs = this.myFetcher.GetAllUIDsFrom("INBOX");
-            String mailNumber8Body = this.myFetcher.GetBodyFromMail("INBOX", mailsUIDs[8]);
-
-            //texto retornado en formato HTML
-            Assert.True(mailNumber8Body.Contains("<div dir=\"ltr\"><p class=\"\" style"));
-            Assert.True(mailNumber8Body.Contains("/span>Datos para"));
-            Assert.True(mailNumber8Body.Contains("para la red."));
+            Assert.AreEqual(46, this.myFetcher.GetLastUIDFrom("[Gmail]/Borradores"));
+            Assert.AreEqual(13, this.myFetcher.GetLastUIDFrom("[Gmail]/Enviados"));
         }
 
         [Test]
-        public void get_All_Headers_Returns_Correct_Headers()
+        public void Fetcher_Loads_Data_Correctly()
         {
-            HeaderCollection allHeaders = this.myFetcher.GetAllHeadersFrom("INBOX");
+            Mail[] retrievedMails = new Mail[8];
+            retrievedMails = this.myFetcher.GetMailsDataFrom("INBOX", 3);
 
-            Assert.AreEqual(13, allHeaders.Count);
-            Assert.AreEqual("test.imap.505@gmail.com", allHeaders[7].To[1].Email);
-        }
-
-        [Test]
-        public void get_Middle_Headers_Returns_Correct_Headers()
-        {
-            HeaderCollection targetHeaders = this.myFetcher.GetMiddleHeadersFrom("INBOX", 6, 3);
-
-            Assert.AreEqual("Email9", targetHeaders[0].Subject);
-            Assert.AreEqual("Email4", targetHeaders[5].Subject);
-            Assert.AreEqual(6, targetHeaders.Count);
-        }
-
-        [Test]
-        [ExpectedException(typeof(MailReadingOverflowException))]
-        public void reading_More_Than_Possible_Throws_Overflow_Exception()
-        {
-            this.myFetcher.GetMiddleHeadersFrom("INBOX", 4, 10);
-        }
-
-        [Test]
-        [ExpectedException(typeof(InvalidAttachmentException))]
-        public void geting_Non_Existant_Attachment_Throws_Invalid_Attachment_Exception()
-        {
-            Int32[] inboxUIDs = this.myFetcher.GetAllUIDsFrom("INBOX");
-            this.myFetcher.GetAttachmentFromMail("INBOX", inboxUIDs[9], "wrongAttachmentName.jpg");
-        }
-
-        [Test]
-        public void get_Attachment_Downloads_Full_File()
-        {
-            String tempFilePath = AutoTests.getProjectRootDirectory() + "/MailInterfaces/DownloadedEagles.bmp";
-            Int32[] inboxUIDs = this.myFetcher.GetAllUIDsFrom("INBOX");
-            Message mail = this.myFetcher.GetSpecificMail("INBOX", inboxUIDs[2]);
-            Byte[] downloadedAttachment = this.myFetcher.GetAttachmentFromMail("INBOX", inboxUIDs[2], "Eagles.bmp");
-            File.WriteAllBytes(tempFilePath, downloadedAttachment);
-            FileInfo fileOnDisk = new FileInfo(tempFilePath);
-            Int64 sizeOfFile = fileOnDisk.Length;
-            fileOnDisk.Delete();
-            Assert.AreEqual(mail.Attachments[0].Size, sizeOfFile);
-        }
-
-        [Test]
-        public void fetcher_Selects_Mailboxes_Correctly()
-        {
-            Header inboxLastMailHeader = this.myFetcher.GetLastXHeadersFrom("INBOX", 1)[0];
-            Header sentLastMailHeader = this.myFetcher.GetLastXHeadersFrom("[Gmail]/Enviados", 1)[0];
-            Header deletedLastMailHeader = this.myFetcher.GetLastXHeadersFrom("[Gmail]/Papelera", 1)[0];
-
-            Assert.AreEqual("Re: Email11 c/ texto formateado", inboxLastMailHeader.Subject);
-            Assert.AreEqual(56, sentLastMailHeader.Date.Minute);
-            Assert.AreEqual("Email8A para ser borrado", deletedLastMailHeader.Subject);
+            Assert.AreEqual("Re: Email11 c/ texto formateado", retrievedMails[0].Subject);
+            Assert.AreEqual(DateTime.Parse("Sat, 20 Jul 2013 00:52:44"), retrievedMails[1].Date);
+            Assert.AreEqual("Martin Hoomer", retrievedMails[2].From.Name);
+            Assert.IsTrue(retrievedMails[3].Body.Contains("</span><span class=\"\">Estrategia de entrenamiento.</span></p>"));
+            Assert.IsTrue(retrievedMails[4].HasAttachments);
+            Assert.AreEqual(11, retrievedMails[5].UidInbox);
+            Assert.IsTrue(retrievedMails[6].UidDraft <= 0 && retrievedMails[6].UidSent <= 0 && retrievedMails[6].UidSpam <= 0);
+            Assert.IsTrue(retrievedMails[7].To.Contains("imap.sealed@gmail.com") && retrievedMails[7].To.Contains("test.imap.505@gmail.com"));
+            Assert.IsTrue(retrievedMails[0].Flagged && retrievedMails[3].Seen && !retrievedMails[0].Seen);
         }
     }
 }
