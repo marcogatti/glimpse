@@ -196,7 +196,9 @@
     <Compile Include="Controllers\AsyncMailsController.cs" />
     <Compile Include="DataAccessLayer\Entities\Address.cs" />
     <Compile Include="DataAccessLayer\Entities\Mail.cs" />
+    <Compile Include="DataAccessLayer\Entities\MailAccount.cs" />
     <Compile Include="DataAccessLayer\Mappings\AddressMap.cs" />
+    <Compile Include="DataAccessLayer\Mappings\MailAccountMap.cs" />
     <Compile Include="DataAccessLayer\Mappings\MailMap.cs" />
     <Compile Include="DataAccessLayer\NHibernateManager.cs" />
     <Compile Include="Exceptions\ControllersExceptions\CookieNotFoundException.cs" />
@@ -216,10 +218,9 @@
     <Compile Include="MailInterfaces\Connector.cs" />
     <Compile Include="MailInterfaces\Fetcher.cs" />
     <Compile Include="Exceptions\MailInterfacesExceptions\InvalidAttachmentException.cs" />
-    <Compile Include="MailInterfaces\MailAccount.cs" />
+    <Compile Include="MailInterfaces\AccountInterface.cs" />
     <Compile Include="Exceptions\MailInterfacesExceptions\MailReadingOverflowException.cs" />
     <Compile Include="MailInterfaces\Sender.cs" />
-    <Compile Include="Models\FakeMailAddressPersistible.cs" />
     <Compile Include="ViewModels\UserViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -334,6 +335,7 @@
   <ItemGroup>
     <Folder Include="Exceptions\CommonExceptions\" />
     <Folder Include="Exceptions\ModelsExceptions\" />
+    <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

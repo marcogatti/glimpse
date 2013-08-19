@@ -8,14 +8,14 @@ using Glimpse.Helpers;
 using System.Web.Security;
 using System.Xml;
 using Glimpse.Exceptions.MailInterfacesExceptions;
-using Glimpse.Models;
 using Glimpse.MailInterfaces;
+using Glimpse.DataAccessLayer.Entities;
 
 namespace Glimpse.Controllers
 {
     public class AccountController : Controller
     {
-        public const String MAIL_ACCOUNT = "MailAccount";
+        public const String MAIL_INTERFACE = "mail-interface";
 
 
         // GET: /Login
@@ -45,15 +45,14 @@ namespace Glimpse.Controllers
             {
                 UpdateModel(user);
 
-                Session[MAIL_ACCOUNT] = new MailAccount(user.Email, user.Password);
+                MailAccount mailAccount = new MailAccount(user.Email, user.Password);
+                Session[MAIL_INTERFACE] = mailAccount.LoginExternal();
+                mailAccount.CreateOrUpdate();
 
-                FakeMailAddressPersistible mailAddress = FakeMailAddressPersistible.CreateOrUpdate(user.Email, user.Password);
-
-                new CookieHelper().addMailAddressCookie(mailAddress.MailAddress);
+                new CookieHelper().addMailAddressCookie(mailAccount.Address);
                 FormsAuthentication.SetAuthCookie(user.Email, user.rememberMe);
 
                 return RedirectToLocal(returnUrl);
-
             } 
             catch (InvalidAuthenticationException)
             {

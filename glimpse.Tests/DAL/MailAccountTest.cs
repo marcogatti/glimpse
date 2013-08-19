@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,20 +15,12 @@ using Glimpse.DataAccessLayer.Mappings;
 namespace Glimpse.Tests.DAL
 {
     [TestFixture]
-    public class NHibernateTest
+    public class MailAccountTest
     {
-        public ISession session;
-
         [Test]
         public void CreateConnectionAndReturnNullResult()
         {
-            session = NHibernateManager.OpenSession();
 
-            Mail myMail = session.CreateCriteria<Mail>()
-                                .Add(Restrictions.Eq("Id", int.MaxValue))
-                                .UniqueResult<Mail>();
-
-            Assert.IsNull(myMail);
         }
     }
 }

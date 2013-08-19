@@ -11,12 +11,10 @@ namespace Glimpse.DataAccessLayer.Entities
         public virtual int Id { get; set; }
         public virtual int IdMailAccount { get; set; }
         public virtual Address From { get; set; }
+        public virtual long gm_tid { get; set; }
+        public virtual long gm_mid { get; set; }
         public virtual DateTime Date { get; set; }
-        public virtual String To { get; set; }
-        public virtual String CC { get; set; }
-        public virtual String BCC { get; set; }
-        public virtual String Subject { get; set; }
-        public virtual String Body { get; set; }
+        public virtual String Subject { get; set; }        
         public virtual Int64 UidInbox { get; set; }
         public virtual Int64 UidTrash { get; set; }
         public virtual Int64 UidSent { get; set; }
@@ -26,7 +24,11 @@ namespace Glimpse.DataAccessLayer.Entities
         public virtual Boolean Answered { get; set; }
         public virtual Boolean Flagged { get; set; }
         public virtual Boolean Seen { get; set; }
-        public virtual Boolean Spam { get; set; }
-        public virtual Boolean HasAttachments { get; set; }
+        public virtual Boolean Draft { get; set; }
+        public virtual Boolean HasExtras { get; set; }
+        public virtual String To { get; set; }
+        public virtual String CC { get; set; }
+        public virtual String BCC { get; set; }
+        public virtual String Body { get; set; }
     }
 }

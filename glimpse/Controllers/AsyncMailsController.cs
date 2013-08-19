@@ -16,7 +16,7 @@ namespace Glimpse.Controllers
         public ActionResult InboxMails(int amountOfEmails = 0)
         {
 
-            MailAccount account = (MailAccount)Session[AccountController.MAIL_ACCOUNT];
+            AccountInterface account = (AccountInterface)Session[AccountController.MAIL_INTERFACE];
 
             if (account != null)
             {

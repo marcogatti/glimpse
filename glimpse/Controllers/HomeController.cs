@@ -8,9 +8,9 @@ using Glimpse.ViewModels;
 using Glimpse.MailInterfaces;
 using System.Web.Security;
 using Glimpse.Exceptions.ControllersExceptions;
-using Glimpse.Models;
 using Glimpse.Exceptions.MailInterfacesExceptions;
 using Glimpse.Exceptions;
+using Glimpse.DataAccessLayer.Entities;
 
 namespace Glimpse.Controllers
 {
@@ -21,23 +21,21 @@ namespace Glimpse.Controllers
         // GET: /Home/
         public ActionResult Index()
         {
-            FakeMailAddressPersistible mailAddress;
+            MailAccount mailAccount = MailAccount.FindByAddress(new CookieHelper().getMailAddressFromCookie());
 
-            try
-            {
-                mailAddress = FakeMailAddressPersistible.FindByAddress(new CookieHelper().getMailAddressFromCookie());
-            }
-            catch (GlimpseException)
+            if (mailAccount == null)
             {
                 return this.LogOut();
             }
 
-            if (Session[AccountController.MAIL_ACCOUNT] == null)
+            AccountInterface account = (AccountInterface)Session[AccountController.MAIL_INTERFACE];
+
+            if (account == null)
             {
                 try
                 {
-                    MailAccount account = mailAddress.LoginExternal();
-                    Session[AccountController.MAIL_ACCOUNT] = account;
+                    account = mailAccount.LoginExternal();
+                    Session[AccountController.MAIL_INTERFACE] = account;
                 }
                 catch (InvalidAuthenticationException)
                 {
@@ -45,8 +43,8 @@ namespace Glimpse.Controllers
                 }
             }
 
-            ViewBag.InboxMessages = ((MailAccount)Session[AccountController.MAIL_ACCOUNT]).GetInboxMessages();
-            ViewBag.Email = mailAddress.MailAddress;
+            ViewBag.InboxMessages = account.GetInboxMessages();
+            ViewBag.Email = mailAccount.Address;
 
             return View();
         }

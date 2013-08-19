@@ -57,7 +57,7 @@ namespace Glimpse.Tests
             Assert.AreEqual(DateTime.Parse("Sat, 20 Jul 2013 00:52:44"), retrievedMails[1].Date);
             Assert.AreEqual("Martin Hoomer", retrievedMails[2].From.Name);
             Assert.IsTrue(retrievedMails[3].Body.Contains("</span><span class=\"\">Estrategia de entrenamiento.</span></p>"));
-            Assert.IsTrue(retrievedMails[4].HasAttachments);
+            Assert.IsTrue(retrievedMails[4].HasExtras);
             Assert.AreEqual(11, retrievedMails[5].UidInbox);
             Assert.IsTrue(retrievedMails[6].UidDraft <= 0 && retrievedMails[6].UidSent <= 0 && retrievedMails[6].UidSpam <= 0);
             Assert.IsTrue(retrievedMails[7].To.Contains("imap.sealed@gmail.com") && retrievedMails[7].To.Contains("test.imap.505@gmail.com"));

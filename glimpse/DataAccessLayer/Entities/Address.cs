@@ -25,12 +25,6 @@ namespace Glimpse.DataAccessLayer.Entities
 
         public Address() { }
 
-        private static ISession CreateSession()
-        {
-            ISession aSession = NHibernateManager.OpenSession();
-            return aSession;
-        }
-
 
         public static Address CreateOrUpdate(String mailAddress, String name)
         {

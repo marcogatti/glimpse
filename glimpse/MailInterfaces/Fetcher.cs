@@ -101,8 +101,8 @@ namespace Glimpse.MailInterfaces
 
                 retrievedMessage = targetMailbox.Fetch.MessageObjectPeekWithGMailExtensions(currentMail);
 
-                //mailData["threadID"] = this.CleanIMAPResponse(receiver.Command("FETCH " + currentMail + " (X-GM-THRID)"), "X-GM-THRID");
-                //mailData["gmID"] = this.CleanIMAPResponse(receiver.Command("FETCH " + currentMail + " (X-GM-MSGID)"), "X-GM-MSGID");
+                retrievedMail.gm_tid = long.Parse(this.CleanIMAPResponse(receiver.Command("FETCH " + currentMail + " (X-GM-THRID)"), "X-GM-THRID"));
+                retrievedMail.gm_mid = long.Parse(this.CleanIMAPResponse(receiver.Command("FETCH " + currentMail + " (X-GM-MSGID)"), "X-GM-MSGID"));
                 //mailData["labels"] = this.CleanLabels(retrievedMessage.HeaderFields["x-gm-labels"]);
 
                 fromAddress.MailAddress = retrievedMessage.From.Email;
@@ -112,7 +112,7 @@ namespace Glimpse.MailInterfaces
                 retrievedMail.Date = retrievedMessage.Date;
                 retrievedMail.Body = retrievedMessage.BodyHtml.Text;
                 retrievedMail.From = fromAddress;
-                retrievedMail.HasAttachments = (retrievedMessage.Attachments.Count != 0 
+                retrievedMail.HasExtras = (retrievedMessage.Attachments.Count != 0 
                                              || retrievedMessage.EmbeddedObjects.Count != 0
                                              || retrievedMessage.UnknownDispositionMimeParts.Count != 0);
 
