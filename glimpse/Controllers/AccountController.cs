@@ -7,11 +7,17 @@ using Glimpse.ViewModels;
 using Glimpse.Helpers;
 using System.Web.Security;
 using System.Xml;
+using Glimpse.Exceptions.MailInterfacesExceptions;
+using Glimpse.Models;
+using Glimpse.MailInterfaces;
 
 namespace Glimpse.Controllers
 {
     public class AccountController : Controller
     {
+        public const String MAIL_ACCOUNT = "MailAccount";
+
+
         // GET: /Login
         [AllowAnonymous]
         public ActionResult Login()
@@ -34,16 +40,31 @@ namespace Glimpse.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Login(UserViewModel user, string returnUrl)
         {
-            if (ModelState.IsValid)
+
+            try
             {
+                UpdateModel(user);
+
+                Session[MAIL_ACCOUNT] = new MailAccount(user.Email, user.Password);
+
+                FakeMailAddressPersistible mailAddress = FakeMailAddressPersistible.CreateOrUpdate(user.Email, user.Password);
+
+                new CookieHelper().addMailAddressCookie(mailAddress.MailAddress);
                 FormsAuthentication.SetAuthCookie(user.Email, user.rememberMe);
 
-                new CookieHelper().addMailAddressCookie(user);
-
                 return RedirectToLocal(returnUrl);
+
+            } 
+            catch (InvalidAuthenticationException)
+            {
+                ModelState.AddModelError("", "The email address or password provided is incorrect.");
+                return View(user);
             }
-            ModelState.AddModelError("", "The user name or password provided is incorrect.");
-            return View(user);
+            catch (InvalidOperationException)
+            {
+                return View(user);
+            }
+
         }
 
         // GET: /Logout
@@ -51,8 +72,7 @@ namespace Glimpse.Controllers
         public ActionResult Logout()
         {
             FormsAuthentication.SignOut();
-            new CookieHelper().clearLoginCookie("Login");
-
+            new CookieHelper().clearMailAddressCookie();
             return Redirect("/");
         }
 

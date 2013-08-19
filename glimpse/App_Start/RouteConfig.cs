@@ -12,15 +12,21 @@ namespace Glimpse
         public static void RegisterRoutes(RouteCollection routes)
         {
             routes.MapRoute(
-                name: "Account",
+                name: "MainScreen",
                 url: "{action}",
-                defaults: new { controller = "Account" }
+                defaults: new { controller = "Home", action = "Index" }
+            );
+
+            routes.MapRoute(
+                name: "AsyncMails",
+                url: "async/{controller}/{action}",
+                defaults: new { controller = "AsyncMails" }
             );
 
             routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}",
-                defaults: new { controller = "Home", action = "Index"}
+                defaults: new { controller = "Home", action = "Index" }
             );
         }
     }

@@ -72,12 +72,18 @@
     <Reference Include="ActiveUp.Net.WhoIs">
       <HintPath>..\external-libs\ActiveUp.Net.WhoIs.dll</HintPath>
     </Reference>
+    <Reference Include="AntiXssLibrary">
+      <HintPath>..\packages\AntiXSS.4.2.1\lib\net40\AntiXssLibrary.dll</HintPath>
+    </Reference>
     <Reference Include="Antlr3.Runtime, Version=3.4.1.9004, Culture=neutral, PublicKeyToken=eb42632606e9261f, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Antlr.3.4.1.9004\lib\Antlr3.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="FluentNHibernate">
       <HintPath>..\packages\FluentNHibernate.1.3.0.733\lib\FluentNHibernate.dll</HintPath>
+    </Reference>
+    <Reference Include="HtmlSanitizationLibrary">
+      <HintPath>..\packages\AntiXSS.4.2.1\lib\net40\HtmlSanitizationLibrary.dll</HintPath>
     </Reference>
     <Reference Include="Iesi.Collections, Version=1.0.1.0, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -187,11 +193,13 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\AsyncMailsController.cs" />
     <Compile Include="DataAccessLayer\Entities\Address.cs" />
     <Compile Include="DataAccessLayer\Entities\Mail.cs" />
     <Compile Include="DataAccessLayer\Mappings\AddressMap.cs" />
     <Compile Include="DataAccessLayer\Mappings\MailMap.cs" />
     <Compile Include="DataAccessLayer\NHibernateManager.cs" />
+    <Compile Include="Exceptions\ControllersExceptions\CookieNotFoundException.cs" />
     <Compile Include="Exceptions\Internationalization\DefaultLanguageNotSettedException.cs" />
     <Compile Include="Exceptions\Internationalization\LanguageElementNotFoundException.cs" />
     <Compile Include="Exceptions\GlimpseException.cs" />
@@ -211,6 +219,7 @@
     <Compile Include="MailInterfaces\MailAccount.cs" />
     <Compile Include="Exceptions\MailInterfacesExceptions\MailReadingOverflowException.cs" />
     <Compile Include="MailInterfaces\Sender.cs" />
+    <Compile Include="Models\FakeMailAddressPersistible.cs" />
     <Compile Include="ViewModels\UserViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -325,9 +334,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Exceptions\CommonExceptions\" />
-    <Folder Include="Exceptions\ControllersExceptions\" />
     <Folder Include="Exceptions\ModelsExceptions\" />
-    <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
