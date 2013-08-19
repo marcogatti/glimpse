@@ -1,12 +1,12 @@
-﻿using System;
+﻿using ActiveUp.Net.Imap4;
+using ActiveUp.Net.Mail;
+using Glimpse.DataAccessLayer.Entities;
+using Glimpse.Exceptions.MailInterfacesExceptions;
+using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Web;
-using ActiveUp.Net.Imap4;
-using ActiveUp.Net.Mail;
-using System.Collections.Specialized;
-using Glimpse.Exceptions.MailInterfacesExceptions;
-using Glimpse.DataAccessLayer.Entities;
 
 namespace Glimpse.MailInterfaces
 {
@@ -14,11 +14,13 @@ namespace Glimpse.MailInterfaces
     {
         private Imap4Client receiver;
         private Mailbox currentOpenedMailbox;
+        private NameValueCollection accountMailboxesBySpecialProperty = new NameValueCollection();
         const int MAIL_DATA_FIELDS_AMOUNT = 13;
 
         public Fetcher(String username, String password)
         {
             this.receiver = new Connector().ImapLogin(username, password);
+            this.loadMailboxesAndSpecialProperties(this.receiver.Command("LIST \"\" \"*\""));
             this.currentOpenedMailbox = null;
         }
 
@@ -46,7 +48,6 @@ namespace Glimpse.MailInterfaces
             Int32 amountOfMails = targetMailbox.MessageCount;
             return targetMailbox.Fetch.Uid(amountOfMails);
         }
-
         public Int32 GetAmountOfMailsFrom(String mailbox)
         {
             Mailbox targetMailbox = this.GetMailbox(mailbox);
@@ -115,9 +116,9 @@ namespace Glimpse.MailInterfaces
                                              || retrievedMessage.EmbeddedObjects.Count != 0
                                              || retrievedMessage.UnknownDispositionMimeParts.Count != 0);
 
-                retrievedMail.To = this.GetAddressNames(retrievedMessage.To);
-                retrievedMail.BCC = this.GetAddressNames(retrievedMessage.Bcc);
-                retrievedMail.CC = this.GetAddressNames(retrievedMessage.Cc);
+                retrievedMail.To = this.GetAddressNameAndMail(retrievedMessage.To);
+                retrievedMail.BCC = this.GetAddressNameAndMail(retrievedMessage.Bcc);
+                retrievedMail.CC = this.GetAddressNameAndMail(retrievedMessage.Cc);
 
                 this.AddUIDToMail(mailbox, targetMailbox.Fetch.Uid(currentMail), ref retrievedMail);
                 this.AddFlagsToMail(targetMailbox.Fetch.Flags(currentMail).Merged, ref retrievedMail);
@@ -161,27 +162,75 @@ namespace Glimpse.MailInterfaces
             this.receiver.Close();
             this.currentOpenedMailbox = null;
         }
-        private String GetFlagsNames (FlagCollection flags)
+        private void loadMailboxesAndSpecialProperties(string imapResponse)
         {
-            String flagsNames = "";
-            if (flags.Count == 0) return flagsNames;
-            for (int currentFlag = 0; currentFlag < flags.Count; currentFlag++)
+            /*imapResponse del tipo (incluyendo \r\n):
+              (\HasNoChildren) "INBOX"
+              (\Noselect \HasChildren) "[Gmail]"
+              (\HasNoChildren \Drafts) "[Gmail]/Borradores"
+              (\HasNoChildren \All) "[Gmail]/Todos"*/
+            String[] mailboxes = new String[imapResponse.Split(new string[] { "LIST" }, StringSplitOptions.RemoveEmptyEntries).Length];
+            imapResponse = imapResponse.Replace("* LIST", String.Empty).Replace(" \"/\"", String.Empty);
+            mailboxes = imapResponse.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (String mailbox in mailboxes)
             {
-                flagsNames += flags[currentFlag].Name + ", ";
+                if (mailbox.Contains("\\All"))
+                {
+                    this.accountMailboxesBySpecialProperty.Add("All", this.stripMailboxName(mailbox));
+                    continue;
+                }
+                if (mailbox.Contains("INBOX"))
+                {
+                    this.accountMailboxesBySpecialProperty.Add("Inbox", "INBOX"); //nombre INBOX fijo por IMAP
+                    continue;
+                }
+                if (mailbox.Contains("\\Trash"))
+                {
+                    this.accountMailboxesBySpecialProperty.Add("Deleted", this.stripMailboxName(mailbox));
+                    continue;
+                }
+                if (mailbox.Contains("\\Junk"))
+                {
+                    this.accountMailboxesBySpecialProperty.Add("Spam", this.stripMailboxName(mailbox));
+                    continue;
+                }
+                if (mailbox.Contains("\\Important"))
+                {
+                    this.accountMailboxesBySpecialProperty.Add("Important", this.stripMailboxName(mailbox));
+                    continue;
+                }
+                if (mailbox.Contains("\\Sent"))
+                {
+                    this.accountMailboxesBySpecialProperty.Add("Sent", this.stripMailboxName(mailbox));
+                    continue;
+                }
+                if (mailbox.Contains("\\Flagged"))
+                {
+                    this.accountMailboxesBySpecialProperty.Add("Starred", this.stripMailboxName(mailbox));
+                    continue;
+                }
+                if (mailbox.Contains("\\Drafts"))
+                {
+                    this.accountMailboxesBySpecialProperty.Add("Drafts", this.stripMailboxName(mailbox));
+                    continue;
+                }
+                if (mailbox.Contains("OK Success") || mailbox.Contains("Noselect"))
+                    continue;
+                else
+                    this.accountMailboxesBySpecialProperty.Add("Labels", this.stripMailboxName(mailbox));
             }
-            flagsNames.Remove(flagsNames.Length - 2);
-            return flagsNames;
         }
-        private String GetAddressNames(AddressCollection addresses)
+        private String GetAddressNameAndMail(AddressCollection addresses)
         {
-            String addressesNames = "";
-            if (addresses.Count == 0) return addressesNames;
+            String addressesNamesAndMail = "";
+            if (addresses.Count == 0) return addressesNamesAndMail;
             for (int currentAddress = 0; currentAddress < addresses.Count; currentAddress++)
             {
-                addressesNames += addresses[currentAddress].Name + " " + addresses[currentAddress].Email + ", ";
+                addressesNamesAndMail += addresses[currentAddress].Merged + ", ";
             }
-            addressesNames.Remove(addressesNames.Length - 2);
-            return addressesNames;
+            addressesNamesAndMail.Remove(addressesNamesAndMail.Length - 2);
+            return addressesNamesAndMail;
         }
         private String CleanLabels(String labels)
         {
@@ -202,31 +251,19 @@ namespace Glimpse.MailInterfaces
         }
         private void AddUIDToMail(String mailbox, Int64 UID, ref Mail mail)
         {
-            switch (mailbox) { //UIDs no cargados son completados por GlimpseDB como -1
-                case "INBOX":
-                    mail.UidInbox = UID;
-                    break;
-                case "[Gmail]/Todos":
-                case "[Gmail]/All":
-                    mail.UidAll = UID;
-                    break;
-                case "[Gmail]/Papelera":
-                case "[Gmail]/Trash":
-                case "[Gmail]/Deleted":
-                    mail.UidTrash = UID;
-                    break;
-                case "[Gmail]/Spam":
-                    mail.UidSpam = UID;
-                    break;
-                case "[Gmail]/Borradores":
-                case "[Gmail]/Drafts":
-                    mail.UidDraft = UID;
-                    break;
-                case "[Gmail]/Enviados":
-                case "[Gmail]/Sent":
-                    mail.UidSent = UID;
-                    break;
-            }
+            //UIDs no cargados son completados por GlimpseDB como -1
+            if (this.accountMailboxesBySpecialProperty["Inbox"] == mailbox)
+            {mail.UidInbox = UID; return;}
+            if (this.accountMailboxesBySpecialProperty["All"] == mailbox)
+            {mail.UidAll = UID; return;}
+            if (this.accountMailboxesBySpecialProperty["Deleted"] == mailbox)
+            {mail.UidTrash = UID; return;}
+            if (this.accountMailboxesBySpecialProperty["Spam"] == mailbox)
+            {mail.UidSpam = UID; return;}
+            if (this.accountMailboxesBySpecialProperty["Sent"] == mailbox)
+            {mail.UidSent = UID; return;}
+            if (this.accountMailboxesBySpecialProperty["Drafts"] == mailbox)
+            {mail.UidDraft = UID; return;}
         }
         private void AddFlagsToMail(String flags, ref Mail mail)
         {
@@ -234,6 +271,13 @@ namespace Glimpse.MailInterfaces
             if (flags.Contains("flagged")) mail.Flagged = true;
             if (flags.Contains("seen")) mail.Seen = true;
             //if (flags.Contains("draft")) mail.Draft = true;
+        }
+        private String stripMailboxName(String mailbox)
+        {
+            //Input: (\HasNoChildren \Drafts) "[Gmail]/Borradores"
+            //Output: [Gmail]/Borradores
+            String mailboxName = mailbox.Substring(mailbox.IndexOf('"') + 1, mailbox.LastIndexOf('"') - mailbox.IndexOf('"') - 1);
+            return mailboxName;
         }
     }
 }

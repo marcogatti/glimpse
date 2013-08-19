@@ -35,7 +35,7 @@ namespace Glimpse.MailInterfaces
         {
             try
             {
-                this.ImapClient.Login(username, password);
+                this.ImapClient.LoginFast(username, password);
             }
             catch(Imap4Exception imapException)
             {
