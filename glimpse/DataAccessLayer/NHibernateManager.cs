@@ -22,7 +22,6 @@ namespace Glimpse.DataAccessLayer
     public class NHibernateManager
     {        
         private static ISessionFactory _sessionFactory;
-
         private static ISessionFactory SessionFactory
         {
             get
@@ -33,6 +32,18 @@ namespace Glimpse.DataAccessLayer
                 return _sessionFactory;
             }
         }
+
+            private static ISession _defaultSession;
+            public static ISession DefaultSesion
+            {
+                get
+                {
+                    if (_defaultSession == null)
+                        _defaultSession = OpenSession();
+
+                    return _defaultSession;
+                }
+            }
 
         private static void InitializeSessionFactory()
         {

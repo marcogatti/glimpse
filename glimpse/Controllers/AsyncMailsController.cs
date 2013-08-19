@@ -8,11 +8,12 @@ using System.Web.Mvc;
 
 namespace Glimpse.Controllers
 {
+    [Authorize]
     public class AsyncMailsController : Controller
     {
         //
-        // GET: /AsyncMails/
-        public ActionResult InboxMails(int amountOfEmails)
+        // GET: /AsyncMails/InboxMails
+        public ActionResult InboxMails(int amountOfEmails = 0)
         {
 
             MailAccount account = (MailAccount)Session[AccountController.MAIL_ACCOUNT];
