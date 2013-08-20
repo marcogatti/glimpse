@@ -7,6 +7,7 @@ using ActiveUp.Net.Mail;
 using System.IO;
 using Glimpse.Tests.global;
 using Glimpse.DataAccessLayer.Entities;
+using Glimpse.Models;
 
 namespace Glimpse.Tests
 {
@@ -50,7 +51,7 @@ namespace Glimpse.Tests
         [Test]
         public void Fetcher_Loads_Data_Correctly()
         {
-            Mail[] retrievedMails = new Mail[8];
+            MailCollection retrievedMails = new MailCollection();
             retrievedMails = this.myFetcher.GetMailsDataFrom("INBOX", 3);
 
             Assert.AreEqual("Re: Email11 c/ texto formateado", retrievedMails[0].Subject);

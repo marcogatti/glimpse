@@ -221,6 +221,8 @@
     <Compile Include="MailInterfaces\AccountInterface.cs" />
     <Compile Include="Exceptions\MailInterfacesExceptions\MailReadingOverflowException.cs" />
     <Compile Include="MailInterfaces\Sender.cs" />
+    <Compile Include="Models\MailCollection.cs" />
+    <Compile Include="Models\MailManager.cs" />
     <Compile Include="ViewModels\UserViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -335,7 +337,6 @@
   <ItemGroup>
     <Folder Include="Exceptions\CommonExceptions\" />
     <Folder Include="Exceptions\ModelsExceptions\" />
-    <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

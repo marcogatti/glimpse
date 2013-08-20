@@ -11,6 +11,8 @@ namespace Glimpse.DataAccessLayer.Mappings
     {
         public MailMap()
         {
+            Table("Mail");
+
             Id(x => x.Id).Column("Id_Mail");
             Map(x => x.IdMailAccount).Column("ID_MailAccount");
             //Map(x => x.From).Column("ID_From");
@@ -33,9 +35,7 @@ namespace Glimpse.DataAccessLayer.Mappings
             Map(x => x.Flagged).Column("FG_Flagged");
             Map(x => x.Seen).Column("FG_Seen");
             Map(x => x.Draft).Column("FG_Draft");
-            Map(x => x.HasExtras).Column("FG_HasExtras");
-
-            Table("Mail");
+            Map(x => x.HasExtras).Column("FG_HasExtras"); 
         }
     }
 }

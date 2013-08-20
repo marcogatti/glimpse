@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Web;
 using ActiveUp.Net.Mail;
+using Glimpse.Models;
 
 namespace Glimpse.MailInterfaces
 {
@@ -26,5 +27,10 @@ namespace Glimpse.MailInterfaces
             return this.myFetcher.GetInboxMails();
         }
 
+
+        public MailCollection getMailsFromHigherThan(string mailbox, int lastUID)
+        {
+            return this.myFetcher.GetMailDataFromHigherThan(mailbox, lastUID);
+        }
     }
 }

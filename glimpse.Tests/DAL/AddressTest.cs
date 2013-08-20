@@ -34,7 +34,7 @@ namespace Glimpse.Tests.DAL
         [Test]
         public void CreateOrUpdateAnAddress()
         {
-            Address createdAddress = Address.CreateOrUpdate(anAddress, aName);
+            Address createdAddress = Address.Save(anAddress, aName);
             Address foundAddress = Address.FindByAddress(createdAddress.MailAddress);
 
             Assert.AreEqual(createdAddress.MailAddress, foundAddress.MailAddress);

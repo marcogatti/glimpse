@@ -2,6 +2,7 @@
 using ActiveUp.Net.Mail;
 using Glimpse.DataAccessLayer.Entities;
 using Glimpse.Exceptions.MailInterfacesExceptions;
+using Glimpse.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -71,20 +72,20 @@ namespace Glimpse.MailInterfaces
             return desiredAttachment.BinaryContent;
         }
 
-        public Mail[] GetAllMailsDataFrom(String mailbox)
+        public MailCollection GetAllMailsDataFrom(String mailbox)
         {
             return this.GetMailsDataFrom(mailbox, 1);
         }
-        public Mail[] GetUnseenMailsDataFrom(String mailbox)
+        public MailCollection GetUnseenMailsDataFrom(String mailbox)
         {
             return this.GetMailsDataFrom(mailbox, this.GetMailbox(mailbox).FirstUnseen);
         }
-        public Mail[] GetMailDataFromHigherThan(String mailbox, Int32 minimumUID)
+        public MailCollection GetMailDataFromHigherThan(String mailbox, Int32 minimumUID)
         {
             //siempre trae al menos uno, excepto si el mailbox está vacío
             return this.GetMailsDataFrom(mailbox, this.GetMailbox(mailbox).Search("UID " + minimumUID)[0]);
         }
-        public Mail[] GetMailsDataFrom(String mailbox, Int32 reversedLastOrdinalToRetrieve)
+        public MailCollection GetMailsDataFrom(String mailbox, Int32 reversedLastOrdinalToRetrieve)
         {
             //Trae los mails desde el mail más reciente (el ordinal mayor) hasta el mail con ordinal por parámetro reversedLastOrdinalToRetrieve
             if (reversedLastOrdinalToRetrieve <= 0)
@@ -93,7 +94,7 @@ namespace Glimpse.MailInterfaces
             Message retrievedMessage;
             Mail retrievedMail;
             DataAccessLayer.Entities.Address fromAddress = new DataAccessLayer.Entities.Address();
-            Mail[] mailsFromMailbox = new Mail[targetMailbox.MessageCount - reversedLastOrdinalToRetrieve + 1];
+            MailCollection mailsFromMailbox = new MailCollection();
 
             for (int currentMail = targetMailbox.MessageCount; currentMail >= reversedLastOrdinalToRetrieve; currentMail--)
             {
@@ -124,7 +125,7 @@ namespace Glimpse.MailInterfaces
                 this.AddFlagsToMail(targetMailbox.Fetch.Flags(currentMail).Merged, ref retrievedMail);
                 
                 //mailsFromMailbox representa el mail más reciente mientras más bajo sea el índice
-                mailsFromMailbox[targetMailbox.MessageCount - currentMail] = retrievedMail;
+                mailsFromMailbox.Add(retrievedMail);
             }
             return mailsFromMailbox;
         }

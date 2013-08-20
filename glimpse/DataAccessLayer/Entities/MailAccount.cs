@@ -25,35 +25,23 @@ namespace Glimpse.DataAccessLayer.Entities
             this.Password = password;
         }
 
-        public virtual MailAccount CreateOrUpdate()
+        public virtual void Save()
         {
-            MailAccount newAccount = this;
-            MailAccount oldAccount = FindByAddress(newAccount.Address);
-            MailAccount returnAccount;
+            MailAccount oldAccount = FindByAddress(this.Address);
 
             ITransaction tran = currentSession.BeginTransaction();
 
             if (oldAccount == null)
             {
-                currentSession.Save(newAccount);
-                returnAccount = newAccount;
+                currentSession.Save(this);
             }
             else
             {
-                ResetWithOtherAddress(oldAccount, newAccount);
+                oldAccount.Password = this.Password;
                 currentSession.Update(oldAccount);
-                returnAccount = oldAccount;
             }
 
             tran.Commit();
-
-            return returnAccount;
-        }
-
-        private void ResetWithOtherAddress(MailAccount from, MailAccount to)
-        {
-            to.Address = from.Address;
-            to.Password = from.Password;
         }
 
         public static MailAccount FindByAddress(String emailAddress)

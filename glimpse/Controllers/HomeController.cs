@@ -11,6 +11,7 @@ using Glimpse.Exceptions.ControllersExceptions;
 using Glimpse.Exceptions.MailInterfacesExceptions;
 using Glimpse.Exceptions;
 using Glimpse.DataAccessLayer.Entities;
+using Glimpse.Models;
 
 namespace Glimpse.Controllers
 {
@@ -28,14 +29,14 @@ namespace Glimpse.Controllers
                 return this.LogOut();
             }
 
-            AccountInterface account = (AccountInterface)Session[AccountController.MAIL_INTERFACE];
+            AccountInterface accountInterface = (AccountInterface)Session[AccountController.MAIL_INTERFACE];
 
-            if (account == null)
+            if (accountInterface == null)
             {
                 try
                 {
-                    account = mailAccount.LoginExternal();
-                    Session[AccountController.MAIL_INTERFACE] = account;
+                    accountInterface = mailAccount.LoginExternal();
+                    Session[AccountController.MAIL_INTERFACE] = accountInterface;
                 }
                 catch (InvalidAuthenticationException)
                 {
@@ -43,7 +44,12 @@ namespace Glimpse.Controllers
                 }
             }
 
-            ViewBag.InboxMessages = account.GetInboxMessages();
+            // RESOLVER ESTOOOOOOOOOO, PERO YA MIERDA
+
+            //MailManager manager = new MailManager(accountInterface, mailAccount);
+            //manager.FetchFromMailbox("INBOX");
+
+            ViewBag.InboxMessages = accountInterface.GetInboxMessages();
             ViewBag.Email = mailAccount.Address;
 
             return View();

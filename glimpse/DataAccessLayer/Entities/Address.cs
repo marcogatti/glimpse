@@ -26,7 +26,7 @@ namespace Glimpse.DataAccessLayer.Entities
         public Address() { }
 
 
-        public static Address CreateOrUpdate(String mailAddress, String name)
+        public static Address Save(String mailAddress, String name)
         {
             Address newAddress = new Address(mailAddress, name);
             Address oldAddress = FindByAddress(mailAddress);
