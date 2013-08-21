@@ -34,10 +34,13 @@ namespace Glimpse.Models
             Int64 lastDatabaseUID = currentSession.CreateCriteria<MailEntity>()
                                                   .Add(Restrictions.Eq("MailAccount.Id", this.account.Entity.Id))
                                                   .SetProjection(Projections.Max("UidInbox")).UniqueResult<Int64>();
-
-            mails = this.accountInterface.getMailsFromHigherThan(mailbox, lastDatabaseUID);
-            mails.loadMailAccount(this.account);
-            mails.Save();
+            Int32 lastImapUID = this.accountInterface.getLastUIDFrom(mailbox);
+            if (lastImapUID > lastDatabaseUID)
+            {
+                mails = this.accountInterface.getMailsFromHigherThan(mailbox, lastDatabaseUID);
+                mails.loadMailAccount(this.account);
+                mails.Save();
+            }
             List<MailEntity> returnMails = mails.ToList<MailEntity>();
             if (maxAmount > mails.Count)
             { 

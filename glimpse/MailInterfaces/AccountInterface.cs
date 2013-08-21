@@ -27,6 +27,10 @@ namespace Glimpse.MailInterfaces
             return this.myFetcher.GetInboxMails();
         }
 
+        public Int32 getLastUIDFrom(String mailbox)
+        {
+            return this.myFetcher.GetLastUIDFrom(mailbox);
+        }
 
         public MailCollection getMailsFromHigherThan(string mailbox, Int64 lastUID)
         {
