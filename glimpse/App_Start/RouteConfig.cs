@@ -19,7 +19,7 @@ namespace Glimpse
 
             routes.MapRoute(
                 name: "AsyncMails",
-                url: "async/{controller}/{action}",
+                url: "async/{action}",
                 defaults: new { controller = "AsyncMails" }
             );
 

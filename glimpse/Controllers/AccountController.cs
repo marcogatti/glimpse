@@ -10,6 +10,7 @@ using System.Xml;
 using Glimpse.Exceptions.MailInterfacesExceptions;
 using Glimpse.MailInterfaces;
 using Glimpse.DataAccessLayer.Entities;
+using Glimpse.Models;
 
 namespace Glimpse.Controllers
 {
@@ -45,12 +46,12 @@ namespace Glimpse.Controllers
             {
                 UpdateModel(user);
 
-                MailAccountEntity mailAccount = new MailAccountEntity(user.Email, user.Password);
+                MailAccount mailAccount = new MailAccount(new MailAccountEntity(user.Email, user.Password));
 
                 Session[MAIL_INTERFACE] = mailAccount.LoginExternal();
                 mailAccount.Save();
 
-                new CookieHelper().addMailAddressCookie(mailAccount.Address);
+                new CookieHelper().addMailAddressCookie(mailAccount.Entity.Address);
                 FormsAuthentication.SetAuthCookie(user.Email, user.rememberMe);
 
                 return RedirectToLocal(returnUrl);

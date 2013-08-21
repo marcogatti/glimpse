@@ -1,4 +1,4 @@
-﻿using Glimpse.DataAccessLayer;
+﻿﻿using Glimpse.DataAccessLayer;
 using Glimpse.DataAccessLayer.Entities;
 using Glimpse.Models;
 using NHibernate;
@@ -14,7 +14,6 @@ namespace Glimpse.Tests.DAL
     [TestFixture]
     public class MailTest
     {
-
         private MailAccount anAccount;
         private Mail aMail;
         private ISession session = NHibernateManager.OpenSession();

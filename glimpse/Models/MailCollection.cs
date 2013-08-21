@@ -16,9 +16,21 @@ namespace Glimpse.Models
         {
             ITransaction tran = currentSession.BeginTransaction();
 
-            currentSession.Save(this);
+            foreach (MailEntity mailToSave in this)
+            {
+                currentSession.SaveOrUpdate(mailToSave.From);
+                currentSession.SaveOrUpdate(mailToSave);
+            }
 
             tran.Commit();
+        }
+
+        public void loadMailAccount(MailAccount mailAccount)
+        {
+            foreach (MailEntity mail in this)
+            {
+                mail.MailAccount = mailAccount.Entity;
+            }
         }
     }
 }

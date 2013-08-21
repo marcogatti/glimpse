@@ -17,48 +17,12 @@ namespace Glimpse.DataAccessLayer.Entities
         public virtual IList<LabelEntity> Labels { get; set; }
         public virtual IList<MailEntity> Mails { get; set; }
 
-        private static ISession currentSession = NHibernateManager.DefaultSesion;
-
         public MailAccountEntity() { }
 
-        public MailAccountEntity(String emailAddress, String password)
+        public MailAccountEntity(string address, string password)
         {
-            this.Address = emailAddress;
+            this.Address = address;
             this.Password = password;
         }
-
-        public virtual void Save()
-        {
-            MailAccountEntity oldAccount = FindByAddress(this.Address);
-
-            ITransaction tran = currentSession.BeginTransaction();
-
-            if (oldAccount == null)
-            {
-                currentSession.Save(this);
-            }
-            else
-            {
-                oldAccount.Password = this.Password;
-                currentSession.Update(oldAccount);
-            }
-
-            tran.Commit();
-        }
-
-        public static MailAccountEntity FindByAddress(String emailAddress)
-        {
-            MailAccountEntity foundAccount = currentSession.CreateCriteria<MailAccountEntity>()
-                                                     .Add(Restrictions.Eq("Address", emailAddress))
-                                                     .UniqueResult<MailAccountEntity>();
-
-            return foundAccount;
-        }
-
-        public virtual AccountInterface LoginExternal()
-        {
-            return new AccountInterface(this.Address, this.Password);
-        }
-
     }
 }

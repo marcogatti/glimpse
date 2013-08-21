@@ -37,7 +37,4 @@ namespace Glimpse.DataAccessLayer.Entities
 
         public MailEntity() { }
     }
-
-
-
 }
