@@ -13,10 +13,9 @@ namespace Glimpse.DataAccessLayer.Mappings
         {
             Table("Mail");
 
-            Id(x => x.Id).Column("Id_Mail");
-            Map(x => x.IdMailAccount).Column("ID_MailAccount");
-            //Map(x => x.From).Column("ID_From");
-            References<Address>(x => x.From, "ID_From");
+            Id(x => x.Id).Column("ID_Mail").GeneratedBy.Identity();
+            References<MailAccount>(x => x.MailAccount).Column("ID_MailAccount").LazyLoad();
+            References<Address>(x => x.From).Column("ID_From").LazyLoad();
             Map(x => x.gm_tid).Column("GM_ThreadID");
             Map(x => x.gm_mid).Column("GM_MailID");
             Map(x => x.Date).Column("Date");

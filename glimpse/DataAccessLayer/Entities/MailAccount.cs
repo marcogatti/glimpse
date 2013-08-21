@@ -14,6 +14,7 @@ namespace Glimpse.DataAccessLayer.Entities
         public virtual Int32 Id { get; set; }
         public virtual String Address { get; set; }
         public virtual String Password { get; set; }
+        public virtual IList<Mail> Mails { get; set; }
 
         private static ISession currentSession = NHibernateManager.DefaultSesion;
 

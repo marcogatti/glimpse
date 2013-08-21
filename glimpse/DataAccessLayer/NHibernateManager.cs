@@ -47,7 +47,7 @@ namespace Glimpse.DataAccessLayer
 
         private static void InitializeSessionFactory()
         {
-            String connectionString = ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString;
+            String connectionString = ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString + "; Allow Zero Datetime=true;Convert Zero Datetime=true";
             _sessionFactory = Fluently.Configure()
                 .Database(MySQLConfiguration.Standard.ConnectionString(connectionString))
                 .Mappings(m => m.FluentMappings

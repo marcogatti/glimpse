@@ -77,5 +77,10 @@ namespace Glimpse.DataAccessLayer.Entities
                 tran.Commit();
             }
         }
+
+        public virtual void Save()
+        {
+            currentSession.Save(this);
+        }
     }
 }

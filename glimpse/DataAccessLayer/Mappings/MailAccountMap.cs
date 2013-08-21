@@ -14,6 +14,9 @@ namespace Glimpse.DataAccessLayer.Mappings
             Table("MailAccount");
 
             Id(x => x.Id).Column("ID_MailAccount").GeneratedBy.Identity();
+            HasMany<Mail>(x => x.Mails).Inverse()
+                                       .AsBag()
+                                       .LazyLoad();
             Map(x => x.Address).Column("Address");
             Map(x => x.Password).Column("Password");
         }

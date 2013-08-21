@@ -83,7 +83,8 @@ namespace Glimpse.MailInterfaces
         public MailCollection GetMailDataFromHigherThan(String mailbox, Int32 minimumUID)
         {
             //siempre trae al menos uno, excepto si el mailbox está vacío
-            return this.GetMailsDataFrom(mailbox, this.GetMailbox(mailbox).Search("UID " + minimumUID)[0]);
+            if (minimumUID <= 0) minimumUID = 1;
+            return this.GetMailsDataFrom(mailbox, this.GetMailbox(mailbox).Search("UID " + minimumUID + ":*")[0]);
         }
         public MailCollection GetMailsDataFrom(String mailbox, Int32 reversedLastOrdinalToRetrieve)
         {

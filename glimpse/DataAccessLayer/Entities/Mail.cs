@@ -12,7 +12,7 @@ namespace Glimpse.DataAccessLayer.Entities
     public class Mail
     {
         public virtual int Id { get; set; }
-        public virtual int IdMailAccount { get; set; }
+        public virtual MailAccount MailAccount { get; set; }
         public virtual Address From { get; set; }
         public virtual long gm_tid { get; set; }
         public virtual long gm_mid { get; set; }
@@ -34,22 +34,23 @@ namespace Glimpse.DataAccessLayer.Entities
         public virtual String BCC { get; set; }
         public virtual String Body { get; set; }
 
-
         private static ISession currentSession = NHibernateManager.DefaultSesion;
-
 
         public Mail() { }
 
         public virtual Mail Save()
         {
+            this.From.Save();
             currentSession.Save(this);
             return this;
         }
 
-        public virtual IList<Mail> FindFromInbox()
+        public static IList<Mail> FindFromInbox()
         {
-            return (IList<Mail>)currentSession.CreateCriteria<Mail>()
-                                              .Add(Restrictions.Gt("UID_Inbox", 0)).List();
+            var a = currentSession.CreateCriteria<Mail>()
+                                              .Add(Restrictions.Eq("Id", 1)).List();
+
+            return null;
         }
     }
 
