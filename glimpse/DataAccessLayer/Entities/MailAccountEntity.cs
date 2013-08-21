@@ -9,17 +9,17 @@ using System.Web;
 
 namespace Glimpse.DataAccessLayer.Entities
 {
-    public class MailAccount
+    public class MailAccountEntity
     {
-        public virtual Int32 Id { get; set; }
+        public virtual Int64 Id { get; set; }
         public virtual String Address { get; set; }
         public virtual String Password { get; set; }
 
         private static ISession currentSession = NHibernateManager.DefaultSesion;
 
-        public MailAccount() { }
+        public MailAccountEntity() { }
 
-        public MailAccount(String emailAddress, String password)
+        public MailAccountEntity(String emailAddress, String password)
         {
             this.Address = emailAddress;
             this.Password = password;
@@ -27,7 +27,7 @@ namespace Glimpse.DataAccessLayer.Entities
 
         public virtual void Save()
         {
-            MailAccount oldAccount = FindByAddress(this.Address);
+            MailAccountEntity oldAccount = FindByAddress(this.Address);
 
             ITransaction tran = currentSession.BeginTransaction();
 
@@ -44,11 +44,11 @@ namespace Glimpse.DataAccessLayer.Entities
             tran.Commit();
         }
 
-        public static MailAccount FindByAddress(String emailAddress)
+        public static MailAccountEntity FindByAddress(String emailAddress)
         {
-            MailAccount foundAccount = currentSession.CreateCriteria<MailAccount>()
+            MailAccountEntity foundAccount = currentSession.CreateCriteria<MailAccountEntity>()
                                                      .Add(Restrictions.Eq("Address", emailAddress))
-                                                     .UniqueResult<MailAccount>();
+                                                     .UniqueResult<MailAccountEntity>();
 
             return foundAccount;
         }

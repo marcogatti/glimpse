@@ -45,7 +45,7 @@ namespace Glimpse.Controllers
             {
                 UpdateModel(user);
 
-                MailAccount mailAccount = new MailAccount(user.Email, user.Password);
+                MailAccountEntity mailAccount = new MailAccountEntity(user.Email, user.Password);
 
                 Session[MAIL_INTERFACE] = mailAccount.LoginExternal();
                 mailAccount.Save();

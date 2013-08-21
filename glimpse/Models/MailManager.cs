@@ -14,14 +14,14 @@ namespace Glimpse.Models
     {
 
         private AccountInterface accountInterface;
-        private MailAccount account;
+        private MailAccountEntity account;
 
         private static ISession currentSession = NHibernateManager.DefaultSesion;
 
         public const int ALL_MAILS = int.MaxValue;
 
 
-        public MailManager(AccountInterface accountInterface, MailAccount account)
+        public MailManager(AccountInterface accountInterface, MailAccountEntity account)
         {
             this.accountInterface = accountInterface;
             this.account = account;
@@ -31,17 +31,15 @@ namespace Glimpse.Models
         {
             MailCollection mails = new MailCollection();
 
-            Int32 lastDatabaseUID = currentSession.CreateCriteria<Mail>()
-                                                  .Add(Restrictions.Eq("ID_MailAccount", this.account.Id))
-                                                  .SetProjection(Projections.Max("UID_Inbox")).UniqueResult<Int32>();
-
-            //if (lastDatabaseUID == null) lastDatabaseUID = 0;
+            Int64 lastDatabaseUID = currentSession.CreateCriteria<MailEntity>()
+                                                  .Add(Restrictions.Eq("MailAccount.Id", this.account.Id))
+                                                  .SetProjection(Projections.Max("UidInbox")).UniqueResult<Int64>();
 
             mails = this.accountInterface.getMailsFromHigherThan(mailbox, lastDatabaseUID);
             mails.Save();
             if (maxAmount > mails.Count)
             {
-                mails.AddRange((MailCollection)currentSession.CreateCriteria<Mail>()
+                mails.AddRange((MailCollection)currentSession.CreateCriteria<MailEntity>()
                                                .Add(Restrictions.Eq("ID_MailAccount", this.account.Id))
                                                .Add(Restrictions.Le("UID_Inbox", lastDatabaseUID))
                                                .AddOrder(Order.Desc("UID_Inbox"))

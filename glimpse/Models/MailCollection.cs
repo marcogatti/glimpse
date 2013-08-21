@@ -8,7 +8,7 @@ using System.Web;
 
 namespace Glimpse.Models
 {
-    public class MailCollection : List<Mail>
+    public class MailCollection : List<MailEntity>
     {
         private static ISession currentSession = NHibernateManager.DefaultSesion;
 

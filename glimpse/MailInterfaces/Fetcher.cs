@@ -80,7 +80,7 @@ namespace Glimpse.MailInterfaces
         {
             return this.GetMailsDataFrom(mailbox, this.GetMailbox(mailbox).FirstUnseen);
         }
-        public MailCollection GetMailDataFromHigherThan(String mailbox, Int32 minimumUID)
+        public MailCollection GetMailDataFromHigherThan(String mailbox, Int64 minimumUID)
         {
             //siempre trae al menos uno, excepto si el mailbox está vacío
             return this.GetMailsDataFrom(mailbox, this.GetMailbox(mailbox).Search("UID " + minimumUID)[0]);
@@ -92,18 +92,18 @@ namespace Glimpse.MailInterfaces
                 throw new MailReadingOverflowException("No se puede leer mails con ordinal menor a 1.");
             Mailbox targetMailbox = this.GetMailbox(mailbox);
             Message retrievedMessage;
-            Mail retrievedMail;
-            DataAccessLayer.Entities.Address fromAddress = new DataAccessLayer.Entities.Address();
+            MailEntity retrievedMail;
+            DataAccessLayer.Entities.AddressEntity fromAddress = new DataAccessLayer.Entities.AddressEntity();
             MailCollection mailsFromMailbox = new MailCollection();
 
             for (int currentMail = targetMailbox.MessageCount; currentMail >= reversedLastOrdinalToRetrieve; currentMail--)
             {
-                retrievedMail = new Mail();
+                retrievedMail = new MailEntity();
 
                 retrievedMessage = targetMailbox.Fetch.MessageObjectPeekWithGMailExtensions(currentMail);
 
-                retrievedMail.gm_tid = long.Parse(this.CleanIMAPResponse(receiver.Command("FETCH " + currentMail + " (X-GM-THRID)"), "X-GM-THRID"));
-                retrievedMail.gm_mid = long.Parse(this.CleanIMAPResponse(receiver.Command("FETCH " + currentMail + " (X-GM-MSGID)"), "X-GM-MSGID"));
+                retrievedMail.Gm_tid = long.Parse(this.CleanIMAPResponse(receiver.Command("FETCH " + currentMail + " (X-GM-THRID)"), "X-GM-THRID"));
+                retrievedMail.Gm_mid = long.Parse(this.CleanIMAPResponse(receiver.Command("FETCH " + currentMail + " (X-GM-MSGID)"), "X-GM-MSGID"));
                 //mailData["labels"] = this.CleanLabels(retrievedMessage.HeaderFields["x-gm-labels"]);
 
                 fromAddress.MailAddress = retrievedMessage.From.Email;
@@ -117,7 +117,7 @@ namespace Glimpse.MailInterfaces
                                              || retrievedMessage.EmbeddedObjects.Count != 0
                                              || retrievedMessage.UnknownDispositionMimeParts.Count != 0);
 
-                retrievedMail.To = this.GetAddressNameAndMail(retrievedMessage.To);
+                retrievedMail.ToAddr = this.GetAddressNameAndMail(retrievedMessage.To);
                 retrievedMail.BCC = this.GetAddressNameAndMail(retrievedMessage.Bcc);
                 retrievedMail.CC = this.GetAddressNameAndMail(retrievedMessage.Cc);
 
@@ -250,7 +250,7 @@ namespace Glimpse.MailInterfaces
             imapResponse = imapResponse.Remove(imapResponse.IndexOf(")"));
             return imapResponse;
         }
-        private void AddUIDToMail(String mailbox, Int64 UID, ref Mail mail)
+        private void AddUIDToMail(String mailbox, Int64 UID, ref MailEntity mail)
         {
             //UIDs no cargados son completados por GlimpseDB como -1
             if (this.accountMailboxesBySpecialProperty["Inbox"] == mailbox)
@@ -266,7 +266,7 @@ namespace Glimpse.MailInterfaces
             if (this.accountMailboxesBySpecialProperty["Drafts"] == mailbox)
             {mail.UidDraft = UID; return;}
         }
-        private void AddFlagsToMail(String flags, ref Mail mail)
+        private void AddFlagsToMail(String flags, ref MailEntity mail)
         {
             if (flags.Contains("answered")) mail.Answered = true;
             if (flags.Contains("flagged")) mail.Flagged = true;

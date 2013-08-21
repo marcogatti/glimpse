@@ -10,17 +10,27 @@ using NHibernate.Criterion;
 using Glimpse;
 using Glimpse.DataAccessLayer;
 using Glimpse.DataAccessLayer.Entities;
-using Glimpse.DataAccessLayer.Mappings;
+using NHibernate.Cfg;
+using NHibernate.Tool.hbm2ddl;
 
 namespace Glimpse.Tests.DAL
 {
     [TestFixture]
     public class MailAccountTest
     {
-        [Test]
-        public void CreateConnectionAndReturnNullResult()
+        private static void BuildSchema(Configuration cfg)
         {
+            new SchemaExport(cfg).SetOutputFile("D://dropschema").Drop(true, true);
+            new SchemaExport(cfg).SetOutputFile("D://schema").Create(true, true);
+        }
 
+        [Test]
+        [Explicit]
+        public void CreateSchema()
+        {
+            var dataAccessService = new NHibernateManager();
+            dataAccessService.CreateSessionFactory();
+            BuildSchema(dataAccessService.NhibernateConfiguration);
         }
     }
 }

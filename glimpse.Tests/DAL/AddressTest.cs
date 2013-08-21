@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Glimpse.DataAccessLayer.Entities;
-using Glimpse.DataAccessLayer.Mappings;
 using NUnit.Framework;
 
 namespace Glimpse.Tests.DAL
@@ -26,7 +25,7 @@ namespace Glimpse.Tests.DAL
         [Test]
         public void CreateANewAddress()
         {
-            Address.RemoveByAddress(anAddress);
+            AddressEntity.RemoveByAddress(anAddress);
 
             this.CreateOrUpdateAnAddress();
         }
@@ -34,8 +33,8 @@ namespace Glimpse.Tests.DAL
         [Test]
         public void CreateOrUpdateAnAddress()
         {
-            Address createdAddress = Address.Save(anAddress, aName);
-            Address foundAddress = Address.FindByAddress(createdAddress.MailAddress);
+            AddressEntity createdAddress = AddressEntity.Save(anAddress, aName);
+            AddressEntity foundAddress = AddressEntity.FindByAddress(createdAddress.MailAddress);
 
             Assert.AreEqual(createdAddress.MailAddress, foundAddress.MailAddress);
             Assert.AreEqual(createdAddress.Name, foundAddress.Name);

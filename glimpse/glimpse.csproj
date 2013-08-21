@@ -194,12 +194,10 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AsyncMailsController.cs" />
-    <Compile Include="DataAccessLayer\Entities\Address.cs" />
-    <Compile Include="DataAccessLayer\Entities\Mail.cs" />
-    <Compile Include="DataAccessLayer\Entities\MailAccount.cs" />
-    <Compile Include="DataAccessLayer\Mappings\AddressMap.cs" />
-    <Compile Include="DataAccessLayer\Mappings\MailAccountMap.cs" />
-    <Compile Include="DataAccessLayer\Mappings\MailMap.cs" />
+    <Compile Include="DataAccessLayer\Entities\AddressEntity.cs" />
+    <Compile Include="DataAccessLayer\Entities\MailEntity.cs" />
+    <Compile Include="DataAccessLayer\Entities\MailAccountEntity.cs" />
+    <Compile Include="DataAccessLayer\Mappings\GlimpseAutomappingConfiguration.cs" />
     <Compile Include="DataAccessLayer\NHibernateManager.cs" />
     <Compile Include="Exceptions\ControllersExceptions\CookieNotFoundException.cs" />
     <Compile Include="Exceptions\Internationalization\DefaultLanguageNotSettedException.cs" />

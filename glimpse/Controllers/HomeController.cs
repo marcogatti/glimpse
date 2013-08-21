@@ -22,7 +22,7 @@ namespace Glimpse.Controllers
         // GET: /Home/
         public ActionResult Index()
         {
-            MailAccount mailAccount = MailAccount.FindByAddress(new CookieHelper().getMailAddressFromCookie());
+            MailAccountEntity mailAccount = MailAccountEntity.FindByAddress(new CookieHelper().getMailAddressFromCookie());
 
             if (mailAccount == null)
             {
@@ -44,7 +44,7 @@ namespace Glimpse.Controllers
                 }
             }
 
-            // RESOLVER ESTOOOOOOOOOO, PERO YA MIERDA
+            // RESOLVER ESTOOOOOOOOOO, PERO YA MIERDA, YA FALTA POCO
 
             //MailManager manager = new MailManager(accountInterface, mailAccount);
             //manager.FetchFromMailbox("INBOX");
