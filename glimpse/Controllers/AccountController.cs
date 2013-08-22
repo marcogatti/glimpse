@@ -49,7 +49,8 @@ namespace Glimpse.Controllers
                 MailAccount mailAccount = new MailAccount(new MailAccountEntity(user.Email, user.Password));
 
                 Session[MAIL_INTERFACE] = mailAccount.LoginExternal();
-                mailAccount.Save();
+
+                mailAccount.SaveOrUpdate();
 
                 new CookieHelper().addMailAddressCookie(mailAccount.Entity.Address);
                 FormsAuthentication.SetAuthCookie(user.Email, user.rememberMe);
@@ -77,7 +78,7 @@ namespace Glimpse.Controllers
             return Redirect("/");
         }
 
-
+        [NonAction]
         private ActionResult RedirectToLocal(string returnUrl)
         {
             if (Url.IsLocalUrl(returnUrl))

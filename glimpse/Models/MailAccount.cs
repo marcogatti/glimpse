@@ -27,31 +27,46 @@ namespace Glimpse.Models
         }
 
 
-        public virtual void Save()
+        public virtual void SaveOrUpdate()
         {
-            MailAccount oldAccount = FindByAddress(this.Entity.Address);
             ISession currentSession = NHibernateManager.OpenSession();
             ITransaction tran = currentSession.BeginTransaction();
 
+            MailAccount persistAccount;
+
+            MailAccount oldAccount = FindByAddress(this.Entity.Address, currentSession);
             if (oldAccount == null)
             {
-                currentSession.Save(this);
+                persistAccount = this;
             }
             else
             {
-                oldAccount.Entity.Password = this.Entity.Password;
-                currentSession.Update(oldAccount);
+                persistAccount = oldAccount;
+                persistAccount.CopyEntityDataFrom(this);
             }
 
+            currentSession.SaveOrUpdate(persistAccount.Entity);
+   
             tran.Commit();
+        }
+
+        private void CopyEntityDataFrom(MailAccount fromAccount)
+        {
+            this.Entity.Address = fromAccount.Entity.Address;
+            this.Entity.Password = fromAccount.Entity.Password;
+        }
+
+        public static MailAccount FindByAddress(String emailAddress, ISession session)
+        {
+            return new MailAccount(session.CreateCriteria<MailAccountEntity>()
+                                          .Add(Restrictions.Eq("Address", emailAddress))
+                                          .UniqueResult<MailAccountEntity>());
         }
 
         public static MailAccount FindByAddress(String emailAddress)
         {
-            return new MailAccount(NHibernateManager.OpenSession()
-                                                    .CreateCriteria<MailAccountEntity>()
-                                                    .Add(Restrictions.Eq("Address", emailAddress))
-                                                    .UniqueResult<MailAccountEntity>());
+            ISession session = NHibernateManager.OpenSession();
+            return FindByAddress(emailAddress, session);
         }
 
         public virtual AccountInterface LoginExternal()
