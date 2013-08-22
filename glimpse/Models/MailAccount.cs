@@ -35,7 +35,7 @@ namespace Glimpse.Models
             MailAccount persistAccount;
 
             MailAccount oldAccount = FindByAddress(this.Entity.Address, currentSession);
-            if (oldAccount == null)
+            if (oldAccount.Entity == null)
             {
                 persistAccount = this;
             }

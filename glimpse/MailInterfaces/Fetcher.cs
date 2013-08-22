@@ -94,7 +94,7 @@ namespace Glimpse.MailInterfaces
             Mailbox targetMailbox = this.GetMailbox(mailbox);
             Message retrievedMessage;
             MailEntity retrievedMail;
-            DataAccessLayer.Entities.AddressEntity fromAddress = new DataAccessLayer.Entities.AddressEntity();
+            
             MailCollection mailsFromMailbox = new MailCollection();
 
             for (int currentMail = targetMailbox.MessageCount; currentMail >= reversedLastOrdinalToRetrieve; currentMail--)
@@ -107,6 +107,7 @@ namespace Glimpse.MailInterfaces
                 retrievedMail.Gm_mid = long.Parse(this.CleanIMAPResponse(receiver.Command("FETCH " + currentMail + " (X-GM-MSGID)"), "X-GM-MSGID"));
                 //mailData["labels"] = this.CleanLabels(retrievedMessage.HeaderFields["x-gm-labels"]);
 
+                DataAccessLayer.Entities.AddressEntity fromAddress = new DataAccessLayer.Entities.AddressEntity();
                 fromAddress.MailAddress = retrievedMessage.From.Email;
                 fromAddress.Name = retrievedMessage.From.Name;
 
