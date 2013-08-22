@@ -10,19 +10,32 @@ namespace Glimpse.Models
 {
     public class MailCollection : List<MailEntity>, IList<MailEntity>
     {
-        private static ISession currentSession = NHibernateManager.DefaultSesion;
-
         public void Save()
         {
+            ISession currentSession = NHibernateManager.OpenSession();
+
             ITransaction tran = currentSession.BeginTransaction();
 
             foreach (MailEntity mailToSave in this)
             {
-                currentSession.SaveOrUpdate(mailToSave.From);
+                AddressEntity foundAddress = AddressEntity.FindByAddress(mailToSave.From.MailAddress, currentSession);
+
+                if (foundAddress == null)
+                {
+                    currentSession.SaveOrUpdate(mailToSave.From);
+                }
+                else
+                {
+                    mailToSave.From = foundAddress;
+                }
+
                 currentSession.SaveOrUpdate(mailToSave);
             }
 
             tran.Commit();
+
+            currentSession.Flush();
+            currentSession.Close();
         }
 
         public void loadMailAccount(MailAccount mailAccount)

@@ -24,7 +24,7 @@ namespace Glimpse.Controllers
         {
             MailAccount mailAccount = MailAccount.FindByAddress(new CookieHelper().getMailAddressFromCookie());
 
-            if (mailAccount == null)
+            if (mailAccount.Entity == null)
             {
                 return this.LogOut();
             }

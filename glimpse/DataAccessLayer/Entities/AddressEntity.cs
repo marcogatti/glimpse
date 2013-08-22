@@ -14,9 +14,6 @@ namespace Glimpse.DataAccessLayer.Entities
         public virtual String MailAddress { get; set; }
         public virtual String Name { get; set; }
 
-        private static ISession currentSession = NHibernateManager.DefaultSesion;
-
-
         private AddressEntity(String mailAddress, String name)
         {
             this.MailAddress = mailAddress;
@@ -26,23 +23,24 @@ namespace Glimpse.DataAccessLayer.Entities
         public AddressEntity() { }
 
 
-        public static AddressEntity Save(String mailAddress, String name)
+        public static AddressEntity Save(String mailAddress, String name, ISession session)
         {
-            AddressEntity newAddress = new AddressEntity(mailAddress, name);
-            AddressEntity oldAddress = FindByAddress(mailAddress);
+            AddressEntity newAddress = new AddressEntity(mailAddress, name); 
             AddressEntity returnAddress;
 
-            ITransaction tran = currentSession.BeginTransaction();
+            ITransaction tran = session.BeginTransaction();
+
+            AddressEntity oldAddress = FindByAddress(mailAddress, session);
 
             if (oldAddress == null)
             {
-                currentSession.Save(newAddress);
+                session.Save(newAddress);
                 returnAddress = newAddress;
             }
             else
             {
                 ResetWithOtherAddress(oldAddress, newAddress);
-                currentSession.Update(oldAddress);
+                session.Update(oldAddress);
                 returnAddress = oldAddress;
             }
 
@@ -57,22 +55,22 @@ namespace Glimpse.DataAccessLayer.Entities
             to.Name = from.Name;
         }
 
-        public static AddressEntity FindByAddress(String address)
+        public static AddressEntity FindByAddress(String address, ISession session)
         {
-            AddressEntity foundAddress = currentSession.CreateCriteria<AddressEntity>()
+            AddressEntity foundAddress = session.CreateCriteria<AddressEntity>()
                     .Add(Restrictions.Eq("MailAddress", address))
                     .UniqueResult<AddressEntity>();
 
             return foundAddress;
         }
 
-        public static void RemoveByAddress(String mailAddress)
+        public static void RemoveByAddress(String mailAddress, ISession session)
         {
-            if (FindByAddress(mailAddress) != null)
+            if (FindByAddress(mailAddress, session) != null)
             {
-                ITransaction tran = currentSession.BeginTransaction();
+                ITransaction tran = session.BeginTransaction();
 
-                currentSession.Delete(FindByAddress(mailAddress));
+                session.Delete(FindByAddress(mailAddress, session));
 
                 tran.Commit();
             }

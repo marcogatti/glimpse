@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Glimpse.DataAccessLayer.Entities;
 using NUnit.Framework;
+using NHibernate;
+using Glimpse.DataAccessLayer;
 
 namespace Glimpse.Tests.DAL
 {
@@ -13,6 +15,7 @@ namespace Glimpse.Tests.DAL
     {
         private String anAddress;
         private String aName;
+        private ISession aSession = NHibernateManager.OpenSession();
 
 
         [SetUp]
@@ -25,7 +28,7 @@ namespace Glimpse.Tests.DAL
         [Test]
         public void CreateANewAddress()
         {
-            AddressEntity.RemoveByAddress(anAddress);
+            AddressEntity.RemoveByAddress(anAddress, aSession);
 
             this.CreateOrUpdateAnAddress();
         }
@@ -33,8 +36,8 @@ namespace Glimpse.Tests.DAL
         [Test]
         public void CreateOrUpdateAnAddress()
         {
-            AddressEntity createdAddress = AddressEntity.Save(anAddress, aName);
-            AddressEntity foundAddress = AddressEntity.FindByAddress(createdAddress.MailAddress);
+            AddressEntity createdAddress = AddressEntity.Save(anAddress, aName, aSession);
+            AddressEntity foundAddress = AddressEntity.FindByAddress(createdAddress.MailAddress, aSession);
 
             Assert.AreEqual(createdAddress.MailAddress, foundAddress.MailAddress);
             Assert.AreEqual(createdAddress.Name, foundAddress.Name);
