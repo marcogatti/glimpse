@@ -39,9 +39,11 @@ namespace Glimpse.Models
             {
                 mails = this.accountInterface.getMailsFromHigherThan(mailbox, lastDatabaseUID);
                 mails.loadMailAccount(this.account);
-                mails.Save();
+                mails.Save(currentSession);
             }
+
             List<MailEntity> returnMails = mails.ToList<MailEntity>();
+
             if (maxAmount > mails.Count)
             { 
                 returnMails.AddRange(currentSession.CreateCriteria<MailEntity>()
@@ -50,12 +52,15 @@ namespace Glimpse.Models
                                                .AddOrder(Order.Desc("UidInbox"))
                                                .SetMaxResults(maxAmount - mails.Count)
                                                .List<MailEntity>());
-                return returnMails;
             }
             else
             {
-                return (List<MailEntity>)returnMails.Take<MailEntity>(maxAmount);
+                returnMails = (List<MailEntity>)returnMails.Take<MailEntity>(maxAmount);
             }
+
+            currentSession.Flush();
+
+            return returnMails;
         }
     }
 }

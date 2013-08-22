@@ -10,10 +10,8 @@ namespace Glimpse.Models
 {
     public class MailCollection : List<MailEntity>, IList<MailEntity>
     {
-        public void Save()
+        public void Save(ISession currentSession)
         {
-            ISession currentSession = NHibernateManager.OpenSession();
-
             ITransaction tran = currentSession.BeginTransaction();
 
             foreach (MailEntity mailToSave in this)
@@ -33,9 +31,6 @@ namespace Glimpse.Models
             }
 
             tran.Commit();
-
-            currentSession.Flush();
-            currentSession.Close();
         }
 
         public void loadMailAccount(MailAccount mailAccount)
