@@ -32,7 +32,7 @@ namespace Glimpse.Models
             MailCollection mails = new MailCollection();
 
             Int64 lastDatabaseUID = currentSession.CreateCriteria<MailEntity>()
-                                                  .Add(Restrictions.Eq("MailAccount.Id", this.account.Entity.Id))
+                                                  .Add(Restrictions.Eq("MailAccountEntity", this.account.Entity))
                                                   .SetProjection(Projections.Max("UidInbox")).UniqueResult<Int64>();
             Int32 lastImapUID = this.accountInterface.getLastUIDFrom(mailbox);
             if (lastImapUID > lastDatabaseUID)
@@ -45,13 +45,15 @@ namespace Glimpse.Models
             List<MailEntity> returnMails = mails.ToList<MailEntity>();
 
             if (maxAmount > mails.Count)
-            { 
-                returnMails.AddRange(currentSession.CreateCriteria<MailEntity>()
-                                               .Add(Restrictions.Eq("MailAccount", this.account.Entity))
+            {
+                IList<MailEntity> dbMails = currentSession.CreateCriteria<MailEntity>()
+                                               .Add(Restrictions.Eq("MailAccountEntity", this.account.Entity))
                                                .Add(Restrictions.Le("UidInbox", lastDatabaseUID))
                                                .AddOrder(Order.Desc("UidInbox"))
                                                .SetMaxResults(maxAmount - mails.Count)
-                                               .List<MailEntity>());
+                                               .List<MailEntity>();
+
+                returnMails.AddRange(dbMails);
             }
             else
             {

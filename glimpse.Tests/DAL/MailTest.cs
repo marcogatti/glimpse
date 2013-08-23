@@ -31,7 +31,7 @@ namespace Glimpse.Tests.DAL
 
             aMail = new Mail(new MailEntity());
             aMail.Entity.Subject = "Mail de prueba";
-            aMail.Entity.MailAccount = anAccount.Entity;
+            aMail.Entity.MailAccountEntity = anAccount.Entity;
             session.SaveOrUpdate(aMail.Entity);
 
             tran.Commit();

@@ -37,7 +37,7 @@ namespace Glimpse.Models
         {
             foreach (MailEntity mail in this)
             {
-                mail.MailAccount = mailAccount.Entity;
+                mail.MailAccountEntity = mailAccount.Entity;
             }
         }
     }

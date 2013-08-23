@@ -28,7 +28,7 @@ namespace Glimpse.Models
         public static IList<MailEntity> FetchFromInbox(MailAccount mailAccount, int maxAmount){
             return NHibernateManager.OpenSession()
                                     .CreateCriteria<MailEntity>()
-                                    .Add(Restrictions.Eq("MailAccount.Id", mailAccount.Entity.Id))
+                                    .Add(Restrictions.Eq("MailAccountEntity", mailAccount.Entity))
                                     .List<MailEntity>();
         }
 
