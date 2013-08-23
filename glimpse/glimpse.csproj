@@ -203,6 +203,7 @@
     <Compile Include="DataAccessLayer\Entities\MailAccountEntity.cs" />
     <Compile Include="DataAccessLayer\Mappings\AddressMappingOverride.cs" />
     <Compile Include="DataAccessLayer\Mappings\AutomappingConfiguration.cs" />
+    <Compile Include="DataAccessLayer\Mappings\LabelAutomappingOverride.cs" />
     <Compile Include="DataAccessLayer\Mappings\MailAccountAutomappingOverride.cs" />
     <Compile Include="DataAccessLayer\Mappings\MailMappingOverride.cs" />
     <Compile Include="DataAccessLayer\Mappings\MailPerLabelAutomappinOverride.cs" />

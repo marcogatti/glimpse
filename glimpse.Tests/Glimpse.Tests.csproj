@@ -167,6 +167,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DAL\AddressTest.cs" />
+    <Compile Include="DAL\CreateSchema.cs" />
     <Compile Include="DAL\MailAccountTest.cs" />
     <Compile Include="DAL\MailTest.cs" />
     <Compile Include="DAL\NHibernateTest.cs" />
