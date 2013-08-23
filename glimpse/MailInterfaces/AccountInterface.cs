@@ -13,15 +13,7 @@ namespace Glimpse.MailInterfaces
 
         public String Username { get; set; }
         public String Password { get; set; }
-
-        public AccountInterface(String username, String password)
-        {
-            this.Username = username;
-            this.Password = password;
-            this.myFetcher = new Fetcher(username, password);
-            this.mySender = new Sender();
-        }
-
+               
         public MessageCollection GetInboxMessages()
         {
             return this.myFetcher.GetInboxMails();

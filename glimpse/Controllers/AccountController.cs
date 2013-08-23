@@ -41,12 +41,11 @@ namespace Glimpse.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Login(UserViewModel user, string returnUrl)
         {
-
             try
             {
                 UpdateModel(user);
 
-                MailAccount mailAccount = new MailAccount(new MailAccountEntity(user.Email, user.Password));
+                MailAccount mailAccount = new MailAccount(user.Email, user.Password);
 
                 Session[MAIL_INTERFACE] = mailAccount.LoginExternal();
 

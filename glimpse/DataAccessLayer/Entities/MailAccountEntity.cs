@@ -19,10 +19,12 @@ namespace Glimpse.DataAccessLayer.Entities
 
         public MailAccountEntity() { }
 
-        public MailAccountEntity(string address, string password)
+        public MailAccountEntity(String address, String password)
         {
             this.Address = address;
             this.Password = password;
+            this.Labels = new List<LabelEntity>();
+            this.Mails = new List<MailEntity>();
         }
     }
 }

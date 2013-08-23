@@ -7,25 +7,38 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using ActiveUp.Net.Mail;
 
 namespace Glimpse.Models
 {
     public class MailAccount
     {
-        private MailAccountEntity _entity;
-        public MailAccountEntity Entity
+        private Fetcher myFetcher { get; set; }
+        private Sender mySender { get; set; }
+
+        public MailAccountEntity Entity { get; set; }        
+
+        public MailAccount(String address, String password)
         {
-            get
-            {
-                return _entity;
-            }
+            this.Entity = new MailAccountEntity(address, password);
+            this.myFetcher = new Fetcher(address, password);
+            this.mySender = new Sender();
         }
 
-        public MailAccount(MailAccountEntity entity)
+        public MessageCollection GetInboxMessages()
         {
-            this._entity = entity;
+            return this.myFetcher.GetInboxMails();
         }
 
+        public Int32 getLastUIDFrom(String mailbox)
+        {
+            return this.myFetcher.GetLastUIDFrom(mailbox);
+        }
+
+        public MailCollection getMailsFromHigherThan(string mailbox, Int64 lastUID)
+        {
+            return this.myFetcher.GetMailDataFromHigherThan(mailbox, lastUID);
+        }
 
         public virtual void SaveOrUpdate()
         {
@@ -58,9 +71,11 @@ namespace Glimpse.Models
 
         public static MailAccount FindByAddress(String emailAddress, ISession session)
         {
-            return new MailAccount(session.CreateCriteria<MailAccountEntity>()
+            MailAccountEntity mae = session.CreateCriteria<MailAccountEntity>()
                                           .Add(Restrictions.Eq("Address", emailAddress))
-                                          .UniqueResult<MailAccountEntity>());
+                                          .UniqueResult<MailAccountEntity>();
+
+            return new MailAccount(mae.Address, mae.Password);
         }
 
         public static MailAccount FindByAddress(String emailAddress)
