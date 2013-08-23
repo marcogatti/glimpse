@@ -196,11 +196,14 @@
     <Compile Include="Controllers\AsyncMailsController.cs" />
     <Compile Include="DataAccessLayer\Entities\AddressEntity.cs" />
     <Compile Include="DataAccessLayer\Entities\ExtraEntity.cs" />
+    <Compile Include="DataAccessLayer\Entities\MailPerLabel.cs" />
+    <Compile Include="DataAccessLayer\Mappings\ExtraMappingOverride.cs" />
     <Compile Include="DataAccessLayer\Entities\LabelEntity.cs" />
     <Compile Include="DataAccessLayer\Entities\MailEntity.cs" />
     <Compile Include="DataAccessLayer\Entities\MailAccountEntity.cs" />
     <Compile Include="DataAccessLayer\Mappings\AddressMappingOverride.cs" />
     <Compile Include="DataAccessLayer\Mappings\AutomappingConfiguration.cs" />
+    <Compile Include="DataAccessLayer\Mappings\MailAccountAutomappingOverride.cs" />
     <Compile Include="DataAccessLayer\Mappings\MailMappingOverride.cs" />
     <Compile Include="DataAccessLayer\NHibernateManager.cs" />
     <Compile Include="Exceptions\ControllersExceptions\CookieNotFoundException.cs" />
