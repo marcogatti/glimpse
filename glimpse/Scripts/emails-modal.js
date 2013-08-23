@@ -1,5 +1,5 @@
 ﻿
-function calculateEmailsPosition(maxAge) {
+function calculateEmailsPosition() {
 
     var containerWidth = $("#email-container").width();
     var containerHeight = $("#email-container").height();
@@ -41,7 +41,8 @@ function setModal() {
 $(document).ready(function () {
 
     setModal();
-    calculateEmailsPosition(maxAge);
+    calculateEmailsPosition();
+    $(window).resize(function () { calculateEmailsPosition() })
 
 })
 

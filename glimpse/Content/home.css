@@ -28,7 +28,8 @@
     float: left;
     overflow: hidden;
     position: absolute;
-    background: #20B2AA;
+    /*background: #20b2aa;*/
+    background-color: rgba(32, 178, 170, 0.5);
     text-align: center;
 
     text-shadow: 
@@ -54,20 +55,11 @@
         -moz-transform: scale(1.5);
         -o-transform: scale(1.5);
         transform: scale(1.5);
-
         overflow: visible;
-        z-index: 99;
-
-     -webkit-box-shadow: 
-        inset 0 0 0 8px rgba(255,255,255,0.4),
-        0 4px 8px rgba(0,0,0,0.5);
-     box-shadow: 
-        inset 0 0 0 8px rgba(255,255,255,0.4),
-        0 4px 8px rgba(0,0,0,0.5);
-
-        text-shadow: 
-            0 0 1px #fff, 
-            0 2px 4px rgba(0,0,0,1);
+        z-index: +10;
+        -webkit-box-shadow: inset 0 0 0 8px rgba(255,255,255,0.4), 0 4px 8px rgba(0,0,0,0.5);
+        box-shadow: inset 0 0 0 8px rgba(255,255,255,0.4), 0 4px 8px rgba(0,0,0,0.5);
+        text-shadow: 0 0 1px #fff, 0 2px 4px rgba(0,0,0,1);
     }
 
     .circle p {
