@@ -57,7 +57,7 @@ namespace Glimpse.Models
             }
             else
             {
-                returnMails = (List<MailEntity>)returnMails.Take<MailEntity>(maxAmount);
+                returnMails = returnMails.Take<MailEntity>(maxAmount).ToList<MailEntity>();
             }
 
             currentSession.Flush();
