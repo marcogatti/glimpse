@@ -226,6 +226,7 @@
     <Compile Include="MailInterfaces\AccountInterface.cs" />
     <Compile Include="Exceptions\MailInterfacesExceptions\MailReadingOverflowException.cs" />
     <Compile Include="MailInterfaces\Sender.cs" />
+    <Compile Include="Models\Address.cs" />
     <Compile Include="Models\Mail.cs" />
     <Compile Include="Models\MailAccount.cs" />
     <Compile Include="Models\MailCollection.cs" />

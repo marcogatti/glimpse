@@ -16,15 +16,15 @@ namespace Glimpse.Models
 
             foreach (MailEntity mailToSave in this)
             {
-                AddressEntity foundAddress = AddressEntity.FindByAddress(mailToSave.From.MailAddress, currentSession);
+                Address foundAddress = Address.FindByAddress(mailToSave.From.MailAddress, currentSession);
 
-                if (foundAddress == null)
+                if (foundAddress.Entity == null)
                 {
                     currentSession.SaveOrUpdate(mailToSave.From);
                 }
                 else
                 {
-                    mailToSave.From = foundAddress;
+                    mailToSave.From = foundAddress.Entity;
                 }
 
                 currentSession.SaveOrUpdate(mailToSave);

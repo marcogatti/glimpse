@@ -7,41 +7,53 @@ using Glimpse.DataAccessLayer.Entities;
 using NUnit.Framework;
 using NHibernate;
 using Glimpse.DataAccessLayer;
+using Glimpse.Models;
+using NHibernate.Criterion;
 
 namespace Glimpse.Tests.DAL
 {
-   [TestFixture]
+    [TestFixture]
     public class AddressTest
     {
         private String anAddress;
         private String aName;
-        private ISession aSession = NHibernateManager.OpenSession();
+        private ISession aSession;
 
 
-        [SetUp]
-        public void setSomeAddresses() {
+        [TestFixtureSetUp]
+        public void setSomeAddressesAndSession()
+        {
             this.anAddress = "testAddress@example.com";
             this.aName = "TestImap";
+            this.aSession = NHibernateManager.OpenSession();
         }
 
 
         [Test]
         public void CreateANewAddress()
         {
-            AddressEntity.RemoveByAddress(anAddress, aSession);
+            ITransaction tran = aSession.BeginTransaction();
 
-            this.CreateOrUpdateAnAddress();
+            AddressEntity entity = new AddressEntity(anAddress, aName);
+
+            aSession.Save(entity);
+
+            tran.Commit();
+
+            Assert.AreEqual(entity.MailAddress, Address.FindByAddress(anAddress, aSession).Entity.MailAddress);
         }
 
-        [Test]
-        public void CreateOrUpdateAnAddress()
+        [TestFixtureTearDown]
+        public void CleanUpDBAndEndSession()
         {
-            AddressEntity createdAddress = AddressEntity.Save(anAddress, aName, aSession);
-            AddressEntity foundAddress = AddressEntity.FindByAddress(createdAddress.MailAddress, aSession);
+            ITransaction tran = aSession.BeginTransaction();
 
-            Assert.AreEqual(createdAddress.MailAddress, foundAddress.MailAddress);
-            Assert.AreEqual(createdAddress.Name, foundAddress.Name);
-            Assert.AreEqual(createdAddress.Id, foundAddress.Id);
+            aSession.Delete(Address.FindByAddress(anAddress, aSession).Entity);
+
+            tran.Commit();
+
+            aSession.Flush();
+            aSession.Close();
         }
     }
 }
