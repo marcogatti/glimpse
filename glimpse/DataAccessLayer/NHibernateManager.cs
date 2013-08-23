@@ -67,11 +67,12 @@ namespace Glimpse.DataAccessLayer
 
         private static FluentConfiguration CreateFluentConfiguration()
         {
-            var entitiesToMapConfiguration = new GlimpseAutomappingConfiguration();
+            var entitiesToMapConfiguration = new AutomappingConfiguration();
             String connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString;
             return Fluently.Configure()
                         .Database(MySQLConfiguration.Standard.ConnectionString(connectionString))
-                        .Mappings(m => m.AutoMappings.Add(AutoMap.AssemblyOf<MailEntity>(entitiesToMapConfiguration)));
+                        .Mappings(m => m.AutoMappings.Add(AutoMap.AssemblyOf<MailEntity>(entitiesToMapConfiguration)
+                                                                 .UseOverridesFromAssemblyOf<AddressMappingOverride>));
         }
 
         public static ISession OpenSession()

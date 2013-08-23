@@ -199,7 +199,9 @@
     <Compile Include="DataAccessLayer\Entities\LabelEntity.cs" />
     <Compile Include="DataAccessLayer\Entities\MailEntity.cs" />
     <Compile Include="DataAccessLayer\Entities\MailAccountEntity.cs" />
-    <Compile Include="DataAccessLayer\Mappings\GlimpseAutomappingConfiguration.cs" />
+    <Compile Include="DataAccessLayer\Mappings\AddressMappingOverride.cs" />
+    <Compile Include="DataAccessLayer\Mappings\AutomappingConfiguration.cs" />
+    <Compile Include="DataAccessLayer\Mappings\MailMappingOverride.cs" />
     <Compile Include="DataAccessLayer\NHibernateManager.cs" />
     <Compile Include="Exceptions\ControllersExceptions\CookieNotFoundException.cs" />
     <Compile Include="Exceptions\Internationalization\DefaultLanguageNotSettedException.cs" />

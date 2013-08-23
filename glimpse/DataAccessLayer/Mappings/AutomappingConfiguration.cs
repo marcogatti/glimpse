@@ -6,7 +6,7 @@ using System.Web;
 
 namespace Glimpse.DataAccessLayer.Mappings
 {
-    public class GlimpseAutomappingConfiguration : DefaultAutomappingConfiguration
+    public class AutomappingConfiguration : DefaultAutomappingConfiguration
     {
         public override bool ShouldMap(Type type)
         {
