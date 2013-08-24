@@ -136,6 +136,50 @@ namespace Glimpse.MailInterfaces
             this.receiver.Disconnect();
         }
 
+        public void archiveMail(Int64 gmMailID)
+        {
+            this.removeMailTag("INBOX", gmMailID);
+        }
+        public void removeMailTag(String mailbox, Int64 gmMailID)
+        {
+            Mailbox targetMailbox = this.GetMailbox(mailbox);
+            Int32 mailUID = this.getMailUID(mailbox, gmMailID);
+            targetMailbox.UidMoveMessage(mailUID, this.accountMailboxesBySpecialProperty["All"]);
+            this.currentOpenedMailbox.MessageCount--;
+        }
+        public void addMailTag(String mailbox, String tagToAdd, Int64 gmMailID)
+        {
+            Mailbox targetMailbox = this.GetMailbox(mailbox);
+            Int32 mailUID = this.getMailUID(mailbox, gmMailID);
+            targetMailbox.UidCopyMessage(mailUID, tagToAdd);
+        }
+        public void moveToTrash(String mailbox, Int64 gmMailID)
+        {
+            Mailbox targetMailbox = this.GetMailbox(mailbox);
+            Int32 mailUID = this.getMailUID(mailbox, gmMailID);
+            targetMailbox.UidMoveMessage(mailUID, this.accountMailboxesBySpecialProperty["Deleted"]);
+            this.currentOpenedMailbox.MessageCount--;
+        }
+        public void removeFromTrash(String destinyMailbox, Int64 gmMailID)
+        {
+            Mailbox targetMailbox = this.GetMailbox(this.accountMailboxesBySpecialProperty["Deleted"]);
+            Int32 mailUID = this.getMailUID(this.accountMailboxesBySpecialProperty["Deleted"], gmMailID);
+            targetMailbox.UidMoveMessage(mailUID, destinyMailbox);
+            this.currentOpenedMailbox.MessageCount--;
+        }
+        public void deleteFromTrash(Int64 gmMailID)
+        {
+            Mailbox targetMailbox = this.GetMailbox(this.accountMailboxesBySpecialProperty["Deleted"]);
+            Int32 mailUID = this.getMailUID(this.accountMailboxesBySpecialProperty["Deleted"], gmMailID);
+            targetMailbox.UidDeleteMessage(mailUID, true);
+            this.currentOpenedMailbox.MessageCount--;
+        }
+        public Int32 getMailUID(String mailbox, Int64 gmMailID)
+        {
+            this.GetMailbox(mailbox); //Se asegura que se encuentra seleccionado el mailbox en IMAP
+            return Int32.Parse(this.CleanIMAPResponse(this.receiver.Command("UID SEARCH X-GM-MSGID " + gmMailID.ToString()), "SEARCH", false));
+        }
+
         private Mailbox GetMailbox(String targetMailboxName)
         {
             if (this.currentOpenedMailbox == null)
@@ -165,16 +209,16 @@ namespace Glimpse.MailInterfaces
             this.receiver.Close();
             this.currentOpenedMailbox = null;
         }
-        private void loadMailboxesAndSpecialProperties(string imapResponse)
+        private void loadMailboxesAndSpecialProperties(string imapLISTResponse)
         {
             /*imapResponse del tipo (incluyendo \r\n):
               (\HasNoChildren) "INBOX"
               (\Noselect \HasChildren) "[Gmail]"
               (\HasNoChildren \Drafts) "[Gmail]/Borradores"
               (\HasNoChildren \All) "[Gmail]/Todos"*/
-            String[] mailboxes = new String[imapResponse.Split(new string[] { "LIST" }, StringSplitOptions.RemoveEmptyEntries).Length];
-            imapResponse = imapResponse.Replace("* LIST", String.Empty).Replace(" \"/\"", String.Empty);
-            mailboxes = imapResponse.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+            String[] mailboxes = new String[imapLISTResponse.Split(new string[] { "LIST" }, StringSplitOptions.RemoveEmptyEntries).Length];
+            imapLISTResponse = imapLISTResponse.Replace("* LIST", String.Empty).Replace(" \"/\"", String.Empty);
+            mailboxes = imapLISTResponse.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
 
             foreach (String mailbox in mailboxes)
             {
@@ -245,11 +289,20 @@ namespace Glimpse.MailInterfaces
 
             return labels;
         }
-        private String CleanIMAPResponse(String imapResponse, String imapParameter)
+        private String CleanIMAPResponse(String imapResponse, String imapParameter, Boolean isGMSpecific = true)
         {
-            //Respuesta del tipo: "* 1 FETCH (X-GM-MSGID 1278455344230334865)\r\na006 OK FETCH (Success)"
+            //Respuesta del tipo: 
+            //GMSpecific:    "* 1 FETCH (X-GM-MSGID 1278455344230334865)\r\na006 OK FETCH (Success)"
+            //NotGMSpecific: "* SEARCH 15184\r\na007 OK SEARCH (Success)
             imapResponse = imapResponse.Remove(0, imapResponse.IndexOf(imapParameter) + imapParameter.Length + 1);
-            imapResponse = imapResponse.Remove(imapResponse.IndexOf(")"));
+            if (isGMSpecific)
+            {
+                imapResponse = imapResponse.Remove(imapResponse.IndexOf(")"));
+            }
+            else
+            {
+                imapResponse = imapResponse.Remove(imapResponse.IndexOf("\r\n"));
+            }
             return imapResponse;
         }
         private void AddUIDToMail(String mailbox, Int64 UID, ref MailEntity mail)
