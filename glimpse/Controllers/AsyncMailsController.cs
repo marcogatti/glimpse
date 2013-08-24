@@ -1,5 +1,6 @@
 ﻿using ActiveUp.Net.Mail;
 using Glimpse.DataAccessLayer.Entities;
+using Glimpse.Exceptions;
 using Glimpse.Helpers;
 using Glimpse.MailInterfaces;
 using Glimpse.Models;
@@ -19,7 +20,19 @@ namespace Glimpse.Controllers
         // GET: /AsyncMails/InboxMails
         public ActionResult InboxMails(int amountOfEmails = 0)
         {
+            try
+            {
+                IList<Object> mailsToSend = this.FetchMails(amountOfEmails);
+                return Json(new { success = true, mails = mailsToSend }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception)
+            {
+                return Json(new { success = false, message = "Error al obtener los mails" }, JsonRequestBehavior.AllowGet);
+            }
+        }
 
+        private IList<Object> FetchMails(int amountOfEmails)
+        {
             AccountInterface accountInterface = (AccountInterface)Session[AccountController.MAIL_INTERFACE];
 
             if (accountInterface != null)
@@ -30,14 +43,12 @@ namespace Glimpse.Controllers
 
                 IList<MailEntity> mails = manager.FetchFromMailbox("INBOX");
 
-                JsonResult response = Json(new { success = true, mails = PrepareToSend(mails) }, JsonRequestBehavior.AllowGet);
-                return response;
+                return PrepareToSend(mails);
             }
             else
             {
-                return Json(new { success = false, message = "Uuups, something went wrong!" }, JsonRequestBehavior.AllowGet);
+                throw new GlimpseException("El MailInterface no estaba inicializado.");
             }
-
         }
 
         private IList<Object> PrepareToSend(IList<MailEntity> mails)
