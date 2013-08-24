@@ -47,9 +47,9 @@ namespace Glimpse.Controllers
 
                 MailAccount mailAccount = new MailAccount(user.Email, user.Password);
 
-                Session[MAIL_INTERFACE] = mailAccount.LoginExternal();
-
                 mailAccount.SaveOrUpdate();
+
+                Session[MAIL_INTERFACE] = mailAccount;
 
                 new CookieHelper().addMailAddressCookie(mailAccount.Entity.Address);
                 FormsAuthentication.SetAuthCookie(user.Email, user.rememberMe);

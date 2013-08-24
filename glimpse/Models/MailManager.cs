@@ -13,18 +13,15 @@ namespace Glimpse.Models
     public class MailManager
     {
 
-        private AccountInterface accountInterface;
-        private MailAccount account;
+        private MailAccount mailAccount;        
 
         private static ISession currentSession = NHibernateManager.DefaultSesion;
 
         public const int ALL_MAILS = int.MaxValue;
 
-
-        public MailManager(AccountInterface accountInterface, MailAccount account)
+        public MailManager(MailAccount mailAccount)
         {
-            this.accountInterface = accountInterface;
-            this.account = account;
+            this.mailAccount = mailAccount;            
         }
 
         public List<MailEntity> FetchFromMailbox(String mailbox, int maxAmount = ALL_MAILS)
@@ -32,13 +29,15 @@ namespace Glimpse.Models
             MailCollection mails = new MailCollection();
 
             Int64 lastDatabaseUID = currentSession.CreateCriteria<MailEntity>()
-                                                  .Add(Restrictions.Eq("MailAccount.Id", this.account.Entity.Id))
-                                                  .SetProjection(Projections.Max("UidInbox")).UniqueResult<Int64>();
-            Int32 lastImapUID = this.accountInterface.getLastUIDFrom(mailbox);
+                                                  .Add(Restrictions.Eq("MailAccount.Id", this.mailAccount.Entity.Id))
+                                                  .SetProjection(Projections.Max("UidInbox"))
+                                                  .UniqueResult<Int64>();
+
+            Int32 lastImapUID = this.mailAccount.getLastUIDFrom(mailbox);
             if (lastImapUID > lastDatabaseUID)
             {
-                mails = this.accountInterface.getMailsFromHigherThan(mailbox, lastDatabaseUID);
-                mails.loadMailAccount(this.account);
+                mails = this.mailAccount.getMailsFromHigherThan(mailbox, lastDatabaseUID);
+                mails.loadMailAccount(this.mailAccount);
                 mails.Save(currentSession);
             }
 
@@ -47,7 +46,7 @@ namespace Glimpse.Models
             if (maxAmount > mails.Count)
             { 
                 returnMails.AddRange(currentSession.CreateCriteria<MailEntity>()
-                                               .Add(Restrictions.Eq("MailAccount", this.account.Entity))
+                                               .Add(Restrictions.Eq("MailAccount", this.mailAccount.Entity))
                                                .Add(Restrictions.Le("UidInbox", lastDatabaseUID))
                                                .AddOrder(Order.Desc("UidInbox"))
                                                .SetMaxResults(maxAmount - mails.Count)

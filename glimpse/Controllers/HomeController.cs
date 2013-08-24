@@ -22,21 +22,23 @@ namespace Glimpse.Controllers
         // GET: /Home/
         public ActionResult Index()
         {
-            MailAccount mailAccount = MailAccount.FindByAddress(new CookieHelper().getMailAddressFromCookie());
+            String mailAddress = new CookieHelper().getMailAddressFromCookie();
 
-            if (mailAccount.Entity == null)
+            MailAccount cookieMailAccount = MailAccount.FindByAddress(mailAddress);
+
+            if (cookieMailAccount.Entity == null)
             {
                 return this.LogOut();
             }
 
-            AccountInterface accountInterface = (AccountInterface)Session[AccountController.MAIL_INTERFACE];
+            MailAccount mailAccount = (MailAccount)Session[AccountController.MAIL_INTERFACE];
 
-            if (accountInterface == null)
+            if (mailAccount == null)
             {
                 try
                 {
-                    accountInterface = mailAccount.LoginExternal();
-                    Session[AccountController.MAIL_INTERFACE] = accountInterface;
+                    mailAccount = cookieMailAccount.LoginExternal();
+                    Session[AccountController.MAIL_INTERFACE] = mailAccount;
                 }
                 catch (InvalidAuthenticationException)
                 {
@@ -44,10 +46,10 @@ namespace Glimpse.Controllers
                 }
             }
 
-            MailManager manager = new MailManager(accountInterface, mailAccount);
+            MailManager manager = new MailManager(mailAccount, cookieMailAccount);
 
             ViewBag.InboxMessages = manager.FetchFromMailbox("INBOX");
-            ViewBag.Email = mailAccount.Entity.Address;
+            ViewBag.Email = cookieMailAccount.Entity.Address;
 
             return View();
         }

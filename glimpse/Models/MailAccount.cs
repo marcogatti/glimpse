@@ -21,7 +21,7 @@ namespace Glimpse.Models
         public MailAccount(String address, String password)
         {
             this.Entity = new MailAccountEntity(address, password);
-            this.myFetcher = new Fetcher(address, password);
+            this.LoginExternal();
             this.mySender = new Sender();
         }
 
@@ -47,7 +47,7 @@ namespace Glimpse.Models
 
             MailAccount persistAccount;
 
-            MailAccount oldAccount = FindByAddress(this.Entity.Address, currentSession);
+            MailAccount oldAccount = FindByAddress(this.Entity.Address);
             if (oldAccount.Entity == null)
             {
                 persistAccount = this;
@@ -63,31 +63,27 @@ namespace Glimpse.Models
             tran.Commit();
         }
 
-        private void CopyEntityDataFrom(MailAccount fromAccount)
+        public static MailAccount FindByAddress(String emailAddress)
         {
-            this.Entity.Address = fromAccount.Entity.Address;
-            this.Entity.Password = fromAccount.Entity.Password;
-        }
-
-        public static MailAccount FindByAddress(String emailAddress, ISession session)
-        {
+            ISession session = NHibernateManager.OpenSession();
+            
             MailAccountEntity mae = session.CreateCriteria<MailAccountEntity>()
                                           .Add(Restrictions.Eq("Address", emailAddress))
                                           .UniqueResult<MailAccountEntity>();
 
             return new MailAccount(mae.Address, mae.Password);
         }
-
-        public static MailAccount FindByAddress(String emailAddress)
+                
+        public MailAccount LoginExternal()
         {
-            ISession session = NHibernateManager.OpenSession();
-            return FindByAddress(emailAddress, session);
+            this.myFetcher = new Fetcher(this.Entity.Address, this.Entity.Password);
+            return this;
         }
 
-        public virtual AccountInterface LoginExternal()
+        private void CopyEntityDataFrom(MailAccount fromAccount)
         {
-            return new AccountInterface(this.Entity.Address, this.Entity.Password);
+            this.Entity.Address = fromAccount.Entity.Address;
+            this.Entity.Password = fromAccount.Entity.Password;
         }
-
     }
 }

@@ -1,5 +1,6 @@
 ﻿using ActiveUp.Net.Mail;
 using Glimpse.MailInterfaces;
+using Glimpse.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +17,7 @@ namespace Glimpse.Controllers
         public ActionResult InboxMails(int amountOfEmails = 0)
         {
 
-            AccountInterface account = (AccountInterface)Session[AccountController.MAIL_INTERFACE];
+            MailAccount account = (MailAccount)Session[AccountController.MAIL_INTERFACE];
 
             if (account != null)
             {
