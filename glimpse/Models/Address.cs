@@ -10,20 +10,37 @@ namespace Glimpse.Models
 {
     public class Address
     {
-        private AddressEntity _entity;
-        public AddressEntity Entity
-        {
-            get
-            {
-                return _entity;
-            }
-        }
+        public AddressEntity Entity { get; private set; }
 
         public Address(AddressEntity entity)
         {
-            this._entity = entity;
+            this.Entity = entity;
         }
 
+        public static Address FindByAddress(String address, ISession session)
+        {
+            var entity = session.CreateCriteria<AddressEntity>()
+                    .Add(Restrictions.Eq("MailAddress", address))
+                    .UniqueResult<AddressEntity>();
+
+            Address foundAddress = new Address(entity);
+
+            return foundAddress;
+        }
+
+        public static void RemoveByAddress(String mailAddress, ISession session)
+        {
+            Address foundAddress = FindByAddress(mailAddress, session);
+
+            if (foundAddress != null)
+            {
+                ITransaction tran = session.BeginTransaction();
+
+                session.Delete(foundAddress);
+
+                tran.Commit();
+            }
+        }
 
         public void Save(ISession currentSession)
         {
@@ -39,38 +56,19 @@ namespace Glimpse.Models
             }
             else
             {
-                oldAddress.CopyEntityDataFrom(this.Entity);
+                oldAddress.Clone(this.Entity);
                 persistAddress = oldAddress.Entity;
             }
 
             currentSession.SaveOrUpdate(persistAddress);
 
             tran.Commit();
-        }
+        }        
 
-        private void CopyEntityDataFrom(AddressEntity from)
+        private void Clone(AddressEntity from)
         {
             this.Entity.MailAddress = from.MailAddress;
             this.Entity.Name = from.Name;
-        }
-
-        public static Address FindByAddress(String address, ISession session)
-        {
-            return new Address(session.CreateCriteria<AddressEntity>()
-                    .Add(Restrictions.Eq("MailAddress", address))
-                    .UniqueResult<AddressEntity>());
-        }
-
-        public static void RemoveByAddress(String mailAddress, ISession session)
-        {
-            if (FindByAddress(mailAddress, session) != null)
-            {
-                ITransaction tran = session.BeginTransaction();
-
-                session.Delete(FindByAddress(mailAddress, session));
-
-                tran.Commit();
-            }
         }
     }
 }

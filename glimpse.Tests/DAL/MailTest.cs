@@ -38,7 +38,7 @@ namespace Glimpse.Tests.DAL
         [Test]
         public void GetOneMailFromInboxAndDataIsOK()
         {
-            Mail theMail = new Mail(Mail.FetchFromInbox(anAccount, 1).First<MailEntity>());
+            Mail theMail = new Mail(Mail.FindByMailAccount(anAccount, 1).First<MailEntity>());
 
             Assert.AreEqual(aMail.Entity.Subject, theMail.Entity.Subject);
         }

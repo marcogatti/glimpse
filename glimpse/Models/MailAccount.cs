@@ -55,7 +55,7 @@ namespace Glimpse.Models
             else
             {
                 persistAccount = oldAccount;
-                persistAccount.CopyEntityDataFrom(this);
+                persistAccount.Clone(this);
             }
 
             currentSession.SaveOrUpdate(persistAccount.Entity);
@@ -67,11 +67,11 @@ namespace Glimpse.Models
         {
             ISession session = NHibernateManager.OpenSession();
             
-            MailAccountEntity mae = session.CreateCriteria<MailAccountEntity>()
+            MailAccountEntity account = session.CreateCriteria<MailAccountEntity>()
                                           .Add(Restrictions.Eq("Address", emailAddress))
                                           .UniqueResult<MailAccountEntity>();
 
-            return new MailAccount(mae.Address, mae.Password);
+            return new MailAccount(account.Address, account.Password);
         }
                 
         public MailAccount LoginExternal()
@@ -80,7 +80,7 @@ namespace Glimpse.Models
             return this;
         }
 
-        private void CopyEntityDataFrom(MailAccount fromAccount)
+        private void Clone(MailAccount fromAccount)
         {
             this.Entity.Address = fromAccount.Entity.Address;
             this.Entity.Password = fromAccount.Entity.Password;
