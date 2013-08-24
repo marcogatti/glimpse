@@ -1,4 +1,4 @@
-﻿@using ActiveUp.Net.Mail
+﻿@using Glimpse.DataAccessLayer.Entities
 
 @section css {
     @Styles.Render("~/Home/css")}
@@ -71,7 +71,7 @@
 
         <div id="email-container" class="span10">
 
-            @foreach (Message inboxMail in ViewBag.InboxMessages)
+            @foreach (MailEntity inboxMail in ViewBag.InboxMessages)
             {
                 Int64 age = DateTime.Now.Ticks - inboxMail.Date.Ticks;
 
@@ -80,13 +80,13 @@
                 }
                     
                 <a data-toggle="modal" href="#example">
-                    <div class="circle" data-body="@inboxMail.BodyHtml.Text"
-                                            data-subject="@inboxMail.Subject.ToString()"
-                                            data-date="@inboxMail.Date.ToString()"
-                                            data-from="@inboxMail.From.Email.ToString()"
+                    <div class="circle" data-body="@inboxMail.Body"
+                                            data-subject="@inboxMail.Subject"
+                                            data-date="@inboxMail.Date"
+                                            data-from="@inboxMail.From.MailAddress"
                                             data-age="@age">
                         <p class="subject">@inboxMail.Subject</p>
-                        <p>@inboxMail.From.Email.ToString()</p>
+                        <p>@inboxMail.From.MailAddress</p>
                     </div>
                 </a>
             }

@@ -8,28 +8,34 @@ using System.Web;
 
 namespace Glimpse.Models
 {
-    public class MailCollection : List<Mail>
+    public class MailCollection : List<MailEntity>, IList<MailEntity>
     {
-        private static ISession currentSession = NHibernateManager.DefaultSesion;
-
-        public void Save()
+        public void Save(ISession currentSession)
         {
             ITransaction tran = currentSession.BeginTransaction();
 
-            //currentSession.Save(this);
-
-            foreach(Mail mailToSave in this)
+            foreach (MailEntity mailToSave in this)
             {
-                mailToSave.Save();
+                Address foundAddress = Address.FindByAddress(mailToSave.From.MailAddress, currentSession);
+
+                if (foundAddress.Entity == null)
+                {
+                    currentSession.SaveOrUpdate(mailToSave.From);
+                }
+                else
+                {
+                    mailToSave.From = foundAddress.Entity;
+                }
+
+                currentSession.SaveOrUpdate(mailToSave);
             }
-            tran.Commit();
         }
 
         public void loadMailAccount(MailAccount mailAccount)
         {
-            foreach (Mail mail in this)
+            foreach (MailEntity mail in this)
             {
-                mail.MailAccount = mailAccount;
+                mail.MailAccountEntity = mailAccount.Entity;
             }
         }
     }

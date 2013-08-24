@@ -24,7 +24,7 @@ namespace Glimpse.Controllers
         {
             MailAccount mailAccount = MailAccount.FindByAddress(new CookieHelper().getMailAddressFromCookie());
 
-            if (mailAccount == null)
+            if (mailAccount.Entity == null)
             {
                 return this.LogOut();
             }
@@ -44,13 +44,10 @@ namespace Glimpse.Controllers
                 }
             }
 
-            // RESOLVER ESTOOOOOOOOOO, PERO YA MIERDA
+            MailManager manager = new MailManager(accountInterface, mailAccount);
 
-            //MailManager manager = new MailManager(accountInterface, mailAccount);
-            //manager.FetchFromMailbox("INBOX");
-
-            ViewBag.InboxMessages = accountInterface.GetInboxMessages();
-            ViewBag.Email = mailAccount.Address;
+            ViewBag.InboxMessages = manager.FetchFromMailbox("INBOX");
+            ViewBag.Email = mailAccount.Entity.Address;
 
             return View();
         }

@@ -10,17 +10,14 @@ using NHibernate.Criterion;
 using Glimpse;
 using Glimpse.DataAccessLayer;
 using Glimpse.DataAccessLayer.Entities;
-using Glimpse.DataAccessLayer.Mappings;
+using NHibernate.Cfg;
+using NHibernate.Tool.hbm2ddl;
 
 namespace Glimpse.Tests.DAL
 {
     [TestFixture]
     public class MailAccountTest
     {
-        [Test]
-        public void CreateConnectionAndReturnNullResult()
-        {
 
-        }
     }
 }

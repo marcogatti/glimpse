@@ -61,7 +61,7 @@ namespace Glimpse.Tests
             Assert.IsTrue(retrievedMails[4].HasExtras);
             Assert.AreEqual(11, retrievedMails[5].UidInbox);
             Assert.IsTrue(retrievedMails[6].UidDraft <= 0 && retrievedMails[6].UidSent <= 0 && retrievedMails[6].UidSpam <= 0);
-            Assert.IsTrue(retrievedMails[7].To.Contains("imap.sealed@gmail.com") && retrievedMails[7].To.Contains("test.imap.505@gmail.com"));
+            Assert.IsTrue(retrievedMails[7].ToAddr.Contains("imap.sealed@gmail.com") && retrievedMails[7].ToAddr.Contains("test.imap.505@gmail.com"));
             Assert.IsTrue(retrievedMails[0].Flagged && retrievedMails[3].Seen && !retrievedMails[0].Seen);
         }
     }

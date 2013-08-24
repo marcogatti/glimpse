@@ -27,31 +27,42 @@ namespace Glimpse.Models
             this.account = account;
         }
 
-        public MailCollection FetchFromMailbox(String mailbox, int maxAmount = ALL_MAILS)
+        public List<MailEntity> FetchFromMailbox(String mailbox, int maxAmount = ALL_MAILS)
         {
             MailCollection mails = new MailCollection();
 
-            Int32 lastDatabaseUID = (Int32)currentSession.CreateCriteria<Mail>()
-                                                  .Add(Restrictions.Eq("MailAccount.Id", this.account.Id))
+            Int64 lastDatabaseUID = currentSession.CreateCriteria<MailEntity>()
+                                                  .Add(Restrictions.Eq("MailAccountEntity", this.account.Entity))
                                                   .SetProjection(Projections.Max("UidInbox")).UniqueResult<Int64>();
+            Int32 lastImapUID = this.accountInterface.getLastUIDFrom(mailbox);
+            if (lastImapUID > lastDatabaseUID)
+            {
+                mails = this.accountInterface.getMailsFromHigherThan(mailbox, lastDatabaseUID);
+                mails.loadMailAccount(this.account);
+                mails.Save(currentSession);
+            }
 
-            mails = this.accountInterface.getMailsFromHigherThan(mailbox, lastDatabaseUID);
-            mails.loadMailAccount(this.account);
-            mails.Save();
+            List<MailEntity> returnMails = mails.ToList<MailEntity>();
+
             if (maxAmount > mails.Count)
             {
-                mails.AddRange((MailCollection)currentSession.CreateCriteria<Mail>()
-                                               .Add(Restrictions.Eq("MailAccount", this.account.Id))
+                IList<MailEntity> dbMails = currentSession.CreateCriteria<MailEntity>()
+                                               .Add(Restrictions.Eq("MailAccountEntity", this.account.Entity))
                                                .Add(Restrictions.Le("UidInbox", lastDatabaseUID))
                                                .AddOrder(Order.Desc("UidInbox"))
                                                .SetMaxResults(maxAmount - mails.Count)
-                                               .List());
-                return mails;
+                                               .List<MailEntity>();
+
+                returnMails.AddRange(dbMails);
             }
             else
             {
-                return (MailCollection)mails.Take(maxAmount);
+                returnMails = returnMails.Take<MailEntity>(maxAmount).ToList<MailEntity>();
             }
+
+            currentSession.Flush();
+
+            return returnMails;
         }
     }
 }

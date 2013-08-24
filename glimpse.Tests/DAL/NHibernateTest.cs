@@ -10,7 +10,8 @@ using NHibernate.Criterion;
 using Glimpse;
 using Glimpse.DataAccessLayer;
 using Glimpse.DataAccessLayer.Entities;
-using Glimpse.DataAccessLayer.Mappings;
+using NHibernate.Cfg;
+using NHibernate.Tool.hbm2ddl;
 
 namespace Glimpse.Tests.DAL
 {
@@ -24,9 +25,9 @@ namespace Glimpse.Tests.DAL
         {
             session = NHibernateManager.OpenSession();
 
-            Mail myMail = session.CreateCriteria<Mail>()
-                                .Add(Restrictions.Eq("Id", int.MaxValue))
-                                .UniqueResult<Mail>();
+            MailEntity myMail = session.CreateCriteria<MailEntity>()
+                                .Add(Restrictions.Eq("Id", Int64.MaxValue))
+                                .UniqueResult<MailEntity>();
 
             Assert.IsNull(myMail);
         }
