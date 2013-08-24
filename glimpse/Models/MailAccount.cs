@@ -22,7 +22,7 @@ namespace Glimpse.Models
         {
             this.Entity = new MailAccountEntity(address, password);
             this.LoginExternal();
-            this.mySender = new Sender();
+            this.mySender = new Sender(address, password);
         }
 
         public MessageCollection GetInboxMessages()

@@ -16,13 +16,13 @@ namespace Glimpse.Tests
     {
         Fetcher myFetcher;
 
-        [SetUp]
+        [TestFixtureSetUp]
         public void SetUp()
         {
             this.myFetcher = new Fetcher("imap.sealed@gmail.com", "imapsealed");
         }
 
-        [TearDown]
+        [TestFixtureTearDown]
         public void TearDown()
         {
             this.myFetcher.CloseClient();

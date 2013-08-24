@@ -173,6 +173,7 @@
     <Compile Include="DAL\NHibernateTest.cs" />
     <Compile Include="Internationalization\InternationalizationTest.cs" />
     <Compile Include="MailInterfaces\ConnectorTest.cs" />
+    <Compile Include="MailInterfaces\SenderTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MailInterfaces\FetcherTest.cs" />
     <Compile Include="Global\AutoTests.cs" />
@@ -180,6 +181,7 @@
   <ItemGroup>
     <Content Include="App.config" />
     <Content Include="Internationalization\LanguageElements.xml" />
+    <Content Include="MailInterfaces\ReadSign.jpg" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

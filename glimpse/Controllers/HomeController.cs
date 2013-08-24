@@ -46,7 +46,7 @@ namespace Glimpse.Controllers
                 }
             }
 
-            MailManager manager = new MailManager(mailAccount, cookieMailAccount);
+            MailManager manager = new MailManager(mailAccount);
 
             ViewBag.InboxMessages = manager.FetchFromMailbox("INBOX");
             ViewBag.Email = cookieMailAccount.Entity.Address;
