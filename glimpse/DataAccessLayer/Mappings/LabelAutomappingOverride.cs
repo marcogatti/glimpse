@@ -12,7 +12,7 @@ namespace Glimpse.DataAccessLayer.Mappings
     {
         public void Override(AutoMapping<LabelEntity> mapping)
         {
-            mapping.HasOne<MailAccountEntity>(x => x.MailAccount);
+            mapping.References<MailAccountEntity>(x => x.MailAccount).Cascade.None();
         }
 
     }

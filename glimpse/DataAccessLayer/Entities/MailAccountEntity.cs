@@ -17,9 +17,13 @@ namespace Glimpse.DataAccessLayer.Entities
         public virtual IList<LabelEntity> Labels { get; set; }
         public virtual IList<MailEntity> Mails { get; set; }
 
-        public MailAccountEntity() { }
+        public MailAccountEntity()
+        {
+            this.Labels = new List<LabelEntity>();
+            this.Mails = new List<MailEntity>();
+        }
 
-        public MailAccountEntity(string address, string password)
+        public MailAccountEntity(string address, string password) : this()
         {
             this.Address = address;
             this.Password = password;

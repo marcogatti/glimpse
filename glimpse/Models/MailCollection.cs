@@ -29,6 +29,9 @@ namespace Glimpse.Models
 
                 currentSession.SaveOrUpdate(mailToSave);
             }
+
+            tran.Commit();
+            currentSession.Flush();
         }
 
         public void loadMailAccount(MailAccount mailAccount)

@@ -91,7 +91,18 @@ namespace Glimpse.MailInterfaces
             //Trae los mails desde el mail más reciente (el ordinal mayor) hasta el mail con ordinal por parámetro reversedLastOrdinalToRetrieve
             if (reversedLastOrdinalToRetrieve <= 0)
                 throw new MailReadingOverflowException("No se puede leer mails con ordinal menor a 1.");
-            Mailbox targetMailbox = this.GetMailbox(mailbox);
+
+            Mailbox targetMailbox;
+
+            try
+            {
+                targetMailbox = this.GetMailbox(mailbox);
+            }
+            catch (Exception e)
+            {
+                throw new CouldNotSelectMailboxException("Error while selecting mailbox INBOX", e);
+            }
+
             Message retrievedMessage;
             MailEntity retrievedMail;
 
@@ -101,13 +112,24 @@ namespace Glimpse.MailInterfaces
             {
                 retrievedMail = new MailEntity();
                 retrievedMessage = new Message();
+                string raw_gmtid;
+                string raw_gmmid;
+                int thisUid;
+                String thisFlags;
 
                 try
                 {
                     retrievedMessage = targetMailbox.Fetch.MessageObjectPeekWithGMailExtensions(currentMail);
-                    retrievedMail.Gm_tid = UInt64.Parse(this.CleanIMAPResponse(receiver.Command("FETCH " + currentMail + " (X-GM-THRID)"), "X-GM-THRID"));
-                    retrievedMail.Gm_mid = UInt64.Parse(this.CleanIMAPResponse(receiver.Command("FETCH " + currentMail + " (X-GM-MSGID)"), "X-GM-MSGID"));
+                    raw_gmtid = this.CleanIMAPResponse(receiver.Command("FETCH " + currentMail + " (X-GM-THRID)"), "X-GM-THRID");
+                    raw_gmmid = this.CleanIMAPResponse(receiver.Command("FETCH " + currentMail + " (X-GM-MSGID)"), "X-GM-MSGID");
+                    thisUid = targetMailbox.Fetch.Uid(currentMail);
+                    thisFlags = targetMailbox.Fetch.Flags(currentMail).Merged;
                     //mailData["labels"] = this.CleanLabels(retrievedMessage.HeaderFields["x-gm-labels"]);
+                }
+                catch (Imap4Exception)
+                {
+                    // Log to database
+                    continue;
                 }
                 catch (Exception)
                 {
@@ -115,7 +137,7 @@ namespace Glimpse.MailInterfaces
                     continue;
                 }
 
-                DataAccessLayer.Entities.AddressEntity fromAddress = new DataAccessLayer.Entities.AddressEntity();
+                AddressEntity fromAddress = new AddressEntity();
                 fromAddress.MailAddress = retrievedMessage.From.Email;
                 fromAddress.Name = retrievedMessage.From.Name;
 
@@ -131,22 +153,11 @@ namespace Glimpse.MailInterfaces
                 retrievedMail.BCC = this.GetAddressNameAndMail(retrievedMessage.Bcc);
                 retrievedMail.CC = this.GetAddressNameAndMail(retrievedMessage.Cc);
 
-                try
-                {
-                    this.AddUIDToMail(mailbox, targetMailbox.Fetch.Uid(currentMail), ref retrievedMail);
-                    this.AddFlagsToMail(targetMailbox.Fetch.Flags(currentMail).Merged, ref retrievedMail);
-                }
-                catch (Imap4Exception)
-                {
-                    // Log to database
-                    continue;
-                }
+                this.AddUIDToMail(mailbox, thisUid, ref retrievedMail);
+                this.AddFlagsToMail(targetMailbox.Fetch.Flags(currentMail).Merged, ref retrievedMail);
 
-                catch (Exception)
-                {
-                    // Log to database
-                    continue;
-                }
+                retrievedMail.Gm_tid = UInt64.Parse(raw_gmtid);
+                retrievedMail.Gm_mid = UInt64.Parse(raw_gmmid);
 
                 //mailsFromMailbox representa el mail más reciente mientras más bajo sea el índice
                 mailsFromMailbox.Add(retrievedMail);

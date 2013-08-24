@@ -16,7 +16,9 @@ namespace Glimpse.DataAccessLayer.Mappings
             mapping.Map(x => x.CC).CustomSqlType("TEXT");
             mapping.Map(x => x.BCC).CustomSqlType("TEXT");
             mapping.Map(x => x.Body).CustomSqlType("LONGTEXT").LazyLoad();
-            mapping.References<MailAccountEntity>(x => x.MailAccountEntity);
+            mapping.References<MailAccountEntity>(x => x.MailAccountEntity).Cascade.None();
+            mapping.HasMany<ExtraEntity>(x => x.Extras).Inverse().Cascade.All();
+            mapping.HasMany<MailPerLabelEntity>(x => x.LabelsPerMail).Inverse().Cascade.None();
         }
     }
 }
