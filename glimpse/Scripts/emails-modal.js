@@ -10,11 +10,11 @@ function calculateEmailsPosition() {
         var left = $(this).attr('data-age') / maxAge;
         var top = ($(this).attr('data-from').charCodeAt(0) - "a".charCodeAt(0)) / 26;    
 
-        $(this).css('top', function (index) {
+        $(this).css('top', function () {
             return top * (containerHeight - (maxSize * 0.6)) + 'px';
         });
 
-        $(this).css('left', function (index) {
+        $(this).css('left', function () {
             return left * (containerWidth - (maxSize * 0.6)) + 'px';
         });
     })
@@ -38,11 +38,41 @@ function setModal() {
     });
 }
 
+function configureCircleHover() {
+
+    var dateTime = $(".dateTime");
+
+    $(".circle").hover(
+
+        function () {
+
+            var currentCircle = $(this);
+
+            dateTime.html(
+                '<div class="dateTime">' + currentCircle.data("date") + '</div>'
+            );
+
+            dateTime.css({
+                "visibility": "visible",
+                "left": function () {
+                    return currentCircle.css("left")
+                }
+            });
+        }, function () {
+            dateTime.css("visibility", "hidden");
+        })
+
+    dateTime.css("top", function () {
+        return $("#email-container").height();
+    });
+}
+
 $(document).ready(function () {
 
     setModal();
     calculateEmailsPosition();
     $(window).resize(function () { calculateEmailsPosition() })
+    configureCircleHover();
 
 })
 
