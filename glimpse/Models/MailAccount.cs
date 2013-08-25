@@ -60,12 +60,12 @@ namespace Glimpse.Models
 
         public virtual void SaveOrUpdate()
         {
-            ISession currentSession = NHibernateManager.OpenSession();
-            ITransaction tran = currentSession.BeginTransaction();
+            ISession session = NHibernateManager.OpenSession();
+            ITransaction tran = session.BeginTransaction();
 
             MailAccount persistAccount;
 
-            MailAccount oldAccount = FindByAddress(this.Entity.Address, currentSession);
+            MailAccount oldAccount = FindByAddress(this.Entity.Address, session);
             if (oldAccount == null)
             {
                 persistAccount = this;
@@ -76,9 +76,10 @@ namespace Glimpse.Models
                 persistAccount.Clone(this);
             }
 
-            currentSession.SaveOrUpdate(persistAccount.Entity);
+            session.SaveOrUpdate(persistAccount.Entity);
    
             tran.Commit();
+            session.Close();
         }
         
         public MailAccount LoginExternal()
