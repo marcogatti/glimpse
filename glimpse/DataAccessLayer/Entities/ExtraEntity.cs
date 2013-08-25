@@ -14,7 +14,5 @@ namespace Glimpse.DataAccessLayer.Entities
         public virtual String FileType { get; set; }
         public virtual Int16 ExtraType { get; set; }
         public virtual Byte[] Data { get; set; }
-
-        public ExtraEntity() { }
     }
 }
