@@ -74,32 +74,33 @@ function fetchMailsAsync() {
 
     $.getJSON("async/InboxMails", function (data) {
 
-        $.each(data.mails, function (index, value) {
+        if (data.success == true) {
 
-            if (value.age > maxAge) {
-                maxAge = value.age;
-            }
+            $.each(data.mails, function (index, value) {
 
-            var newCircle = "<a data-toggle='modal' href='#example'><div class='circle'" +
-                    "data-date='" + value.date + "' data-from='" + value.from.address +
-                    "' data-age='"+ value.age +"'>" +
-                    "<p class='subject'>"+ value.subject +"</p></div></a>"
+                if (value.age > maxAge) {
+                    maxAge = value.age;
+                }
 
-            $("#email-container").append(newCircle);
-        });
+                var newCircle = "<a data-toggle='modal' href='#example'><div class='circle' data-date='" + value.date +
+                        "' data-from='" + value.from.address +
+                        "' data-age='" + value.age + "'>" +
+                        "<p class='subject'>" + value.subject + "</p></div></a>"
+
+                $("#email-container").append(newCircle);
+            });
+        } else alert(data.message);
+
+    }).done(function () {
+        calculateEmailsPosition();
+        configureCircleHover();
+        setModal();
+        $(window).resize(function () { calculateEmailsPosition() })
     });
 }
 
 $(document).ready(function () {
 
-    setModal();
-
-    // RESOLVER ORDEN!
     fetchMailsAsync();
-    calculateEmailsPosition();
-
-    $(window).resize(function () { calculateEmailsPosition() })
-    configureCircleHover();
-
 })
 
