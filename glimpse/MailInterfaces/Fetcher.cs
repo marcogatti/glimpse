@@ -30,24 +30,6 @@ namespace Glimpse.MailInterfaces
             return this.accountMailboxesBySpecialProperty;
         }
 
-        public MessageCollection GetInboxMails()
-        {
-            return this.GetAllMailsFrom("INBOX");
-        }
-        public MessageCollection GetAllMailsFrom(String mailbox)
-        {
-            Mailbox targetMail = this.GetMailbox(mailbox);
-            Int32 amountOfMails = targetMail.MessageCount;
-            MessageCollection messages = new MessageCollection();
-
-            for (int i = amountOfMails; i > 0; i--)
-            {
-                messages.Add(targetMail.Fetch.MessageObjectPeekWithGMailExtensions(i));
-            }
-
-            return messages;
-        }
-
         public Int32 GetLastUIDFrom(String mailbox)
         {
             Mailbox targetMailbox = this.GetMailbox(mailbox);
@@ -93,13 +75,23 @@ namespace Glimpse.MailInterfaces
         }
         public List<Mail> GetMailDataFromHigherThan(String mailbox, Int64 minimumUID)
         {
-            if (minimumUID < 0) minimumUID = 0;
+            Int32 mailOrdinalOfMinimumUID;
+
+            Mailbox targetMailbox = this.GetMailbox(mailbox);
+
+            if (minimumUID != 0)
+                mailOrdinalOfMinimumUID = Int32.Parse(this.CleanOrdinalResponse(this.receiver.Command("UID FETCH " + minimumUID + " UID")));
+            else 
+                mailOrdinalOfMinimumUID = 0;
+
             //siempre trae al menos uno, excepto si el mailbox está vacío
-            Int32[] mailsUIDs = this.GetMailbox(mailbox).Search("UID " + (minimumUID+1).ToString() + ":*");
-            //si el mailbox está vacío o si IMAP trajo sólo el último aunque esté repetido
-            if (mailsUIDs == null)
+            Int32[] mailsUIDs = targetMailbox.Search("UID " + (minimumUID + 1).ToString() + ":*");
+
+            //si el mailbox está vacío o si IMAP trajo sólo el último y es el mismo que minimumUID
+            if (mailsUIDs == null || mailsUIDs[0] == mailOrdinalOfMinimumUID)
                 return new List<Mail>();
-            return this.GetMailsDataFrom(mailbox, mailsUIDs[0]);
+            else
+                return this.GetMailsDataFrom(mailbox, mailsUIDs[0]);
         }
         public List<Mail> GetMailsDataFrom(String mailbox, Int32 reversedLastOrdinalToRetrieve)
         {
@@ -123,7 +115,7 @@ namespace Glimpse.MailInterfaces
 
             List<Mail> mailsFromMailbox = new List<Mail>();
 
-            for (int currentMail = targetMailbox.MessageCount; currentMail >= reversedLastOrdinalToRetrieve; currentMail--)
+            for (int currentMail = reversedLastOrdinalToRetrieve; currentMail <= targetMailbox.MessageCount; currentMail++)
             {
                 retrievedMail = new MailEntity();
                 retrievedMessage = new Message();
@@ -411,6 +403,13 @@ namespace Glimpse.MailInterfaces
             {
                 imapResponse = imapResponse.Remove(imapResponse.IndexOf("\r\n"));
             }
+            return imapResponse;
+        }
+        private String CleanOrdinalResponse(String imapResponse)
+        {
+            imapResponse = imapResponse.Remove(imapResponse.IndexOf("FETCH"));
+            imapResponse = imapResponse.Substring(2, imapResponse.Length - 2);
+            imapResponse = imapResponse.Trim();
             return imapResponse;
         }
         private String stripMailboxName(String mailbox)

@@ -43,11 +43,6 @@ namespace Glimpse.Models
                 return new MailAccount(account);
         }
 
-        public MessageCollection GetInboxMessages()
-        {
-            return this.myFetcher.GetInboxMails();
-        }
-
         public Int32 getLastUIDFrom(String mailbox)
         {
             return this.myFetcher.GetLastUIDFrom(mailbox);
@@ -63,21 +58,16 @@ namespace Glimpse.Models
             ISession currentSession = NHibernateManager.OpenSession();
             ITransaction tran = currentSession.BeginTransaction();
 
-            MailAccount persistAccount;
-
             MailAccount oldAccount = FindByAddress(this.Entity.Address, currentSession);
-            if (oldAccount == null)
+
+            if (oldAccount != null)
             {
-                persistAccount = this;
-            }
-            else
-            {
-                persistAccount = oldAccount;
-                persistAccount.Clone(this);
+                oldAccount.Clone(this);
+                this.Entity = oldAccount.Entity;                
             }
 
-            currentSession.SaveOrUpdate(persistAccount.Entity);
-   
+            currentSession.SaveOrUpdate(this.Entity);
+
             tran.Commit();
         }
         
