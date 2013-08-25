@@ -54,7 +54,7 @@ namespace Glimpse.Controllers
             }
 
             ViewBag.Email = cookieMailAccount.Entity.Address;
-            session.Close();
+
             return View();
         }
 
