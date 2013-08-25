@@ -98,8 +98,8 @@ namespace Glimpse.MailInterfaces
             Int32[] mailsUIDs = this.GetMailbox(mailbox).Search("UID " + (minimumUID + 1) + ":*");
             //si el mailbox está vacío o si IMAP trajo sólo el último aunque esté repetido
             if (mailsUIDs == null || mailsUIDs[0] == minimumUID)
-                return new MailCollection();
-            return this.GetMailsDataFrom(mailbox, mailsUIDs[0] );
+                return new List<Mail>();
+            return this.GetMailsDataFrom(mailbox, mailsUIDs[0]);
         }
         public List<Mail> GetMailsDataFrom(String mailbox, Int32 reversedLastOrdinalToRetrieve)
         {

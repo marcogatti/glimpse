@@ -24,8 +24,12 @@ namespace Glimpse.Tests.DAL
         {
             ITransaction tran = session.BeginTransaction();
 
-            anAccount = new MailAccount("test.imap.505@gmail.com","ytrewq123");            
-            session.SaveOrUpdate(anAccount.Entity);
+            anAccount = new MailAccount("test.imap.505@gmail.com", "ytrewq123");
+            MailAccount existingAccount = MailAccount.FindByAddress("test.imap.505@gmail.com");
+            if (existingAccount == null)
+                session.SaveOrUpdate(anAccount.Entity);
+
+            anAccount.Entity = existingAccount.Entity;
 
             aMail = new Mail(new MailEntity());
             aMail.Entity.Subject = "Mail de prueba";
