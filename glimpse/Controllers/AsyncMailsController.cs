@@ -57,11 +57,14 @@ namespace Glimpse.Controllers
 
             foreach (MailEntity mail in mails)
             {
+                Int64 currentAge = DateTime.Now.Ticks - mail.Date.Ticks;
+
                 Object anEmail = new
                 {
                     id = mail.Id,
                     subject = mail.Subject,
                     date = mail.Date,
+                    age = currentAge,
                     from = new
                     {
                         address = mail.From.MailAddress,

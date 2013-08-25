@@ -67,39 +67,12 @@
         </div>
         <!--/span-->
 
-        @{
-            Int64 maxAge = 0;
-        }
-
         <div id="email-container" class="span10">
 
             <div id="dateTime" class="coord hidden"></div>
             <div id="from" class="coord hidden"></div>
 
-            @foreach (MailEntity inboxMail in ViewBag.InboxMessages)
-            {
-                Int64 currentAge = DateTime.Now.Ticks - inboxMail.Date.Ticks;
-
-                if (currentAge > maxAge) {
-                    maxAge = currentAge;  
-                }
-                    
-                <a data-toggle="modal" href="#example">
-                    <div class="circle" data-body="@inboxMail.Body"
-                                            data-subject="@inboxMail.Subject"
-                                            data-date="@inboxMail.Date"
-                                            data-from="@inboxMail.From.MailAddress"
-                                            data-age="@currentAge">
-                        <p class="subject">@inboxMail.Subject</p>
-                    </div>
-                </a>
-            }
-
         </div>
-
-        <script>
-            var maxAge = @maxAge;
-        </script>
 
     </div>
     <!--/row-->

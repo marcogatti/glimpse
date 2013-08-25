@@ -1,4 +1,5 @@
-﻿
+﻿var maxAge = 0;
+
 function calculateEmailsPosition() {
 
     var containerWidth = $("#email-container").width();
@@ -69,10 +70,34 @@ function configureCircleHover() {
     from.css("left", "-60px");
 }
 
+function fetchMailsAsync() {
+
+    $.getJSON("async/InboxMails", function (data) {
+
+        $.each(data.mails, function (index, value) {
+
+            if (value.age > maxAge) {
+                maxAge = value.age;
+            }
+
+            var newCircle = "<a data-toggle='modal' href='#example'><div class='circle'" +
+                    "data-date='" + value.date + "' data-from='" + value.from.address +
+                    "' data-age='"+ value.age +"'>" +
+                    "<p class='subject'>"+ value.subject +"</p></div></a>"
+
+            $("#email-container").append(newCircle);
+        });
+    });
+}
+
 $(document).ready(function () {
 
     setModal();
+
+    // RESOLVER ORDEN!
+    fetchMailsAsync();
     calculateEmailsPosition();
+
     $(window).resize(function () { calculateEmailsPosition() })
     configureCircleHover();
 
