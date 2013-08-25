@@ -16,7 +16,6 @@ namespace Glimpse.MailInterfaces
         private Imap4Client receiver;
         private Mailbox currentOpenedMailbox;
         public NameValueCollection accountMailboxesBySpecialProperty { get; private set; }
-        const int MAIL_DATA_FIELDS_AMOUNT = 13;
 
         public Fetcher(String username, String password)
         {

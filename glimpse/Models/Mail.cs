@@ -39,6 +39,34 @@ namespace Glimpse.Models
             session.SaveOrUpdate(this);
 
             tran.Commit();
+            session.Close();
+        }
+
+        private void Clone(MailEntity from)
+        {
+            this.Entity.MailAccountEntity = from.MailAccountEntity;
+            this.Entity.From = from.From;
+            this.Entity.LabelsPerMail = from.LabelsPerMail;
+            this.Entity.Extras = from.Extras;
+            this.Entity.Gm_tid = from.Gm_tid;
+            this.Entity.Gm_mid = from.Gm_mid;
+            this.Entity.Date = from.Date;
+            this.Entity.Subject = from.Subject;
+            this.Entity.UidInbox = from.UidInbox;
+            this.Entity.UidTrash = from.UidTrash;
+            this.Entity.UidSent = from.UidSent;
+            this.Entity.UidDraft = from.UidDraft;
+            this.Entity.UidSpam = from.UidSpam;
+            this.Entity.UidAll = from.UidAll;
+            this.Entity.Answered = from.Answered;
+            this.Entity.Flagged = from.Flagged;
+            this.Entity.Seen = from.Seen;
+            this.Entity.Draft = from.Draft;
+            this.Entity.HasExtras = from.HasExtras;
+            this.Entity.ToAddr = from.ToAddr;
+            this.Entity.CC = from.CC;
+            this.Entity.BCC = from.BCC;
+            this.Entity.Body = from.Body;
         }
     }
 }

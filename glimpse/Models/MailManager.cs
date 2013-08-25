@@ -15,8 +15,6 @@ namespace Glimpse.Models
 
         private MailAccount mailAccount;        
 
-        private static ISession currentSession = NHibernateManager.OpenSession();
-
         public const int ALL_MAILS = int.MaxValue;
 
         public MailManager(MailAccount mailAccount)
@@ -26,9 +24,11 @@ namespace Glimpse.Models
 
         public List<Mail> FetchFromMailbox(String mailbox, int maxAmount = ALL_MAILS)
         {
+            ISession session = NHibernateManager.OpenSession();
+
             List<Mail> imapMails = new List<Mail>();
 
-            Int64 lastDatabaseUID = currentSession.CreateCriteria<MailEntity>()
+            Int64 lastDatabaseUID = session.CreateCriteria<MailEntity>()
                                                   .Add(Restrictions.Eq("MailAccountEntity", this.mailAccount.Entity))
                                                   .SetProjection(Projections.Max("UidInbox")).UniqueResult<Int64>();
             Int32 lastImapUID = this.mailAccount.getLastUIDFrom(mailbox);
@@ -48,7 +48,7 @@ namespace Glimpse.Models
 
             if (maxAmount > imapMails.Count)
             {
-                List<MailEntity> mailList = (List<MailEntity>)currentSession.CreateCriteria<MailEntity>()
+                List<MailEntity> mailList = (List<MailEntity>)session.CreateCriteria<MailEntity>()
                                                 .Add(Restrictions.Eq("MailAccountEntity", this.mailAccount.Entity))
                                                 .Add(Restrictions.Le("UidInbox", lastDatabaseUID))
                                                 .AddOrder(Order.Desc("UidInbox"))
@@ -65,32 +65,35 @@ namespace Glimpse.Models
                 returnMails = returnMails.Take<Mail>(maxAmount).ToList<Mail>();
             }
 
-            currentSession.Flush();
-
+            session.Flush();
+            session.Close();
             return returnMails;
         }
 
         private void Save(List<Mail> mails)
         {
-            ITransaction tran = currentSession.BeginTransaction();
+            ISession session = NHibernateManager.OpenSession();
+
+            ITransaction tran = session.BeginTransaction();
 
             foreach (Mail mailToSave in mails)
             {
-                Address foundAddress = Address.FindByAddress(mailToSave.Entity.From.MailAddress, currentSession);
+                Address foundAddress = Address.FindByAddress(mailToSave.Entity.From.MailAddress, session);
 
                 if (foundAddress.Entity == null)
                 {
-                    currentSession.SaveOrUpdate(mailToSave.Entity.From);
+                    session.SaveOrUpdate(mailToSave.Entity.From);
                 }
                 else
                 {
                     mailToSave.setFrom(foundAddress.Entity);
                 }
 
-                currentSession.SaveOrUpdate(mailToSave.Entity);
+                session.SaveOrUpdate(mailToSave.Entity);
             }
 
             tran.Commit();
+            session.Close();
         }
     }
 }
