@@ -19,6 +19,7 @@ namespace Glimpse.DataAccessLayer.Mappings
             mapping.References<MailAccountEntity>(x => x.MailAccountEntity).Cascade.None();
             mapping.HasMany<ExtraEntity>(x => x.Extras).Inverse().Cascade.All();
             mapping.HasMany<MailPerLabelEntity>(x => x.LabelsPerMail).Inverse().Cascade.None();
+            mapping.Map(x => x.ToAddr).Not.LazyLoad();
         }
     }
 }

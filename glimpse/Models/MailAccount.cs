@@ -43,11 +43,6 @@ namespace Glimpse.Models
                 return new MailAccount(account);
         }
 
-        public MessageCollection GetInboxMessages()
-        {
-            return this.myFetcher.GetInboxMails();
-        }
-
         public Int32 getLastUIDFrom(String mailbox)
         {
             return this.myFetcher.GetLastUIDFrom(mailbox);

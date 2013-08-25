@@ -1,10 +1,12 @@
 ﻿using ActiveUp.Net.Mail;
+using Glimpse.DataAccessLayer;
 using Glimpse.DataAccessLayer.Entities;
 using Glimpse.Exceptions;
 using Glimpse.Helpers;
 using Glimpse.MailInterfaces;
 using Glimpse.Models;
 using Newtonsoft.Json;
+using NHibernate;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,8 +24,15 @@ namespace Glimpse.Controllers
         {
             try
             {
-                IList<Object> mailsToSend = this.FetchMails(amountOfEmails);
-                return Json(new { success = true, mails = mailsToSend }, JsonRequestBehavior.AllowGet);
+                ISession session = NHibernateManager.OpenSession();
+
+                IList<Object> mailsToSend = this.FetchMails(amountOfEmails, session);
+                JsonResult result = Json(new { success = true, mails = mailsToSend }, JsonRequestBehavior.AllowGet);
+
+                session.Flush();
+                session.Close();
+
+                return result;
             }
             catch (Exception e)
             {
@@ -31,7 +40,7 @@ namespace Glimpse.Controllers
             }
         }
 
-        private List<Object> FetchMails(int amountOfEmails)
+        private List<Object> FetchMails(int amountOfEmails, ISession session)
         {
             MailAccount mailAccount = (MailAccount)Session[AccountController.MAIL_INTERFACE];
 
@@ -39,7 +48,7 @@ namespace Glimpse.Controllers
             {
                 MailManager manager = new MailManager(mailAccount);
 
-                List<Mail> mails = manager.FetchFromMailbox("INBOX");
+                List<Mail> mails = manager.FetchFromMailbox("INBOX", session);
 
                 return this.PrepareToSend(mails);
             }

@@ -22,9 +22,8 @@ namespace Glimpse.Models
             this.mailAccount = mailAccount;            
         }
 
-        public List<Mail> FetchFromMailbox(String mailbox, int maxAmount = ALL_MAILS)
+        public List<Mail> FetchFromMailbox(String mailbox, ISession session, int maxAmount = ALL_MAILS)
         {
-            ISession session = NHibernateManager.OpenSession();
 
             List<Mail> imapMails = new List<Mail>();
 
@@ -64,9 +63,6 @@ namespace Glimpse.Models
             {
                 returnMails = returnMails.Take<Mail>(maxAmount).ToList<Mail>();
             }
-
-            session.Flush();
-            session.Close();
             return returnMails;
         }
 
