@@ -73,8 +73,8 @@
 
         <div id="email-container" class="span10">
 
-            <div class="dateTime"></div>
-            <div class="from"></div>
+            <div id="dateTime" class="coord hidden"></div>
+            <div id="from" class="coord hidden"></div>
 
             @foreach (MailEntity inboxMail in ViewBag.InboxMessages)
             {
@@ -91,7 +91,6 @@
                                             data-from="@inboxMail.From.MailAddress"
                                             data-age="@currentAge">
                         <p class="subject">@inboxMail.Subject</p>
-                        <p class="from">@inboxMail.From.MailAddress</p>
                     </div>
                 </a>
             }

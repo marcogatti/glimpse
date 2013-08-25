@@ -40,7 +40,8 @@ function setModal() {
 
 function configureCircleHover() {
 
-    var dateTime = $(".dateTime");
+    var dateTime = $("#dateTime");
+    var from = $("#from");
 
     $(".circle").hover(
 
@@ -48,23 +49,24 @@ function configureCircleHover() {
 
             var currentCircle = $(this);
 
-            dateTime.html(
-                '<div class="dateTime">' + currentCircle.data("date") + '</div>'
-            );
+            dateTime.html(currentCircle.data("date"));
+            from.html(currentCircle.data("from"));
 
-            dateTime.css({
-                "visibility": "visible",
-                "left": function () {
-                    return currentCircle.css("left")
-                }
-            });
+            $(".coord").removeClass("hidden").addClass("visible");
+
+            dateTime.css("left",currentCircle.css("left"));
+
+            from.css("top", currentCircle.css("top"));
+
         }, function () {
-            dateTime.css("visibility", "hidden");
+            $(".coord").removeClass("visible").addClass("hidden");
         })
 
     dateTime.css("top", function () {
         return $("#email-container").height();
     });
+
+    from.css("left", "-60px");
 }
 
 $(document).ready(function () {
