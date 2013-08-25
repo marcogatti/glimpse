@@ -15,14 +15,19 @@ namespace Glimpse.MailInterfaces
     {
         private Imap4Client receiver;
         private Mailbox currentOpenedMailbox;
-        private NameValueCollection accountMailboxesBySpecialProperty = new NameValueCollection();
+        public NameValueCollection accountMailboxesBySpecialProperty { get; private set; }
         const int MAIL_DATA_FIELDS_AMOUNT = 13;
 
         public Fetcher(String username, String password)
         {
             this.receiver = new Connector().ImapLogin(username, password);
+            this.accountMailboxesBySpecialProperty = new NameValueCollection();
             this.loadMailboxesAndSpecialProperties(this.receiver.Command("LIST \"\" \"*\""));
             this.currentOpenedMailbox = null;
+        }
+        public NameValueCollection getLabels()
+        {
+            return this.accountMailboxesBySpecialProperty;
         }
 
         public MessageCollection GetInboxMails()
@@ -59,10 +64,11 @@ namespace Glimpse.MailInterfaces
             this.GetMailbox(mailbox); //Se asegura que se encuentra seleccionado el mailbox en IMAP
             return Int32.Parse(this.CleanIMAPResponse(this.receiver.Command("UID SEARCH X-GM-MSGID " + gmMailID.ToString()), "SEARCH", false));
         }
-        public byte[] GetAttachmentFromMail(String mailbox, Int32 uniqueMailID, String attachmentName)
+        public byte[] GetAttachmentFromMail(String mailbox, Int64 gmMailID, String attachmentName)
         {
             Mailbox targetMailbox = this.GetMailbox(mailbox);
-            AttachmentCollection attachmentsInMail = targetMailbox.Fetch.UidMessageObject(uniqueMailID).Attachments;
+            Int32 mailUID = this.getMailUID(mailbox, gmMailID);
+            AttachmentCollection attachmentsInMail = targetMailbox.Fetch.UidMessageObject(mailUID).Attachments;
             MimePart desiredAttachment;
             try
             {
@@ -87,9 +93,13 @@ namespace Glimpse.MailInterfaces
         }
         public MailCollection GetMailDataFromHigherThan(String mailbox, Int64 minimumUID)
         {
-            //siempre trae al menos uno, excepto si el mailbox está vacío
             if (minimumUID <= 0) minimumUID = 1;
-            return this.GetMailsDataFrom(mailbox, this.GetMailbox(mailbox).Search("UID " + minimumUID + ":*")[0]);
+            //siempre trae al menos uno, excepto si el mailbox está vacío
+            Int32[] mailsUIDs = this.GetMailbox(mailbox).Search("UID " + (minimumUID + 1) + ":*");
+            //si el mailbox está vacío o si IMAP trajo sólo el último aunque esté repetido
+            if (mailsUIDs == null || mailsUIDs[0] == minimumUID)
+                return new MailCollection();
+            return this.GetMailsDataFrom(mailbox, mailsUIDs[0] );
         }
         public MailCollection GetMailsDataFrom(String mailbox, Int32 reversedLastOrdinalToRetrieve)
         {
