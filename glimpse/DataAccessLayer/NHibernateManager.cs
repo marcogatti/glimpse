@@ -34,18 +34,6 @@ namespace Glimpse.DataAccessLayer
             }
         }
 
-        private static ISession _defaultSession;
-        public static ISession DefaultSesion
-        {
-            get
-            {
-                if (_defaultSession == null)
-                    _defaultSession = OpenSession();
-
-                return _defaultSession;
-            }
-        }
-
         private readonly FluentConfiguration fluentConfiguration;
 
         private Configuration nhibernateConfiguration;
@@ -58,7 +46,6 @@ namespace Glimpse.DataAccessLayer
         {
             fluentConfiguration = CreateFluentConfiguration().ExposeConfiguration(cfg => nhibernateConfiguration = cfg);
         }
-
 
         public ISessionFactory CreateSessionFactory()
         {

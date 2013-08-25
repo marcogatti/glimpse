@@ -11,25 +11,21 @@ namespace Glimpse.Models
 {
     public class Mail
     {
-        private MailEntity _entity;
-        public MailEntity Entity
-        {
-            get
-            {
-                return _entity;
-            }
-        }
+        public MailEntity Entity { get; private set; }
 
         public Mail(MailEntity entity)
         {
-            this._entity = entity;
+            this.Entity = entity;
         }
  
-        public static IList<MailEntity> FetchFromInbox(MailAccount mailAccount, int maxAmount){
-            return NHibernateManager.OpenSession()
-                                    .CreateCriteria<MailEntity>()
-                                    .Add(Restrictions.Eq("MailAccount.Id", mailAccount.Entity.Id))
-                                    .List<MailEntity>();
+        public static IList<MailEntity> FindByMailAccount(MailAccount mailAccount, int maxAmount){
+
+            ISession session = NHibernateManager.OpenSession();
+
+            List<MailEntity> foundMails = (List<MailEntity>)session.CreateCriteria<MailEntity>()
+                                                        .Add(Restrictions.Eq("MailAccount.Id", mailAccount.Entity.Id))
+                                                        .List<MailEntity>();
+            return foundMails;
         }
 
         public void Save()

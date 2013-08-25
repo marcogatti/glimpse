@@ -14,12 +14,12 @@ namespace Glimpse.DataAccessLayer.Entities
         public virtual String MailAddress { get; set; }
         public virtual String Name { get; set; }
 
+        public AddressEntity() { }
+
         public AddressEntity(String mailAddress, String name)
         {
             this.MailAddress = mailAddress;
             this.Name = name;
-        }
-
-        public AddressEntity() { }
+        }        
     }
 }

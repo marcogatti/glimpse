@@ -15,7 +15,7 @@ namespace Glimpse.Models
 
         private MailAccount mailAccount;        
 
-        private static ISession currentSession = NHibernateManager.DefaultSesion;
+        private static ISession currentSession = NHibernateManager.OpenSession();
 
         public const int ALL_MAILS = int.MaxValue;
 
