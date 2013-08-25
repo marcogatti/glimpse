@@ -77,21 +77,21 @@ namespace Glimpse.MailInterfaces
             return desiredAttachment.BinaryContent;
         }
 
-        public MailCollection GetAllMailsDataFrom(String mailbox)
+        public List<Mail> GetAllMailsDataFrom(String mailbox)
         {
             return this.GetMailsDataFrom(mailbox, 1);
         }
-        public MailCollection GetUnseenMailsDataFrom(String mailbox)
+        public List<Mail> GetUnseenMailsDataFrom(String mailbox)
         {
             return this.GetMailsDataFrom(mailbox, this.GetMailbox(mailbox).FirstUnseen);
         }
-        public MailCollection GetMailDataFromHigherThan(String mailbox, Int64 minimumUID)
+        public List<Mail> GetMailDataFromHigherThan(String mailbox, Int64 minimumUID)
         {
             //siempre trae al menos uno, excepto si el mailbox está vacío
             if (minimumUID <= 0) minimumUID = 1;
             return this.GetMailsDataFrom(mailbox, this.GetMailbox(mailbox).Search("UID " + minimumUID + ":*")[0]);
         }
-        public MailCollection GetMailsDataFrom(String mailbox, Int32 reversedLastOrdinalToRetrieve)
+        public List<Mail> GetMailsDataFrom(String mailbox, Int32 reversedLastOrdinalToRetrieve)
         {
             //Trae los mails desde el mail más reciente (el ordinal mayor) hasta el mail con ordinal por parámetro reversedLastOrdinalToRetrieve
             if (reversedLastOrdinalToRetrieve <= 0)
@@ -99,8 +99,8 @@ namespace Glimpse.MailInterfaces
             Mailbox targetMailbox = this.GetMailbox(mailbox);
             Message retrievedMessage;
             MailEntity retrievedMail;
-            
-            MailCollection mailsFromMailbox = new MailCollection();
+
+            List<Mail> mailsFromMailbox = new List<Mail>();
 
             for (int currentMail = targetMailbox.MessageCount; currentMail >= reversedLastOrdinalToRetrieve; currentMail--)
             {
@@ -132,7 +132,7 @@ namespace Glimpse.MailInterfaces
                 this.AddFlagsToMail(targetMailbox.Fetch.Flags(currentMail).Merged, ref retrievedMail);
                 
                 //mailsFromMailbox representa el mail más reciente mientras más bajo sea el índice
-                mailsFromMailbox.Add(retrievedMail);
+                mailsFromMailbox.Add(new Mail(retrievedMail));
             }
             return mailsFromMailbox;
         }

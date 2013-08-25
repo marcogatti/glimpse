@@ -24,9 +24,9 @@ namespace Glimpse.Models
             this.mailAccount = mailAccount;            
         }
 
-        public List<MailEntity> FetchFromMailbox(String mailbox, int maxAmount = ALL_MAILS)
+        public List<Mail> FetchFromMailbox(String mailbox, int maxAmount = ALL_MAILS)
         {
-            MailCollection mails = new MailCollection();
+            List<Mail> imapMails = new List<Mail>();
 
             Int64 lastDatabaseUID = currentSession.CreateCriteria<MailEntity>()
                                                   .Add(Restrictions.Eq("MailAccount.Id", this.mailAccount.Entity.Id))
@@ -36,30 +36,62 @@ namespace Glimpse.Models
             Int32 lastImapUID = this.mailAccount.getLastUIDFrom(mailbox);
             if (lastImapUID > lastDatabaseUID)
             {
-                mails = this.mailAccount.getMailsFromHigherThan(mailbox, lastDatabaseUID);
-                mails.loadMailAccount(this.mailAccount);
-                mails.Save(currentSession);
+                imapMails = this.mailAccount.getMailsFromHigherThan(mailbox, lastDatabaseUID);
+                foreach (Mail mail in imapMails)
+                {
+                    mail.Entity.MailAccount = mailAccount.Entity;
+                }
+
+                this.Save(imapMails);
             }
 
-            List<MailEntity> returnMails = mails.ToList<MailEntity>();
+            List<Mail> returnMails = imapMails;
 
-            if (maxAmount > mails.Count)
-            { 
-                returnMails.AddRange(currentSession.CreateCriteria<MailEntity>()
-                                               .Add(Restrictions.Eq("MailAccount", this.mailAccount.Entity))
-                                               .Add(Restrictions.Le("UidInbox", lastDatabaseUID))
-                                               .AddOrder(Order.Desc("UidInbox"))
-                                               .SetMaxResults(maxAmount - mails.Count)
-                                               .List<MailEntity>());
+            if (maxAmount > imapMails.Count)
+            {
+                List<MailEntity> mailList = (List<MailEntity>)currentSession.CreateCriteria<MailEntity>()
+                                                .Add(Restrictions.Eq("MailAccount", this.mailAccount.Entity))
+                                                .Add(Restrictions.Le("UidInbox", lastDatabaseUID))
+                                                .AddOrder(Order.Desc("UidInbox"))
+                                                .SetMaxResults(maxAmount - imapMails.Count)
+                                                .List<MailEntity>();
+
+                foreach (MailEntity mail in mailList)
+                {
+                    returnMails.Add(new Mail(mail));
+                }
             }
             else
             {
-                returnMails = (List<MailEntity>)returnMails.Take<MailEntity>(maxAmount);
+                returnMails = returnMails.Take<Mail>(maxAmount).ToList<Mail>();
             }
 
             currentSession.Flush();
 
             return returnMails;
+        }
+
+        private void Save(List<Mail> mails)
+        {
+            ITransaction tran = currentSession.BeginTransaction();
+
+            foreach (Mail mailToSave in mails)
+            {
+                Address foundAddress = Address.FindByAddress(mailToSave.Entity.From.MailAddress, currentSession);
+
+                if (foundAddress.Entity == null)
+                {
+                    currentSession.SaveOrUpdate(mailToSave.Entity.From);
+                }
+                else
+                {
+                    mailToSave.Entity.From = foundAddress.Entity;
+                }
+
+                currentSession.SaveOrUpdate(mailToSave);
+            }
+
+            tran.Commit();
         }
     }
 }

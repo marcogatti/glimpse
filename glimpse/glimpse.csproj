@@ -230,7 +230,6 @@
     <Compile Include="Models\Address.cs" />
     <Compile Include="Models\Mail.cs" />
     <Compile Include="Models\MailAccount.cs" />
-    <Compile Include="Models\MailCollection.cs" />
     <Compile Include="Models\MailManager.cs" />
     <Compile Include="ViewModels\UserViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
