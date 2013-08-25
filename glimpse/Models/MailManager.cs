@@ -29,17 +29,16 @@ namespace Glimpse.Models
             List<Mail> imapMails = new List<Mail>();
 
             Int64 lastDatabaseUID = currentSession.CreateCriteria<MailEntity>()
-                                                  .Add(Restrictions.Eq("MailAccount.Id", this.mailAccount.Entity.Id))
-                                                  .SetProjection(Projections.Max("UidInbox"))
-                                                  .UniqueResult<Int64>();
-
+                                                  .Add(Restrictions.Eq("MailAccountEntity", this.mailAccount.Entity))
+                                                  .SetProjection(Projections.Max("UidInbox")).UniqueResult<Int64>();
             Int32 lastImapUID = this.mailAccount.getLastUIDFrom(mailbox);
+
             if (lastImapUID > lastDatabaseUID)
             {
                 imapMails = this.mailAccount.getMailsFromHigherThan(mailbox, lastDatabaseUID);
                 foreach (Mail mail in imapMails)
                 {
-                    mail.Entity.MailAccount = mailAccount.Entity;
+                    mail.Entity.MailAccountEntity = mailAccount.Entity;
                 }
 
                 this.Save(imapMails);
@@ -50,7 +49,7 @@ namespace Glimpse.Models
             if (maxAmount > imapMails.Count)
             {
                 List<MailEntity> mailList = (List<MailEntity>)currentSession.CreateCriteria<MailEntity>()
-                                                .Add(Restrictions.Eq("MailAccount", this.mailAccount.Entity))
+                                                .Add(Restrictions.Eq("MailAccountEntity", this.mailAccount.Entity))
                                                 .Add(Restrictions.Le("UidInbox", lastDatabaseUID))
                                                 .AddOrder(Order.Desc("UidInbox"))
                                                 .SetMaxResults(maxAmount - imapMails.Count)
@@ -88,7 +87,7 @@ namespace Glimpse.Models
                     mailToSave.Entity.From = foundAddress.Entity;
                 }
 
-                currentSession.SaveOrUpdate(mailToSave);
+                currentSession.SaveOrUpdate(mailToSave.Entity);
             }
 
             tran.Commit();

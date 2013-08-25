@@ -13,6 +13,7 @@ namespace Glimpse.DataAccessLayer.Mappings
         public void Override(AutoMapping<ExtraEntity> mapping)
         {
             mapping.Map(x => x.FileType).Length(15);
+            mapping.References<MailEntity>(x => x.MailEntity).Cascade.None();
         }
     }
 }

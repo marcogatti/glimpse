@@ -12,6 +12,8 @@ using Glimpse.Exceptions.MailInterfacesExceptions;
 using Glimpse.Exceptions;
 using Glimpse.DataAccessLayer.Entities;
 using Glimpse.Models;
+using NHibernate;
+using Glimpse.DataAccessLayer;
 
 namespace Glimpse.Controllers
 {
@@ -22,11 +24,16 @@ namespace Glimpse.Controllers
         // GET: /Home/
         public ActionResult Index()
         {
+            ISession session = NHibernateManager.OpenSession();
+
             String mailAddress = new CookieHelper().getMailAddressFromCookie();
 
-            MailAccount cookieMailAccount = MailAccount.FindByAddress(mailAddress);
+            MailAccount cookieMailAccount = MailAccount.FindByAddress(mailAddress, session);
 
-            if (cookieMailAccount.Entity == null)
+            session.Flush();
+            session.Close();
+
+            if (cookieMailAccount == null)
             {
                 return this.LogOut();
             }
@@ -46,9 +53,6 @@ namespace Glimpse.Controllers
                 }
             }
 
-            MailManager manager = new MailManager(mailAccount);
-
-            ViewBag.InboxMessages = manager.FetchFromMailbox("INBOX");
             ViewBag.Email = cookieMailAccount.Entity.Address;
 
             return View();

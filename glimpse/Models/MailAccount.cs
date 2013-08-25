@@ -16,8 +16,14 @@ namespace Glimpse.Models
         private Fetcher myFetcher { get; set; }
         private Sender mySender { get; set; }
 
-        public MailAccountEntity Entity { get; set; }        
+        public MailAccountEntity Entity { get; set; }
 
+        public MailAccount(MailAccountEntity accountEntity)
+        {
+            this.Entity = accountEntity;
+            this.LoginExternal();
+            this.mySender = new Sender(this.Entity.Address, this.Entity.Password);
+        }
         public MailAccount(String address, String password)
         {
             this.Entity = new MailAccountEntity(address, password);
@@ -25,15 +31,16 @@ namespace Glimpse.Models
             this.mySender = new Sender(address, password);
         }
 
-        public static MailAccount FindByAddress(String emailAddress)
+        public static MailAccount FindByAddress(String emailAddress, ISession session)
         {
-            ISession session = NHibernateManager.OpenSession();
-
             MailAccountEntity account = session.CreateCriteria<MailAccountEntity>()
                                           .Add(Restrictions.Eq("Address", emailAddress))
                                           .UniqueResult<MailAccountEntity>();
 
-            return new MailAccount(account.Address, account.Password);
+            if (account == null)
+                return null;
+            else 
+                return new MailAccount(account);
         }
 
         public MessageCollection GetInboxMessages()
@@ -58,8 +65,8 @@ namespace Glimpse.Models
 
             MailAccount persistAccount;
 
-            MailAccount oldAccount = FindByAddress(this.Entity.Address);
-            if (oldAccount.Entity == null)
+            MailAccount oldAccount = FindByAddress(this.Entity.Address, currentSession);
+            if (oldAccount == null)
             {
                 persistAccount = this;
             }
