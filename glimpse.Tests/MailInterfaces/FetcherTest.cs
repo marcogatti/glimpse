@@ -42,15 +42,15 @@ namespace Glimpse.Tests
             List<Mail> retrievedMails = new List<Mail>();
             retrievedMails = this.myFetcher.GetMailsDataFrom("INBOX", 3);
 
-            Assert.AreEqual("Re: Email11 c/ texto formateado", retrievedMails[0].Entity.Subject);
-            Assert.AreEqual(DateTime.Parse("Sat, 20 Jul 2013 00:52:44"), retrievedMails[1].Entity.Date);
-            Assert.AreEqual("Martin Hoomer", retrievedMails[2].Entity.From.Name);
-            Assert.IsTrue(retrievedMails[3].Entity.Body.Contains("</span><span class=\"\">Estrategia de entrenamiento.</span></p>"));
-            Assert.IsTrue(retrievedMails[4].Entity.HasExtras);
+            Assert.AreEqual("Re: Email11 c/ texto formateado", retrievedMails[10].Entity.Subject);
+            Assert.AreEqual(DateTime.Parse("Sat, 20 Jul 2013 00:52:44"), retrievedMails[9].Entity.Date);
+            Assert.AreEqual("Martin Hoomer", retrievedMails[8].Entity.From.Name);
+            Assert.IsTrue(retrievedMails[7].Entity.Body.Contains("</span><span class=\"\">Estrategia de entrenamiento.</span></p>"));
+            Assert.IsTrue(retrievedMails[6].Entity.HasExtras);
             Assert.AreEqual(11, retrievedMails[5].Entity.UidInbox);
-            Assert.IsTrue(retrievedMails[6].Entity.UidDraft <= 0 && retrievedMails[6].Entity.UidSent <= 0 && retrievedMails[6].Entity.UidSpam <= 0);
-            Assert.IsTrue(retrievedMails[7].Entity.ToAddr.Contains("imap.sealed@gmail.com") && retrievedMails[7].Entity.ToAddr.Contains("test.imap.505@gmail.com"));
-            Assert.IsTrue(retrievedMails[0].Entity.Flagged && retrievedMails[3].Entity.Seen && !retrievedMails[0].Entity.Seen);
+            Assert.IsTrue(retrievedMails[4].Entity.UidDraft <= 0 && retrievedMails[6].Entity.UidSent <= 0 && retrievedMails[1].Entity.UidSpam <= 0);
+            Assert.IsTrue(retrievedMails[3].Entity.ToAddr.Contains("imap.sealed@gmail.com") && retrievedMails[3].Entity.ToAddr.Contains("test.imap.505@gmail.com"));
+            Assert.IsTrue(retrievedMails[10].Entity.Flagged && retrievedMails[7].Entity.Seen && !retrievedMails[10].Entity.Seen);
         }
 
         [Test]

@@ -34,8 +34,9 @@ namespace Glimpse.Controllers
 
                 return result;
             }
-            catch (Exception e)
+            catch (Exception exp)
             {
+                //Log exception
                 return Json(new { success = false, message = "Error al obtener los mails" }, JsonRequestBehavior.AllowGet);
             }
         }

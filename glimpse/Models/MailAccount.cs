@@ -58,21 +58,15 @@ namespace Glimpse.Models
             ISession session = NHibernateManager.OpenSession();
             ITransaction tran = session.BeginTransaction();
 
-            MailAccount persistAccount;
-
             MailAccount oldAccount = FindByAddress(this.Entity.Address, session);
-            if (oldAccount == null)
+            if (oldAccount != null)
             {
-                persistAccount = this;
-            }
-            else
-            {
-                persistAccount = oldAccount;
-                persistAccount.Clone(this);
+                oldAccount.Clone(this);
+                this.Entity = oldAccount.Entity;                
             }
 
-            session.SaveOrUpdate(persistAccount.Entity);
-   
+            session.SaveOrUpdate(this.Entity);
+
             tran.Commit();
             session.Close();
         }
