@@ -29,23 +29,10 @@ namespace Glimpse.Tests
         }
 
         [Test]
-        public void Get_Inbox_Retrieves_Mails_From_Account()
-        {
-            Assert.IsNotEmpty(myFetcher.GetInboxMails());
-        }
-
-        [Test]
         public void Get_Amount_Of_Mails_Returns_Correct_Amount()
         {
             Assert.AreEqual(13, this.myFetcher.GetAmountOfMailsFrom("INBOX"));
-            Assert.AreEqual(13, this.myFetcher.GetAmountOfMailsFrom("[Gmail]/Importantes"));
-        }
-
-        [Test]
-        public void Get_Last_UID_Returns_Correct_Number()
-        {
-            Assert.AreEqual(46, this.myFetcher.GetLastUIDFrom("[Gmail]/Borradores"));
-            Assert.AreEqual(17, this.myFetcher.GetLastUIDFrom("[Gmail]/Enviados"));
+            Assert.AreEqual(11, this.myFetcher.GetAmountOfMailsFrom("[Gmail]/Importantes"));
         }
 
         [Test]
@@ -103,6 +90,35 @@ namespace Glimpse.Tests
             Assert.AreEqual(startingTrashMailsAmount, actualTrashMailAmount);
             Assert.AreEqual(startingLabelMailsAmount, actualLabelMailAmount);
             Assert.AreEqual(startingAllMailsAmount, actualAllMailsAmount);
+        }
+
+        [Test]
+        public void Mail_Flagging_Operations_Work_Correctly()
+        {
+            MailCollection labelMails = this.myFetcher.GetMailsDataFrom("MyLabel2", 1);
+
+            if (labelMails[0].Subject != "Email para MyLabel, Test de Flags")
+                Assert.Fail("El email levantado no es el correcto. El email debe tener subject: Email para MyLabel, Test de Flags.");
+
+            this.myFetcher.setAnsweredFlag("MyLabel2", 1444291302611131331, true);
+            this.myFetcher.setSeenFlag("MyLabel2", 1444291302611131331, true);
+            this.myFetcher.setFlaggedFlag("MyLabel2", 1444291302611131331, true);
+
+            labelMails = this.myFetcher.GetMailsDataFrom("MyLabel2", 1);
+
+            Assert.True(labelMails[0].Answered);
+            Assert.True(labelMails[0].Seen);
+            Assert.True(labelMails[0].Flagged);
+
+            this.myFetcher.setAnsweredFlag("MyLabel2", 1444291302611131331, false);
+            this.myFetcher.setSeenFlag("MyLabel2", 1444291302611131331, false);
+            this.myFetcher.setFlaggedFlag("MyLabel2", 1444291302611131331, false);
+
+            labelMails = this.myFetcher.GetMailsDataFrom("MyLabel2", 1);
+
+            Assert.False(labelMails[0].Answered);
+            Assert.False(labelMails[0].Seen);
+            Assert.False(labelMails[0].Flagged);
         }
     }
 }

@@ -54,6 +54,11 @@ namespace Glimpse.MailInterfaces
             Mailbox targetMailbox = this.GetMailbox(mailbox);
             return targetMailbox.MessageCount;
         }
+        public Int32 getMailUID(String mailbox, Int64 gmMailID)
+        {
+            this.GetMailbox(mailbox); //Se asegura que se encuentra seleccionado el mailbox en IMAP
+            return Int32.Parse(this.CleanIMAPResponse(this.receiver.Command("UID SEARCH X-GM-MSGID " + gmMailID.ToString()), "SEARCH", false));
+        }
         public byte[] GetAttachmentFromMail(String mailbox, Int32 uniqueMailID, String attachmentName)
         {
             Mailbox targetMailbox = this.GetMailbox(mailbox);
@@ -131,10 +136,6 @@ namespace Glimpse.MailInterfaces
             }
             return mailsFromMailbox;
         }
-        public void CloseClient()
-        {
-            this.receiver.Disconnect();
-        }
 
         public void archiveMail(Int64 gmMailID)
         {
@@ -174,10 +175,48 @@ namespace Glimpse.MailInterfaces
             targetMailbox.UidDeleteMessage(mailUID, true);
             this.currentOpenedMailbox.MessageCount--;
         }
-        public Int32 getMailUID(String mailbox, Int64 gmMailID)
+
+        public void setAnsweredFlag(String mailbox, Int64 gmMailID, Boolean isAnswered)
         {
-            this.GetMailbox(mailbox); //Se asegura que se encuentra seleccionado el mailbox en IMAP
-            return Int32.Parse(this.CleanIMAPResponse(this.receiver.Command("UID SEARCH X-GM-MSGID " + gmMailID.ToString()), "SEARCH", false));
+            Mailbox targetMailbox = this.GetMailbox(mailbox);
+            Int32 mailUID = this.getMailUID(mailbox, gmMailID);
+            if (isAnswered)
+                targetMailbox.UidAddFlagsSilent(mailUID, new FlagCollection { "Answered" });
+            else
+                targetMailbox.UidRemoveFlagsSilent(mailUID, new FlagCollection { "Answered" });
+        }
+        public void setFlaggedFlag(String mailbox, Int64 gmMailID, Boolean isFlagged)
+        {
+            Mailbox targetMailbox = this.GetMailbox(mailbox);
+            Int32 mailUID = this.getMailUID(mailbox, gmMailID);
+            if (isFlagged)
+                targetMailbox.UidAddFlagsSilent(mailUID, new FlagCollection { "Flagged" });
+            else
+                targetMailbox.UidRemoveFlagsSilent(mailUID, new FlagCollection { "Flagged" });
+        }
+        public void setDraftFlag(String mailbox, Int64 gmMailID, Boolean isDraft)
+        {
+            Mailbox targetMailbox = this.GetMailbox(mailbox);
+            Int32 mailUID = this.getMailUID(mailbox, gmMailID);
+
+            if (isDraft)
+                targetMailbox.UidAddFlagsSilent(mailUID, new FlagCollection { "Draft" });
+            else
+                targetMailbox.UidRemoveFlagsSilent(mailUID, new FlagCollection { "Draft" });
+        }
+        public void setSeenFlag(String mailbox, Int64 gmMailID, Boolean isSeen)
+        {
+            Mailbox targetMailbox = this.GetMailbox(mailbox);
+            Int32 mailUID = this.getMailUID(mailbox, gmMailID);
+            if (isSeen)
+                targetMailbox.UidAddFlagsSilent(mailUID, new FlagCollection { "Seen" });
+            else
+                targetMailbox.UidRemoveFlagsSilent(mailUID, new FlagCollection { "Seen" });
+        }
+
+        public void CloseClient()
+        {
+            this.receiver.Disconnect();
         }
 
         private Mailbox GetMailbox(String targetMailboxName)
@@ -268,6 +307,32 @@ namespace Glimpse.MailInterfaces
                     this.accountMailboxesBySpecialProperty.Add("Labels", this.stripMailboxName(mailbox));
             }
         }
+        private void AddUIDToMail(String mailbox, Int64 UID, ref MailEntity mail)
+        {
+            //UIDs no cargados son completados por GlimpseDB como -1
+            if (this.accountMailboxesBySpecialProperty["Inbox"] == mailbox)
+            { mail.UidInbox = UID; return; }
+            if (this.accountMailboxesBySpecialProperty["All"] == mailbox)
+            { mail.UidAll = UID; return; }
+            if (this.accountMailboxesBySpecialProperty["Deleted"] == mailbox)
+            { mail.UidTrash = UID; return; }
+            if (this.accountMailboxesBySpecialProperty["Spam"] == mailbox)
+            { mail.UidSpam = UID; return; }
+            if (this.accountMailboxesBySpecialProperty["Sent"] == mailbox)
+            { mail.UidSent = UID; return; }
+            if (this.accountMailboxesBySpecialProperty["Drafts"] == mailbox)
+            { mail.UidDraft = UID; return; }
+        }
+        private void AddFlagsToMail(String flags, ref MailEntity mail)
+        {
+            if (flags.Contains("answered"))
+                mail.Answered = true;
+            if (flags.Contains("flagged"))
+                mail.Flagged = true;
+            if (flags.Contains("seen"))
+                mail.Seen = true;
+            //if (flags.Contains("draft")) mail.Draft = true;
+        }
         private String GetAddressNameAndMail(AddressCollection addresses)
         {
             String addressesNamesAndMail = "";
@@ -304,29 +369,6 @@ namespace Glimpse.MailInterfaces
                 imapResponse = imapResponse.Remove(imapResponse.IndexOf("\r\n"));
             }
             return imapResponse;
-        }
-        private void AddUIDToMail(String mailbox, Int64 UID, ref MailEntity mail)
-        {
-            //UIDs no cargados son completados por GlimpseDB como -1
-            if (this.accountMailboxesBySpecialProperty["Inbox"] == mailbox)
-            {mail.UidInbox = UID; return;}
-            if (this.accountMailboxesBySpecialProperty["All"] == mailbox)
-            {mail.UidAll = UID; return;}
-            if (this.accountMailboxesBySpecialProperty["Deleted"] == mailbox)
-            {mail.UidTrash = UID; return;}
-            if (this.accountMailboxesBySpecialProperty["Spam"] == mailbox)
-            {mail.UidSpam = UID; return;}
-            if (this.accountMailboxesBySpecialProperty["Sent"] == mailbox)
-            {mail.UidSent = UID; return;}
-            if (this.accountMailboxesBySpecialProperty["Drafts"] == mailbox)
-            {mail.UidDraft = UID; return;}
-        }
-        private void AddFlagsToMail(String flags, ref MailEntity mail)
-        {
-            if (flags.Contains("answered")) mail.Answered = true;
-            if (flags.Contains("flagged")) mail.Flagged = true;
-            if (flags.Contains("seen")) mail.Seen = true;
-            //if (flags.Contains("draft")) mail.Draft = true;
         }
         private String stripMailboxName(String mailbox)
         {
