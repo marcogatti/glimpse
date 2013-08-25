@@ -25,8 +25,9 @@ namespace Glimpse.Controllers
                 IList<Object> mailsToSend = this.FetchMails(amountOfEmails);
                 return Json(new { success = true, mails = mailsToSend }, JsonRequestBehavior.AllowGet);
             }
-            catch (Exception e)
+            catch (Exception exp)
             {
+                //Log exception
                 return Json(new { success = false, message = "Error al obtener los mails" }, JsonRequestBehavior.AllowGet);
             }
         }
