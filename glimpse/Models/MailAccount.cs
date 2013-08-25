@@ -25,6 +25,17 @@ namespace Glimpse.Models
             this.mySender = new Sender(address, password);
         }
 
+        public static MailAccount FindByAddress(String emailAddress)
+        {
+            ISession session = NHibernateManager.OpenSession();
+
+            MailAccountEntity account = session.CreateCriteria<MailAccountEntity>()
+                                          .Add(Restrictions.Eq("Address", emailAddress))
+                                          .UniqueResult<MailAccountEntity>();
+
+            return new MailAccount(account.Address, account.Password);
+        }
+
         public MessageCollection GetInboxMessages()
         {
             return this.myFetcher.GetInboxMails();
@@ -35,7 +46,7 @@ namespace Glimpse.Models
             return this.myFetcher.GetLastUIDFrom(mailbox);
         }
 
-        public MailCollection getMailsFromHigherThan(string mailbox, Int64 lastUID)
+        public List<Mail> getMailsFromHigherThan(string mailbox, Int64 lastUID)
         {
             return this.myFetcher.GetMailDataFromHigherThan(mailbox, lastUID);
         }
@@ -62,18 +73,7 @@ namespace Glimpse.Models
    
             tran.Commit();
         }
-
-        public static MailAccount FindByAddress(String emailAddress)
-        {
-            ISession session = NHibernateManager.OpenSession();
-            
-            MailAccountEntity account = session.CreateCriteria<MailAccountEntity>()
-                                          .Add(Restrictions.Eq("Address", emailAddress))
-                                          .UniqueResult<MailAccountEntity>();
-
-            return new MailAccount(account.Address, account.Password);
-        }
-                
+        
         public MailAccount LoginExternal()
         {
             this.myFetcher = new Fetcher(this.Entity.Address, this.Entity.Password);

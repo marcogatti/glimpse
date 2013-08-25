@@ -20,13 +20,13 @@ namespace Glimpse.Tests.DAL
     {
         private static void BuildSchema(Configuration cfg)
         {
-            new SchemaExport(cfg).SetOutputFile("D://dropschema").Drop(true, true);
-            new SchemaExport(cfg).SetOutputFile("D://schema").Create(true, true);
+            new SchemaExport(cfg).Drop(true, true);
+            new SchemaExport(cfg).Create(true, true);
         }
 
         [Test]
         [Explicit]
-        public void DropAndCreate()
+        public void EXP_Drop_And_Create()
         {
             var dataAccessService = new NHibernateManager();
             dataAccessService.CreateSessionFactory();

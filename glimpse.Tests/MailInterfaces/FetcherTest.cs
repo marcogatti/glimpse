@@ -1,13 +1,14 @@
-﻿using System;
-using NUnit.Framework;
-using ActiveUp.Net.Imap4;
-using Glimpse.MailInterfaces;
-using Glimpse.Exceptions.MailInterfacesExceptions;
+﻿using ActiveUp.Net.Imap4;
 using ActiveUp.Net.Mail;
-using System.IO;
-using Glimpse.Tests.global;
 using Glimpse.DataAccessLayer.Entities;
+using Glimpse.Exceptions.MailInterfacesExceptions;
+using Glimpse.MailInterfaces;
 using Glimpse.Models;
+using Glimpse.Tests.global;
+using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace Glimpse.Tests
 {
@@ -38,18 +39,18 @@ namespace Glimpse.Tests
         [Test]
         public void Fetcher_Loads_Data_Correctly()
         {
-            MailCollection retrievedMails = new MailCollection();
+            List<Mail> retrievedMails = new List<Mail>();
             retrievedMails = this.myFetcher.GetMailsDataFrom("INBOX", 3);
 
-            Assert.AreEqual("Re: Email11 c/ texto formateado", retrievedMails[0].Subject);
-            Assert.AreEqual(DateTime.Parse("Sat, 20 Jul 2013 00:52:44"), retrievedMails[1].Date);
-            Assert.AreEqual("Martin Hoomer", retrievedMails[2].From.Name);
-            Assert.IsTrue(retrievedMails[3].Body.Contains("</span><span class=\"\">Estrategia de entrenamiento.</span></p>"));
-            Assert.IsTrue(retrievedMails[4].HasExtras);
-            Assert.AreEqual(11, retrievedMails[5].UidInbox);
-            Assert.IsTrue(retrievedMails[6].UidDraft <= 0 && retrievedMails[6].UidSent <= 0 && retrievedMails[6].UidSpam <= 0);
-            Assert.IsTrue(retrievedMails[7].ToAddr.Contains("imap.sealed@gmail.com") && retrievedMails[7].ToAddr.Contains("test.imap.505@gmail.com"));
-            Assert.IsTrue(retrievedMails[0].Flagged && retrievedMails[3].Seen && !retrievedMails[0].Seen);
+            Assert.AreEqual("Re: Email11 c/ texto formateado", retrievedMails[0].Entity.Subject);
+            Assert.AreEqual(DateTime.Parse("Sat, 20 Jul 2013 00:52:44"), retrievedMails[1].Entity.Date);
+            Assert.AreEqual("Martin Hoomer", retrievedMails[2].Entity.From.Name);
+            Assert.IsTrue(retrievedMails[3].Entity.Body.Contains("</span><span class=\"\">Estrategia de entrenamiento.</span></p>"));
+            Assert.IsTrue(retrievedMails[4].Entity.HasExtras);
+            Assert.AreEqual(11, retrievedMails[5].Entity.UidInbox);
+            Assert.IsTrue(retrievedMails[6].Entity.UidDraft <= 0 && retrievedMails[6].Entity.UidSent <= 0 && retrievedMails[6].Entity.UidSpam <= 0);
+            Assert.IsTrue(retrievedMails[7].Entity.ToAddr.Contains("imap.sealed@gmail.com") && retrievedMails[7].Entity.ToAddr.Contains("test.imap.505@gmail.com"));
+            Assert.IsTrue(retrievedMails[0].Entity.Flagged && retrievedMails[3].Entity.Seen && !retrievedMails[0].Entity.Seen);
         }
 
         [Test]
@@ -95,9 +96,9 @@ namespace Glimpse.Tests
         [Test]
         public void Mail_Flagging_Operations_Work_Correctly()
         {
-            MailCollection labelMails = this.myFetcher.GetMailsDataFrom("MyLabel2", 1);
+            List<Mail> labelMails = this.myFetcher.GetMailsDataFrom("MyLabel2", 1);
 
-            if (labelMails[0].Subject != "Email para MyLabel, Test de Flags")
+            if (labelMails[0].Entity.Subject != "Email para MyLabel, Test de Flags")
                 Assert.Fail("El email levantado no es el correcto. El email debe tener subject: Email para MyLabel, Test de Flags.");
 
             this.myFetcher.setAnsweredFlag("MyLabel2", 1444291302611131331, true);
@@ -106,9 +107,9 @@ namespace Glimpse.Tests
 
             labelMails = this.myFetcher.GetMailsDataFrom("MyLabel2", 1);
 
-            Assert.True(labelMails[0].Answered);
-            Assert.True(labelMails[0].Seen);
-            Assert.True(labelMails[0].Flagged);
+            Assert.True(labelMails[0].Entity.Answered);
+            Assert.True(labelMails[0].Entity.Seen);
+            Assert.True(labelMails[0].Entity.Flagged);
 
             this.myFetcher.setAnsweredFlag("MyLabel2", 1444291302611131331, false);
             this.myFetcher.setSeenFlag("MyLabel2", 1444291302611131331, false);
@@ -116,9 +117,9 @@ namespace Glimpse.Tests
 
             labelMails = this.myFetcher.GetMailsDataFrom("MyLabel2", 1);
 
-            Assert.False(labelMails[0].Answered);
-            Assert.False(labelMails[0].Seen);
-            Assert.False(labelMails[0].Flagged);
+            Assert.False(labelMails[0].Entity.Answered);
+            Assert.False(labelMails[0].Entity.Seen);
+            Assert.False(labelMails[0].Entity.Flagged);
         }
     }
 }
