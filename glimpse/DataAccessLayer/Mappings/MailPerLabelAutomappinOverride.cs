@@ -12,8 +12,8 @@ namespace Glimpse.DataAccessLayer.Mappings
     {
         public void Override(AutoMapping<MailPerLabelEntity> mapping)
         {
-            mapping.HasOne<MailEntity>(x => x.Mail);
-            mapping.HasOne<MailEntity>(x => x.Label);
+            mapping.References<MailEntity>(x => x.Mail).Cascade.None();
+            mapping.References<LabelEntity>(x => x.Label).Cascade.None();
         }
     }
 }

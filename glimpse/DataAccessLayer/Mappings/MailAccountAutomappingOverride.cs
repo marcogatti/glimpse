@@ -14,8 +14,8 @@ namespace Glimpse.DataAccessLayer.Mappings
         {
             mapping.Map(x => x.Address).Unique().Not.Nullable();
             mapping.Map(x => x.Password).Not.Nullable();
-            mapping.HasMany<MailEntity>(x => x.Mails);
-            mapping.HasMany<LabelEntity>(x => x.Labels);
+            mapping.HasMany<MailEntity>(x => x.Mails).Inverse().Cascade.None();
+            mapping.HasMany<LabelEntity>(x => x.Labels).Inverse().Cascade.None();
         }
     }
 }

@@ -6,9 +6,7 @@
     @Scripts.Render("~/bundles/emails-modal")}
 
 @{
-    ViewBag.Title = "Index";
-    ViewBag.MaxAge = 0;
-        
+    ViewBag.Title = "Index";        
 }
 
 
@@ -71,31 +69,10 @@
 
         <div id="email-container" class="span10">
 
-            @foreach (MailEntity inboxMail in ViewBag.InboxMessages)
-            {
-                Int64 age = DateTime.Now.Ticks - inboxMail.Date.Ticks;
-
-                if (age > ViewBag.MaxAge) {
-                    ViewBag.MaxAge = age;  
-                }
-                    
-                <a data-toggle="modal" href="#example">
-                    <div class="circle" data-body="@inboxMail.Body"
-                                            data-subject="@inboxMail.Subject"
-                                            data-date="@inboxMail.Date"
-                                            data-from="@inboxMail.From.MailAddress"
-                                            data-age="@age">
-                        <p class="subject">@inboxMail.Subject</p>
-                        <p>@inboxMail.From.MailAddress</p>
-                    </div>
-                </a>
-            }
+            <div id="dateTime" class="coord hidden"></div>
+            <div id="from" class="coord hidden"></div>
 
         </div>
-
-        <script>
-            var maxAge = @ViewBag.MaxAge;
-        </script>
 
     </div>
     <!--/row-->

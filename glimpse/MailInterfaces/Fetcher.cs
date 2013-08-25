@@ -15,13 +15,18 @@ namespace Glimpse.MailInterfaces
     {
         private Imap4Client receiver;
         private Mailbox currentOpenedMailbox;
-        private NameValueCollection accountMailboxesBySpecialProperty = new NameValueCollection();
+        public NameValueCollection accountMailboxesBySpecialProperty { get; private set; }
 
         public Fetcher(String username, String password)
         {
             this.receiver = new Connector().ImapLogin(username, password);
+            this.accountMailboxesBySpecialProperty = new NameValueCollection();
             this.loadMailboxesAndSpecialProperties(this.receiver.Command("LIST \"\" \"*\""));
             this.currentOpenedMailbox = null;
+        }
+        public NameValueCollection getLabels()
+        {
+            return this.accountMailboxesBySpecialProperty;
         }
 
         public MessageCollection GetInboxMails()
@@ -58,10 +63,11 @@ namespace Glimpse.MailInterfaces
             this.GetMailbox(mailbox); //Se asegura que se encuentra seleccionado el mailbox en IMAP
             return Int32.Parse(this.CleanIMAPResponse(this.receiver.Command("UID SEARCH X-GM-MSGID " + gmMailID.ToString()), "SEARCH", false));
         }
-        public byte[] GetAttachmentFromMail(String mailbox, Int32 uniqueMailID, String attachmentName)
+        public byte[] GetAttachmentFromMail(String mailbox, Int64 gmMailID, String attachmentName)
         {
             Mailbox targetMailbox = this.GetMailbox(mailbox);
-            AttachmentCollection attachmentsInMail = targetMailbox.Fetch.UidMessageObject(uniqueMailID).Attachments;
+            Int32 mailUID = this.getMailUID(mailbox, gmMailID);
+            AttachmentCollection attachmentsInMail = targetMailbox.Fetch.UidMessageObject(mailUID).Attachments;
             MimePart desiredAttachment;
             try
             {
@@ -71,7 +77,7 @@ namespace Glimpse.MailInterfaces
             }
             catch (System.InvalidOperationException systemException)
             {
-                throw new InvalidAttachmentException(systemException.Message ,"Se pide un archivo adjunto que no existe, o más de un adjunto posee el mismo nombre.");
+                throw new InvalidAttachmentException(systemException.Message, "Se pide un archivo adjunto que no existe, o más de un adjunto posee el mismo nombre.");
             }
             return desiredAttachment.BinaryContent;
         }
@@ -86,16 +92,31 @@ namespace Glimpse.MailInterfaces
         }
         public List<Mail> GetMailDataFromHigherThan(String mailbox, Int64 minimumUID)
         {
+            if (minimumUID < 0) minimumUID = 0;
             //siempre trae al menos uno, excepto si el mailbox está vacío
-            if (minimumUID <= 0) minimumUID = 1;
-            return this.GetMailsDataFrom(mailbox, this.GetMailbox(mailbox).Search("UID " + minimumUID + ":*")[0]);
+            Int32[] mailsUIDs = this.GetMailbox(mailbox).Search("UID " + (minimumUID+1).ToString() + ":*");
+            //si el mailbox está vacío o si IMAP trajo sólo el último aunque esté repetido
+            if (mailsUIDs == null)
+                return new List<Mail>();
+            return this.GetMailsDataFrom(mailbox, mailsUIDs[0]);
         }
         public List<Mail> GetMailsDataFrom(String mailbox, Int32 reversedLastOrdinalToRetrieve)
         {
             //Trae los mails desde el mail más reciente (el ordinal mayor) hasta el mail con ordinal por parámetro reversedLastOrdinalToRetrieve
             if (reversedLastOrdinalToRetrieve <= 0)
                 throw new MailReadingOverflowException("No se puede leer mails con ordinal menor a 1.");
-            Mailbox targetMailbox = this.GetMailbox(mailbox);
+
+            Mailbox targetMailbox;
+
+            try
+            {
+                targetMailbox = this.GetMailbox(mailbox);
+            }
+            catch (Exception e)
+            {
+                throw new CouldNotSelectMailboxException("Error while selecting mailbox " + mailbox + ".", e);
+            }
+
             Message retrievedMessage;
             MailEntity retrievedMail;
 
@@ -104,14 +125,33 @@ namespace Glimpse.MailInterfaces
             for (int currentMail = targetMailbox.MessageCount; currentMail >= reversedLastOrdinalToRetrieve; currentMail--)
             {
                 retrievedMail = new MailEntity();
+                retrievedMessage = new Message();
+                string raw_gmtid;
+                string raw_gmmid;
+                int thisUid;
+                String thisFlags;
 
-                retrievedMessage = targetMailbox.Fetch.MessageObjectPeekWithGMailExtensions(currentMail);
+                try
+                {
+                    retrievedMessage = targetMailbox.Fetch.MessageObjectPeekWithGMailExtensions(currentMail);
+                    raw_gmtid = this.CleanIMAPResponse(receiver.Command("FETCH " + currentMail + " (X-GM-THRID)"), "X-GM-THRID");
+                    raw_gmmid = this.CleanIMAPResponse(receiver.Command("FETCH " + currentMail + " (X-GM-MSGID)"), "X-GM-MSGID");
+                    thisUid = targetMailbox.Fetch.Uid(currentMail);
+                    thisFlags = targetMailbox.Fetch.Flags(currentMail).Merged;
+                    //mailData["labels"] = this.CleanLabels(retrievedMessage.HeaderFields["x-gm-labels"]);
+                }
+                catch (Imap4Exception)
+                {
+                    // Log to database
+                    continue;
+                }
+                catch (Exception)
+                {
+                    // Log to database
+                    continue;
+                }
 
-                retrievedMail.Gm_tid = UInt64.Parse(this.CleanIMAPResponse(receiver.Command("FETCH " + currentMail + " (X-GM-THRID)"), "X-GM-THRID"));
-                retrievedMail.Gm_mid = UInt64.Parse(this.CleanIMAPResponse(receiver.Command("FETCH " + currentMail + " (X-GM-MSGID)"), "X-GM-MSGID"));
-                //mailData["labels"] = this.CleanLabels(retrievedMessage.HeaderFields["x-gm-labels"]);
-
-                DataAccessLayer.Entities.AddressEntity fromAddress = new DataAccessLayer.Entities.AddressEntity();
+                AddressEntity fromAddress = new AddressEntity();
                 fromAddress.MailAddress = retrievedMessage.From.Email;
                 fromAddress.Name = retrievedMessage.From.Name;
 
@@ -119,7 +159,7 @@ namespace Glimpse.MailInterfaces
                 retrievedMail.Date = retrievedMessage.Date;
                 retrievedMail.Body = retrievedMessage.BodyHtml.Text;
                 retrievedMail.From = fromAddress;
-                retrievedMail.HasExtras = (retrievedMessage.Attachments.Count != 0 
+                retrievedMail.HasExtras = (retrievedMessage.Attachments.Count != 0
                                              || retrievedMessage.EmbeddedObjects.Count != 0
                                              || retrievedMessage.UnknownDispositionMimeParts.Count != 0);
 
@@ -127,9 +167,12 @@ namespace Glimpse.MailInterfaces
                 retrievedMail.BCC = this.GetAddressNameAndMail(retrievedMessage.Bcc);
                 retrievedMail.CC = this.GetAddressNameAndMail(retrievedMessage.Cc);
 
-                this.AddUIDToMail(mailbox, targetMailbox.Fetch.Uid(currentMail), ref retrievedMail);
+                this.AddUIDToMail(mailbox, thisUid, ref retrievedMail);
                 this.AddFlagsToMail(targetMailbox.Fetch.Flags(currentMail).Merged, ref retrievedMail);
-                
+
+                retrievedMail.Gm_tid = UInt64.Parse(raw_gmtid);
+                retrievedMail.Gm_mid = UInt64.Parse(raw_gmmid);
+
                 //mailsFromMailbox representa el mail más reciente mientras más bajo sea el índice
                 mailsFromMailbox.Add(new Mail(retrievedMail));
             }

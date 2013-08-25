@@ -20,31 +20,35 @@ namespace Glimpse.Tests.DAL
 
 
         [TestFixtureSetUp]
-        public void PersistAMail()
+        public void TextFixtureSetUp()
         {
             ITransaction tran = session.BeginTransaction();
 
-            anAccount = new MailAccount("test.imap.505@gmail.com","ytrewq123");            
-            session.SaveOrUpdate(anAccount.Entity);
+            anAccount = new MailAccount("test.imap.505@gmail.com", "ytrewq123");
+            MailAccount existingAccount = MailAccount.FindByAddress("test.imap.505@gmail.com", this.session);
+            if (existingAccount == null)
+                this.session.SaveOrUpdate(anAccount.Entity);
+            else
+                this.anAccount = existingAccount;
 
-            aMail = new Mail(new MailEntity());
-            aMail.Entity.Subject = "Mail de prueba";
-            aMail.Entity.MailAccount = anAccount.Entity;
-            session.SaveOrUpdate(aMail.Entity);
+            this.aMail = new Mail(new MailEntity());
+            this.aMail.Entity.Subject = "Mail de prueba";
+            this.aMail.Entity.MailAccountEntity = anAccount.Entity;
+            this.session.SaveOrUpdate(aMail.Entity);
 
             tran.Commit();
         }
 
         [Test]
-        public void GetOneMailFromInboxAndDataIsOK()
+        public void GetOneMailFromInbox()
         {
-            Mail theMail = new Mail(Mail.FindByMailAccount(anAccount, 1).First<MailEntity>());
+            Mail theMail = new Mail(Mail.FindByMailAccount(anAccount, session).First<MailEntity>());
 
-            Assert.AreEqual(aMail.Entity.Subject, theMail.Entity.Subject);
+            Assert.NotNull(theMail.Entity);
         }
 
         [TestFixtureTearDown]
-        public void cleanPersistedMail()
+        public void TestFixtureTearDown()
         {
             ITransaction tran = session.BeginTransaction();
 

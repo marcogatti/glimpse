@@ -18,12 +18,10 @@ namespace Glimpse.Models
             this.Entity = entity;
         }
  
-        public static IList<MailEntity> FindByMailAccount(MailAccount mailAccount, int maxAmount){
-
-            ISession session = NHibernateManager.OpenSession();
+        public static List<MailEntity> FindByMailAccount(MailAccount mailAccount, ISession session){
 
             List<MailEntity> foundMails = (List<MailEntity>)session.CreateCriteria<MailEntity>()
-                                                        .Add(Restrictions.Eq("MailAccount.Id", mailAccount.Entity.Id))
+                                                        .Add(Restrictions.Eq("MailAccountEntity", mailAccount.Entity))
                                                         .List<MailEntity>();
             return foundMails;
         }
