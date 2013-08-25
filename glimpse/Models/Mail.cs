@@ -13,6 +13,11 @@ namespace Glimpse.Models
     {
         public MailEntity Entity { get; private set; }
 
+        public void setFrom(AddressEntity from)
+        {
+            this.Entity.From = from;
+        }
+
         public Mail(MailEntity entity)
         {
             this.Entity = entity;

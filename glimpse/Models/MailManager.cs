@@ -84,7 +84,7 @@ namespace Glimpse.Models
                 }
                 else
                 {
-                    mailToSave.Entity.From = foundAddress.Entity;
+                    mailToSave.setFrom(foundAddress.Entity);
                 }
 
                 currentSession.SaveOrUpdate(mailToSave.Entity);
