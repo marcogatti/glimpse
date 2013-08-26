@@ -120,7 +120,7 @@ function fetchMailsAsync() {
                         "' data-from='" + value.from.address +
                         //"' data-body='" + value.body +    // REVISAR!!
                         "' data-age=" + value.age + ">" +
-                        "<p class='subject'>" + value.subject + "</p></div></a>"
+                        "<p>" + value.subject + "</p></div></a>"
 
                 $("#email-container").append(newCircle);
             });

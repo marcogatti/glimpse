@@ -10,7 +10,7 @@
 
 #email-container {
     height: 480px;
-    border: 2px outset;
+    border: 5px outset;
     position: relative;
 }
 
@@ -27,6 +27,7 @@
     max-height: 150px;
     border-radius: 50%;
     float: left;
+    display: table;
     overflow: hidden;
     position: absolute;
     background-color: rgba(32, 178, 170, 0.5);
@@ -60,15 +61,12 @@
     }
 
     .circle p {
-        color: #fff;
-        font-style: italic;
-    }
-
-    .circle .subject {
         font-style: normal;
         color: #fff;
         font-weight: bold;
         font-family: 'Open Sans', Arial, sans-serif;
+        display: table-cell;
+        vertical-align: middle;
     }
 
 .coord {
@@ -76,24 +74,25 @@
     text-align: center;
     text-shadow: 0 0 1px #fff, 0 2px 4px rgba(0,0,0,1);
     font-style: normal;
-        color: #fff;
-        font-weight: bold;
-        font-family: 'Open Sans', Arial, sans-serif;
+    color: #fff;
+    font-weight: bold;
+    font-family: 'Open Sans', Arial, sans-serif;
 }
 
 .visible {
-  visibility: visible;
-  opacity: 1;
-  transition: opacity 0.5s;
-  -webkit-transition: opacity 0.5s;
+    visibility: visible;
+    opacity: 1;
+    transition: opacity 0.5s;
+    -webkit-transition: opacity 0.5s;
     -moz-transition: opacity 0.5s;
     -o-transition: opacity 0.5s;
 }
+
 .hidden {
-  visibility: hidden;
-  opacity: 0;
-  transition: visibility 0s 0.5s, opacity 0.5s;
-  -webkit-transition: visibility 0s 0.5s, opacity 0.5s;
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s 0.5s, opacity 0.5s;
+    -webkit-transition: visibility 0s 0.5s, opacity 0.5s;
     -moz-transition: visibility 0s 0.5s, opacity 0.5s;
     -o-transition: visibility 0s 0.5s, opacity 0.5s;
 }
