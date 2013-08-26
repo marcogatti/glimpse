@@ -13,6 +13,7 @@ namespace Glimpse.DataAccessLayer.Entities
         public virtual UInt32 Size { get; set; }
         public virtual String FileType { get; set; }
         public virtual Int16 ExtraType { get; set; }
+        public virtual String EmbObjectContentId { get; set; }
         public virtual Byte[] Data { get; set; }
     }
 }

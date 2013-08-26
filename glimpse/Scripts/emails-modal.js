@@ -5,20 +5,27 @@ function calculateEmailsPosition() {
     var containerWidth = $("#email-container").width();
     var containerHeight = $("#email-container").height();
 
+    var offset = parseInt($(".circle").css('width'), 10);
+
     $(".circle").each(function () {
 
-        var maxSize = parseInt($(this).css('max-width'), 10);
         var left = $(this).attr('data-age') / maxAge;
         var top = ($(this).attr('data-from').charCodeAt(0) - "a".charCodeAt(0)) / 26;    
 
         $(this).css('top', function () {
-            return top * (containerHeight - (maxSize * 0.6)) + 'px';
+            return top * (containerHeight - offset) + 'px';
         });
 
         $(this).css('left', function () {
-            return left * (containerWidth - (maxSize * 0.6)) + 'px';
+            return left * (containerWidth - offset) + 'px';
         });
     })
+}
+
+function setDateCoords() {
+    $(".dateCoord").css("top", function () {
+        return $("#email-container").height();
+    });
 }
 
 function setModal() {
@@ -53,53 +60,66 @@ function configureCircleHover() {
             dateTime.html(currentCircle.data("date"));
             from.html(currentCircle.data("from"));
 
-            $(".coord").removeClass("hidden").addClass("visible");
+            $(".hidable").removeClass("hidden").addClass("visible");
 
             dateTime.css("left",currentCircle.css("left"));
 
             from.css("top", currentCircle.css("top"));
 
         }, function () {
-            $(".coord").removeClass("visible").addClass("hidden");
+            $(".hidable").removeClass("visible").addClass("hidden");
         })
 
-    dateTime.css("top", function () {
-        return $("#email-container").height();
-    });
-
     from.css("left", "-60px");
+}
+
+function hideProgressBar() {
+    $(".progress").css("visibility", "hidden");
+}
+
+function setRefreshPosition() {
+    $(window).resize(function () { calculateEmailsPosition() });
 }
 
 function fetchMailsAsync() {
 
     $.getJSON("async/InboxMails", function (data) {
 
-        $.each(data.mails, function (index, value) {
+        if (data.success == true) {
 
-            if (value.age > maxAge) {
-                maxAge = value.age;
-            }
+            $.each(data.mails, function (index, value) {
 
-            var newCircle = "<a data-toggle='modal' href='#example'><div class='circle'" +
-                    "data-date='" + value.date + "' data-from='" + value.from.address +
-                    "' data-age='"+ value.age +"'>" +
-                    "<p class='subject'>"+ value.subject +"</p></div></a>"
+                if (value.age > maxAge) {
+                    maxAge = value.age;
+                    oldest = new Date(parseInt(value.date.substr(6))).toLocaleDateString();
+                }
 
-            $("#email-container").append(newCircle);
-        });
+                var date = new Date(parseInt(value.date.substr(6))).toLocaleDateString();
+
+                var newCircle = "<a data-toggle='modal' href='#example'><div class='circle'"+
+                        " data-date=" + date +
+                        " data-from='" + value.from.address +
+                        "' data-age='" + value.age + "'>" +
+                        "<p class='subject'>" + value.subject + "</p></div></a>"
+
+                $("#email-container").append(newCircle);
+            });
+        } else alert(data.message);
+
+    }).done(function () {
+
+        setDateCoords();
+        hideProgressBar();
+        calculateEmailsPosition();
+        setRefreshPosition()
+        configureCircleHover();
+        setModal();
+        
     });
 }
 
 $(document).ready(function () {
 
-    setModal();
-
-    // RESOLVER ORDEN!
     fetchMailsAsync();
-    calculateEmailsPosition();
-
-    $(window).resize(function () { calculateEmailsPosition() })
-    configureCircleHover();
-
 })
 
