@@ -94,6 +94,7 @@ function fetchMailsAsync() {
         } else alert(data.message);
 
     }).done(function () {
+        $(".progress").css("visibility" , "hidden");
         calculateEmailsPosition();
         configureCircleHover();
         setModal();
