@@ -5,18 +5,19 @@ function calculateEmailsPosition() {
     var containerWidth = $("#email-container").width();
     var containerHeight = $("#email-container").height();
 
+    var offset = parseInt($(".circle").css('width'), 10);
+
     $(".circle").each(function () {
 
-        var maxSize = parseInt($(this).css('max-width'), 10);
         var left = $(this).attr('data-age') / maxAge;
         var top = ($(this).attr('data-from').charCodeAt(0) - "a".charCodeAt(0)) / 26;    
 
         $(this).css('top', function () {
-            return top * (containerHeight - (maxSize * 0.6)) + 'px';
+            return top * (containerHeight - offset) + 'px';
         });
 
         $(this).css('left', function () {
-            return left * (containerWidth - (maxSize * 0.6)) + 'px';
+            return left * (containerWidth - offset) + 'px';
         });
     })
 }
@@ -72,6 +73,14 @@ function configureCircleHover() {
     from.css("left", "-60px");
 }
 
+function hideProgressBar() {
+    $(".progress").css("visibility", "hidden");
+}
+
+function setRefreshPosition() {
+    $(window).resize(function () { calculateEmailsPosition() });
+}
+
 function fetchMailsAsync() {
 
     $.getJSON("async/InboxMails", function (data) {
@@ -87,7 +96,8 @@ function fetchMailsAsync() {
 
                 var date = new Date(parseInt(value.date.substr(6))).toLocaleDateString();
 
-                var newCircle = "<a data-toggle='modal' href='#example'><div class='circle' data-date=" + date +
+                var newCircle = "<a data-toggle='modal' href='#example'><div class='circle'"+
+                        " data-date=" + date +
                         " data-from='" + value.from.address +
                         "' data-age='" + value.age + "'>" +
                         "<p class='subject'>" + value.subject + "</p></div></a>"
@@ -97,12 +107,14 @@ function fetchMailsAsync() {
         } else alert(data.message);
 
     }).done(function () {
+
         setDateCoords();
-        $(".progress").css("visibility" , "hidden");
+        hideProgressBar();
         calculateEmailsPosition();
+        setRefreshPosition()
         configureCircleHover();
         setModal();
-        $(window).resize(function () { calculateEmailsPosition() })
+        
     });
 }
 
