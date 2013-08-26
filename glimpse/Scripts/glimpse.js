@@ -8,6 +8,10 @@ function getContainerWidth() {
     return $("#email-container").width();
 }
 
+function alphabetSize() {
+    return "z".charCodeAt(0) - "a".charCodeAt(0) + 2;
+}
+
 function calculateEmailsPosition() {
 
     var containerWidth = getContainerWidth();
@@ -18,7 +22,7 @@ function calculateEmailsPosition() {
     $(".circle").each(function () {
 
         var left = $(this).attr('data-age') / maxAge;
-        var top = ($(this).attr('data-from').charCodeAt(0) - "a".charCodeAt(0)) / 26;    
+        var top = ($(this).attr('data-from').charCodeAt(0) - "a".charCodeAt(0) + 2) / alphabetSize();    
 
         $(this).css('top', function () {
             return top * (containerHeight - offset) + 'px';
@@ -84,7 +88,9 @@ function hideProgressBar() {
 }
 
 function setRefreshPosition() {
-    $(window).resize(function () { calculateEmailsPosition() });
+    $(window).resize(function () {
+        calculateEmailsPosition();
+    });
 }
 
 function fetchMailsAsync() {
@@ -97,7 +103,6 @@ function fetchMailsAsync() {
 
                 if (value.age > maxAge) {
                     maxAge = value.age;
-                    oldest = new Date(parseInt(value.date.substr(6))).toLocaleDateString();
                 }
 
                 var date = new Date(parseInt(value.date.substr(6))).toLocaleDateString();
@@ -141,20 +146,24 @@ function drawGrid() {
     var canvas = $('canvas').attr({ width: cw, height: ch });
 
     var context = canvas.get(0).getContext("2d");
+    
+    function squareSize() {
+        return getContainerHeight() / alphabetSize();
+    }
 
     function drawBoard() {
-        for (var x = 0; x <= bw; x += 40) {
+        for (var x = 0; x <= bw; x += squareSize()) {
             context.moveTo(0.5 + x + p, p);
             context.lineTo(0.5 + x + p, bh + p);
         }
 
 
-        for (var x = 0; x <= bh; x += 40) {
+        for (var x = 0; x <= bh; x += squareSize()) {
             context.moveTo(p, 0.5 + x + p);
             context.lineTo(bw + p, 0.5 + x + p);
         }
 
-        context.strokeStyle = "grey";
+        context.strokeStyle = "lightgrey";
         context.stroke();
     }
 
