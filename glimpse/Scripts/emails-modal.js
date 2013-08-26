@@ -82,8 +82,10 @@ function fetchMailsAsync() {
                     maxAge = value.age;
                 }
 
-                var newCircle = "<a data-toggle='modal' href='#example'><div class='circle' data-date='" + value.date +
-                        "' data-from='" + value.from.address +
+                var date = new Date(parseInt(value.date.substr(6))).toLocaleDateString();
+
+                var newCircle = "<a data-toggle='modal' href='#example'><div class='circle' data-date=" + date +
+                        " data-from='" + value.from.address +
                         "' data-age='" + value.age + "'>" +
                         "<p class='subject'>" + value.subject + "</p></div></a>"
 
