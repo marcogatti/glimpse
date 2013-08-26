@@ -21,6 +21,12 @@ function calculateEmailsPosition() {
     })
 }
 
+function setDateCoords() {
+    $(".dateCoord").css("top", function () {
+        return $("#email-container").height();
+    });
+}
+
 function setModal() {
 
     $(".circle").on("click", function () {
@@ -53,19 +59,15 @@ function configureCircleHover() {
             dateTime.html(currentCircle.data("date"));
             from.html(currentCircle.data("from"));
 
-            $(".coord").removeClass("hidden").addClass("visible");
+            $(".hidable").removeClass("hidden").addClass("visible");
 
             dateTime.css("left",currentCircle.css("left"));
 
             from.css("top", currentCircle.css("top"));
 
         }, function () {
-            $(".coord").removeClass("visible").addClass("hidden");
+            $(".hidable").removeClass("visible").addClass("hidden");
         })
-
-    dateTime.css("top", function () {
-        return $("#email-container").height();
-    });
 
     from.css("left", "-60px");
 }
@@ -80,6 +82,7 @@ function fetchMailsAsync() {
 
                 if (value.age > maxAge) {
                     maxAge = value.age;
+                    oldest = new Date(parseInt(value.date.substr(6))).toLocaleDateString();
                 }
 
                 var date = new Date(parseInt(value.date.substr(6))).toLocaleDateString();
@@ -94,6 +97,7 @@ function fetchMailsAsync() {
         } else alert(data.message);
 
     }).done(function () {
+        setDateCoords();
         $(".progress").css("visibility" , "hidden");
         calculateEmailsPosition();
         configureCircleHover();
