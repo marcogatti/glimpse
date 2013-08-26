@@ -1,4 +1,5 @@
 ﻿var maxAge = 0;
+var containerBorder = parseInt($("#email-container").css("border-width"));
 
 function getContainerHeight() {
     return $("#email-container").height();
@@ -10,6 +11,10 @@ function getContainerWidth() {
 
 function alphabetSize() {
     return "z".charCodeAt(0) - "a".charCodeAt(0) + 2;
+}
+
+function clearCanvas() {
+    document.getElementById('gridCanvas').getContext('2d').clearRect(0, 0, getContainerWidth(), getContainerHeight())
 }
 
 function calculateEmailsPosition() {
@@ -87,10 +92,12 @@ function hideProgressBar() {
     $(".progress").css("visibility", "hidden");
 }
 
-function setRefreshPosition() {
+function setRefreshOnResize() {
     $(window).resize(function () {
         calculateEmailsPosition();
+        drawGrid();
     });
+
 }
 
 function fetchMailsAsync() {
@@ -124,7 +131,7 @@ function fetchMailsAsync() {
         setDateCoords();
         hideProgressBar();
         calculateEmailsPosition();
-        setRefreshPosition()
+        setRefreshOnResize()
         configureCircleHover();
         setModal();
         
@@ -133,7 +140,9 @@ function fetchMailsAsync() {
 
 function drawGrid() {
 
-    var containerBorder = parseInt($("#email-container").css("border-width"));
+    clearCanvas();
+
+    
     //grid width and height
     var bw = getContainerWidth() - containerBorder;
     var bh = getContainerHeight() - containerBorder;
