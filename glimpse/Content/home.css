@@ -1,6 +1,7 @@
 ﻿body {
     padding-top: 60px;
     padding-bottom: 40px;
+    background: lightgreen;
 }
 
 .sidebar-nav {
@@ -9,7 +10,7 @@
 
 #email-container {
     height: 480px;
-    border: 2px solid;
+    border: 2px outset;
     position: relative;
 }
 
@@ -95,4 +96,8 @@
   -webkit-transition: visibility 0s 0.5s, opacity 0.5s;
     -moz-transition: visibility 0s 0.5s, opacity 0.5s;
     -o-transition: visibility 0s 0.5s, opacity 0.5s;
+}
+
+canvas {
+    background: #fff;
 }
