@@ -117,7 +117,7 @@ namespace Glimpse.Models
                 label = new LabelEntity();
                 label.Name = labelName;
                 label.MailAccount = this.Entity;
-                //label.isGmailSpecific = isGmailSpecific;
+                //label.isSystemLabel = isGmailSpecific;
                 //SaveOrUpdate nueva label
             }
         }

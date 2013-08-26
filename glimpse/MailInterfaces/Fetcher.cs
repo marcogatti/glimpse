@@ -379,6 +379,7 @@ namespace Glimpse.MailInterfaces
                     extra.Size = (UInt32)embeddedPart.Size;
                     extra.Data = embeddedPart.BinaryContent;
                     extra.MailEntity = mail;
+                    //extra.EmbObjectContentId = embeddedPart.ContentId;
                     mail.Extras.Add(extra);
                 }
             }
