@@ -15,7 +15,7 @@ namespace Glimpse.MailInterfaces
     {
         private Imap4Client receiver;
         private Mailbox currentOpenedMailbox;
-        public NameValueCollection accountMailboxesBySpecialProperty { get; private set; }
+        private NameValueCollection accountMailboxesBySpecialProperty { get; set; }
 
         public Fetcher(String username, String password)
         {
@@ -349,7 +349,7 @@ namespace Glimpse.MailInterfaces
                 if (mailbox.Contains("OK Success") || mailbox.Contains("Noselect"))
                     continue;
                 else
-                    this.accountMailboxesBySpecialProperty.Add("Labels", this.stripMailboxName(mailbox));
+                    this.accountMailboxesBySpecialProperty.Add("Tags", this.stripMailboxName(mailbox));
             }
         }
         private void loadAttachments(MailEntity mail, Message message)

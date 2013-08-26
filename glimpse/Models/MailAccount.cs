@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using ActiveUp.Net.Mail;
+using System.Collections.Specialized;
 
 namespace Glimpse.Models
 {
@@ -77,6 +78,49 @@ namespace Glimpse.Models
             return this;
         }
 
+        public void updateLabels()
+        {
+            String tagsNames;
+            ISession session = NHibernateManager.OpenSession();
+            ITransaction tran = session.BeginTransaction();
+            NameValueCollection labelsByProperty = this.myFetcher.getLabels();
+
+            this.RegisterLabel(labelsByProperty["Inbox"]);
+            this.RegisterLabel(labelsByProperty["All"]);
+            this.RegisterLabel(labelsByProperty["Deleted"]);
+            this.RegisterLabel(labelsByProperty["Spam"]);
+            this.RegisterLabel(labelsByProperty["Important"]);
+            this.RegisterLabel(labelsByProperty["Sent"]);
+            this.RegisterLabel(labelsByProperty["Starred"]);
+            this.RegisterLabel(labelsByProperty["Drafts"]);
+
+            tagsNames = labelsByProperty["Tags"];
+            if (tagsNames != null)
+            {
+                String[] labelsName = tagsNames.Split(new String[] {","}, StringSplitOptions.RemoveEmptyEntries);
+                foreach (String label in labelsName)
+                {
+                    this.RegisterLabel(label, false);
+                }
+            }
+
+            tran.Commit();
+            session.Close();
+        }
+
+        private void RegisterLabel(String labelName, Boolean isGmailSpecific = true)
+        {
+            LabelEntity label;
+
+            if (labelName != null)
+            {
+                label = new LabelEntity();
+                label.Name = labelName;
+                label.MailAccount = this.Entity;
+                //label.isGmailSpecific = isGmailSpecific;
+                //SaveOrUpdate nueva label
+            }
+        }
         private void Clone(MailAccount fromAccount)
         {
             this.Entity.Address = fromAccount.Entity.Address;
