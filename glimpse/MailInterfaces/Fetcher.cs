@@ -92,54 +92,48 @@ namespace Glimpse.MailInterfaces
             else
                 return this.GetMailsDataFrom(mailbox, mailsUIDs[0]);
         }
-        public List<Mail> GetMailsDataFrom(String mailbox, Int32 reversedLastOrdinalToRetrieve)
+        public List<Mail> GetMailsDataFrom(String mailbox, Int32 firstOrdinalToRetrieve)
         {
-            //Trae los mails desde el mail más reciente (el ordinal mayor) hasta el mail con ordinal por parámetro reversedLastOrdinalToRetrieve
-            if (reversedLastOrdinalToRetrieve <= 0)
+            //Trae los mails desde firstOrdinalToRetrieve hasta el último del mailbox
+            if (firstOrdinalToRetrieve <= 0)
                 throw new MailReadingOverflowException("No se puede leer mails con ordinal menor a 1.");
 
             Mailbox targetMailbox;
-
-            try
-            {
-                targetMailbox = this.GetMailbox(mailbox);
-            }
-            catch (Exception e)
-            {
-                throw new CouldNotSelectMailboxException("Error while selecting mailbox " + mailbox + ".", e);
-            }
-
             Message retrievedMessage;
             MailEntity retrievedMail;
+            targetMailbox = this.GetMailbox(mailbox);
 
             List<Mail> mailsFromMailbox = new List<Mail>();
 
-            for (int currentMail = reversedLastOrdinalToRetrieve; currentMail <= targetMailbox.MessageCount; currentMail++)
+            for (int currentMail = firstOrdinalToRetrieve; currentMail <= targetMailbox.MessageCount; currentMail++)
             {
                 retrievedMail = new MailEntity();
                 retrievedMessage = new Message();
-                string raw_gmtid;
-                string raw_gmmid;
                 int thisUid;
                 String thisFlags;
 
                 try
                 {
                     retrievedMessage = targetMailbox.Fetch.MessageObjectPeekWithGMailExtensions(currentMail);
-                    raw_gmtid = this.CleanIMAPResponse(receiver.Command("FETCH " + currentMail + " (X-GM-THRID)"), "X-GM-THRID");
-                    raw_gmmid = this.CleanIMAPResponse(receiver.Command("FETCH " + currentMail + " (X-GM-MSGID)"), "X-GM-MSGID");
+                    retrievedMail.Gm_tid = UInt64.Parse(this.CleanIMAPResponse(receiver.Command("FETCH " + currentMail + " (X-GM-THRID)"), "X-GM-THRID"));
+                    retrievedMail.Gm_mid = UInt64.Parse(this.CleanIMAPResponse(receiver.Command("FETCH " + currentMail + " (X-GM-MSGID)"), "X-GM-MSGID"));
                     thisUid = targetMailbox.Fetch.Uid(currentMail);
                     thisFlags = targetMailbox.Fetch.Flags(currentMail).Merged;
-                    //mailData["labels"] = this.CleanLabels(retrievedMessage.HeaderFields["x-gm-labels"]);
+                    //retrievedMail.labels.AddRange(this.GetLabels(retrievedMessage.HeaderFields["x-gm-labels"]));
                 }
                 catch (Imap4Exception)
                 {
-                    // Log to database
+                    //Excepcion de MailSystem contra IMAP
+                    continue;
+                }
+                catch (FormatException)
+                {
+                    //Excepcion intentado parsear la respuesta de imap a Int64
                     continue;
                 }
                 catch (Exception)
                 {
-                    // Log to database
+                    //Cualquier otra excepcion
                     continue;
                 }
 
@@ -151,21 +145,31 @@ namespace Glimpse.MailInterfaces
                 retrievedMail.Date = retrievedMessage.Date;
                 retrievedMail.Body = retrievedMessage.BodyHtml.Text;
                 retrievedMail.From = fromAddress;
+
+                Boolean unknownPartsHaveAttachments = false;
+                //check if UnknownDispositionMimeParts has real attachments
+                foreach (MimePart unknownPart in retrievedMessage.UnknownDispositionMimeParts)
+                {
+                    if (unknownPart.Filename != "" && unknownPart.IsBinary)
+                    {
+                        unknownPartsHaveAttachments = true;
+                        break;
+                    }
+                }
+
                 retrievedMail.HasExtras = (retrievedMessage.Attachments.Count != 0
                                              || retrievedMessage.EmbeddedObjects.Count != 0
-                                             || retrievedMessage.UnknownDispositionMimeParts.Count != 0);
+                                             || unknownPartsHaveAttachments);
 
                 retrievedMail.ToAddr = this.GetAddressNameAndMail(retrievedMessage.To);
                 retrievedMail.BCC = this.GetAddressNameAndMail(retrievedMessage.Bcc);
                 retrievedMail.CC = this.GetAddressNameAndMail(retrievedMessage.Cc);
 
-                this.AddUIDToMail(mailbox, thisUid, ref retrievedMail);
-                this.AddFlagsToMail(targetMailbox.Fetch.Flags(currentMail).Merged, ref retrievedMail);
-
-                retrievedMail.Gm_tid = UInt64.Parse(raw_gmtid);
-                retrievedMail.Gm_mid = UInt64.Parse(raw_gmmid);
-
-                //mailsFromMailbox representa el mail más reciente mientras más bajo sea el índice
+                this.AddUIDToMail(mailbox, thisUid, retrievedMail);
+                this.AddFlagsToMail(targetMailbox.Fetch.Flags(currentMail).Merged, retrievedMail);
+                if (retrievedMail.HasExtras)
+                    this.loadAttachments(retrievedMail, retrievedMessage);
+                //mailsFromMailbox representa el mail más reciente mientras más alto sea el índice
                 mailsFromMailbox.Add(new Mail(retrievedMail));
             }
             return mailsFromMailbox;
@@ -274,7 +278,14 @@ namespace Glimpse.MailInterfaces
         }
         private Mailbox OpenMailbox(String mailbox)
         {
-            this.currentOpenedMailbox = this.receiver.SelectMailbox(mailbox);
+            try
+            {
+                this.currentOpenedMailbox = this.receiver.SelectMailbox(mailbox);
+            }
+            catch (Imap4Exception imapException)
+            {
+                throw new CouldNotSelectMailboxException("Nombre de mailbox incorrecto: " + mailbox + ".", imapException);
+            }
             return this.currentOpenedMailbox;
         }
         private void CloseMailbox()
@@ -341,7 +352,53 @@ namespace Glimpse.MailInterfaces
                     this.accountMailboxesBySpecialProperty.Add("Labels", this.stripMailboxName(mailbox));
             }
         }
-        private void AddUIDToMail(String mailbox, Int64 UID, ref MailEntity mail)
+        private void loadAttachments(MailEntity mail, Message message)
+        {
+            ExtraEntity extra; //ExtraType: (0 = attachment) (1 = embbed object) (2 = unknown)
+
+            foreach (MimePart attachment in message.Attachments)
+            {
+                extra = new ExtraEntity();
+                extra.ExtraType = 0;
+                extra.FileType = attachment.MimeType;
+                extra.Name = attachment.Filename;
+                extra.Size = (UInt32)attachment.Size;
+                extra.Data = attachment.BinaryContent;
+                extra.MailEntity = mail;
+                mail.Extras.Add(extra);
+            }
+
+            foreach (MimePart embeddedPart in message.EmbeddedObjects)
+            {
+                if (embeddedPart.Filename != "")
+                {
+                    extra = new ExtraEntity();
+                    extra.ExtraType = 1;
+                    extra.FileType = embeddedPart.MimeType;
+                    extra.Name = embeddedPart.Filename;
+                    extra.Size = (UInt32)embeddedPart.Size;
+                    extra.Data = embeddedPart.BinaryContent;
+                    extra.MailEntity = mail;
+                    mail.Extras.Add(extra);
+                }
+            }
+
+            foreach (MimePart unknownPart in message.UnknownDispositionMimeParts)
+            {
+                if (unknownPart.Filename != "")
+                {
+                    extra = new ExtraEntity();
+                    extra.ExtraType = 2;
+                    extra.FileType = unknownPart.MimeType;
+                    extra.Name = unknownPart.Filename;
+                    extra.Size = (UInt32)unknownPart.Size;
+                    extra.Data = unknownPart.BinaryContent;
+                    extra.MailEntity = mail;
+                    mail.Extras.Add(extra);
+                }
+            }
+        }
+        private void AddUIDToMail(String mailbox, Int64 UID, MailEntity mail)
         {
             //UIDs no cargados son completados por GlimpseDB como -1
             if (this.accountMailboxesBySpecialProperty["Inbox"] == mailbox)
@@ -357,7 +414,7 @@ namespace Glimpse.MailInterfaces
             if (this.accountMailboxesBySpecialProperty["Drafts"] == mailbox)
             { mail.UidDraft = UID; return; }
         }
-        private void AddFlagsToMail(String flags, ref MailEntity mail)
+        private void AddFlagsToMail(String flags, MailEntity mail)
         {
             if (flags.Contains("answered"))
                 mail.Answered = true;

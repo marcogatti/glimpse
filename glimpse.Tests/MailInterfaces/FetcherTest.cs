@@ -32,7 +32,7 @@ namespace Glimpse.Tests
         [Test]
         public void Get_Amount_Of_Mails_Returns_Correct_Amount()
         {
-            Assert.AreEqual(13, this.myFetcher.GetAmountOfMailsFrom("INBOX"));
+            Assert.AreEqual(14, this.myFetcher.GetAmountOfMailsFrom("INBOX"));
             Assert.AreEqual(11, this.myFetcher.GetAmountOfMailsFrom("[Gmail]/Importantes"));
         }
 
