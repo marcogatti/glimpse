@@ -40,7 +40,7 @@ namespace Glimpse.Models
 
             if (account == null)
                 return null;
-            else 
+            else
                 return new MailAccount(account);
         }
 
@@ -63,7 +63,7 @@ namespace Glimpse.Models
             if (oldAccount != null)
             {
                 oldAccount.Clone(this);
-                this.Entity = oldAccount.Entity;                
+                this.Entity = oldAccount.Entity;
             }
 
             session.SaveOrUpdate(this.Entity);
@@ -71,55 +71,68 @@ namespace Glimpse.Models
             tran.Commit();
             session.Close();
         }
-        
+
         public MailAccount LoginExternal()
         {
             this.myFetcher = new Fetcher(this.Entity.Address, this.Entity.Password);
             return this;
         }
 
-        public void updateLabels()
+        public void UpdateLabels()
         {
             String tagsNames;
             ISession session = NHibernateManager.OpenSession();
             ITransaction tran = session.BeginTransaction();
             NameValueCollection labelsByProperty = this.myFetcher.getLabels();
 
-            this.RegisterLabel(labelsByProperty["Inbox"]);
-            this.RegisterLabel(labelsByProperty["All"]);
-            this.RegisterLabel(labelsByProperty["Deleted"]);
-            this.RegisterLabel(labelsByProperty["Spam"]);
-            this.RegisterLabel(labelsByProperty["Important"]);
-            this.RegisterLabel(labelsByProperty["Sent"]);
-            this.RegisterLabel(labelsByProperty["Starred"]);
-            this.RegisterLabel(labelsByProperty["Drafts"]);
+            IList<LabelEntity> databaseLabels = session.CreateCriteria<LabelEntity>()
+                                               .Add(Restrictions.Eq("MailAccount", this.Entity))
+                                               .List<LabelEntity>();
+
+            this.RegisterLabel(labelsByProperty["Inbox"], session, databaseLabels, "Inbox");
+            this.RegisterLabel(labelsByProperty["All"], session, databaseLabels, "All");
+            this.RegisterLabel(labelsByProperty["Deleted"], session, databaseLabels, "Deleted");
+            this.RegisterLabel(labelsByProperty["Spam"], session, databaseLabels, "Spam");
+            this.RegisterLabel(labelsByProperty["Important"], session, databaseLabels, "Important");
+            this.RegisterLabel(labelsByProperty["Sent"], session, databaseLabels, "Sent");
+            this.RegisterLabel(labelsByProperty["Starred"], session, databaseLabels, "Starred");
+            this.RegisterLabel(labelsByProperty["Drafts"], session, databaseLabels, "Drafts");
 
             tagsNames = labelsByProperty["Tags"];
             if (tagsNames != null)
             {
-                String[] labelsName = tagsNames.Split(new String[] {","}, StringSplitOptions.RemoveEmptyEntries);
+                String[] labelsName = tagsNames.Split(new String[] { "," }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (String label in labelsName)
                 {
-                    this.RegisterLabel(label, false);
+                    this.RegisterLabel(label, session, databaseLabels);
                 }
             }
 
             tran.Commit();
+            session.Flush();
             session.Close();
         }
 
-        private void RegisterLabel(String labelName, Boolean isGmailSpecific = true)
+        private void RegisterLabel(String labelName, ISession session, IList<LabelEntity> databaseLabels, String systemName = null)
         {
-            LabelEntity label;
+            if (labelName == null)
+                return;
+            LabelEntity labelEntity = new LabelEntity();
 
-            if (labelName != null)
+            foreach (LabelEntity databaseLabel in databaseLabels)
             {
-                label = new LabelEntity();
-                label.Name = labelName;
-                label.MailAccount = this.Entity;
-                //label.isSystemLabel = isGmailSpecific;
-                //SaveOrUpdate nueva label
+                if (databaseLabel.Name == labelName)
+                {
+                    return;
+                }
             }
+
+            labelEntity.Name = labelName;
+            labelEntity.MailAccount = this.Entity;
+            labelEntity.SystemName = systemName;
+            Label label = new Label(labelEntity);
+            label.SaveOrUpdate(session);
+
         }
         private void Clone(MailAccount fromAccount)
         {

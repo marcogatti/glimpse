@@ -48,6 +48,7 @@ namespace Glimpse.Controllers
                 MailAccount mailAccount = new MailAccount(user.Email, user.Password);
 
                 mailAccount.SaveOrUpdate();
+                mailAccount.UpdateLabels();
 
                 Session[MAIL_INTERFACE] = mailAccount;
 
