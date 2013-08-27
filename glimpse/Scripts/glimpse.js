@@ -77,9 +77,13 @@ function configureCircleHover() {
 
             $(".hidable").removeClass("hidden").addClass("visible");
 
-            dateTime.css("left",currentCircle.css("left"));
+            dateTime.css("left", function () {
+                return currentCircle.css("left");
+            });
 
-            from.css("top", currentCircle.css("top"));
+            from.css("top", function () {
+                return parseFloat(currentCircle.css("top")) + parseFloat(currentCircle.css("height")) * 0.5;
+            });
 
         }, function () {
             $(".hidable").removeClass("visible").addClass("hidden");
