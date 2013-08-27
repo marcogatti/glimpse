@@ -33,31 +33,42 @@
     background-color: rgba(32, 178, 170, 0.5);
     text-align: center;
     text-shadow: 0 0 1px #fff, 0 1px 2px rgba(0,0,0,0.7);
-    -webkit-box-shadow: inset 0 0 0 8px rgba(255,255,255,0.4), 0 1px 2px rgba(0,0,0,0.1);
+
     box-shadow: inset 0 0 0 8px rgba(255,255,255,0.4), 0 1px 2px rgba(0,0,0,0.1);
+    -webkit-box-shadow: inset 0 0 0 8px rgba(255,255,255,0.4), 0 1px 2px rgba(0,0,0,0.1);
+    -moz-box-shadow: inset 0 0 0 8px rgba(255,255,255,0.4), 0 1px 2px rgba(0,0,0,0.1);
+    -o-box-shadow: inset 0 0 0 8px rgba(255,255,255,0.4), 0 1px 2px rgba(0,0,0,0.1);
+    -ms-box-shadow: inset 0 0 0 8px rgba(255,255,255,0.4), 0 1px 2px rgba(0,0,0,0.1);
 
     transform: translate3d(0,0,0);
     -webkit-transform: translate3d(0,0,0);
     -moz-transform: translate3d(0,0,0);
     -o-transform: translate3d(0,0,0);
+    -ms-transform: translate3d(0,0,0);
 
+    transition: all 0.2s, left 1s, top 1s;
     -webkit-transition: all 0.2s, left 1s, top 1s;
     -moz-transition: all 0.2s, left 1s, top 1s;
     -o-transition: all 0.2s, left 1s, top 1s;
-    transition: all 0.2s, left 1s, top 1s;
+    -ms-transition: all 0.2s, left 1s, top 1s;
 }
 
     .circle:hover {
-        -ms-transform: scale(1.5);
+        transform: scale(1.5);
         -webkit-transform: scale(1.5);
         -moz-transform: scale(1.5);
         -o-transform: scale(1.5);
-        transform: scale(1.5);
+        -ms-transform: scale(1.5);
+
         overflow: visible;
         z-index: +10;
-        -webkit-box-shadow: inset 0 0 0 8px rgba(255,255,255,0.4), 0 4px 8px rgba(0,0,0,0.5);
-        box-shadow: inset 0 0 0 8px rgba(255,255,255,0.4), 0 4px 8px rgba(0,0,0,0.5);
         text-shadow: 0 0 1px #fff, 0 2px 4px rgba(0,0,0,1);
+
+        box-shadow: inset 0 0 0 8px rgba(255,255,255,0.4), 0 4px 8px rgba(0,0,0,0.5);
+        -webkit-box-shadow: inset 0 0 0 8px rgba(255,255,255,0.4), 0 4px 8px rgba(0,0,0,0.5);
+        -moz-box-shadow: inset 0 0 0 8px rgba(255,255,255,0.4), 0 4px 8px rgba(0,0,0,0.5);
+        -o-box-shadow: inset 0 0 0 8px rgba(255,255,255,0.4), 0 4px 8px rgba(0,0,0,0.5);
+        -ms-box-shadow: inset 0 0 0 8px rgba(255,255,255,0.4), 0 4px 8px rgba(0,0,0,0.5);
     }
 
     .circle p {
@@ -86,6 +97,7 @@
     -webkit-transition: opacity 0.5s;
     -moz-transition: opacity 0.5s;
     -o-transition: opacity 0.5s;
+    -ms-transition: opacity 0.5s;
 }
 
 .hidden {
@@ -95,6 +107,7 @@
     -webkit-transition: visibility 0s 0.5s, opacity 0.5s;
     -moz-transition: visibility 0s 0.5s, opacity 0.5s;
     -o-transition: visibility 0s 0.5s, opacity 0.5s;
+    -ms-transition: visibility 0s 0.5s, opacity 0.5s;
 }
 
 canvas {
