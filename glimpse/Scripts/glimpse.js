@@ -102,7 +102,7 @@ function setRefreshOnResize() {
 
 function fetchMailsAsync() {
 
-    $.getJSON("async/InboxMails", function (data) {
+    $.getJSON("async/InboxMails/50", function (data) {
 
         if (data.success == true) {
 

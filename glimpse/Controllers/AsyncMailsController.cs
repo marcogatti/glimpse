@@ -20,13 +20,13 @@ namespace Glimpse.Controllers
     {
         //
         // GET: /AsyncMails/InboxMails
-        public ActionResult InboxMails(int amountOfEmails = 0)
+        public ActionResult InboxMails(int id = 0)
         {
             try
             {
                 ISession session = NHibernateManager.OpenSession();
 
-                IList<Object> mailsToSend = this.FetchMails(amountOfEmails, session);
+                IList<Object> mailsToSend = this.FetchMails(id, session);
                 JsonResult result = Json(new { success = true, mails = mailsToSend }, JsonRequestBehavior.AllowGet);
 
                 session.Flush();
@@ -49,7 +49,7 @@ namespace Glimpse.Controllers
             {
                 MailManager manager = new MailManager(mailAccount);
 
-                List<Mail> mails = manager.FetchFromMailbox("INBOX", session);
+                List<Mail> mails = manager.FetchFromMailbox("INBOX", session, amountOfEmails);
 
                 return this.PrepareToSend(mails);
             }
