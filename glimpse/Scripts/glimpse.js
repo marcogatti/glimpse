@@ -82,7 +82,7 @@ function configureCircleHover() {
             });
 
             from.css("top", function () {
-                return parseFloat(currentCircle.css("top")) + parseFloat(currentCircle.css("height")) * 0.5;
+                return currentCircle.css("top");
             });
 
         }, function () {
@@ -116,15 +116,23 @@ function fetchMailsAsync() {
                     maxAge = value.age;
                 }
 
+                var classes = "circle";
+
+                if (!value.seen) {
+                    classes += " new";
+                }
+
                 var date = new Date(parseInt(value.date.substr(6))).toLocaleDateString();
 
-                var newCircle = "<a data-toggle='modal' href='#example'><div class='circle'" +
-                        " data-subject='" + value.subject +
+                var newCircle = $("<a data-toggle='modal' href='#example'><div class='" + classes +
+                        "' data-subject='" + value.subject +
                         "' data-date='" + date +
                         "' data-from='" + value.from.address +
-                        //"' data-body='" + value.body +    // REVISAR!!
+                        //"' data-body='" + value.body + 
                         "' data-age=" + value.age + ">" +
-                        "<p>" + value.subject + "</p></div></a>"
+                        "<p>" + value.subject + "</p></div></a>");
+
+                
 
                 $("#email-container").append(newCircle);
             });
@@ -135,7 +143,7 @@ function fetchMailsAsync() {
         setDateCoords();
         hideProgressBar();
         calculateEmailsPosition();
-        setRefreshOnResize()
+        setRefreshOnResize();
         configureCircleHover();
         setModal();
         
