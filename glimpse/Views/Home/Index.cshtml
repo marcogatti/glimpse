@@ -3,7 +3,7 @@
 @section css {
     @Styles.Render("~/Home/css")}
 @section scripts {
-    @Scripts.Render("~/bundles/emails-modal")}
+    @Scripts.Render("~/bundles/glimpse")}
 
 @{
     ViewBag.Title = "Index";        
@@ -69,6 +69,8 @@
 
         <div id="email-container" class="span11">
 
+            <canvas id="gridCanvas"></canvas>
+
             <div class="progress progress-striped active">
                 <div class="bar" style="width: 100%;"></div>
             </div>
@@ -82,7 +84,7 @@
     </div>
     <!--/row-->
 
-    <hr>
+    <hr />
 
     <footer>
         <p>&copy; glimpse 2013</p>
