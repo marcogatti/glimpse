@@ -27,7 +27,7 @@
     max-height: 150px;
     border-radius: 50%;
     float: left;
-    display: table;
+    display: block;
     overflow: hidden;
     position: absolute;
     background-color: rgba(32, 178, 170, 0.5);
@@ -107,8 +107,8 @@
         color: #fff;
         font-weight: bold;
         font-family: 'Open Sans', Arial, sans-serif;
-        display: table-cell;
-        vertical-align: middle;
+        /*display: table-cell;
+        vertical-align: middle;*/
     }
 
 .coord {
