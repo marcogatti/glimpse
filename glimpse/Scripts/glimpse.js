@@ -130,7 +130,7 @@ function fetchMailsAsync() {
                         "' data-from='" + value.from.address +
                         //"' data-body='" + value.body + 
                         "' data-age=" + value.age + ">" +
-                        "<p>" + value.subject + "</p></div></a>");
+                        "<div class='centered'><p>" + value.subject + "</p></div></div></a>");
 
                 
 
