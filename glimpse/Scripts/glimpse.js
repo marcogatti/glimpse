@@ -1,7 +1,15 @@
 ﻿var maxAge = 0;
 var containerBorder = parseInt($("#email-container").css("border-width"));
-var labelColors = {};
 
+var labelColors = {};
+var RGBaColors = [
+    "rgba(32, 178, 170, 0.8)",
+    "rgba(255, 215, 0, 0.8)",
+    "rgba(160, 32, 240, 0.8)",
+    "rgba(50, 205, 50, 0.8)",
+    "rgba(123, 104, 238, 0.8)"
+
+];
 
 function getContainerHeight() {
     return $("#email-container").height();
@@ -19,12 +27,13 @@ function clearCanvas() {
     document.getElementById('gridCanvas').getContext('2d').clearRect(0, 0, getContainerWidth(), getContainerHeight())
 }
 
-/*HARD-CODE*/
-function populateDictionary() {
-    labelColors["google"] = "rgba(32, 178, 170, 0.8)";
-    labelColors["facultad"] = "rgba(160, 32, 240, 0.8)";
-    labelColors["trabajo"] = "rgba(50, 205, 50, 0.8)";
-    labelColors["boludeces"] = "rgba(123, 104, 238, 0.8)";
+function populateLabelColors() {
+
+    var i = 0;
+    for (var label in labelColors) {
+        labelColors[label] = RGBaColors[i];
+        i++;
+    }
 }
 
 function calculateEmailsColor() {
@@ -175,14 +184,16 @@ function fetchMailsAsync() {
                         "' data-age=" + value.age + ">" +
                         "<div class='centered'><p>" + value.subject + "</p></div></div></a>");
 
-                
-
                 $("#email-container").append(newCircle);
+
+                /* Create labels */
+                labelColors[value.label]= "";
             });
         } else alert(data.message);
 
     }).done(function () {
 
+        populateLabelColors();
         calculateEmailsColor();
         calculateEmailsPosition();
         setDateCoords();
@@ -238,7 +249,6 @@ function drawGrid() {
 
 $(document).ready(function () {
 
-    populateDictionary();
     fetchMailsAsync();
     drawGrid();
 })
