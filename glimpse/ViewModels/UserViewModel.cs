@@ -24,8 +24,6 @@ namespace Glimpse.ViewModels
         [Display(Name = "Remember me?")]
         public bool rememberMe { get; set; }
 
-
-
         public UserViewModel() { }
 
         public UserViewModel(String email, String password)

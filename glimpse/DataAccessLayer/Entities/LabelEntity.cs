@@ -14,7 +14,6 @@ namespace Glimpse.DataAccessLayer.Entities
         public virtual String SystemName { get; set; }
         public virtual IList<MailEntity> Mails { get; set; }
         
-
         public LabelEntity()
         {
             this.Mails = new List<MailEntity>();

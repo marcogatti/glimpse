@@ -15,7 +15,8 @@ namespace Glimpse.MailInterfaces
     {
         private Imap4Client receiver;
         private Mailbox currentOpenedMailbox;
-        private NameValueCollection accountMailboxesBySpecialProperty { get; set; }
+        private NameValueCollection accountMailboxesBySpecialProperty;
+        private IList<LabelEntity> accountLabels;
 
         public Fetcher(String username, String password)
         {
@@ -27,6 +28,10 @@ namespace Glimpse.MailInterfaces
         public NameValueCollection getLabels()
         {
             return this.accountMailboxesBySpecialProperty;
+        }
+        public void setLabels(IList<LabelEntity> labels)
+        {
+            this.accountLabels = labels;
         }
 
         public Int32 GetLastUIDFrom(String mailbox)
@@ -80,7 +85,7 @@ namespace Glimpse.MailInterfaces
 
             if (minimumUID != 0)
                 mailOrdinalOfMinimumUID = Int32.Parse(this.CleanOrdinalResponse(this.receiver.Command("UID FETCH " + minimumUID + " UID")));
-            else 
+            else
                 mailOrdinalOfMinimumUID = 0;
 
             //siempre trae al menos uno, excepto si el mailbox está vacío
@@ -119,7 +124,7 @@ namespace Glimpse.MailInterfaces
                     retrievedMail.Gm_mid = UInt64.Parse(this.CleanIMAPResponse(receiver.Command("FETCH " + currentMail + " (X-GM-MSGID)"), "X-GM-MSGID"));
                     thisUid = targetMailbox.Fetch.Uid(currentMail);
                     thisFlags = targetMailbox.Fetch.Flags(currentMail).Merged;
-                    //retrievedMail.labels.AddRange(this.GetLabels(retrievedMessage.HeaderFields["x-gm-labels"]));
+
                 }
                 catch (Imap4Exception)
                 {
@@ -166,6 +171,7 @@ namespace Glimpse.MailInterfaces
                 retrievedMail.CC = this.GetAddressNameAndMail(retrievedMessage.Cc);
 
                 this.AddUIDToMail(mailbox, thisUid, retrievedMail);
+                this.AddLabelsToMail(retrievedMessage.HeaderFields["x-gm-labels"], retrievedMail);
                 this.AddFlagsToMail(targetMailbox.Fetch.Flags(currentMail).Merged, retrievedMail);
                 if (retrievedMail.HasExtras)
                     this.loadAttachments(retrievedMail, retrievedMessage);
@@ -196,20 +202,20 @@ namespace Glimpse.MailInterfaces
         {
             Mailbox targetMailbox = this.GetMailbox(mailbox);
             Int32 mailUID = this.getMailUID(mailbox, gmMailID);
-            targetMailbox.UidMoveMessage(mailUID, this.accountMailboxesBySpecialProperty["Deleted"]);
+            targetMailbox.UidMoveMessage(mailUID, this.accountMailboxesBySpecialProperty["Trash"]);
             this.currentOpenedMailbox.MessageCount--;
         }
         public void removeFromTrash(String destinyMailbox, Int64 gmMailID)
         {
-            Mailbox targetMailbox = this.GetMailbox(this.accountMailboxesBySpecialProperty["Deleted"]);
-            Int32 mailUID = this.getMailUID(this.accountMailboxesBySpecialProperty["Deleted"], gmMailID);
+            Mailbox targetMailbox = this.GetMailbox(this.accountMailboxesBySpecialProperty["Trash"]);
+            Int32 mailUID = this.getMailUID(this.accountMailboxesBySpecialProperty["Trash"], gmMailID);
             targetMailbox.UidMoveMessage(mailUID, destinyMailbox);
             this.currentOpenedMailbox.MessageCount--;
         }
         public void deleteFromTrash(Int64 gmMailID)
         {
-            Mailbox targetMailbox = this.GetMailbox(this.accountMailboxesBySpecialProperty["Deleted"]);
-            Int32 mailUID = this.getMailUID(this.accountMailboxesBySpecialProperty["Deleted"], gmMailID);
+            Mailbox targetMailbox = this.GetMailbox(this.accountMailboxesBySpecialProperty["Trash"]);
+            Int32 mailUID = this.getMailUID(this.accountMailboxesBySpecialProperty["Trash"], gmMailID);
             targetMailbox.UidDeleteMessage(mailUID, true);
             this.currentOpenedMailbox.MessageCount--;
         }
@@ -313,17 +319,17 @@ namespace Glimpse.MailInterfaces
                 }
                 if (mailbox.Contains("INBOX"))
                 {
-                    this.accountMailboxesBySpecialProperty.Add("Inbox", "INBOX"); //nombre INBOX fijo por IMAP
+                    this.accountMailboxesBySpecialProperty.Add("INBOX", "INBOX"); //nombre INBOX fijo por IMAP
                     continue;
                 }
                 if (mailbox.Contains("\\Trash"))
                 {
-                    this.accountMailboxesBySpecialProperty.Add("Deleted", this.stripMailboxName(mailbox));
+                    this.accountMailboxesBySpecialProperty.Add("Trash", this.stripMailboxName(mailbox));
                     continue;
                 }
                 if (mailbox.Contains("\\Junk"))
                 {
-                    this.accountMailboxesBySpecialProperty.Add("Spam", this.stripMailboxName(mailbox));
+                    this.accountMailboxesBySpecialProperty.Add("Junk", this.stripMailboxName(mailbox));
                     continue;
                 }
                 if (mailbox.Contains("\\Important"))
@@ -338,7 +344,7 @@ namespace Glimpse.MailInterfaces
                 }
                 if (mailbox.Contains("\\Flagged"))
                 {
-                    this.accountMailboxesBySpecialProperty.Add("Starred", this.stripMailboxName(mailbox));
+                    this.accountMailboxesBySpecialProperty.Add("Flagged", this.stripMailboxName(mailbox));
                     continue;
                 }
                 if (mailbox.Contains("\\Drafts"))
@@ -402,13 +408,13 @@ namespace Glimpse.MailInterfaces
         private void AddUIDToMail(String mailbox, Int64 UID, MailEntity mail)
         {
             //UIDs no cargados son completados por GlimpseDB como -1
-            if (this.accountMailboxesBySpecialProperty["Inbox"] == mailbox)
+            if (this.accountMailboxesBySpecialProperty["INBOX"] == mailbox)
             { mail.UidInbox = UID; return; }
             if (this.accountMailboxesBySpecialProperty["All"] == mailbox)
             { mail.UidAll = UID; return; }
-            if (this.accountMailboxesBySpecialProperty["Deleted"] == mailbox)
+            if (this.accountMailboxesBySpecialProperty["Trash"] == mailbox)
             { mail.UidTrash = UID; return; }
-            if (this.accountMailboxesBySpecialProperty["Spam"] == mailbox)
+            if (this.accountMailboxesBySpecialProperty["Junk"] == mailbox)
             { mail.UidSpam = UID; return; }
             if (this.accountMailboxesBySpecialProperty["Sent"] == mailbox)
             { mail.UidSent = UID; return; }
@@ -425,10 +431,35 @@ namespace Glimpse.MailInterfaces
                 mail.Seen = true;
             //if (flags.Contains("draft")) mail.Draft = true;
         }
+        private void AddLabelsToMail(String gmLabels, MailEntity mail)
+        {
+            if (this.accountLabels == null) //Si no fueron updateados los labels del fetcher (con método setLabels())
+                return;                     //no se puede marcar los mails con los labels (se necesita el LabelEntity)
+
+            LabelEntity mailLabel = new LabelEntity();
+
+            gmLabels = gmLabels.Replace("\\", String.Empty);
+            gmLabels = gmLabels.Replace("\"", String.Empty);
+            //Gmail no pone el label de la carpeta actual donde se encuentra el mail
+            gmLabels += " " + this.currentOpenedMailbox.Name;
+
+            String[] labelsNames = gmLabels.Split(new Char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (String labelName in labelsNames)
+            {
+                mailLabel = (from accountLabel in this.accountLabels
+                             where (accountLabel.Name == labelName || accountLabel.SystemName == labelName)
+                             select accountLabel).SingleOrDefault<LabelEntity>();
+                
+                if (mailLabel != null)
+                    mail.Labels.Add(mailLabel);
+            }
+        }
         private String GetAddressNameAndMail(AddressCollection addresses)
         {
             String addressesNamesAndMail = "";
-            if (addresses.Count == 0) return addressesNamesAndMail;
+            if (addresses.Count == 0)
+                return addressesNamesAndMail;
             for (int currentAddress = 0; currentAddress < addresses.Count; currentAddress++)
             {
                 addressesNamesAndMail += addresses[currentAddress].Merged + ", ";

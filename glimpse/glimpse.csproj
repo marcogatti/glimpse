@@ -233,6 +233,7 @@
     <Compile Include="Models\Mail.cs" />
     <Compile Include="Models\MailAccount.cs" />
     <Compile Include="Models\MailManager.cs" />
+    <Compile Include="ViewModels\LabelViewModel.cs" />
     <Compile Include="ViewModels\UserViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

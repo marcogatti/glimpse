@@ -27,14 +27,15 @@ namespace Glimpse.Controllers
             ISession session = NHibernateManager.OpenSession();
 
             String mailAddress = new CookieHelper().getMailAddressFromCookie();
-
+            
             MailAccount cookieMailAccount = MailAccount.FindByAddress(mailAddress, session);
 
-            session.Flush();
-            session.Close();
+
 
             if (cookieMailAccount == null)
             {
+                session.Flush();
+                session.Close();
                 return this.LogOut();
             }
 
@@ -49,11 +50,23 @@ namespace Glimpse.Controllers
                 }
                 catch (InvalidAuthenticationException)
                 {
+                    session.Flush();
+                    session.Close();
                     return this.LogOut();
                 }
             }
 
+            IList<LabelEntity> accountLabels = Label.FindByAccount(cookieMailAccount.Entity, session);
+            List<LabelViewModel> viewLabels = new List<LabelViewModel>(accountLabels.Count);
+
+            foreach (LabelEntity label in accountLabels)
+                viewLabels.Add(new LabelViewModel(label.Name, label.SystemName));
+
             ViewBag.Email = cookieMailAccount.Entity.Address;
+            ViewBag.Labels = viewLabels;
+
+            session.Flush();
+            session.Close();
 
             return View();
         }

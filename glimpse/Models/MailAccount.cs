@@ -51,7 +51,12 @@ namespace Glimpse.Models
 
         public List<Mail> getMailsFromHigherThan(string mailbox, Int64 lastUID)
         {
-            return this.myFetcher.GetMailDataFromHigherThan(mailbox, lastUID);
+            ISession session = NHibernateManager.OpenSession();
+            IList<LabelEntity> labels = Label.FindByAccount(this.Entity, session);
+            this.myFetcher.setLabels(labels);
+            List<Mail> mails = this.myFetcher.GetMailDataFromHigherThan(mailbox, lastUID);
+            session.Close();
+            return mails;
         }
 
         public virtual void SaveOrUpdate()
@@ -89,13 +94,13 @@ namespace Glimpse.Models
                                                .Add(Restrictions.Eq("MailAccountEntity", this.Entity))
                                                .List<LabelEntity>();
 
-            this.RegisterLabel(labelsByProperty["Inbox"], session, databaseLabels, "Inbox");
+            this.RegisterLabel(labelsByProperty["INBOX"], session, databaseLabels, "INBOX");
             this.RegisterLabel(labelsByProperty["All"], session, databaseLabels, "All");
-            this.RegisterLabel(labelsByProperty["Deleted"], session, databaseLabels, "Deleted");
-            this.RegisterLabel(labelsByProperty["Spam"], session, databaseLabels, "Spam");
+            this.RegisterLabel(labelsByProperty["Trash"], session, databaseLabels, "Trash");
+            this.RegisterLabel(labelsByProperty["Junk"], session, databaseLabels, "Junk");
             this.RegisterLabel(labelsByProperty["Important"], session, databaseLabels, "Important");
             this.RegisterLabel(labelsByProperty["Sent"], session, databaseLabels, "Sent");
-            this.RegisterLabel(labelsByProperty["Starred"], session, databaseLabels, "Starred");
+            this.RegisterLabel(labelsByProperty["Flagged"], session, databaseLabels, "Flagged");
             this.RegisterLabel(labelsByProperty["Drafts"], session, databaseLabels, "Drafts");
 
             tagsNames = labelsByProperty["Tags"];
@@ -109,6 +114,7 @@ namespace Glimpse.Models
             }
 
             tran.Commit();
+
             session.Flush();
             session.Close();
         }
