@@ -62,9 +62,13 @@ namespace Glimpse.Controllers
         private List<Object> PrepareToSend(List<Mail> mails)
         {
             List<Object> preparedMails = new List<Object>();
+            String[] labels = new String[4] { "google", "facultad", "trabajo", "boludeces" };
 
             foreach (Mail mail in mails)
             {
+                Random ran = new Random();
+                String selected = labels[ran.Next(labels.Length)];
+
                 Int64 currentAge = DateTime.Now.Ticks - mail.Entity.Date.Ticks;
 
                 Object anEmail = new
@@ -84,7 +88,8 @@ namespace Glimpse.Controllers
                     body = mail.Entity.Body,
                     tid = mail.Entity.Gm_tid,
                     seen = mail.Entity.Seen,
-                    flagged = mail.Entity.Flagged
+                    flagged = mail.Entity.Flagged,
+                    label = selected
                 };
 
                 preparedMails.Add(anEmail);

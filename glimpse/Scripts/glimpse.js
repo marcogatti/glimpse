@@ -1,5 +1,7 @@
 ﻿var maxAge = 0;
 var containerBorder = parseInt($("#email-container").css("border-width"));
+var labelColors = {};
+
 
 function getContainerHeight() {
     return $("#email-container").height();
@@ -15,6 +17,29 @@ function alphabetSize() {
 
 function clearCanvas() {
     document.getElementById('gridCanvas').getContext('2d').clearRect(0, 0, getContainerWidth(), getContainerHeight())
+}
+
+/*HARD-CODE*/
+function populateDictionary() {
+    labelColors["google"] = "rgba(32, 178, 170, 0.8)";
+    labelColors["facultad"] = "rgba(160, 32, 240, 0.8)";
+    labelColors["trabajo"] = "rgba(50, 205, 50, 0.8)";
+    labelColors["boludeces"] = "rgba(123, 104, 238, 0.8)";
+}
+
+function calculateEmailsColor() {
+
+    $(".circle").each(function () {
+
+        var color = labelColors[$(this).data('label')];
+
+        $(this).css({
+            'color': color,
+            'background-color': color
+        });
+    })
+    
+
 }
 
 function calculateEmailsPosition() {
@@ -36,6 +61,8 @@ function calculateEmailsPosition() {
         $(this).css('left', function () {
             return left * (containerWidth - offset) + 'px';
         });
+
+       
     })
 }
 
@@ -85,6 +112,8 @@ function configureCircleHover() {
                 return currentCircle.css("top");
             });
 
+            currentCircle.addClass("selected");
+
             var currentTid = currentCircle.data("tid");
 
             $('.circle').each(
@@ -97,6 +126,7 @@ function configureCircleHover() {
 
         }, function () {
             $(".hidable").addClass("hidden");
+            $(".selected").removeClass("selected");
             $(".focused").removeClass("focused");
         })
 
@@ -117,7 +147,7 @@ function setRefreshOnResize() {
 
 function fetchMailsAsync() {
 
-    $.getJSON("async/InboxMails/50", function (data) {
+    $.getJSON("async/InboxMails/500", function (data) {
 
         if (data.success == true) {
 
@@ -140,6 +170,7 @@ function fetchMailsAsync() {
                         "' data-date='" + date +
                         "' data-from='" + value.from.address +
                         "' data-tid='" + value.tid +
+                        "' data-label='" + value.label +
                         //"' data-body='" + value.body + 
                         "' data-age=" + value.age + ">" +
                         "<div class='centered'><p>" + value.subject + "</p></div></div></a>");
@@ -152,12 +183,14 @@ function fetchMailsAsync() {
 
     }).done(function () {
 
+        calculateEmailsColor();
+        calculateEmailsPosition();
         setDateCoords();
         hideProgressBar();
-        calculateEmailsPosition();
         setRefreshOnResize();
         configureCircleHover();
         setModal();
+      
         
     });
 }
@@ -205,6 +238,7 @@ function drawGrid() {
 
 $(document).ready(function () {
 
+    populateDictionary();
     fetchMailsAsync();
     drawGrid();
 })

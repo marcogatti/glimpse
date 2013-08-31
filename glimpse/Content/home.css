@@ -25,11 +25,8 @@
     height: 100px;
     border-radius: 50%;
     float: left;
-    /*display: block;*/
     overflow: hidden;
     position: absolute;
-    color: rgba(32, 178, 170, 0.5);
-    background-color: rgba(32, 178, 170, 0.5);
     text-align: center;
     text-shadow: 0 0 1px #fff, 0 1px 2px rgba(0,0,0,0.7);
 
@@ -86,12 +83,15 @@
 }
 
 .circle.focused {
-    box-shadow: inset 0 0 0 8px rgba(255,255,255,0.4), 0 0 16px 16px rgba(0,255,255,0.5);
-    -webkit-box-shadow: inset 0 0 0 8px rgba(255,255,255,0.4), 0 0 16px 16px;
-    -moz-box-shadow: inset 0 0 0 8px rgba(255,255,255,0.4), 0 0 16px 16px rgba(0,255,255,0.5);
-    -o-box-shadow: inset 0 0 0 8px rgba(255,255,255,0.4), 0 0 16px 16px rgba(0,255,255,0.5);
-    -ms-box-shadow: inset 0 0 0 8px rgba(255,255,255,0.4), 0 0 16px 16px rgba(0,255,255,0.5);
+    box-shadow: inset 0 0 0 8px rgba(255,255,255,0.4), 0 0 32px 8px;
+    -webkit-box-shadow: inset 0 0 0 8px rgba(255,255,255,0.4), 0 0 32px 8px;
+    -moz-box-shadow: inset 0 0 0 8px rgba(255,255,255,0.4), 0 0 32px 8px;
+    -o-box-shadow: inset 0 0 0 8px rgba(255,255,255,0.4), 0 0 32px 8px;
+    -ms-box-shadow: inset 0 0 0 8px rgba(255,255,255,0.4), 0 0 32px 8px;
 
+}
+
+.circle.selected {
     overflow: visible;
     z-index: +10;
     text-shadow: 0 0 1px #fff, 0 2px 4px rgba(0,0,0,1);
