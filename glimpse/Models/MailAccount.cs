@@ -86,7 +86,7 @@ namespace Glimpse.Models
             NameValueCollection labelsByProperty = this.myFetcher.getLabels();
 
             IList<LabelEntity> databaseLabels = session.CreateCriteria<LabelEntity>()
-                                               .Add(Restrictions.Eq("MailAccount", this.Entity))
+                                               .Add(Restrictions.Eq("MailAccountEntity", this.Entity))
                                                .List<LabelEntity>();
 
             this.RegisterLabel(labelsByProperty["Inbox"], session, databaseLabels, "Inbox");
@@ -128,7 +128,7 @@ namespace Glimpse.Models
             }
 
             labelEntity.Name = labelName;
-            labelEntity.MailAccount = this.Entity;
+            labelEntity.MailAccountEntity = this.Entity;
             labelEntity.SystemName = systemName;
             Label label = new Label(labelEntity);
             label.SaveOrUpdate(session);

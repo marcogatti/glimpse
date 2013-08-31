@@ -46,7 +46,7 @@ namespace Glimpse.Models
         {
             this.Entity.MailAccountEntity = from.MailAccountEntity;
             this.Entity.From = from.From;
-            this.Entity.LabelsPerMail = from.LabelsPerMail;
+            this.Entity.Labels = from.Labels;
             this.Entity.Extras = from.Extras;
             this.Entity.Gm_tid = from.Gm_tid;
             this.Entity.Gm_mid = from.Gm_mid;

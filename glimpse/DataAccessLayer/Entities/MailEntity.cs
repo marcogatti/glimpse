@@ -14,7 +14,7 @@ namespace Glimpse.DataAccessLayer.Entities
         public virtual Int64 Id { get; set; }
         public virtual MailAccountEntity MailAccountEntity { get; set; }
         public virtual AddressEntity From { get; set; }
-        public virtual IList<MailPerLabelEntity> LabelsPerMail{ get; set; }
+        public virtual IList<LabelEntity> Labels{ get; set; }
         public virtual IList<ExtraEntity> Extras { get; set; }
         public virtual UInt64 Gm_tid { get; set; }
         public virtual UInt64 Gm_mid { get; set; }
@@ -38,7 +38,7 @@ namespace Glimpse.DataAccessLayer.Entities
 
         public MailEntity()
         {
-            this.LabelsPerMail = new List<MailPerLabelEntity>();
+            this.Labels = new List<LabelEntity>();
             this.Extras = new List<ExtraEntity>();
         }
     }

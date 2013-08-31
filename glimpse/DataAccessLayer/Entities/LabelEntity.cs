@@ -9,15 +9,15 @@ namespace Glimpse.DataAccessLayer.Entities
     public class LabelEntity
     {
         public virtual Int32 Id { get; set; }
-        public virtual MailAccountEntity MailAccount { get; set; }
+        public virtual MailAccountEntity MailAccountEntity { get; set; }
         public virtual String Name { get; set; }
         public virtual String SystemName { get; set; }
-        public virtual IList<MailPerLabelEntity> MailsPerLabel { get; set; }
+        public virtual IList<MailEntity> Mails { get; set; }
         
 
         public LabelEntity()
         {
-            this.MailsPerLabel = new List<MailPerLabelEntity>();
+            this.Mails = new List<MailEntity>();
         }
     }
 }

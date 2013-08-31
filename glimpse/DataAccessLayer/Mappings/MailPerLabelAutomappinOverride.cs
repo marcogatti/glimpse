@@ -8,12 +8,12 @@ using System.Web;
 
 namespace Glimpse.DataAccessLayer.Mappings
 {
-    public class MailPerLabelAutomappinOverride : IAutoMappingOverride<MailPerLabelEntity>
-    {
-        public void Override(AutoMapping<MailPerLabelEntity> mapping)
-        {
-            mapping.References<MailEntity>(x => x.MailEntity).Cascade.None();
-            mapping.References<LabelEntity>(x => x.LabelEntity).Cascade.None();
-        }
-    }
+    //public class MailPerLabelAutomappinOverride : IAutoMappingOverride<MailPerLabelEntity>
+    //{
+    //    public void Override(AutoMapping<MailPerLabelEntity> mapping)
+    //    {
+    //        mapping.References<MailEntity>(x => x.MailEntity).Cascade.None();
+    //        mapping.References<LabelEntity>(x => x.LabelEntity).Cascade.None();
+    //    }
+    //}
 }
