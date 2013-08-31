@@ -24,12 +24,13 @@ namespace Glimpse.Models
 
         public List<Mail> FetchFromMailbox(String mailbox, ISession session, int maxAmount = ALL_MAILS)
         {
-
             List<Mail> imapMails = new List<Mail>();
 
             Int64 lastDatabaseUID = session.CreateCriteria<MailEntity>()
                                                   .Add(Restrictions.Eq("MailAccountEntity", this.mailAccount.Entity))
-                                                  .SetProjection(Projections.Max("UidInbox")).UniqueResult<Int64>();
+                                                  .SetProjection(Projections.Max("UidInbox"))
+                                                  .UniqueResult<Int64>();
+
             Int32 lastImapUID = this.mailAccount.getLastUIDFrom(mailbox);
 
             if (lastImapUID > lastDatabaseUID)
