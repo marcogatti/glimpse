@@ -62,12 +62,12 @@ namespace Glimpse.Controllers
         private List<Object> PrepareToSend(List<Mail> mails)
         {
             List<Object> preparedMails = new List<Object>();
-            String[] labels = new String[4] { "google", "facultad", "trabajo", "boludeces" };
+            String[] labels = new String[] { "google", "facultad", "trabajo", "boludeces", "otros" };
 
             foreach (Mail mail in mails)
             {
                 Random ran = new Random();
-                String selected = labels[ran.Next(labels.Length)];
+                String selected = labels[ran.Next(0, labels.Length)];
 
                 Int64 currentAge = DateTime.Now.Ticks - mail.Entity.Date.Ticks;
 

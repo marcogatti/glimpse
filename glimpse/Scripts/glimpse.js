@@ -3,12 +3,12 @@ var containerBorder = parseInt($("#email-container").css("border-width"));
 
 var labelColors = {};
 var RGBaColors = [
-    "rgba(32, 178, 170, 0.8)",
-    "rgba(255, 215, 0, 0.8)",
-    "rgba(160, 32, 240, 0.8)",
-    "rgba(50, 205, 50, 0.8)",
-    "rgba(123, 104, 238, 0.8)"
-
+    "rgba(255, 99, 71, 0.7",
+    "rgba(50, 205, 50, 0.7",
+    "rgba(160, 32, 240, 0.7)",
+    "rgba(32, 178, 170, 0.7)",
+    "rgba(123, 104, 238, 0.7)",
+    "rgba(255, 105, 0, 0.7"
 ];
 
 function getContainerHeight() {
@@ -31,7 +31,13 @@ function populateLabelColors() {
 
     var i = 0;
     for (var label in labelColors) {
-        labelColors[label] = RGBaColors[i];
+        var currentColor = RGBaColors[i];
+        labelColors[label] = currentColor;
+
+         /* Armar listado de labels */
+        var labelItem = $("<li style = 'font-weight: bold; color: " + currentColor + "'>" + label + "</li>");
+        $("#labels").append(labelItem);
+
         i++;
     }
 }
@@ -201,8 +207,6 @@ function fetchMailsAsync() {
         setRefreshOnResize();
         configureCircleHover();
         setModal();
-      
-        
     });
 }
 
