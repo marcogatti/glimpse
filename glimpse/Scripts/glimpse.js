@@ -75,7 +75,7 @@ function configureCircleHover() {
             dateTime.html(currentCircle.data("date"));
             from.html(currentCircle.data("from"));
 
-            $(".hidable").removeClass("hidden").addClass("visible");
+            $(".hidable").removeClass("hidden");
 
             dateTime.css("left", function () {
                 return currentCircle.css("left");
@@ -85,8 +85,19 @@ function configureCircleHover() {
                 return currentCircle.css("top");
             });
 
+            var currentTid = currentCircle.data("tid");
+
+            $('.circle').each(
+                function () {
+                    if ($(this).data("tid") == currentTid) {
+                        $(this).addClass("focused");
+                    }
+                });
+                
+
         }, function () {
-            $(".hidable").removeClass("visible").addClass("hidden");
+            $(".hidable").addClass("hidden");
+            $(".focused").removeClass("focused");
         })
 
     from.css("left", "-60px");
@@ -128,6 +139,7 @@ function fetchMailsAsync() {
                         "' data-subject='" + value.subject +
                         "' data-date='" + date +
                         "' data-from='" + value.from.address +
+                        "' data-tid='" + value.tid +
                         //"' data-body='" + value.body + 
                         "' data-age=" + value.age + ">" +
                         "<div class='centered'><p>" + value.subject + "</p></div></div></a>");
