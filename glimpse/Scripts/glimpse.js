@@ -82,8 +82,15 @@ function calculateEmailsPosition() {
     })
 }
 
+function zoom(factor) {
+    maxAge = maxAge * factor;
+    calculateEmailsPosition();
+}
+
 function setDateCoords() {
-    $(".dateCoord").css("top", getContainerHeight());
+    $(".dateCoord").css("top", function () {
+        return parseInt(getContainerHeight()) - parseInt($(".dateCoord").css("line-height")) + 'px';
+    });
 }
 
 function setModal() {
@@ -159,8 +166,6 @@ function configureCircleHover() {
             $(".selected").removeClass("selected");
             $(".focused").removeClass("focused");
         })
-
-    from.css("left", "-60px");
 }
 
 function hideProgressBar() {
@@ -273,6 +278,8 @@ function drawGrid() {
 
 $(document).ready(function () {
 
+    $('#zoom-in').click(function () { zoom(0.5); return false; });
+    $('#zoom-out').click(function () { zoom(2); return false; });
     fetchMailsAsync();
     drawGrid();
 })

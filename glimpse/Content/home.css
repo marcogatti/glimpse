@@ -12,6 +12,7 @@
     height: 480px;
     border: 5px outset;
     position: relative;
+    overflow: hidden;
 }
 
 .brand {
@@ -134,4 +135,15 @@
 
 canvas {
     background: #FFFFFF;
+}
+
+#zoom-out {
+    top: 10px;
+    left: 30px;
+    position: absolute;
+}
+#zoom-in {
+    top: 10px;
+    left: 10px;
+    position: absolute;
 }
