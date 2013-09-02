@@ -42,18 +42,18 @@ namespace Glimpse.Controllers
             }
         }
 
-        public ActionResult GetMailBody(Int64 gmMailID)
+        public ActionResult GetMailBody(Int64 id = 0)
         {
             try
             {
                 ISession session = NHibernateManager.OpenSession();
                 MailAccount mailAccount = (MailAccount)Session[AccountController.MAIL_INTERFACE];
                 MailEntity mail = session.CreateCriteria<MailEntity>()
-                                     .Add(Restrictions.Eq("MailAccount", mailAccount))
-                                     .Add(Restrictions.Eq("Gm_mid", gmMailID))
+                                     .Add(Restrictions.Eq("MailAccountEntity", mailAccount.Entity))
+                                     .Add(Restrictions.Eq("Id", id))
                                      .UniqueResult<MailEntity>();
 
-                JsonResult result = Json(new { success = true, body = mail.BodyPeek }, JsonRequestBehavior.AllowGet);
+                JsonResult result = Json(new { success = true, body = mail.Body }, JsonRequestBehavior.AllowGet);
 
                 session.Flush();
                 session.Close();

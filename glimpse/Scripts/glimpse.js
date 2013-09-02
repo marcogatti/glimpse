@@ -91,7 +91,6 @@ function setModal() {
     $(".circle").on("click", function () {
 
         var from = $('<h4>From: ' + $(this).data("from") + '</h4>');
-        var body = $('<div class="bodyhtml">' + $(this).data("body") + '</div>');
         var subject = $('<h3>' + $(this).data("subject") + '</h3>');
 
         $(".modal-body").find("h4").remove();
@@ -99,9 +98,24 @@ function setModal() {
         $(".modal-header").find("h3").remove();
 
         $(".modal-body").append(from);
-        $(".modal-body").append(body);
         $(".modal-header").append(subject);
+
+        $.getJSON("async/GetMailBody/" + $(this).data("id"), function (data) {
+            if (data.success == true) {
+                $(".modal-body").append("<div class='bodyhtml'>" + data.body + "</div>");          
+            } else alert(data.message);
+        });
     });
+}
+
+function fetchMailBody(mailId) {
+
+    $.getJSON("async/GetMailBody/" + mailId, function (data) {
+        if (data.success == true) {
+            return data.body;
+        } else alert(data.message);
+    });
+
 }
 
 function configureCircleHover() {
@@ -182,6 +196,7 @@ function fetchMailsAsync() {
                 var date = new Date(parseInt(value.date.substr(6))).toLocaleDateString();
 
                 var newCircle = $("<a data-toggle='modal' href='#example'><div class='" + classes +
+                        "' data-id='" + value.id +
                         "' data-subject='" + value.subject +
                         "' data-date='" + date +
                         "' data-from='" + value.from.address +
