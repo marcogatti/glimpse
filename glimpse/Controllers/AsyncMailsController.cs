@@ -114,7 +114,7 @@ namespace Glimpse.Controllers
                     tid = mail.Entity.Gm_tid,
                     seen = mail.Entity.Seen,
                     flagged = mail.Entity.Flagged,
-                    label = currentLabels
+                    labels = currentLabels
                 };
 
                 preparedMails.Add(anEmail);

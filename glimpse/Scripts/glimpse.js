@@ -3,12 +3,13 @@ var containerBorder = parseInt($("#email-container").css("border-width"));
 
 var labelColors = {};
 var RGBaColors = [
-    "rgba(255, 99, 71, 0.7",
-    "rgba(50, 205, 50, 0.7",
-    "rgba(160, 32, 240, 0.7)",
+    "rgba(255, 105, 0, 0.7)",
     "rgba(32, 178, 170, 0.7)",
+    "rgba(160, 32, 240, 0.7)",
+    "rgba(50, 205, 50, 0.7",
     "rgba(123, 104, 238, 0.7)",
-    "rgba(255, 105, 0, 0.7"
+    "rgba(255, 99, 71, 0.7"
+
 ];
 
 function getContainerHeight() {
@@ -185,7 +186,7 @@ function fetchMailsAsync() {
                         "' data-date='" + date +
                         "' data-from='" + value.from.address +
                         "' data-tid='" + value.tid +
-                        "' data-label='" + value.label +
+                        "' data-label='" + value.labels[0].name +
                         //"' data-body='" + value.body + 
                         "' data-age=" + value.age + ">" +
                         "<div class='centered'><p>" + value.subject + "</p></div></div></a>");
@@ -193,7 +194,11 @@ function fetchMailsAsync() {
                 $("#email-container").append(newCircle);
 
                 /* Create labels */
-                labelColors[value.label]= "";
+                for (var i = 0; i < value.labels.length; i++) {
+                    if (value.labels[i].system_name == null)
+                    labelColors[value.labels[i].name] = "";
+                }
+
             });
         } else alert(data.message);
 
@@ -244,7 +249,7 @@ function drawGrid() {
             context.lineTo(bw + p, 0.5 + x + p);
         }
 
-        context.strokeStyle = "lightgrey";
+        context.strokeStyle = "#CDCDCD";
         context.stroke();
     }
 
