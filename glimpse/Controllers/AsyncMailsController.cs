@@ -110,7 +110,7 @@ namespace Glimpse.Controllers
                     to = mail.Entity.ToAddr,
                     cc = mail.Entity.CC,
                     bcc = mail.Entity.BCC,
-                    body = mail.Entity.Body,
+                    bodypeek = mail.Entity.BodyPeek,
                     tid = mail.Entity.Gm_tid,
                     seen = mail.Entity.Seen,
                     flagged = mail.Entity.Flagged,
