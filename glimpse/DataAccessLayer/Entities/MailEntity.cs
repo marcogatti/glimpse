@@ -35,6 +35,7 @@ namespace Glimpse.DataAccessLayer.Entities
         public virtual String CC { get; set; }
         public virtual String BCC { get; set; }
         public virtual String Body { get; set; }
+        public virtual String BodyPeek { get; set; }
 
         public MailEntity()
         {

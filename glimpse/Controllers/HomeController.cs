@@ -30,8 +30,6 @@ namespace Glimpse.Controllers
             
             MailAccount cookieMailAccount = MailAccount.FindByAddress(mailAddress, session);
 
-
-
             if (cookieMailAccount == null)
             {
                 session.Flush();
@@ -76,6 +74,5 @@ namespace Glimpse.Controllers
         {
             return RedirectToAction("Logout", "Account");
         }
-
     }
 }

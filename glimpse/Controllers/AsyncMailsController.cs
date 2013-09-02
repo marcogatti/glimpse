@@ -7,6 +7,7 @@ using Glimpse.MailInterfaces;
 using Glimpse.Models;
 using Newtonsoft.Json;
 using NHibernate;
+using NHibernate.Criterion;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,6 +39,31 @@ namespace Glimpse.Controllers
             {
                 //Log exception
                 return Json(new { success = false, message = "Error al obtener los mails" }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        public ActionResult GetMailBody(Int64 gmMailID)
+        {
+            try
+            {
+                ISession session = NHibernateManager.OpenSession();
+                MailAccount mailAccount = (MailAccount)Session[AccountController.MAIL_INTERFACE];
+                MailEntity mail = session.CreateCriteria<MailEntity>()
+                                     .Add(Restrictions.Eq("MailAccount", mailAccount))
+                                     .Add(Restrictions.Eq("Gm_mid", gmMailID))
+                                     .UniqueResult<MailEntity>();
+
+                JsonResult result = Json(new { success = true, body = mail.BodyPeek }, JsonRequestBehavior.AllowGet);
+
+                session.Flush();
+                session.Close();
+
+                return result;
+            }
+            catch (Exception)
+            {
+                //Log exception
+                return Json(new { success = false, message = "Error al obtener el cuerpo del mail." }, JsonRequestBehavior.AllowGet);
             }
         }
 
