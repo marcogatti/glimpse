@@ -1,4 +1,5 @@
 ﻿var maxAge = 0;
+var minAge = 0;
 var containerBorder = parseInt($("#email-container").css("border-width"));
 
 var labelColors = {};
@@ -18,6 +19,10 @@ function getContainerHeight() {
 
 function getContainerWidth() {
     return $("#email-container").width();
+}
+
+function currentPeriod() {
+    return maxAge - minAge;
 }
 
 function alphabetSize() {
@@ -67,7 +72,7 @@ function calculateEmailsPosition() {
 
     $(".circle").each(function () {
 
-        var left = $(this).attr('data-age') / maxAge;
+        var left = ($(this).attr('data-age') - minAge) / (maxAge - minAge);
         var top = ($(this).attr('data-from').charCodeAt(0) - "a".charCodeAt(0) + 2) / alphabetSize();    
 
         $(this).css('top', function () {
@@ -83,8 +88,38 @@ function calculateEmailsPosition() {
 }
 
 function zoom(factor) {
-    maxAge = maxAge * factor;
+    maxAge -= currentPeriod() * factor;
+    minAge += currentPeriod() * factor;
     calculateEmailsPosition();
+}
+
+function setDragging() {
+
+    var startX, endX = 0;
+    var isDragging = false;
+
+    $("#email-container")
+    .mousedown(function (e) {
+        startX = e.pageX;
+        $(window).mousemove(function () {
+            isDragging = true;
+            $(window).unbind("mousemove");
+        });
+    });
+
+    $("body")
+    .mouseup(function (e) {
+        endX = e.pageX;
+        var wasDragging = isDragging;
+        isDragging = false;
+        $(window).unbind("mousemove");
+        if (wasDragging) { //was clicking
+            var offset = (startX - endX) * currentPeriod() / 1000;
+            minAge += offset;
+            maxAge += offset;
+            calculateEmailsPosition();
+        }
+    });
 }
 
 function setDateCoords() {
@@ -123,6 +158,13 @@ function fetchMailBody(mailId) {
         } else alert(data.message);
     });
 
+}
+
+function configureZoom() {
+
+    var factor = 0.2;
+    $('#zoom-in').click(function () { zoom(factor); return false; });
+    $('#zoom-out').click(function () { zoom(-factor); return false; });
 }
 
 function configureCircleHover() {
@@ -202,12 +244,12 @@ function fetchMailsAsync() {
 
                 var newCircle = $("<a data-toggle='modal' href='#example'><div class='" + classes +
                         "' data-id='" + value.id +
+                        "' data-tid='" + value.tid +
                         "' data-subject='" + value.subject +
                         "' data-date='" + date +
                         "' data-from='" + value.from.address +
-                        "' data-tid='" + value.tid +
+                        "' data-bodypeek='" + value.bodypeek +
                         "' data-label='" + value.labels[0].name +
-                        //"' data-body='" + value.body + 
                         "' data-age=" + value.age + ">" +
                         "<div class='centered'><p>" + value.subject + "</p></div></div></a>");
 
@@ -232,6 +274,7 @@ function fetchMailsAsync() {
         setRefreshOnResize();
         configureCircleHover();
         setModal();
+        setDragging();
     });
 }
 
@@ -278,8 +321,7 @@ function drawGrid() {
 
 $(document).ready(function () {
 
-    $('#zoom-in').click(function () { zoom(0.5); return false; });
-    $('#zoom-out').click(function () { zoom(2); return false; });
+    configureZoom();
     fetchMailsAsync();
     drawGrid();
 })
