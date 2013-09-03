@@ -151,3 +151,9 @@ canvas {
     left: 10px;
     position: absolute;
 }
+
+.glimpse-label {
+
+    font-weight: bold;
+    font-family: 'Open Sans', Arial, sans-serif;
+}

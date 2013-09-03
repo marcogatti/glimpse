@@ -78,7 +78,7 @@ function populateLabelColors() {
         labelColors[label] = currentColor;
 
          /* Armar listado de labels */
-        var labelItem = $("<li style = 'font-weight: bold; color: " + currentColor + "'>" + label + "</li>");
+        var labelItem = $("<li class='glimpse-label' style = 'color: " + currentColor + "'>" + label + "</li>");
         $("#labels").append(labelItem);
 
         i++;
@@ -96,8 +96,6 @@ function calculateEmailsColor() {
             'background-color': color
         });
     })
-    
-
 }
 
 function calculateEmailsPosition() {
@@ -138,14 +136,21 @@ function zoom(factor, zoomPoint) {
 }
 
 function configureZoom() {
+    setWheelZoom();
+    setButtonZoom();
+}
 
+function setButtonZoom() {
+
+    /*  zoom exactamente en el centro del contenedor    */
     var zoomPoint = getContainerWidth() / 2;
-
     $('#zoom-in').click(function () { zoom(1, zoomPoint); return false; });
     $('#zoom-out').click(function () { zoom(-1, zoomPoint); return false; });
 }
 
 function setWheelZoom() {
+
+    /*  zoom donde apunta el mouse  */
     $('#email-container').on('mousewheel', function (event, delta, deltaX, deltaY) {
         event.preventDefault();
         zoom(deltaY, event.offsetX);
@@ -172,7 +177,7 @@ function setDragging() {
         var wasDragging = isDragging;
         isDragging = false;
         $(window).unbind("mousemove");
-        if (wasDragging) { //was clicking
+        if (wasDragging) {
             var offset = (startX - endX) * currentPeriodShown() / 1000;
             minAge += offset;
             maxAge += offset;
@@ -195,15 +200,16 @@ function setModal() {
         var subject = $('<h3>' + $(this).data("subject") + '</h3>');
 
         $(".modal-body").find("h4").remove();
-        $(".modal-body").find(".bodyhtml").remove();
+        $(".modal-body").find("#bodyhtml").remove();
         $(".modal-header").find("h3").remove();
 
         $(".modal-body").append(from);
         $(".modal-header").append(subject);
 
+        /*  horrible, pero no encontré otra forma de hacerlo andar  */
         $.getJSON("async/GetMailBody/" + $(this).data("id"), function (data) {
             if (data.success == true) {
-                $(".modal-body").append("<div class='bodyhtml'>" + data.body + "</div>");          
+                $(".modal-body").append("<div id='bodyhtml'>" + data.body + "</div>");          
             } else alert(data.message);
         });
     });
@@ -233,8 +239,6 @@ function configureCircleHover() {
             dateTime.html(currentCircle.data("date"));
             from.html(currentCircle.data("from"));
 
-            $(".hidable").removeClass("hidden");
-
             dateTime.css("left", function () {
                 return currentCircle.css("left");
             });
@@ -242,6 +246,8 @@ function configureCircleHover() {
             from.css("top", function () {
                 return currentCircle.css("top");
             });
+
+            $(".hidable").removeClass("hidden");
 
             currentCircle.addClass("selected");
 
@@ -323,18 +329,18 @@ function fetchMailsAsync() {
         calculateEmailsPosition();
         setDateCoords();
         hideProgressBar();
-        setRefreshOnResize();
         configureCircleHover();
         setModal();
-        setDragging();
-        setWheelZoom();
+
     });
 }
 
 $(document).ready(function () {
 
-    configureZoom();
     fetchMailsAsync();
+    setDragging();
+    configureZoom();
     drawGrid();
+    setRefreshOnResize();
 })
 
