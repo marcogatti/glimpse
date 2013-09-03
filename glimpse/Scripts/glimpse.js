@@ -21,16 +21,53 @@ function getContainerWidth() {
     return $("#email-container").width();
 }
 
-function currentPeriod() {
-    return maxAge - minAge;
-}
-
 function alphabetSize() {
     return "z".charCodeAt(0) - "a".charCodeAt(0) + 2;
 }
 
 function clearCanvas() {
     document.getElementById('gridCanvas').getContext('2d').clearRect(0, 0, getContainerWidth(), getContainerHeight())
+}
+
+function drawGrid() {
+
+    clearCanvas();
+
+
+    //grid width and height
+    var bw = getContainerWidth() - containerBorder;
+    var bh = getContainerHeight() - containerBorder;
+    //padding around grid
+    var p = 0;
+    //size of canvas
+    var cw = bw;
+    var ch = bh;
+
+    var canvas = $('canvas').attr({ width: cw, height: ch });
+
+    var context = canvas.get(0).getContext("2d");
+
+    function squareSize() {
+        return getContainerHeight() / alphabetSize();
+    }
+
+    function drawBoard() {
+        for (var x = 0; x <= bw; x += squareSize()) {
+            context.moveTo(0.5 + x + p, p);
+            context.lineTo(0.5 + x + p, bh + p);
+        }
+
+
+        for (var x = 0; x <= bh; x += squareSize()) {
+            context.moveTo(p, 0.5 + x + p);
+            context.lineTo(bw + p, 0.5 + x + p);
+        }
+
+        context.strokeStyle = "#CDCDCD";
+        context.stroke();
+    }
+
+    drawBoard();
 }
 
 function populateLabelColors() {
@@ -87,10 +124,32 @@ function calculateEmailsPosition() {
     })
 }
 
-function zoom(factor) {
-    maxAge -= currentPeriod() * factor;
-    minAge += currentPeriod() * factor;
+function currentPeriodShown() {
+    return maxAge - minAge;
+}
+
+function zoom(factor, zoomPoint) {
+
+    var movement = currentPeriodShown() * factor * 0.0002;
+    maxAge -= (getContainerWidth() - zoomPoint) * movement;
+    minAge += zoomPoint * movement;
+
     calculateEmailsPosition();
+}
+
+function configureZoom() {
+
+    var zoomPoint = getContainerWidth() / 2;
+
+    $('#zoom-in').click(function () { zoom(1, zoomPoint); return false; });
+    $('#zoom-out').click(function () { zoom(-1, zoomPoint); return false; });
+}
+
+function setWheelZoom() {
+    $('#email-container').on('mousewheel', function (event, delta, deltaX, deltaY) {
+        event.preventDefault();
+        zoom(deltaY, event.offsetX);
+    });
 }
 
 function setDragging() {
@@ -114,7 +173,7 @@ function setDragging() {
         isDragging = false;
         $(window).unbind("mousemove");
         if (wasDragging) { //was clicking
-            var offset = (startX - endX) * currentPeriod() / 1000;
+            var offset = (startX - endX) * currentPeriodShown() / 1000;
             minAge += offset;
             maxAge += offset;
             calculateEmailsPosition();
@@ -158,13 +217,6 @@ function fetchMailBody(mailId) {
         } else alert(data.message);
     });
 
-}
-
-function configureZoom() {
-
-    var factor = 0.2;
-    $('#zoom-in').click(function () { zoom(factor); return false; });
-    $('#zoom-out').click(function () { zoom(-factor); return false; });
 }
 
 function configureCircleHover() {
@@ -275,48 +327,8 @@ function fetchMailsAsync() {
         configureCircleHover();
         setModal();
         setDragging();
+        setWheelZoom();
     });
-}
-
-function drawGrid() {
-
-    clearCanvas();
-
-    
-    //grid width and height
-    var bw = getContainerWidth() - containerBorder;
-    var bh = getContainerHeight() - containerBorder;
-    //padding around grid
-    var p = 0;
-    //size of canvas
-    var cw = bw;
-    var ch = bh;
-
-    var canvas = $('canvas').attr({ width: cw, height: ch });
-
-    var context = canvas.get(0).getContext("2d");
-    
-    function squareSize() {
-        return getContainerHeight() / alphabetSize();
-    }
-
-    function drawBoard() {
-        for (var x = 0; x <= bw; x += squareSize()) {
-            context.moveTo(0.5 + x + p, p);
-            context.lineTo(0.5 + x + p, bh + p);
-        }
-
-
-        for (var x = 0; x <= bh; x += squareSize()) {
-            context.moveTo(p, 0.5 + x + p);
-            context.lineTo(bw + p, 0.5 + x + p);
-        }
-
-        context.strokeStyle = "#CDCDCD";
-        context.stroke();
-    }
-
-    drawBoard();
 }
 
 $(document).ready(function () {
