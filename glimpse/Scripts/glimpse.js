@@ -1,6 +1,6 @@
 ﻿var maxAge = 0;
 var minAge = 0;
-var containerBorder = parseInt($("#email-container").css("border-width"));
+var containerBorder = parseInt($("#email-container").css("border-width"), 10);
 
 var labelColors = {};
 var RGBaColors = [
@@ -13,11 +13,11 @@ var RGBaColors = [
 
 ];
 
-function getContainerHeight() {
+function containerHeight() {
     return $("#email-container").height();
 }
 
-function getContainerWidth() {
+function containerWidth() {
     return $("#email-container").width();
 }
 
@@ -26,7 +26,7 @@ function alphabetSize() {
 }
 
 function clearCanvas() {
-    document.getElementById('gridCanvas').getContext('2d').clearRect(0, 0, getContainerWidth(), getContainerHeight())
+    document.getElementById('gridCanvas').getContext('2d').clearRect(0, 0, containerWidth(), containerHeight());
 }
 
 function drawGrid() {
@@ -35,30 +35,33 @@ function drawGrid() {
 
 
     //grid width and height
-    var bw = getContainerWidth() - containerBorder;
-    var bh = getContainerHeight() - containerBorder;
+    var bw = containerWidth() - containerBorder,
+        bh = containerHeight() - containerBorder,
+
     //padding around grid
-    var p = 0;
+     p = 0,
+
     //size of canvas
-    var cw = bw;
-    var ch = bh;
+     cw = bw,
+     ch = bh,
 
-    var canvas = $('canvas').attr({ width: cw, height: ch });
+     canvas = $('canvas').attr({ width: cw, height: ch }),
 
-    var context = canvas.get(0).getContext("2d");
+     context = canvas.get(0).getContext("2d");
 
     function squareSize() {
-        return getContainerHeight() / alphabetSize();
+        return containerHeight() / alphabetSize();
     }
 
     function drawBoard() {
-        for (var x = 0; x <= bw; x += squareSize()) {
+        var x = 0;
+
+        for (x = 0; x <= bw; x += squareSize()) {
             context.moveTo(0.5 + x + p, p);
             context.lineTo(0.5 + x + p, bh + p);
         }
 
-
-        for (var x = 0; x <= bh; x += squareSize()) {
+        for (x = 0; x <= bh; x += squareSize()) {
             context.moveTo(p, 0.5 + x + p);
             context.lineTo(bw + p, 0.5 + x + p);
         }
@@ -74,14 +77,19 @@ function populateLabelColors() {
 
     var i = 0;
     for (var label in labelColors) {
-        var currentColor = RGBaColors[i];
-        labelColors[label] = currentColor;
 
-         /* Armar listado de labels */
-        var labelItem = $("<li class='glimpse-label' style = 'color: " + currentColor + "'>" + label + "</li>");
-        $("#labels").append(labelItem);
+        if (labelColors.hasOwnProperty(label)) {
 
-        i++;
+            var currentColor = RGBaColors[i],
+                labelItem = $("<li class='glimpse-label' style = 'color: " + currentColor + "'>" + label + "</li>");
+
+            labelColors[label] = currentColor;
+            /* Armar listado de labels */
+            $("#labels").append(labelItem);
+
+            i++;
+        }  
+       
     }
 }
 
@@ -98,38 +106,36 @@ function calculateEmailsColor() {
     })
 }
 
-function calculateEmailsPosition() {
 
-    var containerWidth = getContainerWidth();
-    var containerHeight = getContainerHeight();
+function currentPeriodShown() {
+    return maxAge - minAge;
+}
+
+function calculateEmailsPosition() {
 
     var offset = parseInt($(".circle").css('width'), 10);
 
     $(".circle").each(function () {
 
-        var left = ($(this).attr('data-age') - minAge) / (maxAge - minAge);
-        var top = ($(this).attr('data-from').charCodeAt(0) - "a".charCodeAt(0) + 2) / alphabetSize();    
+        var left = ($(this).attr('data-age') - minAge) / currentPeriodShown(),
+            top = ($(this).attr('data-from').charCodeAt(0) - "a".charCodeAt(0) + 2) / alphabetSize();
 
         $(this).css('top', function () {
-            return top * (containerHeight - offset) + 'px';
+            return top * (containerHeight() - offset) + 'px';
         });
 
         $(this).css('left', function () {
-            return left * (containerWidth - offset) + 'px';
+            return left * (containerWidth() - offset) + 'px';
         });
 
        
     })
 }
 
-function currentPeriodShown() {
-    return maxAge - minAge;
-}
-
 function zoom(factor, zoomPoint) {
 
     var movement = currentPeriodShown() * factor * 0.0002;
-    maxAge -= (getContainerWidth() - zoomPoint) * movement;
+    maxAge -= (containerWidth() - zoomPoint) * movement;
     minAge += zoomPoint * movement;
 
     calculateEmailsPosition();
@@ -143,7 +149,7 @@ function configureZoom() {
 function setButtonZoom() {
 
     /*  zoom exactamente en el centro del contenedor    */
-    var zoomPoint = getContainerWidth() / 2;
+    var zoomPoint = containerWidth() / 2;
     $('#zoom-in').click(function () { zoom(1, zoomPoint); return false; });
     $('#zoom-out').click(function () { zoom(-1, zoomPoint); return false; });
 }
@@ -159,8 +165,8 @@ function setWheelZoom() {
 
 function setDragging() {
 
-    var startX, endX = 0;
-    var isDragging = false;
+    var startX, endX = 0,
+        isDragging = false;
 
     $("#email-container")
     .mousedown(function (e) {
@@ -188,7 +194,7 @@ function setDragging() {
 
 function setDateCoords() {
     $(".dateCoord").css("top", function () {
-        return parseInt(getContainerHeight()) - parseInt($(".dateCoord").css("line-height")) + 'px';
+        return parseInt(containerHeight(), 10) - parseInt($(".dateCoord").css("line-height"), 10) + 'px';
     });
 }
 
@@ -196,8 +202,8 @@ function setModal() {
 
     $(".circle").on("click", function () {
 
-        var from = $('<h4>From: ' + $(this).data("from") + '</h4>');
-        var subject = $('<h3>' + $(this).data("subject") + '</h3>');
+        var from = $('<h4>From: ' + $(this).data("from") + '</h4>'),
+            subject = $('<h3>' + $(this).data("subject") + '</h3>');
 
         $(".modal-body").find("h4").remove();
         $(".modal-body").find("#bodyhtml").remove();
@@ -215,20 +221,20 @@ function setModal() {
     });
 }
 
-function fetchMailBody(mailId) {
+//function fetchMailBody(mailId) {
 
-    $.getJSON("async/GetMailBody/" + mailId, function (data) {
-        if (data.success == true) {
-            return data.body;
-        } else alert(data.message);
-    });
+//    $.getJSON("async/GetMailBody/" + mailId, function (data) {
+//        if (data.success == true) {
+//            return data.body;
+//        } else alert(data.message);
+//    });
 
-}
+//}
 
 function configureCircleHover() {
 
-    var dateTime = $("#dateTime");
-    var from = $("#from");
+    var dateTime = $("#dateTime"),
+        from = $("#from");
 
     $(".circle").hover(
 
@@ -255,7 +261,7 @@ function configureCircleHover() {
 
             $('.circle').each(
                 function () {
-                    if ($(this).data("tid") == currentTid) {
+                    if ($(this).data("tid") === currentTid) {
                         $(this).addClass("focused");
                     }
                 });
@@ -284,7 +290,7 @@ function fetchMailsAsync() {
 
     $.getJSON("async/InboxMails/500", function (data) {
 
-        if (data.success == true) {
+        if (data.success === true) {
 
             $.each(data.mails, function (index, value) {
 
@@ -292,13 +298,12 @@ function fetchMailsAsync() {
                     maxAge = value.age;
                 }
 
-                var classes = "circle";
+                var date = new Date(parseInt(value.date.substr(6))).toLocaleDateString(),
+                    classes = "circle";
 
                 if (!value.seen) {
                     classes += " new";
                 }
-
-                var date = new Date(parseInt(value.date.substr(6))).toLocaleDateString();
 
                 var newCircle = $("<a data-toggle='modal' href='#example'><div class='" + classes +
                         "' data-id='" + value.id +
