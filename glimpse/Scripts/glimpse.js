@@ -1,17 +1,7 @@
-﻿var maxAge = 0;
-var minAge = 0;
-var containerBorder = parseInt($("#email-container").css("border-width"), 10);
+﻿var maxAge = 0,
+    minAge = 0,
+    labelColors = {};
 
-var labelColors = {};
-var RGBaColors = [
-    "rgba(255, 105, 0, 0.7)",
-    "rgba(32, 178, 170, 0.7)",
-    "rgba(160, 32, 240, 0.7)",
-    "rgba(50, 205, 50, 0.7",
-    "rgba(123, 104, 238, 0.7)",
-    "rgba(255, 99, 71, 0.7"
-
-];
 
 function containerHeight() {
     return $("#email-container").height();
@@ -33,9 +23,9 @@ function drawGrid() {
 
     clearCanvas();
 
-
+    var containerBorder = parseInt($("#email-container").css("border-width"), 10),
     //grid width and height
-    var bw = containerWidth() - containerBorder,
+        bw = containerWidth() - containerBorder,
         bh = containerHeight() - containerBorder,
 
     //padding around grid
@@ -74,6 +64,15 @@ function drawGrid() {
 }
 
 function populateLabelColors() {
+
+    var RGBaColors = [
+    "rgba(255, 105, 0, 0.7)",
+    "rgba(32, 178, 170, 0.7)",
+    "rgba(160, 32, 240, 0.7)",
+    "rgba(50, 205, 50, 0.7",
+    "rgba(123, 104, 238, 0.7)",
+    "rgba(255, 99, 71, 0.7"
+    ];
 
     var i = 0;
     for (var label in labelColors) {
@@ -170,6 +169,7 @@ function setDragging() {
 
     $("#email-container")
     .mousedown(function (e) {
+        e.preventDefault();
         startX = e.pageX;
         $(window).mousemove(function () {
             isDragging = true;
@@ -305,16 +305,20 @@ function fetchMailsAsync() {
                     classes += " new";
                 }
 
-                var newCircle = $("<a data-toggle='modal' href='#example'><div class='" + classes +
-                        "' data-id='" + value.id +
-                        "' data-tid='" + value.tid +
-                        "' data-subject='" + value.subject +
-                        "' data-date='" + date +
-                        "' data-from='" + value.from.address +
-                        "' data-bodypeek='" + value.bodypeek +
-                        "' data-label='" + value.labels[0].name +
-                        "' data-age=" + value.age + ">" +
-                        "<div class='centered'><p>" + value.subject + "</p></div></div></a>");
+                var dataAttributes = [
+                    " data-id=", value.id,
+                    " data-tid=", value.tid,
+                    " data-subject=", value.subject,
+                    " data-date=", date,
+                    " data-from=", value.from.address,
+                    " data-bodypeek=", value.bodypeek,
+                    " data-label=", value.labels[0].name,
+                    " data-age=", value.age
+                ];
+
+                var newCircle = $("<a data-toggle='modal' href='#example'><div class='" + classes + "'" +
+                                    dataAttributes.join("'") +
+                                    "'><div class='centered'><p>" + value.subject + "</p></div></div></a>");
 
                 $("#email-container").append(newCircle);
 
