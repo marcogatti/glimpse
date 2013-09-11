@@ -66,6 +66,14 @@ function drawGrid() {
 function populateLabelColors() {
 
     var RGBaColors = [
+
+    //  algunos de los colores de Gmail
+    "rgba(251, 76, 47, 0.7)",   //  rojo
+    "rgba(22, 167, 101, 0.7)",  //  verde
+    "rgba(255, 173, 70, 0.7)",  //  naranja
+    "rgba(73, 134, 231, 0.7)",  //  azul
+
+    //  otros
     "rgba(255, 105, 0, 0.7)",
     "rgba(32, 178, 170, 0.7)",
     "rgba(160, 32, 240, 0.7)",
@@ -80,7 +88,7 @@ function populateLabelColors() {
         if (labelColors.hasOwnProperty(label)) {
 
             var currentColor = RGBaColors[i],
-                labelItem = $("<li class='glimpse-label' style = 'color: " + currentColor + "'>" + label + "</li>");
+                labelItem = $("<li class='label glimpse-label' style = 'background-color: " + currentColor + "'>" + label + "</li>");
 
             labelColors[label] = currentColor;
             /* Armar listado de labels */
