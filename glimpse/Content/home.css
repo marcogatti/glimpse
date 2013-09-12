@@ -46,11 +46,11 @@
     -o-transform: translate3d(0,0,0);
     -ms-transform: translate3d(0,0,0);
 
-    transition: all 0.2s, left 1s, top 1s;
-    -webkit-transition: all 0.5s, left 1s, top 1s;
-    -moz-transition: all 0.2s, left 1s, top 1s;
+    transition: all 0.2s, left 0.5s ease-out, top 0.5s ease-out;
+    -webkit-transition: all 0.2s, left 0.5s ease-out, top 0.5s ease-out;
+    /*-moz-transition: all 0.2s, left 1s, top 1s;
     -o-transition: all 0.2s, left 1s, top 1s;
-    -ms-transition: all 0.2s, left 1s, top 1s;
+    -ms-transition: all 0.2s, left 1s, top 1s;*/
 
 }
 

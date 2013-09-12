@@ -172,31 +172,24 @@ function setWheelZoom() {
 
 function setDragging() {
 
-    var startX, endX = 0,
-        isDragging = false;
+    var startX, endX = 0;
 
     $("#email-container")
-    .mousedown(function (e) {
-        e.preventDefault();
-        startX = e.pageX;
-        $(window).mousemove(function () {
-            isDragging = true;
-            $(window).unbind("mousemove");
+    .mousedown(function (downEvent) {
+        downEvent.preventDefault();
+        startX = downEvent.pageX;
+        $(window).mousemove(function (dragEvent) {
+            var offset = (startX - dragEvent.pageX) * currentPeriodShown() / 1000;
+            minAge += offset;
+            maxAge += offset;
+            calculateEmailsPosition();
+            startX = dragEvent.pageX;
         });
     });
 
     $("body")
-    .mouseup(function (e) {
-        endX = e.pageX;
-        var wasDragging = isDragging;
-        isDragging = false;
+    .mouseup(function () {
         $(window).unbind("mousemove");
-        if (wasDragging) {
-            var offset = (startX - endX) * currentPeriodShown() / 1000;
-            minAge += offset;
-            maxAge += offset;
-            calculateEmailsPosition();
-        }
     });
 }
 
