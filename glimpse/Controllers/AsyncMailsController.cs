@@ -16,7 +16,7 @@ using System.Web.Mvc;
 
 namespace Glimpse.Controllers
 {
-    //[Authorize]
+    [Authorize]
     public class AsyncMailsController : Controller
     {
         //
