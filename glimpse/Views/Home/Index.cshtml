@@ -2,9 +2,12 @@
 
 @section css {
     @Styles.Render("~/Home/css")}
+<link href="~/Content/ui-lightness/jquery-ui-1.10.3.custom.css" rel="stylesheet" />
 @section scripts {
     @Scripts.Render("~/bundles/jquerymousewheel"),
     @Scripts.Render("~/bundles/glimpse")
+    <script src="~/Scripts/ckeditor/ckeditor.js"></script>
+    <script src="~/Scripts/jquery-ui-1.10.3.custom.js"></script>
 }
 
 @{
@@ -24,7 +27,7 @@
             <div class="nav-collapse collapse">
                 <p class="navbar-text pull-right">
                     Logged in as <a href="#" class="navbar-link">@ViewBag.Email</a>
-                    @Html.ActionLink("Logout", "Logout", "Account", null, new { @class= "navbar-link"})
+                    @Html.ActionLink("Logout", "Logout", "Account", null, new { @class = "navbar-link" })
                 </p>
                 <ul class="nav">
                     <li class="active"><a href="#">Home</a></li>
@@ -54,14 +57,15 @@
     <div class="row-fluid">
         <div class="span2">
             <div class="well sidebar-nav">
+                <a href="#compose" id="compose">Redactar</a>
                 <ol id="labels" class="nav nav-list">
 
                     <li class="nav-header">Labels</li>
 
-@*                    <li class="nav-header">Sidebar</li>
+                    @*                    <li class="nav-header">Sidebar</li>
                     <li><a href="#">Link</a></li>*@
- 
-                    </ol>
+
+                </ol>
 
             </div>
             <!--/.well -->
@@ -76,8 +80,8 @@
         <div id="email-container" class="span10">
 
             <a href="#">
-            <i id="zoom-in" class="icon-zoom-in"></i>
-            <i id="zoom-out" class="icon-zoom-out"></i>
+                <i id="zoom-in" class="icon-zoom-in"></i>
+                <i id="zoom-out" class="icon-zoom-out"></i>
             </a>
 
             <canvas id="gridCanvas"></canvas>
@@ -100,5 +104,11 @@
 
 </div>
 
-
+<!--Invisible-->
+<div id="compose_pannel">
+    <div class="ui-dialog-content">
+        <textarea cols="80" id="text_editor" rows="10"></textarea>
+    </div>
+    <div class="ui-dialog-buttonpane"></div>
+</div>
 <!--/.fluid-container-->
