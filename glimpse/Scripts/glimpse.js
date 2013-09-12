@@ -120,7 +120,7 @@ function currentPeriodShown() {
 
 function calculateEmailsPosition() {
 
-    var offset = parseInt($(".circle").css('width'), 10);
+    var margin = parseInt($(".circle").css('width'), 10);
 
     $(".circle").each(function () {
 
@@ -128,22 +128,31 @@ function calculateEmailsPosition() {
             top = ($(this).attr('data-from').charCodeAt(0) - "a".charCodeAt(0) + 2) / alphabetSize();
 
         $(this).css('top', function () {
-            return top * (containerHeight() - offset) + 'px';
+            return top * (containerHeight() - margin) + 'px';
         });
 
         $(this).css('left', function () {
-            return left * (containerWidth() - offset) + 'px';
+            return left * (containerWidth() - margin) + 'px';
         });
 
 
     })
 }
 
+function notNegative(value1, value2) {
+    return value1 + value2 >= 0;
+}
+
 function zoom(factor, zoomPoint) {
 
     var movement = currentPeriodShown() * factor * 0.0002;
+
     maxAge -= (containerWidth() - zoomPoint) * movement;
-    minAge += zoomPoint * movement;
+
+    var offset = zoomPoint * movement;
+    if (notNegative(minAge, offset)) {
+        minAge += offset;
+    }
 
     calculateEmailsPosition();
 }
@@ -170,6 +179,14 @@ function setWheelZoom() {
     });
 }
 
+function movePeriodShown(offset) {
+    if (notNegative(minAge, offset)) {
+        minAge += offset;
+        maxAge += offset;
+    }
+    calculateEmailsPosition();
+}
+
 function setDragging() {
 
     var startX, endX = 0;
@@ -180,9 +197,7 @@ function setDragging() {
         startX = downEvent.pageX;
         $(window).mousemove(function (dragEvent) {
             var offset = (startX - dragEvent.pageX) * currentPeriodShown() / 1000;
-            minAge += offset;
-            maxAge += offset;
-            calculateEmailsPosition();
+            movePeriodShown(offset);
             startX = dragEvent.pageX;
         });
     });
@@ -221,16 +236,6 @@ function setModal() {
         });
     });
 }
-
-//function fetchMailBody(mailId) {
-
-//    $.getJSON("async/GetMailBody/" + mailId, function (data) {
-//        if (data.success == true) {
-//            return data.body;
-//        } else alert(data.message);
-//    });
-
-//}
 
 function configureCircleHover() {
 
@@ -337,7 +342,6 @@ function fetchMailsAsync() {
         populateLabelColors();
         calculateEmailsColor();
         calculateEmailsPosition();
-        setDateCoords();
         hideProgressBar();
         configureCircleHover();
         setModal();
@@ -378,6 +382,7 @@ function prepareComposeDialog() {
 
 $(document).ready(function () {
 
+    setDateCoords();
     fetchMailsAsync();
     setDragging();
     configureZoom();
