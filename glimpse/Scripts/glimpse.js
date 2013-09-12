@@ -1,7 +1,7 @@
-﻿var maxAge = 0,
+var maxAge = 0,
     minAge = 0,
-    labelColors = {};
-
+    labelColors = {},
+    editor;
 
 function containerHeight() {
     return $("#email-container").height();
@@ -135,7 +135,7 @@ function calculateEmailsPosition() {
             return left * (containerWidth() - margin) + 'px';
         });
 
-       
+
     })
 }
 
@@ -231,7 +231,7 @@ function setModal() {
         /*  horrible, pero no encontré otra forma de hacerlo andar  */
         $.getJSON("async/GetMailBody/" + $(this).data("id"), function (data) {
             if (data.success == true) {
-                $(".modal-body").append("<div id='bodyhtml'>" + data.body + "</div>");          
+                $(".modal-body").append("<div id='bodyhtml'>" + data.body + "</div>");
             } else alert(data.message);
         });
     });
@@ -271,7 +271,7 @@ function configureCircleHover() {
                         $(this).addClass("focused");
                     }
                 });
-                
+
 
         }, function () {
             $(".hidable").addClass("hidden");
@@ -331,7 +331,7 @@ function fetchMailsAsync() {
                 /* Create labels */
                 for (var i = 0; i < value.labels.length; i++) {
                     if (value.labels[i].system_name == null)
-                    labelColors[value.labels[i].name] = "";
+                        labelColors[value.labels[i].name] = "";
                 }
 
             });
@@ -349,6 +349,37 @@ function fetchMailsAsync() {
     });
 }
 
+function prepareComposeDialog() {
+
+    $("#compose_pannel").dialog({
+        autoOpen: false,
+        closeOnEscape: true,
+        draggable: true,
+        height: 400,
+        width: 600,
+        minWidth: 400,
+        minHeight: 200,
+        resizable: true,
+        title:"Redacta un email",
+        position: { my: "left botton", at: "left bottom", of: window },
+        buttons: [
+        {
+            text: "Cerrar",
+            click: function () {
+                $(this).dialog("close");
+            }
+        },
+        {
+            text: "Enviar"
+        }
+        ]
+    });
+    $("#compose").on("click", function () {
+        $("#compose_pannel").dialog("open");
+        editor = CKEDITOR.replace('text_editor');
+    });
+}
+
 $(document).ready(function () {
 
     setDateCoords();
@@ -357,5 +388,6 @@ $(document).ready(function () {
     configureZoom();
     drawGrid();
     setRefreshOnResize();
+    prepareComposeDialog();
 })
 
