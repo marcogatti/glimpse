@@ -104,10 +104,16 @@
 
 </div>
 
-<!--Invisible-->
+<!--Mails Editor-->
 <div id="compose_pannel">
     <div class="ui-dialog-content">
-        <textarea cols="80" id="text_editor" rows="10"></textarea>
+        <table style="width: 100%;">
+            <tbody>
+                <tr><td><textarea rows="1" placeholder="Destinatarios..." style="width: 100%; resize: vertical; height: 22px; min-height: 22px;"></textarea></td></tr>
+                <tr><td><textarea rows="1" placeholder="Asunto..." style="width: 100%; resize: vertical; height: 22px; min-height: 22px;"></textarea></td></tr>
+                <tr><td><textarea cols="80" id="text_editor" rows="10"></textarea></td></tr>
+            </tbody>
+        </table>
     </div>
     <div class="ui-dialog-buttonpane"></div>
 </div>
