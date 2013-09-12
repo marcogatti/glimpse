@@ -63,6 +63,20 @@ function drawGrid() {
     drawBoard();
 }
 
+function setLabelSelection() {
+    $(".sidebar-elem-glimpse.label").on('click', function () {
+        $(this).toggleClass('label-hidden');
+        var currentLabel = $(this).html();
+
+        $(".circle").each(function () {
+            if ($(this).data("label") === currentLabel) {
+                $(this).toggleClass("hidden");
+            }
+        });
+    });
+
+}
+
 function populateLabelColors() {
 
     var RGBaColors = [
@@ -98,6 +112,8 @@ function populateLabelColors() {
         }  
        
     }
+
+    setLabelSelection();
 }
 
 function calculateEmailsColor() {
