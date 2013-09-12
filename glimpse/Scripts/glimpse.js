@@ -64,7 +64,7 @@ function drawGrid() {
 }
 
 function setLabelSelection() {
-    $(".sidebar-elem-glimpse.label").on('click', function () {
+    $(".label-glimpse").on('click', function () {
         $(this).toggleClass('label-hidden');
         var currentLabel = $(this).html();
 
@@ -102,7 +102,7 @@ function populateLabelColors() {
         if (labelColors.hasOwnProperty(label)) {
 
             var currentColor = RGBaColors[i],
-                labelItem = $("<li class='label sidebar-elem-glimpse' style = 'background-color: " + currentColor + "'>" + label + "</li>");
+                labelItem = $("<li class='label label-glimpse' style = 'background-color: " + currentColor + "'>" + label + "</li>");
 
             labelColors[label] = currentColor;
             /* Armar listado de labels */
@@ -411,8 +411,8 @@ $(document).ready(function () {
     fetchMailsAsync();
     setDragging();
     configureZoom();
-    drawGrid();
     setRefreshOnResize();
     prepareComposeDialog();
+    drawGrid();
 })
 
