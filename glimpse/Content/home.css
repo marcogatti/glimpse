@@ -152,7 +152,7 @@ canvas {
     position: absolute;
 }
 
-.glimpse-label {
+.sidebar-elem-glimpse {
     margin: 5px;
     display: block; 
 }
