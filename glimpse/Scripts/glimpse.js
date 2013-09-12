@@ -63,6 +63,20 @@ function drawGrid() {
     drawBoard();
 }
 
+function setLabelSelection() {
+    $(".sidebar-elem-glimpse.label").on('click', function () {
+        $(this).toggleClass('label-hidden');
+        var currentLabel = $(this).html();
+
+        $(".circle").each(function () {
+            if ($(this).data("label") === currentLabel) {
+                $(this).toggleClass("hidden");
+            }
+        });
+    });
+
+}
+
 function populateLabelColors() {
 
     var RGBaColors = [
@@ -88,7 +102,7 @@ function populateLabelColors() {
         if (labelColors.hasOwnProperty(label)) {
 
             var currentColor = RGBaColors[i],
-                labelItem = $("<li class='label glimpse-label' style = 'background-color: " + currentColor + "'>" + label + "</li>");
+                labelItem = $("<li class='label sidebar-elem-glimpse' style = 'background-color: " + currentColor + "'>" + label + "</li>");
 
             labelColors[label] = currentColor;
             /* Armar listado de labels */
@@ -98,6 +112,8 @@ function populateLabelColors() {
         }  
        
     }
+
+    setLabelSelection();
 }
 
 function calculateEmailsColor() {
@@ -154,6 +170,7 @@ function zoom(factor, zoomPoint) {
         minAge += offset;
     }
 
+    setDateCoord();
     calculateEmailsPosition();
 }
 
@@ -185,6 +202,7 @@ function movePeriodShown(offset) {
         maxAge += offset;
     }
     calculateEmailsPosition();
+    setDateCoord();
 }
 
 function setDragging() {
@@ -208,10 +226,17 @@ function setDragging() {
     });
 }
 
-function setDateCoords() {
+function setDateCoordsPosition() {
     $(".dateCoord").css("top", function () {
         return parseInt(containerHeight(), 10) - parseInt($(".dateCoord").css("line-height"), 10) + 'px';
     });
+}
+
+function setDateCoord() {
+    var now = new Date().getTime();
+    var jsMinAge = Math.floor(minAge / 10000);
+    var newDateToday = new Date(now - jsMinAge);
+    $("#dateToday").html(newDateToday.toLocaleDateString());
 }
 
 function setModal() {
@@ -382,7 +407,7 @@ function prepareComposeDialog() {
 
 $(document).ready(function () {
 
-    setDateCoords();
+    setDateCoordsPosition();
     fetchMailsAsync();
     setDragging();
     configureZoom();

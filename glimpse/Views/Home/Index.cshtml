@@ -1,13 +1,14 @@
 ﻿@using Glimpse.DataAccessLayer.Entities
 
 @section css {
-    @Styles.Render("~/Home/css")}
-<link href="~/Content/ui-lightness/jquery-ui-1.10.3.custom.css" rel="stylesheet" />
+    @Styles.Render("~/Home/css")
+    @Styles.Render("~/Content/ui-lightness/jquery-ui-1.10.3.custom.css")
+}
 @section scripts {
-    @Scripts.Render("~/bundles/jquerymousewheel"),
+    @Scripts.Render("~/bundles/jquerymousewheel")
     @Scripts.Render("~/bundles/glimpse")
-    <script src="~/Scripts/ckeditor/ckeditor.js"></script>
-    <script src="~/Scripts/jquery-ui-1.10.3.custom.js"></script>
+    @Scripts.Render("~/Scripts/ckeditor/ckeditor.js")
+    @Scripts.Render("~/Scripts/jquery-ui-1.10.3.custom.js")
 }
 
 @{
@@ -57,13 +58,10 @@
     <div class="row-fluid">
         <div class="span2">
             <div class="well sidebar-nav">
-                <a href="#compose" id="compose" class="btn">Redactar</a>
+                <a href="#compose" id="compose" class="btn sidebar-elem-glimpse">Redactar</a>
                 <ol id="labels" class="nav nav-list">
 
                     <li class="nav-header">Labels</li>
-
-                    @*                    <li class="nav-header">Sidebar</li>
-                    <li><a href="#">Link</a></li>*@
 
                 </ol>
 
@@ -71,7 +69,7 @@
             <!--/.well -->
 
             <div class="progress progress-striped active">
-                <div class="bar" style="width: 100%;"></div>
+                <div class="bar" style="width: 100%;">Loading...</div>
             </div>
 
         </div>
@@ -109,8 +107,8 @@
     <div class="ui-dialog-content">
         <table style="width: 100%;">
             <tbody>
-                <tr><td><textarea rows="1" placeholder="Destinatarios..." style="width: 100%; resize: vertical; height: 22px; min-height: 22px;"></textarea></td></tr>
-                <tr><td><textarea rows="1" placeholder="Asunto..." style="width: 100%; resize: vertical; height: 22px; min-height: 22px;"></textarea></td></tr>
+                <tr><td><textarea rows="1" placeholder="Destinatarios..." class="compose-text"></textarea></td></tr>
+                <tr><td><textarea rows="1" placeholder="Asunto..." class="compose-text"></textarea></td></tr>
                 <tr><td><textarea cols="80" id="text_editor" rows="10"></textarea></td></tr>
             </tbody>
         </table>
