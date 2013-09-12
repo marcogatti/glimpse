@@ -1,6 +1,7 @@
 ﻿var maxAge = 0;
 var minAge = 0;
 var containerBorder = parseInt($("#email-container").css("border-width"));
+var editor;
 
 var labelColors = {};
 var RGBaColors = [
@@ -77,7 +78,7 @@ function populateLabelColors() {
         var currentColor = RGBaColors[i];
         labelColors[label] = currentColor;
 
-         /* Armar listado de labels */
+        /* Armar listado de labels */
         var labelItem = $("<li class='glimpse-label' style = 'color: " + currentColor + "'>" + label + "</li>");
         $("#labels").append(labelItem);
 
@@ -108,7 +109,7 @@ function calculateEmailsPosition() {
     $(".circle").each(function () {
 
         var left = ($(this).attr('data-age') - minAge) / (maxAge - minAge);
-        var top = ($(this).attr('data-from').charCodeAt(0) - "a".charCodeAt(0) + 2) / alphabetSize();    
+        var top = ($(this).attr('data-from').charCodeAt(0) - "a".charCodeAt(0) + 2) / alphabetSize();
 
         $(this).css('top', function () {
             return top * (containerHeight - offset) + 'px';
@@ -118,7 +119,7 @@ function calculateEmailsPosition() {
             return left * (containerWidth - offset) + 'px';
         });
 
-       
+
     })
 }
 
@@ -209,7 +210,7 @@ function setModal() {
         /*  horrible, pero no encontré otra forma de hacerlo andar  */
         $.getJSON("async/GetMailBody/" + $(this).data("id"), function (data) {
             if (data.success == true) {
-                $(".modal-body").append("<div id='bodyhtml'>" + data.body + "</div>");          
+                $(".modal-body").append("<div id='bodyhtml'>" + data.body + "</div>");
             } else alert(data.message);
         });
     });
@@ -259,7 +260,7 @@ function configureCircleHover() {
                         $(this).addClass("focused");
                     }
                 });
-                
+
 
         }, function () {
             $(".hidable").addClass("hidden");
@@ -316,7 +317,7 @@ function fetchMailsAsync() {
                 /* Create labels */
                 for (var i = 0; i < value.labels.length; i++) {
                     if (value.labels[i].system_name == null)
-                    labelColors[value.labels[i].name] = "";
+                        labelColors[value.labels[i].name] = "";
                 }
 
             });
@@ -335,6 +336,37 @@ function fetchMailsAsync() {
     });
 }
 
+function prepareComposeDialog() {
+
+    $("#compose_pannel").dialog({
+        autoOpen: false,
+        closeOnEscape: true,
+        draggable: true,
+        height: 400,
+        width: 600,
+        minWidth: 400,
+        minHeight: 200,
+        resizable: true,
+        title:"Redacta un email",
+        position: { my: "left botton", at: "left bottom", of: window },
+        buttons: [
+        {
+            text: "Cerrar",
+            click: function () {
+                $(this).dialog("close");
+            }
+        },
+        {
+            text: "Enviar"
+        }
+        ]
+    });
+    $("#compose").on("click", function () {
+        $("#compose_pannel").dialog("open");
+        editor = CKEDITOR.replace('text_editor');
+    });
+}
+
 $(document).ready(function () {
 
     fetchMailsAsync();
@@ -342,5 +374,6 @@ $(document).ready(function () {
     configureZoom();
     drawGrid();
     setRefreshOnResize();
+    prepareComposeDialog();
 })
 
