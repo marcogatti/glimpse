@@ -5,6 +5,7 @@ using Glimpse.Exceptions;
 using Glimpse.Helpers;
 using Glimpse.MailInterfaces;
 using Glimpse.Models;
+using Glimpse.ViewModels;
 using Newtonsoft.Json;
 using NHibernate;
 using NHibernate.Criterion;
@@ -47,7 +48,7 @@ namespace Glimpse.Controllers
             try
             {
                 ISession session = NHibernateManager.OpenSession();
-                MailAccount mailAccount = (MailAccount)Session[AccountController.MAIL_INTERFACE];
+                MailAccount mailAccount = GetCurrentMailAccount();
                 MailEntity mail = session.CreateCriteria<MailEntity>()
                                      .Add(Restrictions.Eq("MailAccountEntity", mailAccount.Entity))
                                      .Add(Restrictions.Eq("Id", id))
@@ -67,9 +68,26 @@ namespace Glimpse.Controllers
             }
         }
 
+        [HttpPost]
+        public ActionResult sendEmail(MailSentViewModel sendInfo)
+        {
+            try
+            {
+                MailAccount mailAccount = GetCurrentMailAccount();
+                mailAccount.sendMail(sendInfo.ToAddress, sendInfo.Body, sendInfo.Subject);
+            }
+            catch (Exception e)
+            {
+                return Json(new { success = false }, JsonRequestBehavior.AllowGet);
+            }
+
+            return Json(new { success = true }, JsonRequestBehavior.AllowGet);
+        }
+
+
         private List<Object> FetchMails(int amountOfEmails, ISession session)
         {
-            MailAccount mailAccount = (MailAccount)Session[AccountController.MAIL_INTERFACE];
+            MailAccount mailAccount = GetCurrentMailAccount();
 
             if (mailAccount != null)
             {
@@ -129,11 +147,20 @@ namespace Glimpse.Controllers
 
             foreach (LabelEntity label in labels)
             {
-                returnLabels.Add(new { name = label.Name,
-                                       system_name = label.SystemName,
-                                       mail_account = label.MailAccountEntity.Id});
+                returnLabels.Add(new
+                {
+                    name = label.Name,
+                    system_name = label.SystemName,
+                    mail_account = label.MailAccountEntity.Id
+                });
             }
             return returnLabels;
+        }
+
+        private MailAccount GetCurrentMailAccount()
+        {
+            MailAccount mailAccount = (MailAccount)Session[AccountController.MAIL_INTERFACE];
+            return mailAccount;
         }
 
     }

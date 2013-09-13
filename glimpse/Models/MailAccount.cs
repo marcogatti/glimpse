@@ -119,6 +119,15 @@ namespace Glimpse.Models
             session.Close();
         }
 
+        public void sendMail(String toAddress, String body, String subject)
+        {
+            AddressCollection recipients = new AddressCollection();
+
+            recipients.Add(toAddress, "");
+
+            this.mySender.sendMail(recipients, body, subject);
+        }
+
         private void RegisterLabel(String labelName, ISession session, IList<LabelEntity> databaseLabels, String systemName = null)
         {
             if (labelName == null)

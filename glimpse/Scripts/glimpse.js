@@ -374,6 +374,28 @@ function fetchMailsAsync() {
     });
 }
 
+function sendEmailAsync(toAddres, subject, body) {
+
+    var sendInfo = {
+        ToAddress: toAddres,
+        Subject: subject,
+        Body: body
+    };
+
+    $.ajax({
+        type: "POST",
+        url: "async/sendEmail",
+        dataType: 'application/json; charset=utf-8',
+        success: function (toAddres) {
+                alert("Mail enviado correctamente a " + toAddres + ".");
+        },
+        error: function (a,b,c) {
+            alert("Falló el envío del mail, por favor intentelo nuevamente más tarde.");
+        },
+        data: sendInfo
+    });
+}
+
 function prepareComposeDialog() {
 
     $("#compose_pannel").dialog({
@@ -395,7 +417,11 @@ function prepareComposeDialog() {
             }
         },
         {
-            text: "Enviar"
+            text: "Enviar",
+            click: function () {
+                sendEmailAsync($("#email-to").val(), $("#email-subject").val(), editor.getData());
+                $(this).dialog("close");
+            }
         }
         ]
     });
