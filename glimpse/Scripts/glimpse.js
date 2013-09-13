@@ -82,18 +82,16 @@ function populateLabelColors() {
     var RGBaColors = [
 
     //  algunos de los colores de Gmail
-    "rgba(251, 76, 47, 0.7)",   //  rojo
-    "rgba(22, 167, 101, 0.7)",  //  verde
-    "rgba(255, 173, 70, 0.7)",  //  naranja
-    "rgba(73, 134, 231, 0.7)",  //  azul
+    "rgb(251, 76, 47)",   //  rojo
+    "rgb(22, 167, 101)",  //  verde
+    "rgb(255, 173, 70)",  //  naranja
+    "rgb(73, 134, 231)",  //  azul
 
     //  otros
-    "rgba(255, 105, 0, 0.7)",
-    "rgba(32, 178, 170, 0.7)",
-    "rgba(160, 32, 240, 0.7)",
-    "rgba(50, 205, 50, 0.7",
-    "rgba(123, 104, 238, 0.7)",
-    "rgba(255, 99, 71, 0.7"
+    "Crimson",
+    "LimeGreen",
+    "Indigo",
+    "LightSeaGreen"
     ];
 
     var i = 0;
@@ -106,7 +104,7 @@ function populateLabelColors() {
 
             labelColors[label] = currentColor;
             /* Armar listado de labels */
-            $("#labels").append(labelItem);
+            $("#labels-header").append(labelItem);
 
             i++;
         }  
@@ -202,7 +200,6 @@ function movePeriodShown(offset) {
         maxAge += offset;
     }
     calculateEmailsPosition();
-    setDateCoord();
 }
 
 function setDragging() {
@@ -220,9 +217,10 @@ function setDragging() {
         });
     });
 
-    $("body")
+    $(document)
     .mouseup(function () {
         $(window).unbind("mousemove");
+        setDateCoord();
     });
 }
 

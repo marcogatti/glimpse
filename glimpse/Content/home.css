@@ -25,9 +25,11 @@
     position: absolute;
     text-align: center;
     text-shadow: 0 0 1px #fff, 0 1px 2px rgba(0,0,0,0.7);
+    opacity: 0.8;
 
-    color: rgba(159, 182, 205, 0.7);
-    background-color: rgba(159, 182, 205, 0.7);
+    /*  Color de emails sin etiqueta    */
+    color: rgb(159, 182, 205);
+    background-color: rgb(159, 182, 205);
 
     box-shadow: inset 0 0 0 8px rgba(255,255,255,0.4), 0 1px 2px rgba(0,0,0,0.1);
     -webkit-box-shadow: inset 0 0 0 8px rgba(255,255,255,0.4), 0 1px 2px rgba(0,0,0,0.1);
@@ -143,16 +145,15 @@ div.zoom {
     cursor: pointer;
 }
 
-#zoom-out {
+.icon-zoom {
     top: 10px;
-    left: 100px;
     position: absolute;
 }
-
-#zoom-in {
-    top: 10px;
+.icon-zoom-out {
+    left: 100px;
+}
+.icon-zoom-in {
     left: 120px;
-    position: absolute;
 }
 
 .label-glimpse {
@@ -160,10 +161,20 @@ div.zoom {
     display: block; 
     cursor: pointer;
 }
+    .label-glimpse:hover {
+        opacity: 0.8;
+    }
 
 .label-hidden {
-        box-shadow: inset 0 0 8px 8px rgba(0,0,0,0.7);
+    box-shadow: inset 0 0 8px 8px rgba(0,0,0,0.7);
     -webkit-box-shadow: inset 0 0 8px 8px rgba(0,0,0,0.7);
+    -moz-box-shadow: inset 0 0 8px 8px rgba(0,0,0,0.7);
+    -o-box-shadow: inset 0 0 8px 8px rgba(0,0,0,0.7);
+    -ms-box-shadow: inset 0 0 8px 8px rgba(0,0,0,0.7);
+}
+
+#labels-header {
+    margin-top: 25px;
 }
 
 .compose-text {
@@ -172,8 +183,4 @@ div.zoom {
     height: 22px;
     min-height: 22px;
     max-height: 66px;
-}
-
-#labels {
-    margin-top: 25px;
 }
