@@ -64,7 +64,7 @@ function drawGrid() {
 }
 
 function setLabelSelection() {
-    $(".sidebar-elem-glimpse.label").on('click', function () {
+    $(".label-glimpse").on('click', function () {
         $(this).toggleClass('label-hidden');
         var currentLabel = $(this).html();
 
@@ -102,7 +102,7 @@ function populateLabelColors() {
         if (labelColors.hasOwnProperty(label)) {
 
             var currentColor = RGBaColors[i],
-                labelItem = $("<li class='label sidebar-elem-glimpse' style = 'background-color: " + currentColor + "'>" + label + "</li>");
+                labelItem = $("<li class='label label-glimpse' style = 'background-color: " + currentColor + "'>" + label + "</li>");
 
             labelColors[label] = currentColor;
             /* Armar listado de labels */
@@ -227,16 +227,20 @@ function setDragging() {
 }
 
 function setDateCoordsPosition() {
-    $(".dateCoord").css("top", function () {
-        return parseInt(containerHeight(), 10) - parseInt($(".dateCoord").css("line-height"), 10) + 'px';
+    $(".date-coord").css("top", function () {
+        return parseInt(containerHeight(), 10) - parseInt($(".date-coord").css("line-height"), 10) + 'px';
     });
+
+    $("#date-today").tooltip({ placement: top });
+    $("#date-today").tooltip("show");
 }
 
 function setDateCoord() {
     var now = new Date().getTime();
     var jsMinAge = Math.floor(minAge / 10000);
     var newDateToday = new Date(now - jsMinAge);
-    $("#dateToday").html(newDateToday.toLocaleDateString());
+    //  selector mágico
+    $("#date-today+div").find(".tooltip-inner").html(newDateToday.toLocaleDateString());
 }
 
 function setModal() {
@@ -274,15 +278,15 @@ function configureCircleHover() {
             var currentCircle = $(this);
 
             dateTime.html(currentCircle.data("date"));
-            from.html(currentCircle.data("from"));
+            //from.html(currentCircle.data("from"));
 
             dateTime.css("left", function () {
                 return currentCircle.css("left");
             });
 
-            from.css("top", function () {
-                return currentCircle.css("top");
-            });
+            //from.css("top", function () {
+            //    return currentCircle.css("top");
+            //});
 
             $(".hidable").removeClass("hidden");
 
@@ -312,7 +316,6 @@ function hideProgressBar() {
 function setRefreshOnResize() {
     $(window).resize(function () {
         calculateEmailsPosition();
-        drawGrid();
     });
 
 }
@@ -347,7 +350,7 @@ function fetchMailsAsync() {
                     " data-age=", value.age
                 ];
 
-                var newCircle = $("<a data-toggle='modal' href='#example'><div class='" + classes + "'" +
+                var newCircle = $("<a data-toggle='modal' href='#example' title=" + value.from.address + "><div class='" + classes + "'" +
                                     dataAttributes.join("'") +
                                     "'><div class='centered'><p>" + value.subject + "</p></div></div></a>");
 
@@ -437,7 +440,6 @@ $(document).ready(function () {
     fetchMailsAsync();
     setDragging();
     configureZoom();
-    drawGrid();
     setRefreshOnResize();
     prepareComposeDialog();
 })

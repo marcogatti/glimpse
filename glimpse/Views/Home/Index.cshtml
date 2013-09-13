@@ -27,13 +27,13 @@
             <a class="brand" href="#">Glimpse</a>
             <div class="nav-collapse collapse">
                 <p class="navbar-text pull-right">
-                    Logged in as <a href="#" class="navbar-link">@ViewBag.Email</a>
-                    @Html.ActionLink("Logout", "Logout", "Account", null, new { @class = "navbar-link" })
+                    Has iniciado sesión con tu cuenta <a href="#" class="navbar-link">@ViewBag.Email</a>
+                    @Html.ActionLink("Salir", "Logout", "Account", null, new { @class = "navbar-link" })
                 </p>
                 <ul class="nav">
-                    <li class="active"><a href="#">Home</a></li>
-                    <li><a href="#about">About</a></li>
-                    <li><a href="#contact">Contact</a></li>
+                    <li class="active"><a href="#">Inicio</a></li>
+                    <li><a href="#about">Acerca de</a></li>
+                    <li><a href="#contact">Contacto</a></li>
                 </ul>
             </div>
             <!--/.nav-collapse -->
@@ -58,10 +58,11 @@
     <div class="row-fluid">
         <div class="span2">
             <div class="well sidebar-nav">
-                <a href="#compose" id="compose" class="btn sidebar-elem-glimpse">Redactar</a>
+                <a href="#compose" id="compose" class="btn btn-block">Redactar</a>
+
                 <ol id="labels" class="nav nav-list">
 
-                    <li class="nav-header">Labels</li>
+                    <li class="nav-header">Etiquetas</li>
 
                 </ol>
 
@@ -69,7 +70,7 @@
             <!--/.well -->
 
             <div class="progress progress-striped active">
-                <div class="bar" style="width: 100%;">Loading...</div>
+                <div class="bar" style="width: 100%;">Cargando...</div>
             </div>
 
         </div>
@@ -77,17 +78,14 @@
 
         <div id="email-container" class="span10">
 
-            <a href="#">
+            <div class="zoom">
                 <i id="zoom-in" class="icon-zoom-in"></i>
                 <i id="zoom-out" class="icon-zoom-out"></i>
-            </a>
+            </div>
 
-            <canvas id="gridCanvas"></canvas>
-
-            <div id="dateToday" class="coord dateCoord">Today</div>
-            <div id="dateTime" class="coord dateCoord hidable hidden"></div>
+            <a id="date-today" href="#" data-toggle="tooltip" title="Hoy"></a>
+            <div id="dateTime" class="coord date-coord hidable hidden"></div>
             <div id="from" class="coord hidable hidden"></div>
-
 
         </div>
 

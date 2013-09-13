@@ -1,11 +1,6 @@
 ﻿body {
     padding-top: 60px;
-    padding-bottom: 40px;
     background: #F0F0F0  ;
-}
-
-.sidebar-nav {
-    padding: 9px 0;
 }
 
 #email-container {
@@ -13,6 +8,7 @@
     border: 5px outset;
     position: relative;
     overflow: hidden;
+    background: rgba(255, 255, 255, 0.7);
 }
 
 .brand {
@@ -25,7 +21,6 @@
     width: 100px;
     height: 100px;
     border-radius: 50%;
-    float: left;
     overflow: hidden;
     position: absolute;
     text-align: center;
@@ -55,7 +50,6 @@
 }
 
 /*  Para alineación vertical dentro de las bolas    */
-
 .circle:before {
   content: '';
   display: inline-block;
@@ -120,11 +114,20 @@
 .coord {
     position: absolute;
     text-align: center;
-    text-shadow: 0 0 1px #fff, 0 2px 4px rgba(0,0,0,1);
     font-style: normal;
     color: #fff;
-    font-weight: bold;
     font-family: 'Open Sans', Arial, sans-serif;
+}
+
+.date-coord {
+    text-align: center;
+    width: 100px;
+    background-color: rgba(0, 0, 0, 0.8);
+    border-radius: 5%;
+}
+
+.date-today {
+    position:absolute;
 }
 
 /*  Para alineacion vertical de la coordenada "from"    */
@@ -136,36 +139,41 @@
     visibility: hidden;
 }
 
-canvas {
-    background: #FFFFFF;
-    z-index: -1;
+div.zoom {
+    cursor: pointer;
 }
 
 #zoom-out {
     top: 10px;
-    left: 30px;
-    position: absolute;
-}
-#zoom-in {
-    top: 10px;
-    left: 10px;
+    left: 100px;
     position: absolute;
 }
 
-.sidebar-elem-glimpse {
-    margin: 5px;
+#zoom-in {
+    top: 10px;
+    left: 120px;
+    position: absolute;
+}
+
+.label-glimpse {
+    margin-top: 5px;
     display: block; 
+    cursor: pointer;
 }
 
 .label-hidden {
-        box-shadow: inset 0 0 0 8px rgba(0,0,0,0.5);
+        box-shadow: inset 0 0 8px 8px rgba(0,0,0,0.7);
     -webkit-box-shadow: inset 0 0 8px 8px rgba(0,0,0,0.7);
 }
 
 .compose-text {
-     width: 100%; 
-     resize: vertical; 
-     height: 22px; 
-     min-height: 22px;
-     max-height: 66px;
+    width: 100%;
+    resize: vertical;
+    height: 22px;
+    min-height: 22px;
+    max-height: 66px;
+}
+
+#labels {
+    margin-top: 25px;
 }
