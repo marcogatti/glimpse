@@ -147,12 +147,15 @@ namespace Glimpse.Controllers
 
             foreach (LabelEntity label in labels)
             {
-                returnLabels.Add(new
+                if (label.SystemName == null)
                 {
-                    name = label.Name,
-                    system_name = label.SystemName,
-                    mail_account = label.MailAccountEntity.Id
-                });
+                    returnLabels.Add(new
+                    {
+                        name = label.Name,
+                        system_name = label.SystemName,
+                        mail_account = label.MailAccountEntity.Id
+                    });
+                }
             }
             return returnLabels;
         }

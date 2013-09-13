@@ -79,7 +79,7 @@ function setLabelSelection() {
 
 function populateLabelColors() {
 
-    var RGBaColors = [
+    var glimpseColors = [
 
     //  algunos de los colores de Gmail
     "rgb(251, 76, 47)",   //  rojo
@@ -99,7 +99,7 @@ function populateLabelColors() {
 
         if (labelColors.hasOwnProperty(label)) {
 
-            var currentColor = RGBaColors[i],
+            var currentColor = glimpseColors[i],
                 labelItem = $("<li class='label label-glimpse' style = 'background-color: " + currentColor + "'>" + label + "</li>");
 
             labelColors[label] = currentColor;
@@ -337,6 +337,14 @@ function fetchMailsAsync() {
                     classes += " new";
                 }
 
+                var label;
+
+                if (value.labels[0] !== undefined) {
+                    label = value.labels[0].name;
+                } else {
+                    label = "";
+                }
+
                 var dataAttributes = [
                     " data-id=", value.id,
                     " data-tid=", value.tid,
@@ -344,7 +352,7 @@ function fetchMailsAsync() {
                     " data-date=", date,
                     " data-from=", value.from.address,
                     " data-bodypeek=", value.bodypeek,
-                    " data-label=", value.labels[0].name,
+                    " data-label=", label,
                     " data-age=", value.age
                 ];
 
