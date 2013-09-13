@@ -88,10 +88,10 @@ function populateLabelColors() {
     "rgb(73, 134, 231)",  //  azul
 
     //  otros
-    "Crimson",
     "LimeGreen",
-    "Indigo",
-    "LightSeaGreen"
+    "LightSeaGreen",
+    "Crimson",
+    "Indigo"
     ];
 
     var i = 0;
@@ -118,11 +118,27 @@ function calculateEmailsColor() {
 
     $(".circle").each(function () {
 
-        var color = labelColors[$(this).data('label')];
+        var innerColor,
+            ringColor,
+            outsetColor,
+            shadow;
+
+        if ($(this).data('label0') !== "") {
+            innerColor = labelColors[$(this).data('label0')];
+        }
+        if ($(this).data('label1') !== "") {
+            ringColor = labelColors[$(this).data('label1')];
+            shadow = 'inset 0 0 0 12px ' + ringColor;
+        }
+        if ($(this).data('label2') !== "") {
+            outsetColor = labelColors[$(this).data('label2')];
+            shadow += ', 0 0 0 8px ' + outsetColor;
+        }
 
         $(this).css({
-            'color': color,
-            'background-color': color
+            'color': innerColor,
+            'background-color': innerColor,
+            '-webkit-box-shadow': shadow,
         });
     })
 }
@@ -337,13 +353,18 @@ function fetchMailsAsync() {
                     classes += " new";
                 }
 
-                var label;
+                var label0, label1, label2;
 
                 if (value.labels[0] !== undefined) {
-                    label = value.labels[0].name;
-                } else {
-                    label = "";
+                    label0 = value.labels[0].name;
                 }
+                if (value.labels[1] !== undefined) {
+                    label1 = value.labels[1].name;
+                }
+                if (value.labels[2] !== undefined) {
+                    label2 = value.labels[2].name;
+                }
+
 
                 var dataAttributes = [
                     " data-id=", value.id,
@@ -352,7 +373,9 @@ function fetchMailsAsync() {
                     " data-date=", date,
                     " data-from=", value.from.address,
                     " data-bodypeek=", value.bodypeek,
-                    " data-label=", label,
+                    " data-label0=", label0,
+                    " data-label1=", label1,
+                    " data-label2=", label2,
                     " data-age=", value.age
                 ];
 
