@@ -78,7 +78,7 @@ namespace Glimpse.Controllers
             }
             catch (Exception)
             {
-                return Json(new { success = false }, JsonRequestBehavior.AllowGet);
+                return Json(new { success = false, address = sendInfo.ToAddress }, JsonRequestBehavior.AllowGet);
             }
 
             return Json(new { success = true }, JsonRequestBehavior.AllowGet);

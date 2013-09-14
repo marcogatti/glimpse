@@ -427,13 +427,13 @@ function resetComposeDialog() {
     $("#email-subject").val("");
 }
 
-function mailSentCorrectly(toAddres) {
-    alert("Mail enviado correctamente a " + toAddres + ".");
+function mailSentCorrectly(data, textStatus, jqXHR) {
+    alert("Mail enviado correctamente a " + data.address + ".");
     resetComposeDialog();
 }
 
 function mailFailedToSend(jqXHR, textStatus, errorThrown) {
-    alert("Falló el envío del mail, por favor intentelo nuevamente más tarde. Error: " + errorThrown);
+    alert("Falló el envío del mail, por favor intentelo nuevamente más tarde.");
 }
 
 function sendEmailAsync(toAddres, subject, body) {
@@ -448,8 +448,8 @@ function sendEmailAsync(toAddres, subject, body) {
         type: "POST",
         url: "async/sendEmail",
         dataType: 'json',
-        success: function (toAddres) {
-            mailSentCorrectly(toAddres)
+        success: function (data, textStatus, jqXHR) {
+            mailSentCorrectly(data, textStatus, jqXHR)
         },
         error: function (jqXHR, textStatus, errorThrown) {
             mailFailedToSend(jqXHR, textStatus, errorThrown)
