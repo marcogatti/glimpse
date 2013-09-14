@@ -107,8 +107,8 @@ function populateLabelColors() {
             $("#labels-header").append(labelItem);
 
             i++;
-        }  
-       
+        }
+
     }
 
     setLabelSelection();
@@ -406,6 +406,23 @@ function fetchMailsAsync() {
     });
 }
 
+
+function resetComposeDialog() {
+    $("#compose_pannel").dialog("close");
+    editor.setData("");
+    $("#email-to").val("");
+    $("#email-subject").val("");
+}
+
+function mailSentCorrectly(toAddres) {
+    alert("Mail enviado correctamente a " + toAddres + ".");
+    resetComposeDialog();
+}
+
+function mailFailedToSend(jqXHR, textStatus, errorThrown) {
+    alert("Falló el envío del mail, por favor intentelo nuevamente más tarde. Error: " + errorThrown);
+}
+
 function sendEmailAsync(toAddres, subject, body) {
 
     var sendInfo = {
@@ -417,12 +434,12 @@ function sendEmailAsync(toAddres, subject, body) {
     $.ajax({
         type: "POST",
         url: "async/sendEmail",
-        dataType: 'application/json; charset=utf-8',
+        dataType: 'json',
         success: function (toAddres) {
-                alert("Mail enviado correctamente a " + toAddres + ".");
+            mailSentCorrectly(toAddres)
         },
-        error: function (a,b,c) {
-            alert("Falló el envío del mail, por favor intentelo nuevamente más tarde.");
+        error: function (jqXHR, textStatus, errorThrown) {
+            mailFailedToSend(jqXHR, textStatus, errorThrown)
         },
         data: sendInfo
     });
@@ -439,7 +456,7 @@ function prepareComposeDialog() {
         minWidth: 400,
         minHeight: 200,
         resizable: true,
-        title:"Redacta un email",
+        title: "Redacta un email",
         position: { my: "left botton", at: "left bottom", of: window },
         buttons: [
         {
@@ -452,7 +469,6 @@ function prepareComposeDialog() {
             text: "Enviar",
             click: function () {
                 sendEmailAsync($("#email-to").val(), $("#email-subject").val(), editor.getData());
-                $(this).dialog("close");
             }
         }
         ]
