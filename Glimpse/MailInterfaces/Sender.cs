@@ -33,7 +33,10 @@ namespace Glimpse.MailInterfaces
         {
             this.checkRecipients(recipients);
             SmtpMessage newMail = new SmtpMessage();
-            if (this.senderName != null) newMail.From = new Address(this.senderAddress, this.senderName);
+            if (this.senderName != null)
+                newMail.From = new Address(this.senderAddress, this.senderName);
+            else
+                newMail.From = new Address(this.senderAddress);
 
             newMail.BodyHtml.Text = bodyHTML;
             newMail.BodyHtml.ContentTransferEncoding = ContentTransferEncoding.QuotedPrintable;
@@ -47,8 +50,8 @@ namespace Glimpse.MailInterfaces
 
             newMail.Subject = subject;
             newMail.To = recipients;
-            newMail.Cc = CC;
-            newMail.Bcc = BCC;
+            newMail.Cc = CC ?? new AddressCollection();
+            newMail.Bcc = BCC ?? new AddressCollection();
 
             if (attachments != null)
                 foreach (Attachment attachment in attachments)

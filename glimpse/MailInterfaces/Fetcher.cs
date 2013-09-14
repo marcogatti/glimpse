@@ -153,7 +153,8 @@ namespace Glimpse.MailInterfaces
                     retrievedMail.BodyPeek = retrievedMessage.BodyText.Text.Substring(0, 125);
                 else
                     retrievedMail.BodyPeek = retrievedMessage.BodyText.Text.Substring(0, retrievedMessage.BodyText.Text.Length);
-                retrievedMail.BodyPeek = retrievedMail.BodyPeek.Replace("\\r\\n", " ");
+                retrievedMail.BodyPeek = retrievedMail.BodyPeek.Replace("\\n", " ");
+                retrievedMail.BodyPeek = retrievedMail.BodyPeek.Replace("\\r", String.Empty);
                 retrievedMail.From = fromAddress;
 
                 Boolean unknownPartsHaveAttachments = false;

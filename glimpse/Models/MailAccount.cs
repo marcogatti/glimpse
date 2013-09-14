@@ -122,8 +122,8 @@ namespace Glimpse.Models
         public void sendMail(String toAddress, String body, String subject)
         {
             AddressCollection recipients = new AddressCollection();
-
-            recipients.Add(toAddress, "");
+            ActiveUp.Net.Mail.Address address = new ActiveUp.Net.Mail.Address(toAddress);
+            recipients.Add(address);
 
             this.mySender.sendMail(recipients, body, subject);
         }
