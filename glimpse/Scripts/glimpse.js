@@ -63,13 +63,17 @@ function drawGrid() {
     drawBoard();
 }
 
+function hasLabel(circle, label) {
+    return ([circle.data("label0"), circle.data("label1"), circle.data("label2")].indexOf(label) != -1);
+}
+
 function setLabelSelection() {
     $(".label-glimpse").on('click', function () {
         $(this).toggleClass('label-hidden');
         var currentLabel = $(this).html();
 
         $(".circle").each(function () {
-            if ($(this).data("label") === currentLabel) {
+            if (hasLabel($(this), currentLabel)) {
                 $(this).toggleClass("hidden");
             }
         });
