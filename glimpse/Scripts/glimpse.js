@@ -184,7 +184,7 @@ function zoom(factor, zoomPoint) {
         minAge += offset;
     }
 
-    setDateCoord();
+    setDateCoords();
     calculateEmailsPosition();
 }
 
@@ -236,7 +236,7 @@ function setDragging() {
     $(document)
     .mouseup(function () {
         $(window).unbind("mousemove");
-        setDateCoord();
+        setDateCoords();
     });
 }
 
@@ -244,17 +244,25 @@ function setDateCoordsPosition() {
     $(".date-coord").css("top", function () {
         return parseInt(containerHeight(), 10) - parseInt($(".date-coord").css("line-height"), 10) + 'px';
     });
-
-    $("#date-today").tooltip({ placement: top });
-    $("#date-today").tooltip("show");
+    $("#date-last").css("left", function () {
+        return parseInt(containerWidth(), 10) - parseInt($("#date-last").css("width")) + 'px';
+    });
 }
 
-function setDateCoord() {
-    var now = new Date().getTime();
-    var jsMinAge = Math.floor(minAge / 10000);
-    var newDateToday = new Date(now - jsMinAge);
+function setDateCoords() {
+    var now = new Date().getTime(),
+        jsMinAge = Math.floor(minAge / 10000),
+        jsMaxAge = Math.floor(maxAge / 10000),
+        newDateToday = new Date(now - jsMinAge).toLocaleDateString(),
+        newDateLast = new Date(now - jsMaxAge).toLocaleDateString();
+
+    if (newDateToday === new Date().toLocaleDateString()) {
+        newDateToday = "Hoy";
+    }
     //  selector mágico
-    $("#date-today+div").find(".tooltip-inner").html(newDateToday.toLocaleDateString());
+    //$("#date-today+div").find(".tooltip-inner").html(newDateToday.toLocaleDateString());
+    $("#date-today").html(newDateToday);
+    $("#date-last").html(newDateLast);
 }
 
 function setModal() {
@@ -402,6 +410,7 @@ function fetchMailsAsync() {
         hideProgressBar();
         configureCircleHover();
         setModal();
+        setDateCoords();
 
     });
 }
