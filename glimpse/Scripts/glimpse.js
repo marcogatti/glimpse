@@ -79,21 +79,19 @@ function setLabelSelection() {
 
 function populateLabelColors() {
 
-    var RGBaColors = [
+    var glimpseColors = [
 
     //  algunos de los colores de Gmail
-    "rgba(251, 76, 47, 0.7)",   //  rojo
-    "rgba(22, 167, 101, 0.7)",  //  verde
-    "rgba(255, 173, 70, 0.7)",  //  naranja
-    "rgba(73, 134, 231, 0.7)",  //  azul
+    "rgb(251, 76, 47)",   //  rojo
+    "rgb(22, 167, 101)",  //  verde
+    "rgb(255, 173, 70)",  //  naranja
+    "rgb(73, 134, 231)",  //  azul
 
     //  otros
-    "rgba(255, 105, 0, 0.7)",
-    "rgba(32, 178, 170, 0.7)",
-    "rgba(160, 32, 240, 0.7)",
-    "rgba(50, 205, 50, 0.7",
-    "rgba(123, 104, 238, 0.7)",
-    "rgba(255, 99, 71, 0.7"
+    "LimeGreen",
+    "LightSeaGreen",
+    "Crimson",
+    "Indigo"
     ];
 
     var i = 0;
@@ -101,12 +99,12 @@ function populateLabelColors() {
 
         if (labelColors.hasOwnProperty(label)) {
 
-            var currentColor = RGBaColors[i],
+            var currentColor = glimpseColors[i],
                 labelItem = $("<li class='label label-glimpse' style = 'background-color: " + currentColor + "'>" + label + "</li>");
 
             labelColors[label] = currentColor;
             /* Armar listado de labels */
-            $("#labels").append(labelItem);
+            $("#labels-header").append(labelItem);
 
             i++;
         }  
@@ -120,11 +118,27 @@ function calculateEmailsColor() {
 
     $(".circle").each(function () {
 
-        var color = labelColors[$(this).data('label')];
+        var innerColor,
+            ringColor,
+            outsetColor,
+            shadow;
+
+        if ($(this).data('label0') !== "") {
+            innerColor = labelColors[$(this).data('label0')];
+        }
+        if ($(this).data('label1') !== "") {
+            ringColor = labelColors[$(this).data('label1')];
+            shadow = 'inset 0 0 0 12px ' + ringColor;
+        }
+        if ($(this).data('label2') !== "") {
+            outsetColor = labelColors[$(this).data('label2')];
+            shadow += ', 0 0 0 8px ' + outsetColor;
+        }
 
         $(this).css({
-            'color': color,
-            'background-color': color
+            'color': innerColor,
+            'background-color': innerColor,
+            '-webkit-box-shadow': shadow,
         });
     })
 }
@@ -202,7 +216,6 @@ function movePeriodShown(offset) {
         maxAge += offset;
     }
     calculateEmailsPosition();
-    setDateCoord();
 }
 
 function setDragging() {
@@ -220,9 +233,10 @@ function setDragging() {
         });
     });
 
-    $("body")
+    $(document)
     .mouseup(function () {
         $(window).unbind("mousemove");
+        setDateCoord();
     });
 }
 
@@ -339,6 +353,19 @@ function fetchMailsAsync() {
                     classes += " new";
                 }
 
+                var label0, label1, label2;
+
+                if (value.labels[0] !== undefined) {
+                    label0 = value.labels[0].name;
+                }
+                if (value.labels[1] !== undefined) {
+                    label1 = value.labels[1].name;
+                }
+                if (value.labels[2] !== undefined) {
+                    label2 = value.labels[2].name;
+                }
+
+
                 var dataAttributes = [
                     " data-id=", value.id,
                     " data-tid=", value.tid,
@@ -346,7 +373,9 @@ function fetchMailsAsync() {
                     " data-date=", date,
                     " data-from=", value.from.address,
                     " data-bodypeek=", value.bodypeek,
-                    " data-label=", value.labels[0].name,
+                    " data-label0=", label0,
+                    " data-label1=", label1,
+                    " data-label2=", label2,
                     " data-age=", value.age
                 ];
 
