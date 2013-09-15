@@ -121,5 +121,15 @@ namespace Glimpse.Tests
             Assert.False(labelMails[0].Entity.Seen);
             Assert.False(labelMails[0].Entity.Flagged);
         }
+
+        [Test]
+        public void Get_Mails_Between_UID_Works_Correctly()
+        {
+            List<Mail> retrievedMails = this.myFetcher.GetMailsBetweenUID("[Gmail]/Todos", 5, 20);
+
+            Assert.AreEqual(5, retrievedMails.Count);
+            Assert.AreEqual("Empieza a utilizar Google+", retrievedMails[0].Entity.Subject);
+            Assert.True(retrievedMails[4].Entity.Body.Contains("class=\"\">En este apartado"));
+        }
     }
 }

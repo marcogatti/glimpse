@@ -196,7 +196,9 @@
     <Compile Include="Controllers\AsyncMailsController.cs" />
     <Compile Include="DataAccessLayer\Entities\AddressEntity.cs" />
     <Compile Include="DataAccessLayer\Entities\ExtraEntity.cs" />
+    <Compile Include="DataAccessLayer\Entities\LogEntity.cs" />
     <Compile Include="DataAccessLayer\Entities\MailPerLabelEntity.cs" />
+    <Compile Include="DataAccessLayer\Mappings\LogMappingOverride.cs" />
     <Compile Include="DataAccessLayer\Mappings\ExtraMappingOverride.cs" />
     <Compile Include="DataAccessLayer\Entities\LabelEntity.cs" />
     <Compile Include="DataAccessLayer\Entities\MailEntity.cs" />
@@ -231,6 +233,7 @@
     <Compile Include="MailInterfaces\Sender.cs" />
     <Compile Include="Models\Address.cs" />
     <Compile Include="Models\Label.cs" />
+    <Compile Include="Models\Log.cs" />
     <Compile Include="Models\Mail.cs" />
     <Compile Include="Models\MailAccount.cs" />
     <Compile Include="Models\MailManager.cs" />
