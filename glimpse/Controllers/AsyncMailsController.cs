@@ -76,12 +76,12 @@ namespace Glimpse.Controllers
                 MailAccount mailAccount = GetCurrentMailAccount();
                 mailAccount.sendMail(sendInfo.ToAddress, sendInfo.Body, sendInfo.Subject);
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 return Json(new { success = false, address = sendInfo.ToAddress }, JsonRequestBehavior.AllowGet);
             }
 
-            return Json(new { success = true }, JsonRequestBehavior.AllowGet);
+            return Json(new { success = true, address = sendInfo.ToAddress }, JsonRequestBehavior.AllowGet);
         }
 
 

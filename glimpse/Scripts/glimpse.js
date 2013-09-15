@@ -427,12 +427,17 @@ function resetComposeDialog() {
     $("#email-subject").val("");
 }
 
-function mailSentCorrectly(data, textStatus, jqXHR) {
-    alert("Mail enviado correctamente a " + data.address + ".");
-    resetComposeDialog();
+function mailSendingConnectionOK(data, textStatus, jqXHR) {
+
+    if (data.success == true) {
+        alert('Mail enviado correctamente a ' + data.address + '.');
+        resetComposeDialog();
+    } else {
+        alert('Falló el envío del mail a "' + data.address + '". Verifica la dirección de correo.');
+    }
 }
 
-function mailFailedToSend(jqXHR, textStatus, errorThrown) {
+function mailSendingConnectionFailed(jqXHR, textStatus, errorThrown) {
     alert("Falló el envío del mail, por favor intentelo nuevamente más tarde.");
 }
 
@@ -449,10 +454,10 @@ function sendEmailAsync(toAddres, subject, body) {
         url: "async/sendEmail",
         dataType: 'json',
         success: function (data, textStatus, jqXHR) {
-            mailSentCorrectly(data, textStatus, jqXHR)
+            mailSendingConnectionOK(data, textStatus, jqXHR)
         },
         error: function (jqXHR, textStatus, errorThrown) {
-            mailFailedToSend(jqXHR, textStatus, errorThrown)
+            mailSendingConnectionFailed(jqXHR, textStatus, errorThrown)
         },
         data: sendInfo
     });

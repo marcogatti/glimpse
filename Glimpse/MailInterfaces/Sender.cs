@@ -33,31 +33,60 @@ namespace Glimpse.MailInterfaces
         {
             this.checkRecipients(recipients);
             SmtpMessage newMail = new SmtpMessage();
+
+            SetMailSender(newMail);
+
+            SetMailBody(bodyHTML, newMail);
+
+            SetMailRecipients(recipients, subject, CC, BCC, newMail);
+
+            SetMailAttachments(attachments, newMail);
+
+            newMail.SendSsl("smtp.gmail.com", 465, this.senderAddress, this.password, SaslMechanism.Login);
+        }
+
+        private static void SetMailAttachments(AttachmentCollection attachments, SmtpMessage newMail)
+        {
+            if (attachments != null)
+                foreach (Attachment attachment in attachments)
+                    newMail.Attachments.Add(attachment);
+        }
+
+        private void SetMailSender(SmtpMessage newMail)
+        {
             if (this.senderName != null)
                 newMail.From = new Address(this.senderAddress, this.senderName);
             else
                 newMail.From = new Address(this.senderAddress);
+        }
 
-            newMail.BodyHtml.Text = bodyHTML;
-            newMail.BodyHtml.ContentTransferEncoding = ContentTransferEncoding.QuotedPrintable;
-            newMail.BodyHtml.Charset = "ISO-8859-1";
-            newMail.BodyHtml.Format = BodyFormat.Html;
-
-            newMail.BodyText.Text = newMail.BodyHtml.TextStripped;
-            newMail.BodyText.ContentTransferEncoding = ContentTransferEncoding.QuotedPrintable;
-            newMail.BodyText.Charset = "ISO-8859-1";
-            newMail.BodyText.Format = BodyFormat.Text;
-
+        private static void SetMailRecipients(AddressCollection recipients, String subject, AddressCollection CC, AddressCollection BCC, SmtpMessage newMail)
+        {
             newMail.Subject = subject;
             newMail.To = recipients;
             newMail.Cc = CC ?? new AddressCollection();
             newMail.Bcc = BCC ?? new AddressCollection();
+        }
 
-            if (attachments != null)
-                foreach (Attachment attachment in attachments)
-                    newMail.Attachments.Add(attachment);
+        private static void SetMailBody(String bodyHTML, SmtpMessage newMail)
+        {
+            if (bodyHTML != null)
+            {
+                newMail.BodyHtml.Text = bodyHTML;
+                newMail.BodyText.Text = newMail.BodyHtml.TextStripped;
+            }
+            else
+            {
+                newMail.BodyHtml.Text = newMail.BodyText.Text = " ";
+            }
 
-            newMail.SendSsl("smtp.gmail.com", 465, this.senderAddress, this.password, SaslMechanism.Login);
+            newMail.BodyHtml.ContentTransferEncoding = ContentTransferEncoding.QuotedPrintable;
+            newMail.BodyHtml.Charset = "ISO-8859-1";
+            newMail.BodyHtml.Format = BodyFormat.Html;
+
+            newMail.BodyText.ContentTransferEncoding = ContentTransferEncoding.QuotedPrintable;
+            newMail.BodyText.Charset = "ISO-8859-1";
+            newMail.BodyText.Format = BodyFormat.Text;
         }
 
         private void checkRecipients(AddressCollection recipients)
