@@ -31,15 +31,9 @@ namespace Glimpse.Models
             return foundMails;
         }
 
-        public void Save()
+        public void Save(ISession session)
         {
-            ISession session = NHibernateManager.OpenSession();
-            ITransaction tran = session.BeginTransaction();
-
-            session.SaveOrUpdate(this);
-
-            tran.Commit();
-            session.Close();
+            session.SaveOrUpdate(this.Entity);
         }
 
         private void Clone(MailEntity from)
@@ -67,6 +61,24 @@ namespace Glimpse.Models
             this.Entity.CC = from.CC;
             this.Entity.BCC = from.BCC;
             this.Entity.Body = from.Body;
+        }
+
+        public static MailEntity ReadMail(Int64 id, MailAccount mailAccount, ISession session)
+        {
+            ITransaction tran = session.BeginTransaction();
+
+            MailEntity mail = session.CreateCriteria<MailEntity>()
+                                 .Add(Restrictions.Eq("MailAccountEntity", mailAccount.Entity))
+                                 .Add(Restrictions.Eq("Id", id))
+                                 .UniqueResult<MailEntity>();
+
+            mail.Seen = true;
+
+            new Mail(mail).Save(session);
+
+            tran.Commit();
+
+            return mail;
         }
     }
 }

@@ -48,11 +48,10 @@ namespace Glimpse.Controllers
             try
             {
                 ISession session = NHibernateManager.OpenSession();
-                MailAccount mailAccount = GetCurrentMailAccount();
-                MailEntity mail = session.CreateCriteria<MailEntity>()
-                                     .Add(Restrictions.Eq("MailAccountEntity", mailAccount.Entity))
-                                     .Add(Restrictions.Eq("Id", id))
-                                     .UniqueResult<MailEntity>();
+
+                MailAccount currentMailAccount = GetCurrentMailAccount();
+
+                MailEntity mail = Mail.ReadMail(id, currentMailAccount, session);
 
                 JsonResult result = Json(new { success = true, body = mail.Body }, JsonRequestBehavior.AllowGet);
 
@@ -61,7 +60,7 @@ namespace Glimpse.Controllers
 
                 return result;
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 //Log exception
                 return Json(new { success = false, message = "Error al obtener el cuerpo del mail." }, JsonRequestBehavior.AllowGet);
