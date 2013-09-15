@@ -44,7 +44,7 @@ namespace Glimpse.Models
                 return new MailAccount(account);
         }
 
-        public Int32 getLastUIDFrom(String mailbox)
+        public Int32 getLastUIDExternalFrom(String mailbox)
         {
             return this.myFetcher.GetLastUIDFrom(mailbox);
         }
@@ -171,6 +171,16 @@ namespace Glimpse.Models
             tran.Commit();
 
             return mail;
+        }
+
+        public Int64 GetLastUIDLocalFromALL(ISession session)
+        {
+            Int64 lastDatabaseUID = session.CreateCriteria<MailEntity>()
+                                      .Add(Restrictions.Eq("MailAccountEntity", this.Entity))
+                                      .SetProjection(Projections.Max("UidInbox"))
+                                      .UniqueResult<Int64>();
+
+            return lastDatabaseUID;
         }
     }
 }

@@ -234,6 +234,7 @@
     <Compile Include="Models\Mail.cs" />
     <Compile Include="Models\MailAccount.cs" />
     <Compile Include="Models\MailManager.cs" />
+    <Compile Include="Exceptions\CommonExceptions\NotUniqueResultException.cs" />
     <Compile Include="ViewModels\LabelViewModel.cs" />
     <Compile Include="ViewModels\MailSentViewModel.cs" />
     <Compile Include="ViewModels\UserViewModel.cs" />
@@ -489,7 +490,6 @@
     <Content Include="Views\Home\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Exceptions\CommonExceptions\" />
     <Folder Include="Exceptions\ModelsExceptions\" />
   </ItemGroup>
   <ItemGroup>
