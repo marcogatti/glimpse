@@ -45,12 +45,12 @@ namespace Glimpse.MailInterfaces
             Mailbox targetMailbox = this.GetMailbox(mailbox);
             return targetMailbox.MessageCount;
         }
-        public Int32 getMailUID(String mailbox, Int64 gmMailID)
+        public Int32 getMailUID(String mailbox, UInt64 gmMailID)
         {
             this.GetMailbox(mailbox); //Se asegura que se encuentra seleccionado el mailbox en IMAP
             return Int32.Parse(this.CleanIMAPResponse(this.receiver.Command("UID SEARCH X-GM-MSGID " + gmMailID.ToString()), "SEARCH", false));
         }
-        public byte[] GetAttachmentFromMail(String mailbox, Int64 gmMailID, String attachmentName)
+        public byte[] GetAttachmentFromMail(String mailbox, UInt64 gmMailID, String attachmentName)
         {
             Mailbox targetMailbox = this.GetMailbox(mailbox);
             Int32 mailUID = this.getMailUID(mailbox, gmMailID);
@@ -187,38 +187,38 @@ namespace Glimpse.MailInterfaces
             return mailsFromMailbox;
         }
 
-        public void archiveMail(Int64 gmMailID)
+        public void archiveMail(UInt64 gmMailID)
         {
             this.removeMailTag("INBOX", gmMailID);
         }
-        public void removeMailTag(String mailbox, Int64 gmMailID)
+        public void removeMailTag(String mailbox, UInt64 gmMailID)
         {
             Mailbox targetMailbox = this.GetMailbox(mailbox);
             Int32 mailUID = this.getMailUID(mailbox, gmMailID);
             targetMailbox.UidMoveMessage(mailUID, this.accountMailboxesBySpecialProperty["All"]);
             this.currentOpenedMailbox.MessageCount--;
         }
-        public void addMailTag(String mailbox, String tagToAdd, Int64 gmMailID)
+        public void addMailTag(String mailbox, String tagToAdd, UInt64 gmMailID)
         {
             Mailbox targetMailbox = this.GetMailbox(mailbox);
             Int32 mailUID = this.getMailUID(mailbox, gmMailID);
             targetMailbox.UidCopyMessage(mailUID, tagToAdd);
         }
-        public void moveToTrash(String mailbox, Int64 gmMailID)
+        public void moveToTrash(String mailbox, UInt64 gmMailID)
         {
             Mailbox targetMailbox = this.GetMailbox(mailbox);
             Int32 mailUID = this.getMailUID(mailbox, gmMailID);
             targetMailbox.UidMoveMessage(mailUID, this.accountMailboxesBySpecialProperty["Trash"]);
             this.currentOpenedMailbox.MessageCount--;
         }
-        public void removeFromTrash(String destinyMailbox, Int64 gmMailID)
+        public void removeFromTrash(String destinyMailbox, UInt64 gmMailID)
         {
             Mailbox targetMailbox = this.GetMailbox(this.accountMailboxesBySpecialProperty["Trash"]);
             Int32 mailUID = this.getMailUID(this.accountMailboxesBySpecialProperty["Trash"], gmMailID);
             targetMailbox.UidMoveMessage(mailUID, destinyMailbox);
             this.currentOpenedMailbox.MessageCount--;
         }
-        public void deleteFromTrash(Int64 gmMailID)
+        public void deleteFromTrash(UInt64 gmMailID)
         {
             Mailbox targetMailbox = this.GetMailbox(this.accountMailboxesBySpecialProperty["Trash"]);
             Int32 mailUID = this.getMailUID(this.accountMailboxesBySpecialProperty["Trash"], gmMailID);
@@ -226,7 +226,7 @@ namespace Glimpse.MailInterfaces
             this.currentOpenedMailbox.MessageCount--;
         }
 
-        public void setAnsweredFlag(String mailbox, Int64 gmMailID, Boolean isAnswered)
+        public void setAnsweredFlag(String mailbox, UInt64 gmMailID, Boolean isAnswered)
         {
             Mailbox targetMailbox = this.GetMailbox(mailbox);
             Int32 mailUID = this.getMailUID(mailbox, gmMailID);
@@ -235,7 +235,7 @@ namespace Glimpse.MailInterfaces
             else
                 targetMailbox.UidRemoveFlagsSilent(mailUID, new FlagCollection { "Answered" });
         }
-        public void setFlaggedFlag(String mailbox, Int64 gmMailID, Boolean isFlagged)
+        public void setFlaggedFlag(String mailbox, UInt64 gmMailID, Boolean isFlagged)
         {
             Mailbox targetMailbox = this.GetMailbox(mailbox);
             Int32 mailUID = this.getMailUID(mailbox, gmMailID);
@@ -244,7 +244,7 @@ namespace Glimpse.MailInterfaces
             else
                 targetMailbox.UidRemoveFlagsSilent(mailUID, new FlagCollection { "Flagged" });
         }
-        public void setDraftFlag(String mailbox, Int64 gmMailID, Boolean isDraft)
+        public void setDraftFlag(String mailbox, UInt64 gmMailID, Boolean isDraft)
         {
             Mailbox targetMailbox = this.GetMailbox(mailbox);
             Int32 mailUID = this.getMailUID(mailbox, gmMailID);
@@ -254,7 +254,7 @@ namespace Glimpse.MailInterfaces
             else
                 targetMailbox.UidRemoveFlagsSilent(mailUID, new FlagCollection { "Draft" });
         }
-        public void setSeenFlag(String mailbox, Int64 gmMailID, Boolean isSeen)
+        public void setSeenFlag(String mailbox, UInt64 gmMailID, Boolean isSeen)
         {
             Mailbox targetMailbox = this.GetMailbox(mailbox);
             Int32 mailUID = this.getMailUID(mailbox, gmMailID);
