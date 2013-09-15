@@ -134,9 +134,12 @@ function calculateEmailsColor() {
             ringColor = labelColors[$(this).data('label1')];
             shadow = 'inset 0 0 0 12px ' + ringColor;
         }
+
+        shadow += ', 0 0 0 8px ';
+
         if ($(this).data('label2') !== "") {
             outsetColor = labelColors[$(this).data('label2')];
-            shadow += ', 0 0 0 8px ' + outsetColor;
+            shadow += outsetColor;
         }
 
         $(this).css({
@@ -287,6 +290,7 @@ function setModal() {
         $.getJSON("async/GetMailBody/" + $(this).data("id"), function (data) {
             if (data.success == true) {
                 $(".modal-body").append("<div id='bodyhtml'>" + data.body + "</div>");
+                $(this).removeClass("new");
             } else alert(data.message);
         });
     });
@@ -307,7 +311,7 @@ function configureCircleHover() {
             //from.html(currentCircle.data("from"));
 
             dateTime.css("left", function () {
-                return currentCircle.css("left");
+                return parseInt(currentCircle.css("left")) - 25 + 'px';
             });
 
             //from.css("top", function () {
@@ -358,7 +362,7 @@ function fetchMailsAsync() {
                     maxAge = value.age;
                 }
 
-                var date = new Date(parseInt(value.date.substr(6))).toLocaleDateString(),
+                var date = new Date(parseInt(value.date.substr(6))).toGMTString(),
                     classes = "circle";
 
                 if (!value.seen) {
