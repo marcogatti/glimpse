@@ -92,5 +92,16 @@ namespace Glimpse.Models
             tran.Commit();
             session.Close();
         }
+
+        public List<MailEntity> GetMailsFrom(string tag, int amountOfEmails, ISession session)
+        {
+            List<MailEntity> mailList = (List<MailEntity>)session.CreateCriteria<MailEntity>()
+                                                .Add(Restrictions.Eq("MailAccountEntity", this.mailAccount.Entity))
+                                                .AddOrder(Order.Desc("Date"))
+                                                .SetMaxResults(amountOfEmails)
+                                                .List<MailEntity>();
+
+            return mailList;
+        }
     }
 }

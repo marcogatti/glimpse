@@ -92,7 +92,7 @@ namespace Glimpse.Controllers
             {
                 MailManager manager = new MailManager(mailAccount);
 
-                List<Mail> mails = manager.FetchFromMailbox("INBOX", session, amountOfEmails);
+                List<MailEntity> mails = manager.GetMailsFrom("INBOX", amountOfEmails, session);
 
                 return this.PrepareToSend(mails);
             }
@@ -102,35 +102,35 @@ namespace Glimpse.Controllers
             }
         }
 
-        private List<Object> PrepareToSend(List<Mail> mails)
+        private List<Object> PrepareToSend(List<MailEntity> mails)
         {
             List<Object> preparedMails = new List<Object>();
 
-            foreach (Mail mail in mails)
+            foreach (MailEntity mail in mails)
             {
 
-                Int64 currentAge = DateTime.Now.Ticks - mail.Entity.Date.Ticks;
+                Int64 currentAge = DateTime.Now.Ticks - mail.Date.Ticks;
 
-                List<Object> currentLabels = PrepareLabels(mail.Entity.Labels);
+                List<Object> currentLabels = PrepareLabels(mail.Labels);
 
                 Object anEmail = new
                 {
-                    id = mail.Entity.Id,
-                    subject = mail.Entity.Subject,
-                    date = mail.Entity.Date,
+                    id = mail.Id,
+                    subject = mail.Subject,
+                    date = mail.Date,
                     age = currentAge,
                     from = new
                     {
-                        address = mail.Entity.From.MailAddress,
-                        name = mail.Entity.From.Name
+                        address = mail.From.MailAddress,
+                        name = mail.From.Name
                     },
-                    to = mail.Entity.ToAddr,
-                    cc = mail.Entity.CC,
-                    bcc = mail.Entity.BCC,
-                    bodypeek = mail.Entity.BodyPeek,
-                    tid = mail.Entity.Gm_tid,
-                    seen = mail.Entity.Seen,
-                    flagged = mail.Entity.Flagged,
+                    to = mail.ToAddr,
+                    cc = mail.CC,
+                    bcc = mail.BCC,
+                    bodypeek = mail.BodyPeek,
+                    tid = mail.Gm_tid,
+                    seen = mail.Seen,
+                    flagged = mail.Flagged,
                     labels = currentLabels
                 };
 

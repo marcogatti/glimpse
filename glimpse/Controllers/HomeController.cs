@@ -60,6 +60,8 @@ namespace Glimpse.Controllers
             foreach (LabelEntity label in accountLabels)
                 viewLabels.Add(new LabelViewModel(label.Name, label.SystemName));
 
+            MailsTasksHandler.StartSynchronization(mailAccount);
+
             ViewBag.Email = cookieMailAccount.Entity.Address;
             ViewBag.Labels = viewLabels;
 

@@ -227,6 +227,7 @@
     <Compile Include="MailInterfaces\Fetcher.cs" />
     <Compile Include="Exceptions\MailInterfacesExceptions\InvalidAttachmentException.cs" />
     <Compile Include="Exceptions\MailInterfacesExceptions\MailReadingOverflowException.cs" />
+    <Compile Include="MailInterfaces\MailsTasksHandler.cs" />
     <Compile Include="MailInterfaces\Sender.cs" />
     <Compile Include="Models\Address.cs" />
     <Compile Include="Models\Label.cs" />
