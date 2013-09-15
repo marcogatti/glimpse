@@ -1,4 +1,5 @@
 ﻿using Glimpse.DataAccessLayer;
+using Glimpse.DataAccessLayer.Entities;
 using Glimpse.Models;
 using NHibernate;
 using System;
@@ -38,12 +39,12 @@ namespace Glimpse.MailInterfaces
                 Label label = Label.FindBySystemName(mailAccount, "INBOX", session);
                 Int64 lastUidExternal = mailAccount.getLastUIDExternalFrom("INBOX"); //TODO: Deshardcodear
                 Int64 lastUidLocal = mailAccount.GetLastUIDLocalFromALL(session);
+                session.Close();
 
-                MailsTask task = new MailsTask(lastUidLocal, lastUidExternal, label, session);
+                MailsTask task = new MailsTask(lastUidLocal, lastUidExternal, label);
 
                 if (task.HasFinished)
-                {
-                    session.Close();
+                {       
                     return;
                 }
 
@@ -63,27 +64,35 @@ namespace Glimpse.MailInterfaces
         private static void SynchronizeAccount(MailAccount mailAccount, MailsTask task)
         {
             Int64 toUid, fromUid;
-            ISession currentSession = task.session;
 
-
-            toUid = task.NextUid;
-            fromUid = CalculateFromUid(toUid, task.UidLocal);
-
-            new MailManager(mailAccount).FetchAndSaveMails(task.Label, fromUid, toUid);
-
-            currentSession.Flush();
-
-            task.Dirty = true;
-
-            PrepareForNextRun(task, fromUid);
-
-            if (!task.HasFinished)
+            try
             {
-                StartMailsTask(mailAccount, task);
+                toUid = task.NextUid;
+                fromUid = CalculateFromUid(toUid, task.UidLocal);
+
+                mailAccount.FetchAndSaveMails(task.Label, fromUid, toUid);
+
+                //new MailManager(mailAccount).FetchAndSaveMails(task.Label, fromUid, toUid);
+
+                task.Dirty = true;
+
+                PrepareForNextRun(task, fromUid);
+
+                if (!task.HasFinished)
+                {
+                    StartMailsTask(mailAccount, task);
+                }
+                else
+                {
+                    EndSynchronization(mailAccount, task);
+                }
             }
-            else
+            catch (Exception exc)
             {
                 EndSynchronization(mailAccount, task);
+
+                Log logger = new Log(new LogEntity(003, "Error generico SynchronizeAccount. Parametros: mailAddress(" + mailAccount.Entity.Address + ").", exc.StackTrace));
+                logger.Save();
             }
         }
 
@@ -125,7 +134,6 @@ namespace Glimpse.MailInterfaces
         internal Int64 UidLocal { get; set; }
         internal Int64 NextUid { get; set; }
         internal Label Label { get; set; }
-        internal ISession session { get; set; }
 
         public bool IsWorking
         {
@@ -146,12 +154,11 @@ namespace Glimpse.MailInterfaces
 
 
 
-        public MailsTask(Int64 lastUidLocal, Int64 lastUidExternal, Label label, ISession session)
+        public MailsTask(Int64 lastUidLocal, Int64 lastUidExternal, Label label)
         {
             this.UidLocal = lastUidLocal;
             this.NextUid = this.UidExternal = lastUidExternal;
             this.Label = label;
-            this.session = session;
             this.Dirty = false;
             this._working = true;
         }

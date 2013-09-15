@@ -106,14 +106,7 @@ namespace Glimpse.Models
 
         public void FetchAndSaveMails(Label label, Int64 fromUid, Int64 toUid)
         {
-            /* CAMBIAR ESTOOOOO!!!*/
-
-            ISession session = NHibernateManager.OpenSession();
-
-            this.FetchFromMailbox("INBOX", session);
-
-            session.Flush();
-            session.Close();
+            this.mailAccount.FetchAndSaveMails(label, fromUid, toUid);
         }
     }
 }

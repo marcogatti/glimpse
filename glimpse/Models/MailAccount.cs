@@ -184,5 +184,45 @@ namespace Glimpse.Models
 
             return lastDatabaseUID;
         }
+
+        public void FetchAndSaveMails(Label label, Int64 fromUid, Int64 toUid)
+        {
+            List<Mail> mails = this.myFetcher.GetMailsBetweenUID(label.Entity.Name, (int)fromUid, (int)toUid);
+
+            foreach (Mail mail in mails)
+            {
+                mail.Entity.MailAccountEntity = this.Entity;
+            }
+
+            MailAccount.Save(mails);
+        }
+
+        private static void Save(List<Mail> mails)
+        {
+            ISession session = NHibernateManager.OpenSession();
+
+            ITransaction tran = session.BeginTransaction();
+
+            foreach (Mail mailToSave in mails)
+            {
+                Address foundAddress = Address.FindByAddress(mailToSave.Entity.From.MailAddress, session);
+
+                if (foundAddress.Entity == null)
+                {
+                    session.SaveOrUpdate(mailToSave.Entity.From);
+                }
+                else
+                {
+                    mailToSave.setFrom(foundAddress.Entity);
+                }
+
+                session.SaveOrUpdate(mailToSave.Entity);
+            }
+
+            tran.Commit();
+
+            session.Flush();
+            session.Close();
+        }
     }
 }

@@ -50,10 +50,10 @@ namespace Glimpse.Controllers
                 mailAccount.SaveOrUpdate();
                 mailAccount.UpdateLabels();
 
-                Session[MAIL_INTERFACE] = mailAccount;
-
                 new CookieHelper().addMailAddressCookie(mailAccount.Entity.Address);
                 FormsAuthentication.SetAuthCookie(user.Email, user.rememberMe);
+
+                MailsTasksHandler.StartSynchronization(mailAccount);
 
                 return RedirectToLocal(returnUrl);
             } 
