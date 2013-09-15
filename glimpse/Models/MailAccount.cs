@@ -154,5 +154,23 @@ namespace Glimpse.Models
             this.Entity.Address = fromAccount.Entity.Address;
             this.Entity.Password = fromAccount.Entity.Password;
         }
+
+        public Mail ReadMail(Int64 id, ISession session)
+        {
+            ITransaction tran = session.BeginTransaction();
+
+            MailEntity mailEntity = session.CreateCriteria<MailEntity>()
+                                 .Add(Restrictions.Eq("MailAccountEntity", this.Entity))
+                                 .Add(Restrictions.Eq("Id", id))
+                                 .UniqueResult<MailEntity>();
+            mailEntity.Seen = true;
+
+            Mail mail = new Mail(mailEntity);
+            mail.Save(session);
+
+            tran.Commit();
+
+            return mail;
+        }
     }
 }

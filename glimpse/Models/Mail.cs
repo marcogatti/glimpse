@@ -62,23 +62,5 @@ namespace Glimpse.Models
             this.Entity.BCC = from.BCC;
             this.Entity.Body = from.Body;
         }
-
-        public static MailEntity ReadMail(Int64 id, MailAccount mailAccount, ISession session)
-        {
-            ITransaction tran = session.BeginTransaction();
-
-            MailEntity mail = session.CreateCriteria<MailEntity>()
-                                 .Add(Restrictions.Eq("MailAccountEntity", mailAccount.Entity))
-                                 .Add(Restrictions.Eq("Id", id))
-                                 .UniqueResult<MailEntity>();
-
-            mail.Seen = true;
-
-            new Mail(mail).Save(session);
-
-            tran.Commit();
-
-            return mail;
-        }
     }
 }

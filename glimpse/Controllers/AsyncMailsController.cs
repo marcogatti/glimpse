@@ -51,9 +51,9 @@ namespace Glimpse.Controllers
 
                 MailAccount currentMailAccount = GetCurrentMailAccount();
 
-                MailEntity mail = Mail.ReadMail(id, currentMailAccount, session);
+                Mail mail = currentMailAccount.ReadMail(id, session);
 
-                JsonResult result = Json(new { success = true, body = mail.Body }, JsonRequestBehavior.AllowGet);
+                JsonResult result = Json(new { success = true, body = mail.Entity.Body }, JsonRequestBehavior.AllowGet);
 
                 session.Flush();
                 session.Close();
