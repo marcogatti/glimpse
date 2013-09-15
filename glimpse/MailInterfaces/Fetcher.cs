@@ -264,19 +264,25 @@ namespace Glimpse.MailInterfaces
                 thisFlags = targetMailbox.Fetch.Flags(mailOrdinal).Merged;
 
             }
-            catch (Imap4Exception)
+            catch (Imap4Exception exc)
             {
                 //Excepcion de MailSystem contra IMAP
+                Log logger = new Log(new LogEntity(001, "Error de MailSystem contra IMAP. Parametros del mail: mailbox("+targetMailbox.Name+"), ordinalMail("+mailOrdinal+").", exc.StackTrace));
+                logger.Save();
                 return null;
             }
-            catch (FormatException)
+            catch (FormatException exc)
             {
                 //Excepcion intentado parsear la respuesta de imap a Int64
+                Log logger = new Log(new LogEntity(001, "Error parseando la respuesta de imap a Int64. Parametros del mail: mailbox(" + targetMailbox.Name + "), ordinalMail(" + mailOrdinal + ").", exc.StackTrace));
+                logger.Save();
                 return null;
             }
-            catch (Exception)
+            catch (Exception exc)
             {
                 //Cualquier otra excepcion
+                Log logger = new Log(new LogEntity(001, "Error generico. Parametros del mail: mailbox(" + targetMailbox.Name + "), ordinalMail(" + mailOrdinal + ").", exc.StackTrace));
+                logger.Save();
                 return null;
             }
 

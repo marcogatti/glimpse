@@ -60,9 +60,11 @@ namespace Glimpse.Controllers
 
                 return result;
             }
-            catch (Exception e)
+            catch (Exception exc)
             {
                 //Log exception
+                Log logger = new Log(new LogEntity(002, "Error generico GetMailBody. Parametros del mail: idMail(" + id.ToString() + ").", exc.StackTrace));
+                logger.Save();
                 return Json(new { success = false, message = "Error al obtener el cuerpo del mail." }, JsonRequestBehavior.AllowGet);
             }
         }
@@ -75,14 +77,15 @@ namespace Glimpse.Controllers
                 MailAccount mailAccount = GetCurrentMailAccount();
                 mailAccount.sendMail(sendInfo.ToAddress, sendInfo.Body, sendInfo.Subject);
             }
-            catch (Exception e)
+            catch (Exception exc)
             {
+                Log logger = new Log(new LogEntity(002, "Error generico sendEmail. Parametros del mail: subjectMail(" + sendInfo.Subject + "), addressMail(" +sendInfo.ToAddress+").", exc.StackTrace));
+                logger.Save();
                 return Json(new { success = false, address = sendInfo.ToAddress }, JsonRequestBehavior.AllowGet);
             }
 
             return Json(new { success = true, address = sendInfo.ToAddress }, JsonRequestBehavior.AllowGet);
         }
-
 
         private List<Object> FetchMails(int amountOfEmails, ISession session)
         {

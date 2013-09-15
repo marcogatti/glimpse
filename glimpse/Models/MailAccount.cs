@@ -168,7 +168,7 @@ namespace Glimpse.Models
             Mail mail = new Mail(mailEntity);
             mail.Save(session);
 
-            this.myFetcher.setSeenFlag("[Gmail]/All",mail.Entity.Gm_mid, true);
+            this.myFetcher.setSeenFlag("[Gmail]/Todos",mail.Entity.Gm_mid, true);
 
             tran.Commit();
 
