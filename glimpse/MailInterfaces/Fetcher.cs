@@ -40,6 +40,12 @@ namespace Glimpse.MailInterfaces
             Int32 amountOfMails = targetMailbox.MessageCount;
             return targetMailbox.Fetch.Uid(amountOfMails);
         }
+        public Int32 GetFirstUIDFrom(String mailbox)
+        {
+            Mailbox targetMailbox = this.GetMailbox(mailbox);
+            return targetMailbox.Fetch.Uid(1);
+        }
+
         public Int32 GetAmountOfMailsFrom(String mailbox)
         {
             Mailbox targetMailbox = this.GetMailbox(mailbox);
