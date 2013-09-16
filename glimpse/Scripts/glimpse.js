@@ -272,12 +272,17 @@ function setDateCoords() {
     $("#date-last").html(newDateLast);
 }
 
+function markAsRead(circle) {
+    circle.removeClass("new");
+}
+
 function setModal() {
 
     $(".circle").on("click", function () {
 
         var from = 'From: ' + $(this).data("from"),
-            subject = $(this).data("subject");
+            subject = $(this).data("subject"),
+            currentCircle = $(this);
 
         $(".modal-body").find("h4").html(from);
         $(".modal-header").find("h3").html(subject);
@@ -285,11 +290,12 @@ function setModal() {
         $(".modal-body").find("#bodyhtml").html("");
         showProgressBar("#body-progress");
 
-        $.getJSON("async/GetMailBody/" + $(this).data("id"), function (data) {
+        $.getJSON("async/GetMailBody/" + currentCircle.data("id"), function (data) {
             if (data.success == true) {
                 hideProgressBar("#body-progress");
                 $(".modal-body").find("#bodyhtml").html(data.body);
-                //$(this).removeClass("new");
+                markAsRead(currentCircle);
+
             } else alert(data.message);
         });
     });
