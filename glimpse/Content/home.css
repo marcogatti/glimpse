@@ -34,6 +34,7 @@ hr {
     text-align: center;
     text-shadow: 0 0 1px #fff, 0 1px 2px rgba(0,0,0,1);
     opacity: 0.85;
+    cursor: pointer;
 
     /*  Color de emails sin etiqueta    */
     color: rgb(159, 182, 205);
@@ -80,6 +81,10 @@ hr {
 }
 /*  */
 
+    .centered .pre {
+        font-size: xx-small;
+    }
+
 .circle.new {
 
     /*-webkit-box-shadow: inset 0 0 0 8px rgba(255,255,255,1), 0 0 0 8px;*/
@@ -110,6 +115,18 @@ hr {
     z-index: +10;
     text-shadow: 0 0 1px #fff, 0 2px 4px rgba(0,0,0,1);
 }
+
+.circle.preview {
+    transform: scale(1.5);
+    -webkit-transform: scale(1.5);
+}
+
+    .circle.preview p {
+        font-size: small;
+    }
+    .circle.preview .pre {
+        font-size: xx-small;
+    }
 
 @-webkit-keyframes blink {
     from {

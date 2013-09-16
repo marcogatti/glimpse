@@ -35,12 +35,72 @@
         " data-age=", value.age
     ];
 
-    var newCircle = $("<a data-toggle='modal' href='#example' title=" + value.from.address + "><div class='" + classes + "'" +
+    var newCircle = $("<div class='" + classes + "'" +
                         dataAttributes.join("'") +
-                        "'><div class='centered'><p>" + value.subject + "</p></div></div></a>");
+                        "'><div class='centered'><p>" + value.subject + "</p></div></div>");
 
     $("#email-container").append(newCircle);
 
+}
+
+//function setModal() {
+
+//    $(".circle").click(function () {
+//        var from = 'From: ' + $(this).data("from"),
+//            subject = $(this).data("subject"),
+//            currentCircle = $(this);
+
+//        $(".modal-body").find("h4").html(from);
+//        $(".modal-header").find("h3").html(subject);
+
+//        $(".modal-body").find("#bodyhtml").html("");
+//        showProgressBar("#body-progress");
+
+//        $("#body-modal").modal("show");
+
+//        $.getJSON("async/GetMailBody/" + currentCircle.data("id"), function (data) {
+//            if (data.success == true) {
+//                hideProgressBar("#body-progress");
+//                $(".modal-body").find("#bodyhtml").html(data.body);
+//                markAsRead(currentCircle);
+
+//            } else alert(data.message);
+//        });
+//    });
+//}
+
+function setCirclePre() {
+    $(".circle").click(
+        function () {
+            if (!isOnPreview($(this))) {
+                $(this).addClass("preview");
+                $(this).find(".centered").append("<div class='pre'>" + $(this).data("bodypeek") + "</div>");
+            } else {
+                $(this).find(".pre").remove();
+                $(this).removeClass("preview");
+                
+                var from = 'From: ' + $(this).data("from"),
+                    subject = $(this).data("subject"),
+                    currentCircle = $(this);
+
+                $(".modal-body").find("h4").html(from);
+                $(".modal-header").find("h3").html(subject);
+
+                $(".modal-body").find("#bodyhtml").html("");
+                showProgressBar("#body-progress");
+
+                $("#body-modal").modal("show");
+
+                $.getJSON("async/GetMailBody/" + currentCircle.data("id"), function (data) {
+                    if (data.success == true) {
+                        hideProgressBar("#body-progress");
+                        $(".modal-body").find("#bodyhtml").html(data.body);
+                        markAsRead(currentCircle);
+
+                    } else alert(data.message);
+                });
+            }
+        })
 }
 
 function fetchMailsAsync() {
@@ -68,7 +128,7 @@ function fetchMailsAsync() {
         calculateEmailsPosition();
         hideProgressBar("#circles-progress");
         configureCircleHover();
-        setModal();
+        setCirclePre();
         setDateCoords();
 
     });
