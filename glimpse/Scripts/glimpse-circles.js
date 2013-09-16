@@ -43,32 +43,6 @@
 
 }
 
-//function setModal() {
-
-//    $(".circle").click(function () {
-//        var from = 'From: ' + $(this).data("from"),
-//            subject = $(this).data("subject"),
-//            currentCircle = $(this);
-
-//        $(".modal-body").find("h4").html(from);
-//        $(".modal-header").find("h3").html(subject);
-
-//        $(".modal-body").find("#bodyhtml").html("");
-//        showProgressBar("#body-progress");
-
-//        $("#body-modal").modal("show");
-
-//        $.getJSON("async/GetMailBody/" + currentCircle.data("id"), function (data) {
-//            if (data.success == true) {
-//                hideProgressBar("#body-progress");
-//                $(".modal-body").find("#bodyhtml").html(data.body);
-//                markAsRead(currentCircle);
-
-//            } else alert(data.message);
-//        });
-//    });
-//}
-
 function setCirclePre() {
     $(".circle").click(
         function () {
@@ -112,18 +86,12 @@ function fetchMailsAsync() {
             $.each(data.mails, function (index, value) {
 
                 insertCircle(value);
-
-                /* Create labels */
-                for (var i = 0; i < value.labels.length; i++) {
-                    if (value.labels[i].system_name == null)
-                        labelColors[value.labels[i].name] = "";
-                }
             });
+
         } else alert(data.message);
 
     }).done(function () {
 
-        populateLabelColors();
         calculateEmailsColor();
         calculateEmailsPosition();
         hideProgressBar("#circles-progress");

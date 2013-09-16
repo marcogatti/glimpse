@@ -81,21 +81,17 @@ function populateLabelColors() {
     ];
 
     var i = 0;
-    for (var label in labelColors) {
+    $("#labels-header").children(".label").each(function () { 
+    
+        var currentColor = glimpseColors[i];
 
-        if (labelColors.hasOwnProperty(label)) {
-
-            var currentColor = glimpseColors[i],
-                labelItem = $("<li class='label label-glimpse' style = 'background-color: " + currentColor + "'>" + label + "</li>");
-
-            labelColors[label] = currentColor;
-            /* Armar listado de labels */
-            $("#labels-header").append(labelItem);
-
+        if($(this).data("system")){
+        } else{
+            $(this).css("background-color", currentColor);
+            labelColors[$(this).data("name")] = currentColor;
             i++;
         }
-
-    }
+    });
 
     setLabelSelection();
 }
