@@ -44,8 +44,14 @@
 <div id="example" class="modal hide fade in" style="display: none;">
     <div class="modal-header">
         <a class="close" data-dismiss="modal">×</a>
+        <h3>De: </h3>
     </div>
     <div class="modal-body">
+        <h4>Asunto</h4>
+        <div id="bodyhtml"></div>
+        <div id="body-progress" class="progress progress-striped active">
+            <div class="bar" style="width: 100%;">Cargando...</div>
+        </div>
     </div>
     <div class="modal-footer">
         <a href="#" class="btn btn-success">Call to action</a>
@@ -69,7 +75,7 @@
             </div>
             <!--/.well -->
 
-            <div class="progress progress-striped active">
+            <div id="circles-progress" class="progress progress-striped active">
                 <div class="bar" style="width: 100%;">Cargando...</div>
             </div>
 

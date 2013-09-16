@@ -276,21 +276,20 @@ function setModal() {
 
     $(".circle").on("click", function () {
 
-        var from = $('<h4>From: ' + $(this).data("from") + '</h4>'),
-            subject = $('<h3>' + $(this).data("subject") + '</h3>');
+        var from = 'From: ' + $(this).data("from"),
+            subject = $(this).data("subject");
 
-        $(".modal-body").find("h4").remove();
-        $(".modal-body").find("#bodyhtml").remove();
-        $(".modal-header").find("h3").remove();
+        $(".modal-body").find("h4").html(from);
+        $(".modal-header").find("h3").html(subject);
 
-        $(".modal-body").append(from);
-        $(".modal-header").append(subject);
+        $(".modal-body").find("#bodyhtml").html("");
+        showProgressBar("#body-progress");
 
-        /*  horrible, pero no encontré otra forma de hacerlo andar  */
         $.getJSON("async/GetMailBody/" + $(this).data("id"), function (data) {
             if (data.success == true) {
-                $(".modal-body").append("<div id='bodyhtml'>" + data.body + "</div>");
-                $(this).removeClass("new");
+                hideProgressBar("#body-progress");
+                $(".modal-body").find("#bodyhtml").html(data.body);
+                //$(this).removeClass("new");
             } else alert(data.message);
         });
     });
@@ -339,9 +338,14 @@ function configureCircleHover() {
         })
 }
 
-function hideProgressBar() {
-    $(".progress").css("visibility", "hidden");
+function hideProgressBar(bar) {
+    $(bar).css("visibility", "hidden");
 }
+
+function showProgressBar(bar) {
+    $(bar).css("visibility", "visible");
+}
+
 
 function setRefreshOnResize() {
     $(window).resize(function () {
@@ -415,7 +419,7 @@ function fetchMailsAsync() {
         populateLabelColors();
         calculateEmailsColor();
         calculateEmailsPosition();
-        hideProgressBar();
+        hideProgressBar("#circles-progress");
         configureCircleHover();
         setModal();
         setDateCoords();
