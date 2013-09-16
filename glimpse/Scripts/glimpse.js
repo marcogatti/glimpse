@@ -134,9 +134,12 @@ function calculateEmailsColor() {
             ringColor = labelColors[$(this).data('label1')];
             shadow = 'inset 0 0 0 12px ' + ringColor;
         }
+
+        shadow += ', 0 0 0 8px ';
+
         if ($(this).data('label2') !== "") {
             outsetColor = labelColors[$(this).data('label2')];
-            shadow += ', 0 0 0 8px ' + outsetColor;
+            shadow += outsetColor;
         }
 
         $(this).css({
@@ -269,24 +272,30 @@ function setDateCoords() {
     $("#date-last").html(newDateLast);
 }
 
+function markAsRead(circle) {
+    circle.removeClass("new");
+}
+
 function setModal() {
 
     $(".circle").on("click", function () {
 
-        var from = $('<h4>From: ' + $(this).data("from") + '</h4>'),
-            subject = $('<h3>' + $(this).data("subject") + '</h3>');
+        var from = 'From: ' + $(this).data("from"),
+            subject = $(this).data("subject"),
+            currentCircle = $(this);
 
-        $(".modal-body").find("h4").remove();
-        $(".modal-body").find("#bodyhtml").remove();
-        $(".modal-header").find("h3").remove();
+        $(".modal-body").find("h4").html(from);
+        $(".modal-header").find("h3").html(subject);
 
-        $(".modal-body").append(from);
-        $(".modal-header").append(subject);
+        $(".modal-body").find("#bodyhtml").html("");
+        showProgressBar("#body-progress");
 
-        /*  horrible, pero no encontré otra forma de hacerlo andar  */
-        $.getJSON("async/GetMailBody/" + $(this).data("id"), function (data) {
+        $.getJSON("async/GetMailBody/" + currentCircle.data("id"), function (data) {
             if (data.success == true) {
-                $(".modal-body").append("<div id='bodyhtml'>" + data.body + "</div>");
+                hideProgressBar("#body-progress");
+                $(".modal-body").find("#bodyhtml").html(data.body);
+                markAsRead(currentCircle);
+
             } else alert(data.message);
         });
     });
@@ -307,7 +316,7 @@ function configureCircleHover() {
             //from.html(currentCircle.data("from"));
 
             dateTime.css("left", function () {
-                return currentCircle.css("left");
+                return parseInt(currentCircle.css("left")) - 25 + 'px';
             });
 
             //from.css("top", function () {
@@ -335,9 +344,14 @@ function configureCircleHover() {
         })
 }
 
-function hideProgressBar() {
-    $(".progress").css("visibility", "hidden");
+function hideProgressBar(bar) {
+    $(bar).css("visibility", "hidden");
 }
+
+function showProgressBar(bar) {
+    $(bar).css("visibility", "visible");
+}
+
 
 function setRefreshOnResize() {
     $(window).resize(function () {
@@ -358,7 +372,7 @@ function fetchMailsAsync() {
                     maxAge = value.age;
                 }
 
-                var date = new Date(parseInt(value.date.substr(6))).toLocaleDateString(),
+                var date = new Date(parseInt(value.date.substr(6))).toGMTString(),
                     classes = "circle";
 
                 if (!value.seen) {
@@ -411,7 +425,7 @@ function fetchMailsAsync() {
         populateLabelColors();
         calculateEmailsColor();
         calculateEmailsPosition();
-        hideProgressBar();
+        hideProgressBar("#circles-progress");
         configureCircleHover();
         setModal();
         setDateCoords();
