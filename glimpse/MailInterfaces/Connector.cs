@@ -5,6 +5,7 @@ using System.Web;
 using ActiveUp.Net.Mail;
 using ActiveUp.Net.Imap4;
 using Glimpse.Exceptions.MailInterfacesExceptions;
+using Glimpse.Helpers;
 
 namespace Glimpse.MailInterfaces
 {
@@ -16,7 +17,7 @@ namespace Glimpse.MailInterfaces
         {
             this.ImapClient = new Imap4Client();
             this.ImapConnect(true);
-            this.ImapAttemptLogin(username, password);
+            this.ImapAttemptLogin(username, CryptoHelper.DecryptDefaultKey(password));
             return this.ImapClient;
         }
 

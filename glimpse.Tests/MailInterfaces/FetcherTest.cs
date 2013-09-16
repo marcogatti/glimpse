@@ -20,7 +20,7 @@ namespace Glimpse.Tests
         [TestFixtureSetUp]
         public void SetUp()
         {
-            this.myFetcher = new Fetcher("imap.sealed@gmail.com", "imapsealed");
+            this.myFetcher = new Fetcher("imap.sealed@gmail.com", "EAAAAFZ7NXAzAUM70Ltujc3mSPjAmKRppTtLiz8XAN8DoHIu");
         }
 
         [TestFixtureTearDown]

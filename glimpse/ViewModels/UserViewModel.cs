@@ -5,6 +5,7 @@ using System.Web;
 using System.ComponentModel.DataAnnotations;
 using Glimpse.MailInterfaces;
 using System.Web.Mvc;
+using System.Diagnostics;
 
 namespace Glimpse.ViewModels
 {
@@ -19,6 +20,7 @@ namespace Glimpse.ViewModels
         [Required]
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public String Password { get; set; }
 
         [Display(Name = "Remember me?")]

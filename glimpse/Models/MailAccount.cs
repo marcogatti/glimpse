@@ -9,6 +9,7 @@ using System.Linq;
 using System.Web;
 using ActiveUp.Net.Mail;
 using System.Collections.Specialized;
+using Glimpse.Helpers;
 
 namespace Glimpse.Models
 {

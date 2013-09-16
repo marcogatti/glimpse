@@ -21,22 +21,21 @@ namespace Glimpse.Tests.MailInterfaces
         [Test]
         public void Login_Returns_A_Connected_Imap_Client()
         {
-            
-            Assert.AreEqual(true, myConnector.ImapLogin("test.imap.506@gmail.com", "ytrewq123").IsConnected);
+            Assert.AreEqual(true, myConnector.ImapLogin("test.imap.506@gmail.com", "EAAAAJEOi8buiitbWq6IHRQ/+WwSmQhmymzpaiMrjI/s6k9/").IsConnected);
         }
 
         [Test]
         [ExpectedException(typeof(InvalidAuthenticationException))]
         public void Login_With_Wrong_Password_Throws_Authentication_Exception()
         {
-            myConnector.ImapLogin("test.imap.506@gmail.com", "wrongPassword");            
+            myConnector.ImapLogin("test.imap.506@gmail.com", "EAAAAFZ7NXAzAUM70Ltujc3mSPjAmKRppTtLiz8XAN8DoHIu");            
         }
 
         [Test]
         [ExpectedException(typeof(InvalidAuthenticationException))]
         public void Login_With_Wrong_Username_Throws_Authentication_Exception()
         {
-            myConnector.ImapLogin("wrongLogin", "ytrewq123");
+            myConnector.ImapLogin("wrongLogin", "EAAAAJEOi8buiitbWq6IHRQ/+WwSmQhmymzpaiMrjI/s6k9/");
         }
     }
 }
