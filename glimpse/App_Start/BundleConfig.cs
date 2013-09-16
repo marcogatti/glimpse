@@ -22,6 +22,9 @@ namespace Glimpse
                         "~/Scripts/bootstrap.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/glimpse").Include(
+                        "~/Scripts/glimpse-utils.js",
+                        "~/Scripts/glimpse-sender.js",
+                        "~/Scripts/glimpse-circles.js",
                         "~/Scripts/glimpse.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/jquerymousewheel").Include(
