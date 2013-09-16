@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using ActiveUp.Net.Mail;
 
 namespace Glimpse.Models
 {
@@ -40,6 +41,22 @@ namespace Glimpse.Models
 
                 tran.Commit();
             }
+        }
+
+        public static AddressCollection ParseAddresses(String toAddresses)
+        {
+            ActiveUp.Net.Mail.AddressCollection addresses = new AddressCollection();
+            String[] recipients = new String[toAddresses.Split(new String[] { "," }, StringSplitOptions.RemoveEmptyEntries).Length];
+
+            toAddresses = System.Text.RegularExpressions.Regex.Replace(toAddresses, @"\s+", ","); //reemplaza todos los espacios por ""
+            recipients = toAddresses.Split(new String[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (String recipient in recipients)
+            {
+                addresses.Add(new ActiveUp.Net.Mail.Address(recipient));
+            }
+
+            return addresses;
         }
 
         public void Save(ISession currentSession)

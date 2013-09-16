@@ -77,9 +77,15 @@ namespace Glimpse.Controllers
                 MailAccount mailAccount = GetCurrentMailAccount();
                 mailAccount.sendMail(sendInfo.ToAddress, sendInfo.Body, sendInfo.Subject);
             }
+            catch (SmtpException exc)
+            {
+                Log logger = new Log(new LogEntity(002, "Error SMTP sendEmail. Parametros del mail: subjectMail(" + sendInfo.Subject + "), addressMail(" + sendInfo.ToAddress + ").", exc.StackTrace));
+                logger.Save();
+                return Json(new { success = false, address = sendInfo.ToAddress }, JsonRequestBehavior.AllowGet);
+            }
             catch (Exception exc)
             {
-                Log logger = new Log(new LogEntity(002, "Error generico sendEmail. Parametros del mail: subjectMail(" + sendInfo.Subject + "), addressMail(" +sendInfo.ToAddress+").", exc.StackTrace));
+                Log logger = new Log(new LogEntity(002, "Error generico sendEmail. Parametros del mail: subjectMail(" + sendInfo.Subject + "), addressMail(" + sendInfo.ToAddress + ").", exc.StackTrace));
                 logger.Save();
                 return Json(new { success = false, address = sendInfo.ToAddress }, JsonRequestBehavior.AllowGet);
             }
