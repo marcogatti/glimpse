@@ -7,5 +7,6 @@ $(document).ready(function () {
     configureZoom();
     setRefreshOnResize();
     prepareComposeDialog();
+    setTransitionsCheckbox();
 })
 

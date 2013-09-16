@@ -85,8 +85,8 @@ function populateLabelColors() {
     
         var currentColor = glimpseColors[i];
 
-        if($(this).data("system")){
-        } else{
+        if (!$(this).data("system")) {
+
             $(this).css("background-color", currentColor);
             labelColors[$(this).data("name")] = currentColor;
             i++;
@@ -94,6 +94,12 @@ function populateLabelColors() {
     });
 
     setLabelSelection();
+}
+
+function setTransitionsCheckbox() {
+    $("#transitions-check").click(function () {
+        $(".circle").css("transition", "none")
+    });
 }
 
 

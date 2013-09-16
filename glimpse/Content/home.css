@@ -15,10 +15,6 @@ hr {
     background: rgb(0, 0, 0);
 }
 
-#panel {
-    /*background-color: rgb(255, 255, 255);*/
-}
-
 .brand {
     font-family: 'Freestyle Script';
     font-size: 32px !important;
@@ -190,7 +186,7 @@ div.zoom {
 }
 
 .label-glimpse {
-    margin-top: 5px;
+    margin-top: 2px;
     display: block; 
     cursor: pointer;
 }
@@ -207,7 +203,7 @@ div.zoom {
 }
 
 #labels-header {
-    margin-top: 25px;
+    margin-top: 10px;
 }
 
 .compose-text {
