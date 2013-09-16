@@ -44,8 +44,14 @@
 <div id="example" class="modal hide fade in" style="display: none;">
     <div class="modal-header">
         <a class="close" data-dismiss="modal">×</a>
+        <h3>De: </h3>
     </div>
     <div class="modal-body">
+        <h4>Asunto</h4>
+        <div id="bodyhtml"></div>
+        <div id="body-progress" class="progress progress-striped active">
+            <div class="bar" style="width: 100%;">Cargando...</div>
+        </div>
     </div>
     <div class="modal-footer">
         <a href="#" class="btn btn-success">Call to action</a>
@@ -57,7 +63,7 @@
 
     <div class="row-fluid">
         <div class="span2">
-            <div class="well sidebar-nav">
+            <div id="panel" class="well sidebar-nav">
                 <a href="#compose" id="compose" class="btn btn-block">Redactar</a>
 
                 <ol id="labels-header" class="nav nav-list">
@@ -69,7 +75,7 @@
             </div>
             <!--/.well -->
 
-            <div class="progress progress-striped active">
+            <div id="circles-progress" class="progress progress-striped active">
                 <div class="bar" style="width: 100%;">Cargando...</div>
             </div>
 
@@ -79,8 +85,8 @@
         <div id="email-container" class="span10">
 
             <div class="zoom">
-                <i id="zoom-in" class="icon-zoom icon-zoom-in"></i>
-                <i id="zoom-out" class="icon-zoom icon-zoom-out"></i>
+                <i id="zoom-in" class="icon-zoom icon-zoom-in icon-white"></i>
+                <i id="zoom-out" class="icon-zoom icon-zoom-out icon-white"></i>
             </div>
 
             <div id="date-today" class="coord date-coord"></div>
