@@ -115,6 +115,9 @@ namespace Glimpse.Models
 
             tran.Commit();
 
+            IList<LabelEntity> labels = Label.FindByAccount(this.Entity, session);
+            this.myFetcher.setLabels(labels);
+
             session.Flush();
             session.Close();
         }
