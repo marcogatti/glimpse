@@ -25,15 +25,15 @@ namespace Glimpse.MailInterfaces
             this.loadMailboxesAndSpecialProperties(this.receiver.Command("LIST \"\" \"*\""));
             this.currentOpenedMailbox = null;
         }
+        public void SetLabels(IList<LabelEntity> labels)
+        {
+            this.accountLabels = labels;
+        }
         public NameValueCollection getLabels()
         {
             return this.accountMailboxesBySpecialProperty;
         }
-        public void setLabels(IList<LabelEntity> labels)
-        {
-            this.accountLabels = labels;
-        }
-
+        
         public Int32 GetLastUIDFrom(String mailbox)
         {
             Mailbox targetMailbox = this.GetMailbox(mailbox);
@@ -45,36 +45,18 @@ namespace Glimpse.MailInterfaces
             Mailbox targetMailbox = this.GetMailbox(mailbox);
             return targetMailbox.Fetch.Uid(1);
         }
-
         public Int32 GetAmountOfMailsFrom(String mailbox)
         {
             Mailbox targetMailbox = this.GetMailbox(mailbox);
             return targetMailbox.MessageCount;
         }
-        public Int32 getMailUID(String mailbox, UInt64 gmMailID)
+        public Int32 GetMailUID(String mailbox, UInt64 gmMailID)
         {
             this.GetMailbox(mailbox); //Se asegura que se encuentra seleccionado el mailbox en IMAP
             return Int32.Parse(this.CleanIMAPResponse(this.receiver.Command("UID SEARCH X-GM-MSGID " + gmMailID.ToString()), "SEARCH", false));
         }
-        public byte[] GetAttachmentFromMail(String mailbox, UInt64 gmMailID, String attachmentName)
-        {
-            Mailbox targetMailbox = this.GetMailbox(mailbox);
-            Int32 mailUID = this.getMailUID(mailbox, gmMailID);
-            AttachmentCollection attachmentsInMail = targetMailbox.Fetch.UidMessageObject(mailUID).Attachments;
-            MimePart desiredAttachment;
-            try
-            {
-                desiredAttachment = attachmentsInMail.Cast<MimePart>()
-                                              .Where<MimePart>(x => x.Filename == attachmentName)
-                                              .Single<MimePart>();
-            }
-            catch (System.InvalidOperationException systemException)
-            {
-                throw new InvalidAttachmentException(systemException.Message, "Se pide un archivo adjunto que no existe, o más de un adjunto posee el mismo nombre.");
-            }
-            return desiredAttachment.BinaryContent;
-        }
 
+        #region Mail Retrieving Methods
         public List<Mail> GetAllMailsDataFrom(String mailbox)
         {
             return this.GetMailsDataFrom(mailbox, 1);
@@ -140,7 +122,27 @@ namespace Glimpse.MailInterfaces
             }
             return retrievedMails;
         }
+        public byte[] GetAttachmentFromMail(String mailbox, UInt64 gmMailID, String attachmentName)
+        {
+            Mailbox targetMailbox = this.GetMailbox(mailbox);
+            Int32 mailUID = this.GetMailUID(mailbox, gmMailID);
+            AttachmentCollection attachmentsInMail = targetMailbox.Fetch.UidMessageObject(mailUID).Attachments;
+            MimePart desiredAttachment;
+            try
+            {
+                desiredAttachment = attachmentsInMail.Cast<MimePart>()
+                                              .Where<MimePart>(x => x.Filename == attachmentName)
+                                              .Single<MimePart>();
+            }
+            catch (System.InvalidOperationException systemException)
+            {
+                throw new InvalidAttachmentException(systemException.Message, "Se pide un archivo adjunto que no existe, o más de un adjunto posee el mismo nombre.");
+            }
+            return desiredAttachment.BinaryContent;
+        }
+        #endregion
 
+        #region Folder Methods
         public void archiveMail(UInt64 gmMailID)
         {
             this.removeMailTag("INBOX", gmMailID);
@@ -148,42 +150,44 @@ namespace Glimpse.MailInterfaces
         public void removeMailTag(String mailbox, UInt64 gmMailID)
         {
             Mailbox targetMailbox = this.GetMailbox(mailbox);
-            Int32 mailUID = this.getMailUID(mailbox, gmMailID);
+            Int32 mailUID = this.GetMailUID(mailbox, gmMailID);
             targetMailbox.UidMoveMessage(mailUID, this.accountMailboxesBySpecialProperty["All"]);
             this.currentOpenedMailbox.MessageCount--;
         }
         public void addMailTag(String mailbox, String tagToAdd, UInt64 gmMailID)
         {
             Mailbox targetMailbox = this.GetMailbox(mailbox);
-            Int32 mailUID = this.getMailUID(mailbox, gmMailID);
+            Int32 mailUID = this.GetMailUID(mailbox, gmMailID);
             targetMailbox.UidCopyMessage(mailUID, tagToAdd);
         }
         public void moveToTrash(String mailbox, UInt64 gmMailID)
         {
             Mailbox targetMailbox = this.GetMailbox(mailbox);
-            Int32 mailUID = this.getMailUID(mailbox, gmMailID);
+            Int32 mailUID = this.GetMailUID(mailbox, gmMailID);
             targetMailbox.UidMoveMessage(mailUID, this.accountMailboxesBySpecialProperty["Trash"]);
             this.currentOpenedMailbox.MessageCount--;
         }
         public void removeFromTrash(String destinyMailbox, UInt64 gmMailID)
         {
             Mailbox targetMailbox = this.GetMailbox(this.accountMailboxesBySpecialProperty["Trash"]);
-            Int32 mailUID = this.getMailUID(this.accountMailboxesBySpecialProperty["Trash"], gmMailID);
+            Int32 mailUID = this.GetMailUID(this.accountMailboxesBySpecialProperty["Trash"], gmMailID);
             targetMailbox.UidMoveMessage(mailUID, destinyMailbox);
             this.currentOpenedMailbox.MessageCount--;
         }
         public void deleteFromTrash(UInt64 gmMailID)
         {
             Mailbox targetMailbox = this.GetMailbox(this.accountMailboxesBySpecialProperty["Trash"]);
-            Int32 mailUID = this.getMailUID(this.accountMailboxesBySpecialProperty["Trash"], gmMailID);
+            Int32 mailUID = this.GetMailUID(this.accountMailboxesBySpecialProperty["Trash"], gmMailID);
             targetMailbox.UidDeleteMessage(mailUID, true);
             this.currentOpenedMailbox.MessageCount--;
         }
+        #endregion
 
+        #region Flag Methods
         public void setAnsweredFlag(String mailbox, UInt64 gmMailID, Boolean isAnswered)
         {
             Mailbox targetMailbox = this.GetMailbox(mailbox);
-            Int32 mailUID = this.getMailUID(mailbox, gmMailID);
+            Int32 mailUID = this.GetMailUID(mailbox, gmMailID);
             if (isAnswered)
                 targetMailbox.UidAddFlagsSilent(mailUID, new FlagCollection { "Answered" });
             else
@@ -192,7 +196,7 @@ namespace Glimpse.MailInterfaces
         public void setFlaggedFlag(String mailbox, UInt64 gmMailID, Boolean isFlagged)
         {
             Mailbox targetMailbox = this.GetMailbox(mailbox);
-            Int32 mailUID = this.getMailUID(mailbox, gmMailID);
+            Int32 mailUID = this.GetMailUID(mailbox, gmMailID);
             if (isFlagged)
                 targetMailbox.UidAddFlagsSilent(mailUID, new FlagCollection { "Flagged" });
             else
@@ -201,7 +205,7 @@ namespace Glimpse.MailInterfaces
         public void setDraftFlag(String mailbox, UInt64 gmMailID, Boolean isDraft)
         {
             Mailbox targetMailbox = this.GetMailbox(mailbox);
-            Int32 mailUID = this.getMailUID(mailbox, gmMailID);
+            Int32 mailUID = this.GetMailUID(mailbox, gmMailID);
 
             if (isDraft)
                 targetMailbox.UidAddFlagsSilent(mailUID, new FlagCollection { "Draft" });
@@ -211,18 +215,20 @@ namespace Glimpse.MailInterfaces
         public void setSeenFlag(String mailbox, UInt64 gmMailID, Boolean isSeen)
         {
             Mailbox targetMailbox = this.GetMailbox(mailbox);
-            Int32 mailUID = this.getMailUID(mailbox, gmMailID);
+            Int32 mailUID = this.GetMailUID(mailbox, gmMailID);
             if (isSeen)
                 targetMailbox.UidAddFlagsSilent(mailUID, new FlagCollection { "Seen" });
             else
                 targetMailbox.UidRemoveFlagsSilent(mailUID, new FlagCollection { "Seen" });
         }
+        #endregion
 
         public void CloseClient()
         {
             this.receiver.Disconnect();
         }
 
+        #region Private Methods
         private Mailbox GetMailbox(String targetMailboxName)
         {
             if (this.currentOpenedMailbox == null)
@@ -268,7 +274,6 @@ namespace Glimpse.MailInterfaces
                 retrievedMail.Gm_mid = UInt64.Parse(this.CleanIMAPResponse(receiver.Command("FETCH " + mailOrdinal + " (X-GM-MSGID)"), "X-GM-MSGID"));
                 thisUid = targetMailbox.Fetch.Uid(mailOrdinal);
                 thisFlags = targetMailbox.Fetch.Flags(mailOrdinal).Merged;
-
             }
             catch (Imap4Exception exc)
             {
@@ -544,5 +549,6 @@ namespace Glimpse.MailInterfaces
             String mailboxName = mailbox.Substring(mailbox.IndexOf('"') + 1, mailbox.LastIndexOf('"') - mailbox.IndexOf('"') - 1);
             return mailboxName;
         }
+        #endregion
     }
 }
