@@ -5,6 +5,7 @@ using System.Web;
 using ActiveUp.Net.Mail;
 using Glimpse.MailInterfaces;
 using Glimpse.Exceptions.MailInterfacesExceptions;
+using Glimpse.Helpers;
 
 namespace Glimpse.MailInterfaces
 {
@@ -25,7 +26,7 @@ namespace Glimpse.MailInterfaces
         {
             this.checkRecipients(newMail.To);
             //mail.SendSsl crea la conexión, manda los 3 parámetros de SMPT (MAIL, RCPT y DATA) y cierra la conexión
-            newMail.SendSsl("smtp.gmail.com", 465, this.senderAddress, this.password, SaslMechanism.Login);
+            newMail.SendSsl("smtp.gmail.com", 465, this.senderAddress, CryptoHelper.DecryptDefaultKey(this.password), SaslMechanism.Login);
         }
         public void sendMail(AddressCollection recipients, String bodyHTML, String subject = "",
                              AddressCollection CC = null, AddressCollection BCC = null,
@@ -42,7 +43,7 @@ namespace Glimpse.MailInterfaces
 
             SetMailAttachments(attachments, newMail);
 
-            newMail.SendSsl("smtp.gmail.com", 465, this.senderAddress, this.password, SaslMechanism.Login);
+            newMail.SendSsl("smtp.gmail.com", 465, this.senderAddress, CryptoHelper.DecryptDefaultKey(this.password), SaslMechanism.Login);
         }
 
         private static void SetMailAttachments(AttachmentCollection attachments, SmtpMessage newMail)
@@ -51,7 +52,7 @@ namespace Glimpse.MailInterfaces
                 foreach (Attachment attachment in attachments)
                     newMail.Attachments.Add(attachment);
         }
-
+        
         private void SetMailSender(SmtpMessage newMail)
         {
             if (this.senderName != null)

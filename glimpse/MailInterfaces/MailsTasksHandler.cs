@@ -38,13 +38,15 @@ namespace Glimpse.MailInterfaces
                 ISession session = NHibernateManager.OpenSession();
                 Label label = Label.FindBySystemName(mailAccount, "INBOX", session);
                 Int64 lastUidExternal = mailAccount.getLastUIDExternalFrom("INBOX"); //TODO: Deshardcodear
+                Int64 firstUidExternal = mailAccount.getFirstUIDExternalFrom("INBOX"); //TODO: Deshardcodear
                 Int64 lastUidLocal = mailAccount.GetLastUIDLocalFromALL(session);
+                Int64 firstUidLocal = mailAccount.GetFirstUIDLocalFromALL(session);
                 session.Close();
 
-                MailsTask task = new MailsTask(lastUidLocal, lastUidExternal, label);
+                MailsTask task = new MailsTask(lastUidLocal, firstUidLocal, lastUidExternal, firstUidExternal, label);
 
                 if (task.HasFinished)
-                {       
+                {
                     return;
                 }
 
@@ -68,11 +70,9 @@ namespace Glimpse.MailInterfaces
             try
             {
                 toUid = task.NextUid;
-                fromUid = CalculateFromUid(toUid, task.UidLocal);
+                fromUid = CalculateFromUid(toUid, task.HighestUidLocal);
 
                 mailAccount.FetchAndSaveMails(task.Label, fromUid, toUid);
-
-                //new MailManager(mailAccount).FetchAndSaveMails(task.Label, fromUid, toUid);
 
                 task.Dirty = true;
 
@@ -130,8 +130,10 @@ namespace Glimpse.MailInterfaces
     public class MailsTask
     {
         internal bool _working;
-        internal Int64 UidExternal { get; set; }
-        internal Int64 UidLocal { get; set; }
+        internal Int64 HighestUidExternal { get; set; }
+        internal Int64 LowestUidExternal { get; set; }
+        internal Int64 HighestUidLocal { get; set; }
+        internal Int64 LowestUidLocal { get; set; }
         internal Int64 NextUid { get; set; }
         internal Label Label { get; set; }
 
@@ -148,16 +150,18 @@ namespace Glimpse.MailInterfaces
         {
             get
             {
-                return this.UidLocal == this.NextUid;
+                return this.HighestUidLocal == this.NextUid;
             }
         }
 
 
 
-        public MailsTask(Int64 lastUidLocal, Int64 lastUidExternal, Label label)
+        public MailsTask(Int64 lastUidLocal,Int64 firstUidLocal, Int64 lastUidExternal, Int64 firstUidExternal, Label label)
         {
-            this.UidLocal = lastUidLocal;
-            this.NextUid = this.UidExternal = lastUidExternal;
+            this.HighestUidLocal = lastUidLocal;
+            this.LowestUidLocal = firstUidLocal;
+            this.NextUid = this.HighestUidExternal = lastUidExternal;
+            this.LowestUidExternal = firstUidExternal;
             this.Label = label;
             this.Dirty = false;
             this._working = true;

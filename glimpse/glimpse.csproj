@@ -236,6 +236,7 @@
     <Compile Include="Models\Log.cs" />
     <Compile Include="Models\Mail.cs" />
     <Compile Include="Models\MailAccount.cs" />
+    <Compile Include="Models\MailCollection.cs" />
     <Compile Include="Models\MailManager.cs" />
     <Compile Include="Exceptions\CommonExceptions\NotUniqueResultException.cs" />
     <Compile Include="ViewModels\LabelViewModel.cs" />
@@ -454,6 +455,9 @@
     <Content Include="Scripts\ckeditor\skins\moono\images\lock.png" />
     <Content Include="Scripts\ckeditor\skins\moono\images\refresh.png" />
     <Content Include="Scripts\ckeditor\styles.js" />
+    <Content Include="Scripts\glimpse-circles.js" />
+    <Content Include="Scripts\glimpse-sender.js" />
+    <Content Include="Scripts\glimpse-utils.js" />
     <Content Include="Scripts\glimpse.js" />
     <Content Include="Scripts\jquery-2.0.3.js" />
     <Content Include="Scripts\jquery-2.0.3.min.js" />

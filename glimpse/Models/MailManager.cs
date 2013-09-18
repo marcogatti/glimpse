@@ -93,7 +93,7 @@ namespace Glimpse.Models
             session.Close();
         }
 
-        public List<MailEntity> GetMailsFrom(string tag, int amountOfEmails, ISession session)
+        public MailCollection GetMailsFrom(string tag, int amountOfEmails, ISession session)
         {
             List<MailEntity> mailList = (List<MailEntity>)session.CreateCriteria<MailEntity>()
                                                 .Add(Restrictions.Eq("MailAccountEntity", this.mailAccount.Entity))
@@ -101,7 +101,7 @@ namespace Glimpse.Models
                                                 .SetMaxResults(amountOfEmails)
                                                 .List<MailEntity>();
 
-            return mailList;
+            return new MailCollection(mailList);
         }
 
         public void FetchAndSaveMails(Label label, Int64 fromUid, Int64 toUid)

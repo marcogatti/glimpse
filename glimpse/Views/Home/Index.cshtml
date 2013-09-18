@@ -1,4 +1,5 @@
 ﻿@using Glimpse.DataAccessLayer.Entities
+@using Glimpse.ViewModels
 
 @section css {
     @Styles.Render("~/Home/css")
@@ -41,7 +42,7 @@
     </div>
 </div>
 
-<div id="example" class="modal hide fade in" style="display: none;">
+<div id="body-modal" class="modal hide fade in" style="display: none;">
     <div class="modal-header">
         <a class="close" data-dismiss="modal">×</a>
         <h3>De: </h3>
@@ -70,6 +71,15 @@
 
                     <li class="nav-header">Etiquetas</li>
 
+                    @{
+                        foreach (LabelViewModel label in ViewBag.Labels)
+                        {
+                            
+                        <li class='label label-glimpse' data-name="@label.showName" data-system="@label.systemName">@label.showName</li>                         
+                        
+                        }
+                    }
+
                 </ol>
 
             </div>
@@ -96,10 +106,18 @@
 
         </div>
 
+
     </div>
     <!--/row-->
 
-    <hr />
+    <div class="row-fluid">
+        <div class="pull-right">
+            <label class="checkbox">
+                <input id="transitions-check" type="checkbox" value="">
+                Desactivar animaciones (para equipos menos potentes)
+            </label>
+        </div>
+    </div>
 
     <footer>
         <p>&copy; glimpse 2013</p>

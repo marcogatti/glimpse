@@ -5,6 +5,8 @@ using System.Web;
 using System.Security.Cryptography;
 using System.IO;
 using System.Text;
+using System.Diagnostics;
+using Glimpse.ViewModels;
 
 namespace Glimpse.Helpers
 {
@@ -12,24 +14,24 @@ namespace Glimpse.Helpers
     {
         private static byte[] _salt = Encoding.ASCII.GetBytes("g57kAdgCdfJ52sdgHh");
 
-
+        [DebuggerNonUserCodeAttribute]
         public static String EncryptDefaultKey(String plainText)
         {
             return EncryptStringAES(plainText, "PasswordDefault1234");
         }
-
+        [DebuggerNonUserCodeAttribute]
+        public static String EncryptDefaultKey(UserViewModel user)
+        {
+            return EncryptStringAES(user.Password, "PasswordDefault1234");
+        }
+        [DebuggerNonUserCodeAttribute]
         public static String DecryptDefaultKey(String cipherText)
         {
             return DecryptStringAES(cipherText, "PasswordDefault1234");
         }
 
 
-        /// <summary>
-        /// Encrypt the given string using AES.  The string can be decrypted using 
-        /// DecryptStringAES().  The sharedSecret parameters must match.
-        /// </summary>
-        /// <param name="plainText">The text to encrypt.</param>
-        /// <param name="sharedSecret">A password used to generate a key for encryption.</param>
+        [DebuggerNonUserCodeAttribute]
         public static String EncryptStringAES(String plainText, String sharedSecret)
         {
             if (string.IsNullOrEmpty(plainText))
@@ -80,12 +82,7 @@ namespace Glimpse.Helpers
             return outStr;
         }
 
-        /// <summary>
-        /// Decrypt the given string.  Assumes the string was encrypted using 
-        /// EncryptStringAES(), using an identical sharedSecret.
-        /// </summary>
-        /// <param name="cipherText">The text to decrypt.</param>
-        /// <param name="sharedSecret">A password used to generate a key for decryption.</param>
+        [DebuggerNonUserCodeAttribute]
         public static String DecryptStringAES(String cipherText, String sharedSecret)
         {
             if (String.IsNullOrEmpty(cipherText))
@@ -138,6 +135,7 @@ namespace Glimpse.Helpers
             return plaintext;
         }
 
+        [DebuggerNonUserCodeAttribute]
         private static byte[] ReadByteArray(Stream s)
         {
             byte[] rawLength = new byte[sizeof(int)];

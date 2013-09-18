@@ -45,7 +45,8 @@ namespace Glimpse.Controllers
             {
                 UpdateModel(user);
 
-                MailAccount mailAccount = new MailAccount(user.Email, user.Password);
+                String cipherPassword =  CryptoHelper.EncryptDefaultKey(user);
+                MailAccount mailAccount = new MailAccount(user.Email, cipherPassword);
 
                 mailAccount.SaveOrUpdate();
                 mailAccount.UpdateLabels();
@@ -66,7 +67,6 @@ namespace Glimpse.Controllers
             {
                 return View(user);
             }
-
         }
 
         // GET: /Logout

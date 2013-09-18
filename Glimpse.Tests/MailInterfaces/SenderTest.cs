@@ -17,7 +17,7 @@ namespace Glimpse.Tests.MailInterfaces
         [TestFixtureSetUp]
         public void SetUp()
         {
-            this.mySender = new Sender("test.imap.performance@gmail.com", "imaptest", "Simpson Homer");
+            this.mySender = new Sender("test.imap.performance@gmail.com", "EAAAANNt9jTRTqnFOymwLQ6Yy6PsecEBR2l10A677SIjAShr", "Simpson Homer");
         }
 
         [Test]

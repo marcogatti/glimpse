@@ -24,48 +24,50 @@ namespace Glimpse.Controllers
         // GET: /AsyncMails/InboxMails
         public ActionResult InboxMails(int id = 0)
         {
+            ISession session = NHibernateManager.OpenSession();
+
             try
             {
-                ISession session = NHibernateManager.OpenSession();
-
                 IList<Object> mailsToSend = this.FetchMails(id, session);
                 JsonResult result = Json(new { success = true, mails = mailsToSend }, JsonRequestBehavior.AllowGet);
-
-                session.Flush();
-                session.Close();
-
                 return result;
             }
-            catch (Exception)
+            catch (Exception exc)
             {
-                //Log exception
+                Log logger = new Log(new LogEntity(002, "Error generico InboxMails. Parametros del mail: idMail(" + id.ToString() + ").", exc.StackTrace));
+                logger.Save();
                 return Json(new { success = false, message = "Error al obtener los mails" }, JsonRequestBehavior.AllowGet);
+            }
+            finally
+            {
+                session.Flush();
+                session.Close();
             }
         }
 
         public ActionResult GetMailBody(Int64 id = 0)
         {
+            ISession session = NHibernateManager.OpenSession();
+
             try
             {
-                ISession session = NHibernateManager.OpenSession();
-
                 MailAccount currentMailAccount = GetCurrentMailAccount();
 
                 Mail mail = currentMailAccount.ReadMail(id, session);
 
                 JsonResult result = Json(new { success = true, body = mail.Entity.Body }, JsonRequestBehavior.AllowGet);
 
-                session.Flush();
-                session.Close();
-
                 return result;
             }
             catch (Exception exc)
             {
-                //Log exception
                 Log logger = new Log(new LogEntity(002, "Error generico GetMailBody. Parametros del mail: idMail(" + id.ToString() + ").", exc.StackTrace));
                 logger.Save();
                 return Json(new { success = false, message = "Error al obtener el cuerpo del mail." }, JsonRequestBehavior.AllowGet);
+            }
+            finally
+            {
+                session.Close();
             }
         }
 
@@ -75,16 +77,52 @@ namespace Glimpse.Controllers
             try
             {
                 MailAccount mailAccount = GetCurrentMailAccount();
-                mailAccount.sendMail(sendInfo.ToAddress, sendInfo.Body, sendInfo.Subject);
+                mailAccount.SendMail(sendInfo.ToAddress, sendInfo.Body, sendInfo.Subject);
+            }
+            catch (SmtpException exc)
+            {
+                Log logger = new Log(new LogEntity(002, "Error SMTP sendEmail. Parametros del mail: subjectMail(" + sendInfo.Subject + "), addressMail(" + sendInfo.ToAddress + ").", exc.StackTrace));
+                logger.Save();
+                return Json(new { success = false, address = sendInfo.ToAddress }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception exc)
             {
-                Log logger = new Log(new LogEntity(002, "Error generico sendEmail. Parametros del mail: subjectMail(" + sendInfo.Subject + "), addressMail(" +sendInfo.ToAddress+").", exc.StackTrace));
+                Log logger = new Log(new LogEntity(002, "Error generico sendEmail. Parametros del mail: subjectMail(" + sendInfo.Subject + "), addressMail(" + sendInfo.ToAddress + ").", exc.StackTrace));
                 logger.Save();
                 return Json(new { success = false, address = sendInfo.ToAddress }, JsonRequestBehavior.AllowGet);
             }
 
             return Json(new { success = true, address = sendInfo.ToAddress }, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult GetMailsByDate(DateTime initialDate, DateTime finalDate)
+        {
+            ISession session = NHibernateManager.OpenSession();
+
+            try
+            {
+                MailCollection mails;
+                List<Object> mailsToReturn = new List<object>();
+                
+                MailAccount currentMailAccount = this.GetCurrentMailAccount();
+                mails = new MailCollection(currentMailAccount.GetMailsByDate(initialDate, finalDate, session));
+                mailsToReturn = this.PrepareToSend(mails);
+
+                JsonResult result = Json(new { success = true, mails = mailsToReturn }, JsonRequestBehavior.AllowGet);
+
+                return result;
+            }
+            catch (Exception exc)
+            {
+                Log logger = new Log(new LogEntity(002, "Error generico GetMailBody. Parametros del mail: initialDate("
+                    + initialDate.ToString() + "), finalDate(" + finalDate.ToString() + ").", exc.StackTrace));
+                logger.Save();
+                return Json(new { success = false, message = "Error al obtener el cuerpo del mail." }, JsonRequestBehavior.AllowGet);
+            }
+            finally
+            {
+                session.Close();
+            }
         }
 
         private List<Object> FetchMails(int amountOfEmails, ISession session)
@@ -95,7 +133,7 @@ namespace Glimpse.Controllers
             {
                 MailManager manager = new MailManager(mailAccount);
 
-                List<MailEntity> mails = manager.GetMailsFrom("INBOX", amountOfEmails, session);
+                MailCollection mails = manager.GetMailsFrom("INBOX", amountOfEmails, session);
 
                 return this.PrepareToSend(mails);
             }
@@ -105,7 +143,7 @@ namespace Glimpse.Controllers
             }
         }
 
-        private List<Object> PrepareToSend(List<MailEntity> mails)
+        private List<Object> PrepareToSend(MailCollection mails)
         {
             List<Object> preparedMails = new List<Object>();
 
@@ -142,8 +180,7 @@ namespace Glimpse.Controllers
 
             return preparedMails;
         }
-
-        private List<object> PrepareLabels(IList<LabelEntity> labels)
+        private List<Object> PrepareLabels(IList<LabelEntity> labels)
         {
             List<Object> returnLabels = new List<object>();
 
@@ -161,7 +198,6 @@ namespace Glimpse.Controllers
             }
             return returnLabels;
         }
-
         private MailAccount GetCurrentMailAccount()
         {
             MailAccount mailAccount = (MailAccount)Session[AccountController.MAIL_INTERFACE];

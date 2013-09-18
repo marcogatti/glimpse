@@ -15,10 +15,6 @@ hr {
     background: rgb(0, 0, 0);
 }
 
-#panel {
-    /*background-color: rgb(255, 255, 255);*/
-}
-
 .brand {
     font-family: 'Freestyle Script';
     font-size: 32px !important;
@@ -34,16 +30,17 @@ hr {
     text-align: center;
     text-shadow: 0 0 1px #fff, 0 1px 2px rgba(0,0,0,1);
     opacity: 0.85;
+    cursor: pointer;
 
     /*  Color de emails sin etiqueta    */
     color: rgb(159, 182, 205);
     background-color: rgb(159, 182, 205);
 
-    box-shadow: inset 0 0 0 12px rgba(255,255,255,0.2), 0 0 0 8px;
-    -webkit-box-shadow: inset 0 0 0 12px rgba(255,255,255,0.2), 0 0 0 8px;
-    -moz-box-shadow: inset 0 0 0 12px rgba(255,255,255,0.2), 0 0 0 8px;
-    -o-box-shadow: inset 0 0 0 12px rgba(255,255,255,0.2), 0 0 0 8px;
-    -ms-box-shadow: inset 0 0 0 12px rgba(255,255,255,0.2), 0 0 0 8px;
+    box-shadow: inset 0 0 0 12px rgba(255,255,255,0.1), 0 0 0 8px;
+    -webkit-box-shadow: inset 0 0 0 12px rgba(255,255,255,0.1), 0 0 0 8px;
+    -moz-box-shadow: inset 0 0 0 12px rgba(255,255,255,0.1), 0 0 0 8px;
+    -o-box-shadow: inset 0 0 0 12px rgba(255,255,255,0.1), 0 0 0 8px;
+    -ms-box-shadow: inset 0 0 0 12px rgba(255,255,255,0.1), 0 0 0 8px;
 
     transform: translate3d(0,0,0);
     -webkit-transform: translate3d(0,0,0);
@@ -80,6 +77,10 @@ hr {
 }
 /*  */
 
+    .centered .pre {
+        font-size: xx-small;
+    }
+
 .circle.new {
 
     /*-webkit-box-shadow: inset 0 0 0 8px rgba(255,255,255,1), 0 0 0 8px;*/
@@ -110,6 +111,18 @@ hr {
     z-index: +10;
     text-shadow: 0 0 1px #fff, 0 2px 4px rgba(0,0,0,1);
 }
+
+.circle.preview {
+    transform: scale(1.5);
+    -webkit-transform: scale(1.5);
+}
+
+    .circle.preview p {
+        font-size: small;
+    }
+    .circle.preview .pre {
+        font-size: xx-small;
+    }
 
 @-webkit-keyframes blink {
     from {
@@ -173,7 +186,7 @@ div.zoom {
 }
 
 .label-glimpse {
-    margin-top: 5px;
+    margin-top: 2px;
     display: block; 
     cursor: pointer;
 }
@@ -190,7 +203,7 @@ div.zoom {
 }
 
 #labels-header {
-    margin-top: 25px;
+    margin-top: 10px;
 }
 
 .compose-text {
