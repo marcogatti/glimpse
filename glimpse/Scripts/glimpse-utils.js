@@ -172,7 +172,8 @@ function setDragging() {
         });
     });
 
-    $(document)
+    //  Revisar (pedidos ajax innecesarios)
+    $(window)
     .mouseup(function () {
         $(window).unbind("mousemove");
         setDateCoords();

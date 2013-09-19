@@ -1,4 +1,6 @@
-﻿function insertCircle(value) {
+﻿var ownedCircles = [];
+
+function insertCircle(value) {
     if (value.age > maxAge) {
         maxAge = value.age;
     }
@@ -84,7 +86,10 @@ function fetchMailsAsync(initialDate, finalDate) {
 
             $.each(data.mails, function (index, value) {
 
-                insertCircle(value);
+                if (ownedCircles.indexOf(value.id) === -1) {
+                    ownedCircles.push(value.id);
+                    insertCircle(value);
+                }              
             });
 
         } else alert(data.message);
