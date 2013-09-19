@@ -225,7 +225,9 @@ function showProgressBar(bar) {
 
 function setRefreshOnResize() {
     $(window).resize(function () {
-        calculateEmailsPosition();
+        $(".circle").each(function () {
+            calculateEmailPosition($(this));
+        });
     });
 
 }

@@ -197,22 +197,6 @@ function calculateEmailColor(circle) {
         });
 }
 
-function calculateEmailsLeft() {
-
-    var margin = parseInt($(".circle").css('width'), 10);
-
-    $(".circle").each(function () {
-
-        var left = ($(this).attr('data-age') - minAge) / currentPeriodShown();
-
-        $(this).css('left', function () {
-            return left * (containerWidth() - margin) + 'px';
-        });
-
-
-    })
-}
-
 function calculateEmailPosition(circle) {
 
     var margin = parseInt(circle.css('width'), 10);
@@ -229,6 +213,22 @@ function calculateEmailPosition(circle) {
         });
 }
 
+function calculateEmailsLeft() {
+
+    var margin = parseInt($(".circle").css('width'), 10);
+
+    $(".circle").each(function () {
+
+        var left = ($(this).attr('data-age') - minAge) / currentPeriodShown();
+
+        $(this).css('left', function () {
+            return left * (containerWidth() - margin) + 'px';
+        });
+
+
+    });
+}
+
 function setLabelSelection() {
     $(".label-glimpse").on('click', function () {
         $(this).toggleClass('label-hidden');
@@ -240,7 +240,6 @@ function setLabelSelection() {
             }
         });
     });
-
 }
 
 function hasLabel(circle, label) {
