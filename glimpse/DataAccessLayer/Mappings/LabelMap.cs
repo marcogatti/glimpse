@@ -14,12 +14,9 @@ namespace Glimpse.DataAccessLayer.Mappings
             Id(x => x.Id).Column("Id").GeneratedBy.Identity();
             Map(x => x.Name).Column("Name");
             Map(x => x.SystemName).Column("SystemName");
-            References<MailAccountEntity>(x => x.MailAccountEntity).Column("MailAccountId").Cascade.None();
-            HasManyToMany(x => x.Mails).ParentKeyColumn("LabelId")
-                                        .ChildKeyColumn("MailId")
-                                        .Cascade.All()
-                                        .LazyLoad()
-                                        .Table("LABELSPERMAIL");
+            References<MailAccountEntity>(x => x.MailAccountEntity).Column("MailAccountId")
+                                                                    .Cascade.None();
+            
             Table("LABEL");
         }
 

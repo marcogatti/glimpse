@@ -12,7 +12,7 @@ namespace Glimpse.DataAccessLayer.Mappings
         public LogMap()
         {
             Id(x => x.Id).Column("Id").GeneratedBy.Identity();
-            Map(x => x.Message).Column("Message").Not.Nullable();
+            Map(x => x.Message).Column("Message");
             Map(x => x.StackTrace).Column("StackTrace");
             Map(x => x.Code).Column("Code");
             Map(x => x.Date).Column("Date");

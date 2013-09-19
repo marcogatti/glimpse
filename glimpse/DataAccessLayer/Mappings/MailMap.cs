@@ -15,7 +15,7 @@ namespace Glimpse.DataAccessLayer.Mappings
             Map(x => x.CC).Column("CC");
             Map(x => x.BCC).Column("BCC");
             Map(x => x.Body).Column("Body").LazyLoad();
-            Map(x => x.ToAddress).Column("ToAddress").Not.LazyLoad();
+            Map(x => x.ToAddress).Column("ToAddress");
             Map(x => x.Gm_tid).Column("Gm_tid");
             Map(x => x.Gm_mid).Column("Gm_mid");
             Map(x => x.Date).Column("Date");
@@ -32,10 +32,13 @@ namespace Glimpse.DataAccessLayer.Mappings
             Map(x => x.Draft).Column("Draft");
             Map(x => x.HasExtras).Column("HasExtras");
             Map(x => x.BodyPeek).Column("BodyPeek");
-            References<AddressEntity>(x => x.From).Column("FromId").Cascade.None();
-            References<MailAccountEntity>(x => x.MailAccountEntity).Column("MailAccountId").Cascade.None();
-            HasMany<ExtraEntity>(x => x.Extras).KeyColumn("Id");
-                //.Inverse().Cascade.All();
+            References<AddressEntity>(x => x.From).Column("FromId")
+                                                    .Cascade.None();
+            References<MailAccountEntity>(x => x.MailAccountEntity).Column("MailAccountId")
+                                                    .Cascade.None();
+            HasMany<ExtraEntity>(x => x.Extras).KeyColumn("Id")
+                                                    .Inverse()
+                                                    .Cascade.All();
             HasManyToMany<LabelEntity>(x => x.Labels).ParentKeyColumn("MailId")
                                                     .ChildKeyColumn("LabelId")
                                                     .Cascade.All()

@@ -43,5 +43,40 @@ namespace Glimpse.Tests.DAL
                                     .UniqueResult<MailEntity>();
             Assert.NotNull(myMail);
         }
+
+        [Test]
+        public void Search_For_Labels_Returns_Results()
+        {
+            List<LabelEntity> labels = (List<LabelEntity>)session.CreateCriteria<LabelEntity>()
+                                    .Add(Restrictions.Eq("Name","INBOX"))
+                                    .List<LabelEntity>();
+
+            Assert.IsNotEmpty(labels);
+        }
+
+        [Test]
+        public void Insert_Mail_Saves_The_Mail_And_Its_Labels()
+        {
+            ulong mid = 1;
+            ulong tid = 1;
+
+            MailEntity mail = new MailEntity();
+            mail.From = session.CreateCriteria<AddressEntity>()
+                                .SetMaxResults(1)
+                                .UniqueResult<AddressEntity>();
+            mail.Gm_mid = mid;
+            mail.Gm_tid = tid;
+            mail.MailAccountEntity = session.CreateCriteria<MailAccountEntity>()
+                                            .SetMaxResults(1)
+                                            .UniqueResult<MailAccountEntity>();
+
+            LabelEntity label = new LabelEntity();
+            label.Name = "NHibernateTestLabel";
+            label.MailAccountEntity = mail.MailAccountEntity;
+
+            mail.Labels.Add(label);
+
+            session.Save(mail);
+        }
     }
 }
