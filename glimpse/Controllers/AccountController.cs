@@ -54,8 +54,6 @@ namespace Glimpse.Controllers
                 new CookieHelper().addMailAddressCookie(mailAccount.Entity.Address);
                 FormsAuthentication.SetAuthCookie(user.Email, user.rememberMe);
 
-                MailsTasksHandler.StartSynchronization(mailAccount);
-
                 return RedirectToLocal(returnUrl);
             } 
             catch (InvalidAuthenticationException)

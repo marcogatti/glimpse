@@ -254,5 +254,16 @@ namespace Glimpse.Models
             session.Flush();
             session.Close();
         }
+
+        public MailAccount Clone()
+        {
+            ISession session = NHibernateManager.OpenSession();
+
+            MailAccountEntity entity = MailAccount.FindByAddress(this.Entity.Address, session).Entity;
+
+            session.Close();
+
+            return new MailAccount(entity);
+        }
     }
 }

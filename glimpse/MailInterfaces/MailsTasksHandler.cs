@@ -16,7 +16,7 @@ namespace Glimpse.MailInterfaces
         private static Dictionary<string, MailsTask> tasksList = new Dictionary<string, MailsTask>();
         private static Mutex tasksListLock = new Mutex(false);
 
-        private static int MAILS_AMMOUNT_PER_PASS = 5;
+        private static int MAILS_AMMOUNT_PER_PASS = 4;
 
 
         public static void StartSynchronization(MailAccount mailAccount)
@@ -33,86 +33,118 @@ namespace Glimpse.MailInterfaces
 
             UnlockTasksList();
 
-            if (!taskIsWorking)
-            {
-                ISession session = NHibernateManager.OpenSession();
-                Label label = Label.FindBySystemName(mailAccount, "INBOX", session);
-                Int64 lastUidExternal = mailAccount.getLastUIDExternalFrom("INBOX"); //TODO: Deshardcodear
-                Int64 firstUidExternal = mailAccount.getFirstUIDExternalFrom("INBOX"); //TODO: Deshardcodear
-                Int64 lastUidLocal = mailAccount.GetLastUIDLocalFromALL(session);
-                Int64 firstUidLocal = mailAccount.GetFirstUIDLocalFromALL(session);
-                session.Close();
+            if (taskIsWorking)
+                return;
 
-                MailsTask task = new MailsTask(lastUidLocal, firstUidLocal, lastUidExternal, firstUidExternal, label);
+            ISession session = NHibernateManager.OpenSession();
+
+            Label label = Label.FindBySystemName(mailAccount, "INBOX", session);
+            Int64 lastUidExternal = mailAccount.getLastUIDExternalFrom("INBOX"); //TODO: Deshardcodear
+            Int64 firstUidExternal = mailAccount.getFirstUIDExternalFrom("INBOX"); //TODO: Deshardcodear
+            Int64 lastUidLocal = mailAccount.GetLastUIDLocalFromALL(session);
+            Int64 firstUidLocal = mailAccount.GetFirstUIDLocalFromALL(session);
+
+            session.Close();
+
+            MailsTask task = new MailsTask(lastUidLocal, firstUidLocal, lastUidExternal, firstUidExternal, label, mailAccount);
+
+            if (task.HasFinished)
+            {
+                return;
+            }
+
+            LockTasksList();
+            tasksList[mailAccount.Entity.Address] = task;
+            UnlockTasksList();
+
+            StartMailsTask(task);
+        }
+
+        private static void StartMailsTask(MailsTask task)
+        {
+            Task.Factory.StartNew(() => SynchronizeAccount(task));
+        }
+
+        private static void SynchronizeAccount(MailsTask task)
+        {
+            try
+            {
+                if (!task.HasFinishedForward)
+                {
+                    SynchronizeForward(task);
+                }
+                else if (!task.HasFinishedBackward)
+                {
+                    SynchronizeBackward(task);
+                }
 
                 if (task.HasFinished)
                 {
+                    EndSynchronization(task);
                     return;
                 }
 
-                LockTasksList();
-                tasksList[mailAccount.Entity.Address] = task;
-                UnlockTasksList();
+                StartMailsTask(task);
 
-                StartMailsTask(mailAccount, task);
-            }
-        }
-
-        private static void StartMailsTask(MailAccount mailAccount, MailsTask task)
-        {
-            Task.Factory.StartNew(() => SynchronizeAccount(mailAccount, task));
-        }
-
-        private static void SynchronizeAccount(MailAccount mailAccount, MailsTask task)
-        {
-            Int64 toUid, fromUid;
-
-            try
-            {
-                toUid = task.NextUid;
-                fromUid = CalculateFromUid(toUid, task.HighestUidLocal);
-
-                mailAccount.FetchAndSaveMails(task.Label, fromUid, toUid);
-
-                task.Dirty = true;
-
-                PrepareForNextRun(task, fromUid);
-
-                if (!task.HasFinished)
-                {
-                    StartMailsTask(mailAccount, task);
-                }
-                else
-                {
-                    EndSynchronization(mailAccount, task);
-                }
             }
             catch (Exception exc)
             {
-                EndSynchronization(mailAccount, task);
+                EndSynchronization(task);
 
-                Log logger = new Log(new LogEntity(003, "Error generico SynchronizeAccount. Parametros: mailAddress(" + mailAccount.Entity.Address + ").", exc.StackTrace));
+                Log logger = new Log(new LogEntity(003, "Error generico SynchronizeAccount. Parametros: mailAddress(" + task.MailAccount.Entity.Address + ").", exc.StackTrace));
                 logger.Save();
             }
         }
 
-        private static void EndSynchronization(MailAccount mailAccount, MailsTask task)
+        private static void SynchronizeBackward(MailsTask task)
         {
-            task._working = false;
+            Int64 toUid, fromUid;
+
+            toUid = task.NextUidBackward;
+            fromUid = GetFromUid(toUid, task.LowestUidExternal);
+
+            task.MailAccount.FetchAndSaveMails(task.Label, fromUid, toUid);
+
+            task.Dirty = true;
+
+            task.NextUidBackward = GetFollowingNextUid(fromUid);
         }
 
-        private static void PrepareForNextRun(MailsTask task, Int64 fromUid)
+        private static void SynchronizeForward(MailsTask task)
         {
-            task.NextUid = fromUid > 0 ? fromUid - 1 : 0;
+            Int64 toUid, fromUid;
+
+            toUid = task.NextUidForward;
+            fromUid = GetFromUid(toUid, task.HighestUidLocal);
+
+            task.MailAccount.FetchAndSaveMails(task.Label, fromUid, toUid);
+
+            task.Dirty = true;
+
+            task.NextUidForward = GetFollowingNextUid(fromUid);
         }
 
-        private static Int64 CalculateFromUid(Int64 toUid, Int64 lastUidLocal)
+        private static void EndSynchronization(MailsTask task)
+        {
+            task.Working = false;
+        }
+
+        private static Int64 GetFollowingNextUid(Int64 fromUid)
+        {
+            if (fromUid - 1 <= 0)
+                return -1;  // Task finished
+            else
+                return fromUid - 1;
+        }
+
+        private static Int64 GetFromUid(Int64 toUid, Int64 UidLimit)
         {
             Int64 fromUid;
-            if (toUid - MAILS_AMMOUNT_PER_PASS > 0)
+
+            if (toUid - MAILS_AMMOUNT_PER_PASS > UidLimit)
                 fromUid = toUid - MAILS_AMMOUNT_PER_PASS;
             else
-                fromUid = lastUidLocal;
+                fromUid = UidLimit + 1;
             return fromUid;
         }
 
@@ -129,42 +161,61 @@ namespace Glimpse.MailInterfaces
 
     public class MailsTask
     {
-        internal bool _working;
+        internal bool Working { get; set; }
         internal Int64 HighestUidExternal { get; set; }
         internal Int64 LowestUidExternal { get; set; }
         internal Int64 HighestUidLocal { get; set; }
         internal Int64 LowestUidLocal { get; set; }
-        internal Int64 NextUid { get; set; }
+        internal Int64 NextUidForward { get; set; }
+        internal Int64 NextUidBackward { get; set; }
         internal Label Label { get; set; }
+        internal MailAccount MailAccount { get; set; }
 
         public bool IsWorking
         {
             get
             {
-                return this._working;
+                return this.Working;
             }
         }
         public bool Dirty { get; set; }
+
+        public bool HasFinishedBackward
+        {
+            get
+            {
+                return (this.LowestUidExternal > this.NextUidBackward) || (this.LowestUidExternal == this.LowestUidLocal);
+            }
+        }
+
+        public bool HasFinishedForward
+        {
+            get
+            {
+                return (this.HighestUidLocal > this.NextUidForward) || (this.HighestUidExternal == this.HighestUidLocal);
+            }
+        }
 
         public bool HasFinished
         {
             get
             {
-                return this.HighestUidLocal == this.NextUid;
+                return this.HasFinishedForward && this.HasFinishedBackward;
             }
         }
 
 
 
-        public MailsTask(Int64 lastUidLocal,Int64 firstUidLocal, Int64 lastUidExternal, Int64 firstUidExternal, Label label)
+        public MailsTask(Int64 lastUidLocal, Int64 firstUidLocal, Int64 lastUidExternal, Int64 firstUidExternal, Label label, MailAccount mailAccount)
         {
             this.HighestUidLocal = lastUidLocal;
-            this.LowestUidLocal = firstUidLocal;
-            this.NextUid = this.HighestUidExternal = lastUidExternal;
+            this.NextUidBackward = this.LowestUidLocal = firstUidLocal;
+            this.NextUidForward = this.HighestUidExternal = lastUidExternal;
             this.LowestUidExternal = firstUidExternal;
             this.Label = label;
             this.Dirty = false;
-            this._working = true;
+            this.Working = true;
+            this.MailAccount = mailAccount;
         }
     }
 }

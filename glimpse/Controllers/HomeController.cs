@@ -54,6 +54,8 @@ namespace Glimpse.Controllers
                 }
             }
 
+            MailsTasksHandler.StartSynchronization(mailAccount.Clone());
+
             IList<LabelEntity> accountLabels = Label.FindByAccount(cookieMailAccount.Entity, session);
             List<LabelViewModel> viewLabels = new List<LabelViewModel>(accountLabels.Count);
 
