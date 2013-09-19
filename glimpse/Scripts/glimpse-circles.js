@@ -41,6 +41,8 @@ function insertCircle(value) {
                         dataAttributes.join("'") +
                         "'><div class='centered'><p>" + value.subject + "</p></div></div>");
 
+    calculateEmailColor(newCircle);
+
     $("#email-container").append(newCircle);
 
 }
@@ -96,7 +98,7 @@ function fetchMailsAsync(initialDate, finalDate) {
 
     }).done(function () {
 
-        calculateEmailsColor();
+        //calculateEmailsColor();
         calculateEmailsPosition();
         hideProgressBar("#circles-progress");
         configureCircleHover();
@@ -113,6 +115,10 @@ function fetchRecentMails() {
     dateBefore.setDate(dateBefore.getDate() - 30);
 
     fetchMailsAsync(dateBefore, dateToday);
+}
+
+function fetchMailsWithinActualPeriod() {
+    fetchMailsAsync(ageToDate(maxAge), ageToDate(minAge));
 }
 
 
@@ -163,37 +169,34 @@ function markAsRead(circle) {
     circle.removeClass("new");
 }
 
-function calculateEmailsColor() {
-
-    $(".circle").each(function () {
+function calculateEmailColor(circle) {
 
         var innerColor,
             ringColor,
             outsetColor,
             shadow;
 
-        if ($(this).data('label0') !== "") {
-            innerColor = labelColors[$(this).data('label0')];
+        if (circle.data('label0') !== "") {
+            innerColor = labelColors[circle.data('label0')];
         }
-        if ($(this).data('label1') !== "") {
-            ringColor = labelColors[$(this).data('label1')];
+        if (circle.data('label1') !== "") {
+            ringColor = labelColors[circle.data('label1')];
             shadow = 'inset 0 0 0 12px ' + ringColor;
         }
 
         shadow += ', 0 0 0 8px ';
 
-        if ($(this).data('label2') !== "") {
-            outsetColor = labelColors[$(this).data('label2')];
+        if (circle.data('label2') !== "") {
+            outsetColor = labelColors[circle.data('label2')];
             shadow += outsetColor;
         }
 
-        $(this).css({
+        circle.css({
             'color': innerColor,
             'background-color': innerColor,
             'box-shadow': shadow,
             '-webkit-box-shadow': shadow,
         });
-    })
 }
 
 function calculateEmailsPosition() {

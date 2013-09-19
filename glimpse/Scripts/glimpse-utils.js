@@ -124,6 +124,7 @@ function zoom(factor, zoomPoint) {
     }
 
     setDateCoords();
+    fetchMailsWithinActualPeriod();
     calculateEmailsPosition();
 }
 
@@ -177,7 +178,7 @@ function setDragging() {
     .mouseup(function () {
         $(window).unbind("mousemove");
         setDateCoords();
-        fetchMailsAsync(ageToDate(maxAge), ageToDate(minAge));
+        fetchMailsWithinActualPeriod();
     });
 }
 
