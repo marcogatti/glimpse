@@ -109,6 +109,10 @@ namespace Glimpse.Models
             session.Flush();
             session.Close();
         }
+        public void RemoveMailLabel(String label, UInt64 gmID)
+        {
+            this.myFetcher.removeMailTag(label, gmID);
+        }
 
         public void SendMail(String toAddresses, String body, String subject)
         {

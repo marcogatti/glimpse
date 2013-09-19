@@ -125,6 +125,34 @@ namespace Glimpse.Controllers
             }
         }
 
+        public ActionResult RemoveLabel(String label, UInt64 gmID)
+        {
+            ISession session = NHibernateManager.OpenSession();
+
+            try
+            {
+                MailAccount currentMailAccount = this.GetCurrentMailAccount();
+                currentMailAccount.RemoveMailLabel(label, gmID); //IMAP
+                Mail mail = new Mail(gmID, currentMailAccount, session);
+                mail.RemoveLabel(label, session);
+
+                JsonResult result = Json(new { success = true }, JsonRequestBehavior.AllowGet);
+
+                return result;
+            }
+            catch (Exception exc)
+            {
+                Log logger = new Log(new LogEntity(002, "Error generico RemoveLabel. Parametros del mail: label("
+                    + label + "), gmID(" + gmID.ToString() + ").", exc.StackTrace));
+                logger.Save();
+                return Json(new { success = false, message = "Error al obtener el cuerpo del mail." }, JsonRequestBehavior.AllowGet);
+            }
+            finally
+            {
+                session.Close();
+            }
+        }
+
         private List<Object> FetchMails(int amountOfEmails, ISession session)
         {
             MailAccount mailAccount = GetCurrentMailAccount();
