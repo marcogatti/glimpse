@@ -134,7 +134,7 @@ namespace Glimpse.Controllers
 
             try
             {
-                List<Mail> mails = new List<Mail>();
+                MailCollection mails;
                 List<Object> mailsToReturn = new List<object>();
 
                 MailAccount currentMailAccount = this.GetCurrentMailAccount();

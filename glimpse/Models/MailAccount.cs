@@ -68,11 +68,11 @@ namespace Glimpse.Models
 
             return mails;
         }
-        public List<Mail> GetMailsByAmount(Int32 amountOfMails, ISession session)
+        public MailCollection GetMailsByAmount(Int32 amountOfMails, ISession session)
         {
             Mail mail;
-            List<Mail> mails = new List<Mail>();
-            IList<MailEntity> databaseMails = new List<MailEntity>();
+            MailCollection mails;
+            IList<MailEntity> databaseMails;
 
             databaseMails = session.CreateCriteria<MailEntity>()
                                                   .Add(Restrictions.Eq("MailAccountEntity", this.Entity))
@@ -80,11 +80,7 @@ namespace Glimpse.Models
                                                   .SetMaxResults(amountOfMails)
                                                   .List<MailEntity>();
 
-            foreach (MailEntity databaseMail in databaseMails)
-            {
-                mail = new Mail(databaseMail);
-                mails.Add(mail);
-            }
+            mails = new MailCollection(databaseMails);
 
             return mails;
         }
