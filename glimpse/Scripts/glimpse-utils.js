@@ -125,7 +125,7 @@ function zoom(factor, zoomPoint) {
 
     setDateCoords();
     fetchMailsWithinActualPeriod();
-    calculateEmailsPosition();
+    calculateEmailsLeft();
 }
 
 function configureZoom() {
@@ -155,7 +155,7 @@ function movePeriodShown(offset) {
         minAge += offset;
         maxAge += offset;
     }
-    calculateEmailsPosition();
+    calculateEmailsLeft();
 }
 
 function setDragging() {

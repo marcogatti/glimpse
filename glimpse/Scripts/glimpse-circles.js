@@ -42,8 +42,8 @@ function insertCircle(value) {
                         "'><div class='centered'><p>" + value.subject + "</p></div></div>");
 
     calculateEmailColor(newCircle);
-
     $("#email-container").append(newCircle);
+    calculateEmailPosition(newCircle);
 
 }
 
@@ -98,8 +98,6 @@ function fetchMailsAsync(initialDate, finalDate) {
 
     }).done(function () {
 
-        //calculateEmailsColor();
-        calculateEmailsPosition();
         hideProgressBar("#circles-progress");
         configureCircleHover();
         setCirclePre();
@@ -199,18 +197,13 @@ function calculateEmailColor(circle) {
         });
 }
 
-function calculateEmailsPosition() {
+function calculateEmailsLeft() {
 
     var margin = parseInt($(".circle").css('width'), 10);
 
     $(".circle").each(function () {
 
-        var left = ($(this).attr('data-age') - minAge) / currentPeriodShown(),
-            top = ($(this).attr('data-from').charCodeAt(0) - "a".charCodeAt(0) + 2) / alphabetSize();
-
-        $(this).css('top', function () {
-            return top * (containerHeight() - margin) + 'px';
-        });
+        var left = ($(this).attr('data-age') - minAge) / currentPeriodShown();
 
         $(this).css('left', function () {
             return left * (containerWidth() - margin) + 'px';
@@ -218,6 +211,22 @@ function calculateEmailsPosition() {
 
 
     })
+}
+
+function calculateEmailPosition(circle) {
+
+    var margin = parseInt(circle.css('width'), 10);
+
+        var left = (circle.attr('data-age') - minAge) / currentPeriodShown(),
+            top = (circle.attr('data-from').charCodeAt(0) - "a".charCodeAt(0) + 2) / alphabetSize();
+
+        circle.css('top', function () {
+            return top * (containerHeight() - margin) + 'px';
+        });
+
+        circle.css('left', function () {
+            return left * (containerWidth() - margin) + 'px';
+        });
 }
 
 function setLabelSelection() {
