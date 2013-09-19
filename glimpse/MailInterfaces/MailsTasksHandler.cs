@@ -185,7 +185,8 @@ namespace Glimpse.MailInterfaces
         {
             get
             {
-                return (this.LowestUidExternal > this.NextUidBackward) || (this.LowestUidExternal == this.LowestUidLocal);
+                return (this.LowestUidExternal > this.NextUidBackward) // Si el puntero al siguiente queda dentras de lo que existe en IMAP.
+                    || (this.LowestUidExternal >= this.LowestUidLocal); // Si tengo lo mismo o mas en la base que en IMAP 
             }
         }
 
@@ -193,7 +194,9 @@ namespace Glimpse.MailInterfaces
         {
             get
             {
-                return (this.HighestUidLocal >= this.NextUidForward) || (this.HighestUidExternal == this.HighestUidLocal);
+                return (this.HighestUidLocal >= this.NextUidForward) // Si el puntero al siguiente esta detras del que tenemos en la base
+                    || (this.HighestUidExternal <= this.HighestUidLocal) // Si tengo lo mismo o mas en la base que en IMAP
+                    || (this.LowestUidExternal > this.NextUidForward); // Si el puntero al siguiente queda por debajo lo que existe en IMAP
             }
         }
 

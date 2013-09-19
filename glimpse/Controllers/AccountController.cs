@@ -73,6 +73,12 @@ namespace Glimpse.Controllers
         {
             FormsAuthentication.SignOut();
             new CookieHelper().clearMailAddressCookie();
+            MailAccount mailAccount = (MailAccount)Session[MAIL_INTERFACE];
+            if (mailAccount != null)
+            {
+                mailAccount.Disconnect();
+                Session.Remove(MAIL_INTERFACE);
+            }
             return Redirect("/");
         }
 
