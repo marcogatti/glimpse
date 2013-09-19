@@ -68,6 +68,26 @@ namespace Glimpse.Models
 
             return mails;
         }
+        public List<Mail> GetMailsByAmount(Int32 amountOfMails, ISession session)
+        {
+            Mail mail;
+            List<Mail> mails = new List<Mail>();
+            IList<MailEntity> databaseMails = new List<MailEntity>();
+
+            databaseMails = session.CreateCriteria<MailEntity>()
+                                                  .Add(Restrictions.Eq("MailAccountEntity", this.Entity))
+                                                  .AddOrder(Order.Desc("Date"))
+                                                  .SetMaxResults(amountOfMails)
+                                                  .List<MailEntity>();
+
+            foreach (MailEntity databaseMail in databaseMails)
+            {
+                mail = new Mail(databaseMail);
+                mails.Add(mail);
+            }
+
+            return mails;
+        }
 
         public MailAccount LoginExternal()
         {
@@ -111,6 +131,10 @@ namespace Glimpse.Models
 
             session.Flush();
             session.Close();
+        }
+        public void RemoveMailLabel(String label, UInt64 gmID)
+        {
+            this.myFetcher.removeMailTag(label, gmID);
         }
 
         public void SendMail(String toAddresses, String body, String subject)

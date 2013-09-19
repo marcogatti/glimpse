@@ -98,7 +98,7 @@ function populateLabelColors() {
 
 function setTransitionsCheckbox() {
     $("#transitions-check").click(function () {
-        $(".circle").css("transition", "none")
+        $(".circle").toggleClass("transition");
     });
 }
 
@@ -124,7 +124,8 @@ function zoom(factor, zoomPoint) {
     }
 
     setDateCoords();
-    calculateEmailsPosition();
+    fetchMailsWithinActualPeriod();
+    calculateEmailsLeft();
 }
 
 function configureZoom() {
@@ -154,7 +155,7 @@ function movePeriodShown(offset) {
         minAge += offset;
         maxAge += offset;
     }
-    calculateEmailsPosition();
+    calculateEmailsLeft();
 }
 
 function setDragging() {
@@ -172,10 +173,12 @@ function setDragging() {
         });
     });
 
-    $(document)
+    //  Revisar (pedidos ajax innecesarios)
+    $(window)
     .mouseup(function () {
         $(window).unbind("mousemove");
         setDateCoords();
+        fetchMailsWithinActualPeriod();
     });
 }
 
@@ -188,18 +191,21 @@ function setDateCoordsPosition() {
     });
 }
 
-function setDateCoords() {
+function ageToDate(age) {
     var now = new Date().getTime(),
-        jsMinAge = Math.floor(minAge / 10000),
-        jsMaxAge = Math.floor(maxAge / 10000),
-        newDateToday = new Date(now - jsMinAge).toLocaleDateString(),
-        newDateLast = new Date(now - jsMaxAge).toLocaleDateString();
+        jsAge = Math.floor(age / 10000);
+    return new Date(now - jsAge);
+}
+
+function setDateCoords() {
+
+        newDateToday = ageToDate(minAge).toLocaleDateString(),
+        newDateLast = ageToDate(maxAge).toLocaleDateString();
 
     if (newDateToday === new Date().toLocaleDateString()) {
         newDateToday = "Hoy";
     }
-    //  selector mágico
-    //$("#date-today+div").find(".tooltip-inner").html(newDateToday.toLocaleDateString());
+
     $("#date-today").html(newDateToday);
     $("#date-last").html(newDateLast);
 }
@@ -219,7 +225,9 @@ function showProgressBar(bar) {
 
 function setRefreshOnResize() {
     $(window).resize(function () {
-        calculateEmailsPosition();
+        $(".circle").each(function () {
+            calculateEmailPosition($(this));
+        });
     });
 
 }
