@@ -98,7 +98,7 @@ function populateLabelColors() {
 
 function setTransitionsCheckbox() {
     $("#transitions-check").click(function () {
-        $(".circle").css("transition", "none")
+        $(".circle").toggleClass("transition");
     });
 }
 

@@ -4,7 +4,7 @@
     }
 
     var date = new Date(parseInt(value.date.substr(6))).toGMTString(),
-        classes = "circle";
+        classes = "circle transition";
 
     if (!value.seen) {
         classes += " new";
