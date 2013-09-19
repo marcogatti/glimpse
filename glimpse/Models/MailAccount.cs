@@ -70,7 +70,6 @@ namespace Glimpse.Models
         }
         public MailCollection GetMailsByAmount(Int32 amountOfMails, ISession session)
         {
-            Mail mail;
             MailCollection mails;
             IList<MailEntity> databaseMails;
 
@@ -122,12 +121,12 @@ namespace Glimpse.Models
 
             tran.Commit();
 
-            IList<LabelEntity> labels = Label.FindByAccount(this.Entity, session);
-            this.myFetcher.SetLabels(labels);
+            setFetcherLabels(session);
 
             session.Flush();
             session.Close();
         }
+
         public void RemoveMailLabel(String label, UInt64 gmID)
         {
             this.myFetcher.removeMailTag(label, gmID);
@@ -275,15 +274,28 @@ namespace Glimpse.Models
             session.Close();
         }
 
+        private void setFetcherLabels(ISession session)
+        {
+            IList<LabelEntity> labels = Label.FindByAccount(this.Entity, session);
+            this.myFetcher.SetLabels(labels);
+        }
         public MailAccount Clone()
         {
             ISession session = NHibernateManager.OpenSession();
 
             MailAccountEntity entity = MailAccount.FindByAddress(this.Entity.Address, session).Entity;
 
+            MailAccount mailAccountClone = new MailAccount(entity);
+            mailAccountClone.setFetcherLabels(session);
+
             session.Close();
 
-            return new MailAccount(entity);
+            return mailAccountClone;
+        }
+
+        public void Disconnect()
+        {
+            this.myFetcher.CloseClient();
         }
     }
 }

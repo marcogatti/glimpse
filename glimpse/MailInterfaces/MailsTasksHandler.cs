@@ -101,7 +101,7 @@ namespace Glimpse.MailInterfaces
             Int64 toUid, fromUid;
 
             toUid = task.NextUidBackward;
-            fromUid = GetFromUid(toUid, task.LowestUidExternal);
+            fromUid = GetFromUid(toUid, task.LowestUidExternal - 1); // En el backward queremos que traiga el LowestUidExternal
 
             task.MailAccount.FetchAndSaveMails(task.Label, fromUid, toUid);
 
@@ -115,7 +115,7 @@ namespace Glimpse.MailInterfaces
             Int64 toUid, fromUid;
 
             toUid = task.NextUidForward;
-            fromUid = GetFromUid(toUid, task.HighestUidLocal);
+            fromUid = GetFromUid(toUid, task.HighestUidLocal); // En el forward no queremos el HighestUidLocal porque ya lo tenemos
 
             task.MailAccount.FetchAndSaveMails(task.Label, fromUid, toUid);
 
@@ -127,6 +127,7 @@ namespace Glimpse.MailInterfaces
         private static void EndSynchronization(MailsTask task)
         {
             task.Working = false;
+            task.MailAccount.Disconnect();
         }
 
         private static Int64 GetFollowingNextUid(Int64 fromUid)
@@ -134,7 +135,7 @@ namespace Glimpse.MailInterfaces
             if (fromUid - 1 <= 0)
                 return -1;  // Task finished
             else
-                return fromUid - 1;
+                return fromUid - 1; //muevo el puntero una posicion atras de que recien me traje
         }
 
         private static Int64 GetFromUid(Int64 toUid, Int64 UidLimit)
@@ -192,7 +193,7 @@ namespace Glimpse.MailInterfaces
         {
             get
             {
-                return (this.HighestUidLocal > this.NextUidForward) || (this.HighestUidExternal == this.HighestUidLocal);
+                return (this.HighestUidLocal >= this.NextUidForward) || (this.HighestUidExternal == this.HighestUidLocal);
             }
         }
 
@@ -209,7 +210,8 @@ namespace Glimpse.MailInterfaces
         public MailsTask(Int64 lastUidLocal, Int64 firstUidLocal, Int64 lastUidExternal, Int64 firstUidExternal, Label label, MailAccount mailAccount)
         {
             this.HighestUidLocal = lastUidLocal;
-            this.NextUidBackward = this.LowestUidLocal = firstUidLocal;
+            this.LowestUidLocal = firstUidLocal;
+            this.NextUidBackward = this.LowestUidLocal - 1; //no queremos descargar el mail que ya tenemos!
             this.NextUidForward = this.HighestUidExternal = lastUidExternal;
             this.LowestUidExternal = firstUidExternal;
             this.Label = label;
