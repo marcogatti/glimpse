@@ -325,7 +325,7 @@ namespace Glimpse.MailInterfaces
                                          || retrievedMessage.EmbeddedObjects.Count != 0
                                          || unknownPartsHaveAttachments);
 
-            retrievedMail.ToAddr = this.GetAddressNameAndMail(retrievedMessage.To);
+            retrievedMail.ToAddress = this.GetAddressNameAndMail(retrievedMessage.To);
             retrievedMail.BCC = this.GetAddressNameAndMail(retrievedMessage.Bcc);
             retrievedMail.CC = this.GetAddressNameAndMail(retrievedMessage.Cc);
 

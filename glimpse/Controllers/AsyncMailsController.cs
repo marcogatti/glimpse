@@ -164,7 +164,7 @@ namespace Glimpse.Controllers
                         address = mail.Entity.From.MailAddress,
                         name = mail.Entity.From.Name
                     },
-                    to = mail.Entity.ToAddr,
+                    to = mail.Entity.ToAddress,
                     cc = mail.Entity.CC,
                     bcc = mail.Entity.BCC,
                     bodypeek = mail.Entity.BodyPeek,

@@ -7,15 +7,17 @@ using Glimpse.DataAccessLayer.Entities;
 
 namespace Glimpse.DataAccessLayer.Mappings
 {
-    public class MailAccountMap : ClassMap<MailAccountEntity>
+    public class LogMap : ClassMap<LogEntity>
     {
-        public MailAccountMap()
+        public LogMap()
         {
             Id(x => x.Id).Column("Id").GeneratedBy.Identity();
-            Map(x => x.Address).Column("Address");
-            Map(x => x.Password).Column("Password");
+            Map(x => x.Message).Column("Message").Not.Nullable();
+            Map(x => x.StackTrace).Column("StackTrace");
+            Map(x => x.Code).Column("Code");
+            Map(x => x.Date).Column("Date");
 
-            Table("MAILACCOUNT");
+            Table("LOG");
         }
     }
 }

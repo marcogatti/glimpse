@@ -31,7 +31,7 @@ namespace Glimpse.DataAccessLayer.Entities
         public virtual Boolean Seen { get; set; }
         public virtual Boolean Draft { get; set; }
         public virtual Boolean HasExtras { get; set; }
-        public virtual String ToAddr { get; set; }
+        public virtual String ToAddress { get; set; }
         public virtual String CC { get; set; }
         public virtual String BCC { get; set; }
         public virtual String BodyPeek { get; set; }

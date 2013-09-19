@@ -18,19 +18,19 @@ namespace Glimpse.Tests.DAL
     [TestFixture]
     public class SchemaBuild
     {
-        private static void BuildSchema(Configuration cfg)
-        {
-            new SchemaExport(cfg).Drop(true, true);
-            new SchemaExport(cfg).Create(true, true);
-        }
+        //private static void BuildSchema(Configuration cfg)
+        //{
+        //    new SchemaExport(cfg).Drop(true, true);
+        //    new SchemaExport(cfg).Create(true, true);
+        //}
 
-        [Test]
-        [Explicit]
-        public void EXP_Drop_And_Create()
-        {
-            var dataAccessService = new NHibernateManager();
-            dataAccessService.CreateSessionFactory();
-            BuildSchema(dataAccessService.NhibernateConfiguration);
-        }
+        //[Test]
+        //[Explicit]
+        //public void EXP_Drop_And_Create()
+        //{
+        //    var dataAccessService = new NHibernateManager();
+        //    dataAccessService.CreateSessionFactory();
+        //    BuildSchema(dataAccessService.NhibernateConfiguration);
+        //}
     }
 }

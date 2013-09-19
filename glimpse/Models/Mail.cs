@@ -57,7 +57,7 @@ namespace Glimpse.Models
             this.Entity.Seen = from.Seen;
             this.Entity.Draft = from.Draft;
             this.Entity.HasExtras = from.HasExtras;
-            this.Entity.ToAddr = from.ToAddr;
+            this.Entity.ToAddress = from.ToAddress;
             this.Entity.CC = from.CC;
             this.Entity.BCC = from.BCC;
             this.Entity.Body = from.Body;

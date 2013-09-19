@@ -7,15 +7,15 @@ using Glimpse.DataAccessLayer.Entities;
 
 namespace Glimpse.DataAccessLayer.Mappings
 {
-    public class MailAccountMap : ClassMap<MailAccountEntity>
+    public class AddressMap : ClassMap<AddressEntity>
     {
-        public MailAccountMap()
+        public AddressMap()
         {
             Id(x => x.Id).Column("Id").GeneratedBy.Identity();
-            Map(x => x.Address).Column("Address");
-            Map(x => x.Password).Column("Password");
-
-            Table("MAILACCOUNT");
+            Map(x => x.MailAddress).Column("MailAddress");
+            Map(x => x.Name).Column("Name");
+            
+            Table("ADDRESS");
         }
     }
 }

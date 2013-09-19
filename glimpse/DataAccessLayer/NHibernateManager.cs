@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Configuration;
 using System.Linq;
 using System.Web;
 using System.Web.Security;
@@ -15,8 +16,6 @@ using NHibernate;
 using NHibernate.Cfg;
 using NHibernate.Tool.hbm2ddl;
 using Glimpse.DataAccessLayer.Entities;
-using Glimpse.DataAccessLayer.Mappings;
-using FluentNHibernate.Automapping;
 
 namespace Glimpse.DataAccessLayer
 {
@@ -28,43 +27,28 @@ namespace Glimpse.DataAccessLayer
             get
             {
                 if (_sessionFactory == null)
-                    _sessionFactory = CreateFluentConfiguration().BuildSessionFactory();
+                {
+                    string strConnectionString = ConfigurationManager.AppSettings["ConnectionString"];
 
+                    FluentConfiguration cfg = Fluently.Configure()
+                        .Database(MySQLConfiguration.Standard.ConnectionString(strConnectionString))
+                        .Mappings(m => m.FluentMappings.AddFromAssemblyOf<MailEntity>());
+
+                    _sessionFactory = cfg.BuildSessionFactory();
+                }
                 return _sessionFactory;
             }
         }
-
-        private readonly FluentConfiguration fluentConfiguration;
-
-        private Configuration nhibernateConfiguration;
-        public Configuration NhibernateConfiguration
-        {
-            get { return nhibernateConfiguration; }
-        }
-
-        public NHibernateManager()
-        {
-            fluentConfiguration = CreateFluentConfiguration().ExposeConfiguration(cfg => nhibernateConfiguration = cfg);
-        }
-
-        public ISessionFactory CreateSessionFactory()
-        {
-            return _sessionFactory ?? (_sessionFactory = fluentConfiguration.BuildSessionFactory());
-        }
-
-        private static FluentConfiguration CreateFluentConfiguration()
-        {
-            var entitiesToMapConfiguration = new AutomappingConfiguration();
-            String connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString;
-            return Fluently.Configure()
-                        .Database(MySQLConfiguration.Standard.ConnectionString(connectionString))
-                        .Mappings(m => m.AutoMappings.Add(AutoMap.AssemblyOf<MailEntity>(entitiesToMapConfiguration)
-                                                                 .UseOverridesFromAssemblyOf<AddressMappingOverride>));
-        }
-
         public static ISession OpenSession()
         {
             return SessionFactory.OpenSession();
+        }
+        public static void CloseSessionFactory()
+        {
+            if (SessionFactory != null)
+            {
+                SessionFactory.Close();
+            }
         }
 
     }
