@@ -95,8 +95,11 @@ namespace Glimpse.Controllers
             return Json(new { success = true, address = sendInfo.ToAddress }, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult GetMailsByDate(DateTime initialDate, DateTime finalDate)
+        public ActionResult GetMailsByDate(Int64 initial, Int64 final)
         {
+            DateTime initialDate = ConvertFromJS(initial);
+            DateTime finalDate = ConvertFromJS(final);
+
             ISession session = NHibernateManager.OpenSession();
 
             try
@@ -123,6 +126,12 @@ namespace Glimpse.Controllers
             {
                 session.Close();
             }
+        }
+
+        private static DateTime ConvertFromJS(Int64 JSDate)
+        {
+            DateTime date = new DateTime(1970, 1, 1) + new TimeSpan(JSDate * 10000);
+            return date;
         }
 
         private List<Object> FetchMails(int amountOfEmails, ISession session)

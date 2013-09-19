@@ -2,7 +2,7 @@ $(document).ready(function () {
 
     setDateCoordsPosition();
     populateLabelColors();
-    fetchMailsAsync();
+    fetchRecentMails();
     setDragging();
     configureZoom();
     setRefreshOnResize();

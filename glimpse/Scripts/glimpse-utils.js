@@ -176,6 +176,7 @@ function setDragging() {
     .mouseup(function () {
         $(window).unbind("mousemove");
         setDateCoords();
+        fetchMailsAsync(ageToDate(maxAge), ageToDate(minAge));
     });
 }
 
@@ -188,18 +189,21 @@ function setDateCoordsPosition() {
     });
 }
 
-function setDateCoords() {
+function ageToDate(age) {
     var now = new Date().getTime(),
-        jsMinAge = Math.floor(minAge / 10000),
-        jsMaxAge = Math.floor(maxAge / 10000),
-        newDateToday = new Date(now - jsMinAge).toLocaleDateString(),
-        newDateLast = new Date(now - jsMaxAge).toLocaleDateString();
+        jsAge = Math.floor(age / 10000);
+    return new Date(now - jsAge);
+}
+
+function setDateCoords() {
+
+        newDateToday = ageToDate(minAge).toLocaleDateString(),
+        newDateLast = ageToDate(maxAge).toLocaleDateString();
 
     if (newDateToday === new Date().toLocaleDateString()) {
         newDateToday = "Hoy";
     }
-    //  selector mágico
-    //$("#date-today+div").find(".tooltip-inner").html(newDateToday.toLocaleDateString());
+
     $("#date-today").html(newDateToday);
     $("#date-last").html(newDateLast);
 }

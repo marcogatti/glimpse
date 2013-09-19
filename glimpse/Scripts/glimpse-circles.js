@@ -77,10 +77,9 @@ function setCirclePre() {
         })
 }
 
-function fetchMailsAsync() {
+function fetchMailsAsync(initialDate, finalDate) {
 
-    $.getJSON("async/InboxMails/500", function (data) {
-
+    $.getJSON("async/GetMailsByDate?initial=" + initialDate.getTime() + "&final=" + finalDate.getTime(), function(data){
         if (data.success === true) {
 
             $.each(data.mails, function (index, value) {
@@ -100,6 +99,15 @@ function fetchMailsAsync() {
         setDateCoords();
 
     });
+}
+
+function fetchRecentMails() {
+
+    var dateBefore = new Date(),
+        dateToday = new Date();
+    dateBefore.setDate(dateBefore.getDate() - 30);
+
+    fetchMailsAsync(dateBefore, dateToday);
 }
 
 
