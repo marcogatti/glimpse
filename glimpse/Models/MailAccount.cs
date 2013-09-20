@@ -23,15 +23,9 @@ namespace Glimpse.Models
         public MailAccount(MailAccountEntity accountEntity)
         {
             this.Entity = accountEntity;
-            this.LoginExternal();
-            this.mySender = new Sender(this.Entity.Address, this.Entity.Password);
         }
         public MailAccount(String address, String password)
-        {
-            this.Entity = new MailAccountEntity(address, password);
-            this.LoginExternal();
-            this.mySender = new Sender(address, password);
-        }
+            : this(new MailAccountEntity(address, password)) { }
 
 
         public Int32 getLastUIDExternalFrom(String mailbox)
@@ -84,10 +78,50 @@ namespace Glimpse.Models
             return mails;
         }
 
-        public MailAccount LoginExternal()
+        public void connectLight()
         {
-            this.myFetcher = new Fetcher(this.Entity.Address, this.Entity.Password);
-            return this;
+            if (this.myFetcher == null || !this.myFetcher.isConnected())
+                this.myFetcher = new Fetcher(this.Entity.Address, this.Entity.Password);
+        }
+        public void connectFull()
+        {
+            this.connectLight();
+
+            using (ISession session = NHibernateManager.OpenSession())
+            {
+                this.setFetcherLabels(session);
+
+                session.Close();
+            }
+        }
+        public bool isConnected()
+        {
+            return this.myFetcher.isConnected();
+        }
+        public void Disconnect()
+        {
+            this.myFetcher.CloseClient();
+        }
+
+        public MailAccount Clone()
+        {
+            MailAccount mailAccountClone;
+            MailAccountEntity entity;
+
+            using (ISession session = NHibernateManager.OpenSession())
+            {
+
+                entity = MailAccount.FindByAddress(this.Entity.Address, session).Entity;
+
+                mailAccountClone = new MailAccount(entity);
+
+                if (this.isConnected())
+                    mailAccountClone.connectFull();
+
+                session.Close();
+            }
+
+            return mailAccountClone;
         }
         public void UpdateLabels()
         {
@@ -187,33 +221,6 @@ namespace Glimpse.Models
                 return new MailAccount(account);
         }
 
-        private void RegisterLabel(String labelName, ISession session, IList<LabelEntity> databaseLabels, String systemName = null)
-        {
-            if (labelName == null)
-                return;
-            LabelEntity labelEntity = new LabelEntity();
-
-            foreach (LabelEntity databaseLabel in databaseLabels)
-            {
-                if (databaseLabel.Name == labelName)
-                {
-                    return;
-                }
-            }
-
-            labelEntity.Name = labelName;
-            labelEntity.MailAccountEntity = this.Entity;
-            labelEntity.SystemName = systemName;
-            Label label = new Label(labelEntity);
-            label.SaveOrUpdate(session);
-
-        }
-        private void Clone(MailAccount fromAccount)
-        {
-            this.Entity.Address = fromAccount.Entity.Address;
-            this.Entity.Password = fromAccount.Entity.Password;
-        }
-
         public Int64 GetLastUIDLocalFromALL(ISession session)
         {
             Int64 lastDatabaseUID = session.CreateCriteria<MailEntity>()
@@ -279,23 +286,32 @@ namespace Glimpse.Models
             IList<LabelEntity> labels = Label.FindByAccount(this.Entity, session);
             this.myFetcher.SetLabels(labels);
         }
-        public MailAccount Clone()
+        private void RegisterLabel(String labelName, ISession session, IList<LabelEntity> databaseLabels, String systemName = null)
         {
-            ISession session = NHibernateManager.OpenSession();
+            if (labelName == null)
+                return;
+            LabelEntity labelEntity = new LabelEntity();
 
-            MailAccountEntity entity = MailAccount.FindByAddress(this.Entity.Address, session).Entity;
+            foreach (LabelEntity databaseLabel in databaseLabels)
+            {
+                if (databaseLabel.Name == labelName)
+                {
+                    return;
+                }
+            }
 
-            MailAccount mailAccountClone = new MailAccount(entity);
-            mailAccountClone.setFetcherLabels(session);
+            labelEntity.Name = labelName;
+            labelEntity.MailAccountEntity = this.Entity;
+            labelEntity.SystemName = systemName;
+            Label label = new Label(labelEntity);
+            label.SaveOrUpdate(session);
 
-            session.Close();
-
-            return mailAccountClone;
+        }
+        private void Clone(MailAccount fromAccount)
+        {
+            this.Entity.Address = fromAccount.Entity.Address;
+            this.Entity.Password = fromAccount.Entity.Password;
         }
 
-        public void Disconnect()
-        {
-            this.myFetcher.CloseClient();
-        }
     }
 }

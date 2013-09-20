@@ -19,10 +19,11 @@ namespace Glimpse.MailInterfaces
         private static int MAILS_AMMOUNT_PER_PASS = 4;
 
 
-        public static void StartSynchronization(MailAccount mailAccount)
+        public static void StartSynchronization(String mailAddress)
         {
             bool taskIsWorking;
-            String mailAddress = mailAccount.Entity.Address;
+            MailAccount mailAccount;
+            MailsTask newTask;
 
             LockTasksList();
 
@@ -36,28 +37,32 @@ namespace Glimpse.MailInterfaces
             if (taskIsWorking)
                 return;
 
-            ISession session = NHibernateManager.OpenSession();
+            using (ISession session = NHibernateManager.OpenSession())
+            {
+                mailAccount = MailAccount.FindByAddress(mailAddress, session);
+                mailAccount.connectFull();
 
-            Label label = Label.FindBySystemName(mailAccount, "INBOX", session);
-            Int64 lastUidExternal = mailAccount.getLastUIDExternalFrom("INBOX"); //TODO: Deshardcodear
-            Int64 firstUidExternal = mailAccount.getFirstUIDExternalFrom("INBOX"); //TODO: Deshardcodear
-            Int64 lastUidLocal = mailAccount.GetLastUIDLocalFromALL(session);
-            Int64 firstUidLocal = mailAccount.GetFirstUIDLocalFromALL(session);
+                Label label = Label.FindBySystemName(mailAccount, "INBOX", session);
+                Int64 lastUidExternal = mailAccount.getLastUIDExternalFrom("INBOX"); //TODO: Deshardcodear
+                Int64 firstUidExternal = mailAccount.getFirstUIDExternalFrom("INBOX"); //TODO: Deshardcodear
+                Int64 lastUidLocal = mailAccount.GetLastUIDLocalFromALL(session);
+                Int64 firstUidLocal = mailAccount.GetFirstUIDLocalFromALL(session);
 
-            session.Close();
+                newTask = new MailsTask(lastUidLocal, firstUidLocal, lastUidExternal, firstUidExternal, label, mailAccount);
 
-            MailsTask task = new MailsTask(lastUidLocal, firstUidLocal, lastUidExternal, firstUidExternal, label, mailAccount);
+                session.Close();     
+            }
 
-            if (task.HasFinished)
+            if (newTask.HasFinished)
             {
                 return;
             }
 
             LockTasksList();
-            tasksList[mailAccount.Entity.Address] = task;
+            tasksList[mailAccount.Entity.Address] = newTask;
             UnlockTasksList();
 
-            StartMailsTask(task);
+            StartMailsTask(newTask);
         }
 
         private static void StartMailsTask(MailsTask task)

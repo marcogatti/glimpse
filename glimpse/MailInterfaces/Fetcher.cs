@@ -228,6 +228,11 @@ namespace Glimpse.MailInterfaces
             this.receiver.Disconnect();
         }
 
+        public bool isConnected()
+        {
+            return this.receiver.IsConnected;
+        }
+
         #region Private Methods
         private Mailbox GetMailbox(String targetMailboxName)
         {

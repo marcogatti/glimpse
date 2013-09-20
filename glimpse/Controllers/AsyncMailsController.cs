@@ -267,6 +267,10 @@ namespace Glimpse.Controllers
         private MailAccount GetCurrentMailAccount()
         {
             MailAccount mailAccount = (MailAccount)Session[AccountController.MAIL_INTERFACE];
+
+            if (!mailAccount.isConnected())
+                mailAccount.connectFull();
+
             return mailAccount;
         }
 
