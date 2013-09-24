@@ -11,7 +11,7 @@ using System.Web;
 
 namespace Glimpse.MailInterfaces
 {
-    public class Fetcher
+    public class Fetcher : IDisposable
     {
         private Imap4Client receiver;
         private Mailbox currentOpenedMailbox;
@@ -231,6 +231,11 @@ namespace Glimpse.MailInterfaces
         public bool isConnected()
         {
             return this.receiver.IsConnected;
+        }
+
+        public void Dispose()
+        {
+            if (this.isConnected()) this.CloseClient();
         }
 
         #region Private Methods
