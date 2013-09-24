@@ -1,5 +1,6 @@
 ﻿using Glimpse.DataAccessLayer;
 using Glimpse.DataAccessLayer.Entities;
+using Glimpse.ErrorLogging;
 using Glimpse.Models;
 using NHibernate;
 using System;
@@ -18,7 +19,7 @@ namespace Glimpse.MailInterfaces
 
         private static int MAILS_AMMOUNT_PER_PASS = 4;
 
-
+        [HandleErrorWithELMAH]
         public static void StartSynchronization(String mailAddress)
         {
             bool taskIsWorking;
@@ -70,6 +71,7 @@ namespace Glimpse.MailInterfaces
             Task.Factory.StartNew(() => SynchronizeAccount(task));
         }
 
+        [HandleErrorWithELMAH]
         private static void SynchronizeAccount(MailsTask task)
         {
             try
@@ -95,9 +97,7 @@ namespace Glimpse.MailInterfaces
             catch (Exception exc)
             {
                 EndSynchronization(task);
-
-                Log logger = new Log(new LogEntity(003, "Error generico SynchronizeAccount. Parametros: mailAddress(" + task.MailAccount.Entity.Address + ").", exc.StackTrace));
-                logger.Save();
+                throw exc;
             }
         }
 

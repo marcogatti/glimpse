@@ -11,6 +11,10 @@ namespace Glimpse
     {
         public static void RegisterRoutes(RouteCollection routes)
         {
+            routes.IgnoreRoute("elmah.axd");
+
+            routes.IgnoreRoute("elmah.axd/{*anything}");
+
             routes.MapRoute(
                 name: "MainScreen",
                 url: "{action}",
