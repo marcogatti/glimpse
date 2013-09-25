@@ -19,7 +19,6 @@ namespace Glimpse.MailInterfaces
 
         private static int MAILS_AMMOUNT_PER_PASS = 4;
 
-        [HandleErrorWithELMAH]
         public static void StartSynchronization(String mailAddress)
         {
             bool taskIsWorking;
@@ -71,7 +70,6 @@ namespace Glimpse.MailInterfaces
             Task.Factory.StartNew(() => SynchronizeAccount(task));
         }
 
-        [HandleErrorWithELMAH]
         private static void SynchronizeAccount(MailsTask task)
         {
             try
@@ -97,6 +95,7 @@ namespace Glimpse.MailInterfaces
             catch (Exception exc)
             {
                 EndSynchronization(task);
+                Log.LogException(exc);
                 throw exc;
             }
         }
