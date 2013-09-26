@@ -12,6 +12,7 @@ using NHibernate.Criterion;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 using System.Web;
 using System.Web.Mvc;
 
@@ -106,7 +107,7 @@ namespace Glimpse.Controllers
             {
                 MailCollection mails;
                 List<Object> mailsToReturn = new List<object>();
-                
+
                 MailAccount currentMailAccount = this.GetCurrentMailAccount();
                 mails = new MailCollection(currentMailAccount.GetMailsByDate(initialDate, finalDate, session));
                 mailsToReturn = this.PrepareToSend(mails);
@@ -195,18 +196,11 @@ namespace Glimpse.Controllers
         {
             MailAccount mailAccount = GetCurrentMailAccount();
 
-            if (mailAccount != null)
-            {
-                MailManager manager = new MailManager(mailAccount);
+            MailManager manager = new MailManager(mailAccount);
 
-                MailCollection mails = manager.GetMailsFrom("INBOX", amountOfEmails, session);
+            MailCollection mails = manager.GetMailsFrom("INBOX", amountOfEmails, session);
 
-                return this.PrepareToSend(mails);
-            }
-            else
-            {
-                throw new GlimpseException("El MailAccount no estaba inicializado.");
-            }
+            return this.PrepareToSend(mails);
         }
 
         private List<Object> PrepareToSend(MailCollection mails)
@@ -231,7 +225,8 @@ namespace Glimpse.Controllers
                         address = mail.From.MailAddress,
                         name = mail.From.Name
                     },
-                    to = mail.ToAddr,
+
+                    to = mail.ToAddress,
                     cc = mail.CC,
                     bcc = mail.BCC,
                     bodypeek = mail.BodyPeek,
@@ -269,8 +264,16 @@ namespace Glimpse.Controllers
             MailAccount mailAccount = (MailAccount)Session[AccountController.MAIL_INTERFACE];
 
             if (!mailAccount.isConnected())
-                mailAccount.connectFull();
-
+            {
+                try
+                {
+                    mailAccount.connectFull();
+                }
+                catch (SocketException exc)
+                {
+                    Log.LogException(exc, "Error al conectar con IMAP");
+                }
+            }
             return mailAccount;
         }
 

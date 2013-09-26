@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,75 +7,45 @@ using Glimpse.DataAccessLayer.Entities;
 
 namespace Glimpse.DataAccessLayer.Mappings
 {
-    public class MailMap : ClassMap<Mail>
+    public class MailMap : ClassMap<MailEntity>
     {
         public MailMap()
         {
-            Table("Mail");
-
-            Id(x => x.Id).Column("ID_Mail").GeneratedBy.Identity();
-            References<MailAccount>(x => x.MailAccount).Column("ID_MailAccount").LazyLoad();
-            References<Address>(x => x.From).Column("ID_From").LazyLoad();
-            Map(x => x.gm_tid).Column("GM_ThreadID");
-            Map(x => x.gm_mid).Column("GM_MailID");
-            Map(x => x.Date).Column("Date");
-            Map(x => x.To).Column("To");
+            Id(x => x.Id).Column("Id").GeneratedBy.Identity();            
             Map(x => x.CC).Column("CC");
             Map(x => x.BCC).Column("BCC");
-            Map(x => x.Subject).Column("Subject");
-            Map(x => x.Body).Column("Body");
-            Map(x => x.UidInbox).Column("UID_Inbox");
-            Map(x => x.UidTrash).Column("UID_Trash");
-            Map(x => x.UidSent).Column("UID_Sent");
-            Map(x => x.UidDraft).Column("UID_Draft");
-            Map(x => x.UidSpam).Column("UID_Spam");
-            Map(x => x.UidAll).Column("UID_All");
-            Map(x => x.Answered).Column("FG_Answered");
-            Map(x => x.Flagged).Column("FG_Flagged");
-            Map(x => x.Seen).Column("FG_Seen");
-            Map(x => x.Draft).Column("FG_Draft");
-            Map(x => x.HasExtras).Column("FG_HasExtras"); 
-        }
-    }
-=======
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using FluentNHibernate.Mapping;
-using Glimpse.DataAccessLayer.Entities;
-
-namespace Glimpse.DataAccessLayer.Mappings
-{
-    public class MailMap : ClassMap<Mail>
-    {
-        public MailMap()
-        {
-            Table("Mail");
-
-            Id(x => x.Id).Column("ID_Mail").GeneratedBy.Identity();
-            References<MailAccount>(x => x.MailAccount).Column("ID_MailAccount").LazyLoad();
-            References<Address>(x => x.From).Column("ID_From").LazyLoad();
-            Map(x => x.gm_tid).Column("GM_ThreadID");
-            Map(x => x.gm_mid).Column("GM_MailID");
+            Map(x => x.Body).Column("Body").LazyLoad();
+            Map(x => x.ToAddress).Column("ToAddress");
+            Map(x => x.Gm_tid).Column("Gm_tid");
+            Map(x => x.Gm_mid).Column("Gm_mid");
             Map(x => x.Date).Column("Date");
-            Map(x => x.To).Column("To");
-            Map(x => x.CC).Column("CC");
-            Map(x => x.BCC).Column("BCC");
             Map(x => x.Subject).Column("Subject");
-            Map(x => x.Body).Column("Body");
-            Map(x => x.UidInbox).Column("UID_Inbox");
-            Map(x => x.UidTrash).Column("UID_Trash");
-            Map(x => x.UidSent).Column("UID_Sent");
-            Map(x => x.UidDraft).Column("UID_Draft");
-            Map(x => x.UidSpam).Column("UID_Spam");
-            Map(x => x.UidAll).Column("UID_All");
-            Map(x => x.Answered).Column("FG_Answered");
-            Map(x => x.Flagged).Column("FG_Flagged");
-            Map(x => x.Seen).Column("FG_Seen");
-            Map(x => x.Draft).Column("FG_Draft");
-            Map(x => x.HasExtras).Column("FG_HasExtras"); 
+            Map(x => x.UidInbox).Column("UidInbox");
+            Map(x => x.UidTrash).Column("UidTrash");
+            Map(x => x.UidSent).Column("UidSent");
+            Map(x => x.UidDraft).Column("UidDraft");
+            Map(x => x.UidSpam).Column("UidSpam");
+            Map(x => x.UidAll).Column("UidAll");
+            Map(x => x.Answered).Column("Answered");
+            Map(x => x.Flagged).Column("Flagged");
+            Map(x => x.Seen).Column("Seen");
+            Map(x => x.Draft).Column("Draft");
+            Map(x => x.HasExtras).Column("HasExtras");
+            Map(x => x.BodyPeek).Column("BodyPeek");
+            Map(x => x.Importance).Column("Importance");
+            References<AddressEntity>(x => x.From).Column("FromId")
+                                                    .Cascade.None();
+            References<MailAccountEntity>(x => x.MailAccountEntity).Column("MailAccountId")
+                                                    .Cascade.None();
+            HasMany<ExtraEntity>(x => x.Extras).KeyColumn("Id")
+                                                    .Inverse()
+                                                    .Cascade.All();
+            HasManyToMany<LabelEntity>(x => x.Labels).ParentKeyColumn("MailId")
+                                                    .ChildKeyColumn("LabelId")
+                                                    .Cascade.All()
+                                                    .Not.LazyLoad()
+                                                    .Table("LABELSPERMAIL");
+            Table("MAIL");
         }
     }
->>>>>>> MG-auto-fluent
 }

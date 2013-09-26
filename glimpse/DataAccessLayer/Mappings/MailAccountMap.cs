@@ -7,18 +7,19 @@ using Glimpse.DataAccessLayer.Entities;
 
 namespace Glimpse.DataAccessLayer.Mappings
 {
-    public class MailAccountMap : ClassMap<MailAccount>
+    public class MailAccountMap : ClassMap<MailAccountEntity>
     {
         public MailAccountMap()
         {
-            Table("MailAccount");
-
-            Id(x => x.Id).Column("ID_MailAccount").GeneratedBy.Identity();
-            HasMany<Mail>(x => x.Mails).Inverse()
-                                       .AsBag()
-                                       .LazyLoad();
+            Id(x => x.Id).Column("Id").GeneratedBy.Identity();
+            References<UserEntity>(x => x.User).Column("UserId")
+                                               .Cascade.None();
             Map(x => x.Address).Column("Address");
             Map(x => x.Password).Column("Password");
+            Map(x => x.Active).Column("Active");
+            Map(x => x.IsMainAccount).Column("IsMainAccount");
+
+            Table("MAILACCOUNT");
         }
     }
 }

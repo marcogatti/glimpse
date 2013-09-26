@@ -14,6 +14,7 @@ using Glimpse.DataAccessLayer.Entities;
 using Glimpse.Models;
 using NHibernate;
 using Glimpse.DataAccessLayer;
+using System.Net.Sockets;
 
 namespace Glimpse.Controllers
 {
@@ -44,15 +45,18 @@ namespace Glimpse.Controllers
                 try
                 {
                     mailAccount = cookieMailAccount;
-                    mailAccount.connectFull();
-                    
                     Session[AccountController.MAIL_INTERFACE] = mailAccount;
+                    mailAccount.connectFull();       
                 }
                 catch (InvalidAuthenticationException)
                 {
                     session.Flush();
                     session.Close();
                     return this.LogOut();
+                }
+                catch (SocketException exc)
+                {
+                    Log.LogException(exc, "Error al conectar con IMAP");
                 }
             }
 
