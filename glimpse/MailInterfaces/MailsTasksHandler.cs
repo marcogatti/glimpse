@@ -6,6 +6,7 @@ using NHibernate;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
@@ -40,7 +41,16 @@ namespace Glimpse.MailInterfaces
             using (ISession session = NHibernateManager.OpenSession())
             {
                 mailAccount = MailAccount.FindByAddress(mailAddress, session);
-                mailAccount.connectFull();
+
+                try
+                {
+                    mailAccount.connectFull();
+                }
+                catch (SocketException exc)
+                {
+                    Log.LogException(exc, "No se pudo conectar a imap");
+                    return;
+                }
 
                 Label label = Label.FindBySystemName(mailAccount, "INBOX", session);
                 Int64 lastUidExternal = mailAccount.getLastUIDExternalFrom("INBOX"); //TODO: Deshardcodear

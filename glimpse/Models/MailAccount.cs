@@ -96,6 +96,9 @@ namespace Glimpse.Models
         }
         public bool isConnected()
         {
+            if (this.myFetcher == null)
+                return false;
+
             return this.myFetcher.isConnected();
         }
         public void Disconnect()
