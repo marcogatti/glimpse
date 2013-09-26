@@ -36,11 +36,13 @@ namespace Glimpse.DataAccessLayer.Entities
         public virtual String BCC { get; set; }
         public virtual String BodyPeek { get; set; }
         public virtual String Body { get; set; }
+        public virtual UInt16 Importance { get; set; }
         
         public MailEntity()
         {
             this.Labels = new List<LabelEntity>();
             this.Extras = new List<ExtraEntity>();
+            this.Importance = 2;
         }
     }
 }

@@ -32,6 +32,7 @@ namespace Glimpse.DataAccessLayer.Mappings
             Map(x => x.Draft).Column("Draft");
             Map(x => x.HasExtras).Column("HasExtras");
             Map(x => x.BodyPeek).Column("BodyPeek");
+            Map(x => x.Importance).Column("Importance");
             References<AddressEntity>(x => x.From).Column("FromId")
                                                     .Cascade.None();
             References<MailAccountEntity>(x => x.MailAccountEntity).Column("MailAccountId")
