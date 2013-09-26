@@ -87,10 +87,13 @@ function setCirclePre() {
 
 function fetchMailsAsync(initialDate, finalDate) {
 
-    $.getJSON("async/GetMailsByDate?initial=" + initialDate.getTime() + "&final=" + finalDate.getTime(), function(data){
-        if (data.success === true) {
+    showProgressBar("#circles-progress");
 
-            showProgressBar("#circles-progress");
+    $.getJSON("async/GetMailsByDate?initial=" + initialDate.getTime() + "&final=" + finalDate.getTime(), function (data) {
+
+        hideProgressBar("#circles-progress");
+
+        if (data.success === true) {
 
             $.each(data.mails, function (index, value) {
 
@@ -104,7 +107,6 @@ function fetchMailsAsync(initialDate, finalDate) {
 
     }).done(function () {
 
-        hideProgressBar("#circles-progress");
         configureCircleHover();
         setCirclePre();
         setDateCoords();
@@ -205,7 +207,7 @@ function calculateEmailColor(circle) {
 
 function calculateEmailPosition(circle) {
 
-    var margin = parseInt(circle.css('width'), 10);
+    var margin = parseInt($(".circle").css('width'), 10);
 
         var left = (circle.attr('data-age') - minAge) / currentPeriodShown(),
             top = (circle.attr('data-from').charCodeAt(0) - "a".charCodeAt(0) + 2) / alphabetSize();
@@ -220,16 +222,22 @@ function calculateEmailPosition(circle) {
 }
 
 function calculateEmailsLeft() {
-
     var margin = parseInt($(".circle").css('width'), 10);
+    var containerChunk = parseInt(currentPeriodShown() / 2),
+        furthestAgeRight = maxAge + containerChunk,
+        furthestAgeLeft = minAge - containerChunk;
 
     $(".circle").each(function () {
+        var currentAge = $(this).attr('data-age');
 
-        var left = ($(this).attr('data-age') - minAge) / currentPeriodShown();
+        if (currentAge < furthestAgeRight && currentAge > furthestAgeLeft) {
 
-        $(this).css('left', function () {
-            return left * (containerWidth() - margin) + 'px';
-        });
+            var left = (currentAge - minAge) / currentPeriodShown();
+
+            $(this).css('left', function () {
+                return left * (containerWidth() - margin) + 'px';
+            });
+        }
 
 
     });

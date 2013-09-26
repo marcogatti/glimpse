@@ -160,25 +160,28 @@ function movePeriodShown(offset) {
 
 function setDragging() {
 
-    var startX, endX = 0;
+    var startX, endX = 0,
+        wasDragging = false;
 
-    $("#email-container")
-    .mousedown(function (downEvent) {
+    $("#email-container").mousedown(function (downEvent) {
         downEvent.preventDefault();
         startX = downEvent.pageX;
         $(window).mousemove(function (dragEvent) {
             var offset = (startX - dragEvent.pageX) * currentPeriodShown() / 1000;
             movePeriodShown(offset);
             startX = dragEvent.pageX;
+            wasDragging = true;
         });
     });
 
     //  Revisar (pedidos ajax innecesarios)
-    $(window)
-    .mouseup(function () {
+    $(window).mouseup(function () {
         $(window).unbind("mousemove");
-        setDateCoords();
-        fetchMailsWithinActualPeriod();
+        if (wasDragging) {    
+            setDateCoords();
+            fetchMailsWithinActualPeriod();
+            wasDragging = false;
+        }
     });
 }
 
