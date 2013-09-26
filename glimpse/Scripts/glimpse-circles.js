@@ -6,7 +6,11 @@ function insertCircle(value) {
     }
 
     var date = new Date(parseInt(value.date.substr(6))).toGMTString(),
-        classes = "circle transition";
+        classes = "circle";
+
+    if(!$("#transitions-check").prop("checked")){
+        classes += " transition";
+    }
 
     if (!value.seen) {
         classes += " new";
@@ -85,6 +89,8 @@ function fetchMailsAsync(initialDate, finalDate) {
 
     $.getJSON("async/GetMailsByDate?initial=" + initialDate.getTime() + "&final=" + finalDate.getTime(), function(data){
         if (data.success === true) {
+
+            showProgressBar("#circles-progress");
 
             $.each(data.mails, function (index, value) {
 
