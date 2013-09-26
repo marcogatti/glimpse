@@ -13,7 +13,7 @@ using Glimpse.Helpers;
 
 namespace Glimpse.Models
 {
-    public class MailAccount
+    public class MailAccount : IDisposable
     {
         private Fetcher myFetcher { get; set; }
         private Sender mySender { get; set; }
@@ -251,6 +251,11 @@ namespace Glimpse.Models
             }
 
             MailAccount.Save(mails);
+        }
+
+        public void Dispose()
+        {
+            this.myFetcher.Dispose();
         }
 
         private static void Save(List<Mail> mails)

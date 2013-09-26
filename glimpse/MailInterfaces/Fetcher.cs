@@ -11,7 +11,7 @@ using System.Web;
 
 namespace Glimpse.MailInterfaces
 {
-    public class Fetcher
+    public class Fetcher : IDisposable
     {
         private Imap4Client receiver;
         private Mailbox currentOpenedMailbox;
@@ -108,10 +108,19 @@ namespace Glimpse.MailInterfaces
         public List<Mail> GetMailsBetweenUID(String mailbox, Int32 firstUID, Int32 lastUID)
         {
             Mailbox targetMailbox = this.GetMailbox(mailbox);
-
-            Int32[] mailsUIDs = targetMailbox.Search("UID " + firstUID + ":" + lastUID);
-
             List<Mail> retrievedMails = new List<Mail>();
+            Int32[] mailsUIDs;
+
+            try
+            {
+                mailsUIDs = targetMailbox.Search("UID " + firstUID + ":" + lastUID);
+            }
+            catch (Exception exc)
+            {
+                Log.LogException(exc, "Error en el search de Uids, parametros: Mailbox: " + mailbox + " firstUid: " + firstUID + " lastUID " + lastUID );
+                return retrievedMails;
+            }
+           
             Mail retrievedMail;
 
             foreach (Int32 currentMailOrdinal in mailsUIDs)
@@ -231,6 +240,11 @@ namespace Glimpse.MailInterfaces
         public bool isConnected()
         {
             return this.receiver.IsConnected;
+        }
+
+        public void Dispose()
+        {
+            if (this.isConnected()) this.CloseClient();
         }
 
         #region Private Methods
