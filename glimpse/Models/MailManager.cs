@@ -13,13 +13,13 @@ namespace Glimpse.Models
     public class MailManager
     {
 
-        private MailAccount mailAccount;        
+        private MailAccount mailAccount;
 
         public const int ALL_MAILS = int.MaxValue;
 
         public MailManager(MailAccount mailAccount)
         {
-            this.mailAccount = mailAccount;            
+            this.mailAccount = mailAccount;
         }
 
         public List<Mail> FetchFromMailbox(String mailbox, ISession session, int maxAmount = ALL_MAILS)
@@ -31,7 +31,7 @@ namespace Glimpse.Models
                                                   .SetProjection(Projections.Max("UidInbox"))
                                                   .UniqueResult<Int64>();
 
-            Int32 lastImapUID = this.mailAccount.getLastUIDFrom(mailbox);
+            Int32 lastImapUID = this.mailAccount.getLastUIDExternalFrom(mailbox);
 
             if (lastImapUID > lastDatabaseUID)
             {
@@ -91,6 +91,22 @@ namespace Glimpse.Models
 
             tran.Commit();
             session.Close();
+        }
+
+        public MailCollection GetMailsFrom(string tag, int amountOfEmails, ISession session)
+        {
+            List<MailEntity> mailList = (List<MailEntity>)session.CreateCriteria<MailEntity>()
+                                                .Add(Restrictions.Eq("MailAccountEntity", this.mailAccount.Entity))
+                                                .AddOrder(Order.Desc("Date"))
+                                                .SetMaxResults(amountOfEmails)
+                                                .List<MailEntity>();
+
+            return new MailCollection(mailList);
+        }
+
+        public void FetchAndSaveMails(Label label, Int64 fromUid, Int64 toUid)
+        {
+            this.mailAccount.FetchAndSaveMails(label, fromUid, toUid);
         }
     }
 }

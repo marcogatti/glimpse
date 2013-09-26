@@ -43,7 +43,9 @@ namespace Glimpse.Controllers
             {
                 try
                 {
-                    mailAccount = cookieMailAccount.LoginExternal();
+                    mailAccount = cookieMailAccount;
+                    mailAccount.connectFull();
+                    
                     Session[AccountController.MAIL_INTERFACE] = mailAccount;
                 }
                 catch (InvalidAuthenticationException)
@@ -53,6 +55,8 @@ namespace Glimpse.Controllers
                     return this.LogOut();
                 }
             }
+
+            MailsTasksHandler.StartSynchronization(mailAccount.Entity.Address);
 
             IList<LabelEntity> accountLabels = Label.FindByAccount(cookieMailAccount.Entity, session);
             List<LabelViewModel> viewLabels = new List<LabelViewModel>(accountLabels.Count);

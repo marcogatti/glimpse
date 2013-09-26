@@ -22,6 +22,21 @@ namespace Glimpse.Models
         {
             this.Entity = entity;
         }
+        public Mail(UInt64 gmID, MailAccount mailAccount, ISession session)
+        {
+            MailEntity entity = session.CreateCriteria<MailEntity>()
+                                    .Add(Restrictions.Eq("MailAccountEntity", mailAccount.Entity))
+                                    .Add(Restrictions.Eq("Gm_mid", gmID))
+                                    .SetMaxResults(1)
+                                    .UniqueResult<MailEntity>();
+            this.Entity = entity;
+        }
+
+        public void RemoveLabel(String label, ISession session)
+        {
+            LabelEntity labelToRemove = this.Entity.Labels.First<LabelEntity>(x => x.Name == label);
+            this.Entity.Labels.Remove(labelToRemove);
+        }
  
         public static List<MailEntity> FindByMailAccount(MailAccount mailAccount, ISession session){
 

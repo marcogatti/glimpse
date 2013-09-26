@@ -47,11 +47,12 @@ namespace Glimpse.Controllers
 
                 String cipherPassword =  CryptoHelper.EncryptDefaultKey(user);
                 MailAccount mailAccount = new MailAccount(user.Email, cipherPassword);
+                mailAccount.connectLight();
 
                 mailAccount.SaveOrUpdate();
                 mailAccount.UpdateLabels();
 
-                Session[MAIL_INTERFACE] = mailAccount;
+                mailAccount.Disconnect();
 
                 new CookieHelper().addMailAddressCookie(mailAccount.Entity.Address);
                 FormsAuthentication.SetAuthCookie(user.Email, user.rememberMe);
@@ -75,6 +76,12 @@ namespace Glimpse.Controllers
         {
             FormsAuthentication.SignOut();
             new CookieHelper().clearMailAddressCookie();
+            MailAccount mailAccount = (MailAccount)Session[MAIL_INTERFACE];
+            if (mailAccount != null)
+            {
+                mailAccount.Disconnect();
+                Session.Remove(MAIL_INTERFACE);
+            }
             return Redirect("/");
         }
 

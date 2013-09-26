@@ -1,10 +1,12 @@
-﻿function insertCircle(value) {
+﻿var ownedCircles = [];
+
+function insertCircle(value) {
     if (value.age > maxAge) {
         maxAge = value.age;
     }
 
     var date = new Date(parseInt(value.date.substr(6))).toGMTString(),
-        classes = "circle";
+        classes = "circle transition";
 
     if (!value.seen) {
         classes += " new";
@@ -39,7 +41,9 @@
                         dataAttributes.join("'") +
                         "'><div class='centered'><p>" + value.subject + "</p></div></div>");
 
+    calculateEmailColor(newCircle);
     $("#email-container").append(newCircle);
+    calculateEmailPosition(newCircle);
 
 }
 
@@ -77,29 +81,42 @@ function setCirclePre() {
         })
 }
 
-function fetchMailsAsync() {
+function fetchMailsAsync(initialDate, finalDate) {
 
-    $.getJSON("async/InboxMails/500", function (data) {
-
+    $.getJSON("async/GetMailsByDate?initial=" + initialDate.getTime() + "&final=" + finalDate.getTime(), function(data){
         if (data.success === true) {
 
             $.each(data.mails, function (index, value) {
 
-                insertCircle(value);
+                if (ownedCircles.indexOf(value.id) === -1) {
+                    ownedCircles.push(value.id);
+                    insertCircle(value);
+                }              
             });
 
         } else alert(data.message);
 
     }).done(function () {
 
-        calculateEmailsColor();
-        calculateEmailsPosition();
         hideProgressBar("#circles-progress");
         configureCircleHover();
         setCirclePre();
         setDateCoords();
 
     });
+}
+
+function fetchRecentMails() {
+
+    var dateBefore = new Date(),
+        dateToday = new Date();
+    dateBefore.setDate(dateBefore.getDate() - 30);
+
+    fetchMailsAsync(dateBefore, dateToday);
+}
+
+function fetchMailsWithinActualPeriod() {
+    fetchMailsAsync(ageToDate(maxAge), ageToDate(minAge));
 }
 
 
@@ -150,58 +167,66 @@ function markAsRead(circle) {
     circle.removeClass("new");
 }
 
-function calculateEmailsColor() {
-
-    $(".circle").each(function () {
+function calculateEmailColor(circle) {
 
         var innerColor,
             ringColor,
             outsetColor,
             shadow;
 
-        if ($(this).data('label0') !== "") {
-            innerColor = labelColors[$(this).data('label0')];
+        if (circle.data('label0') !== "") {
+            innerColor = labelColors[circle.data('label0')];
         }
-        if ($(this).data('label1') !== "") {
-            ringColor = labelColors[$(this).data('label1')];
+        if (circle.data('label1') !== "") {
+            ringColor = labelColors[circle.data('label1')];
             shadow = 'inset 0 0 0 12px ' + ringColor;
         }
 
         shadow += ', 0 0 0 8px ';
 
-        if ($(this).data('label2') !== "") {
-            outsetColor = labelColors[$(this).data('label2')];
+        if (circle.data('label2') !== "") {
+            outsetColor = labelColors[circle.data('label2')];
             shadow += outsetColor;
         }
 
-        $(this).css({
+        circle.css({
             'color': innerColor,
             'background-color': innerColor,
             'box-shadow': shadow,
             '-webkit-box-shadow': shadow,
         });
-    })
 }
 
-function calculateEmailsPosition() {
+function calculateEmailPosition(circle) {
+
+    var margin = parseInt(circle.css('width'), 10);
+
+        var left = (circle.attr('data-age') - minAge) / currentPeriodShown(),
+            top = (circle.attr('data-from').charCodeAt(0) - "a".charCodeAt(0) + 2) / alphabetSize();
+
+        circle.css('top', function () {
+            return top * (containerHeight() - margin) + 'px';
+        });
+
+        circle.css('left', function () {
+            return left * (containerWidth() - margin) + 'px';
+        });
+}
+
+function calculateEmailsLeft() {
 
     var margin = parseInt($(".circle").css('width'), 10);
 
     $(".circle").each(function () {
 
-        var left = ($(this).attr('data-age') - minAge) / currentPeriodShown(),
-            top = ($(this).attr('data-from').charCodeAt(0) - "a".charCodeAt(0) + 2) / alphabetSize();
-
-        $(this).css('top', function () {
-            return top * (containerHeight() - margin) + 'px';
-        });
+        var left = ($(this).attr('data-age') - minAge) / currentPeriodShown();
 
         $(this).css('left', function () {
             return left * (containerWidth() - margin) + 'px';
         });
 
 
-    })
+    });
 }
 
 function setLabelSelection() {
@@ -215,7 +240,6 @@ function setLabelSelection() {
             }
         });
     });
-
 }
 
 function hasLabel(circle, label) {

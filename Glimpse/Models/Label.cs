@@ -1,4 +1,5 @@
 ﻿using Glimpse.DataAccessLayer.Entities;
+using Glimpse.Exceptions;
 using NHibernate;
 using NHibernate.Criterion;
 using System;
@@ -28,6 +29,25 @@ namespace Glimpse.Models
         public void SaveOrUpdate(ISession session)
         {
             session.SaveOrUpdate(this.Entity);
+        }
+
+        public static Label FindBySystemName(MailAccount account, String systemName, ISession session){
+
+            LabelEntity labelEntity;
+
+            try
+            {
+                labelEntity = session.CreateCriteria<LabelEntity>()
+                                          .Add(Restrictions.Eq("MailAccountEntity", account.Entity))
+                                          .Add(Restrictions.Eq("SystemName", systemName))
+                                          .UniqueResult<LabelEntity>();
+            }
+            catch (NHibernate.HibernateException e)
+            {
+                throw new NotUniqueResultException(e, "Cuenta: " + account.Entity.Address + " ,SystemName Label: " + systemName);
+            }
+
+            return new Label(labelEntity);
         }
     }
 }

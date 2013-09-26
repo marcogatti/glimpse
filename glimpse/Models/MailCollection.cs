@@ -1,6 +1,4 @@
-﻿using Glimpse.DataAccessLayer;
-using Glimpse.DataAccessLayer.Entities;
-using NHibernate;
+﻿using Glimpse.DataAccessLayer.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,38 +6,11 @@ using System.Web;
 
 namespace Glimpse.Models
 {
-    public class MailCollection : List<MailEntity>, IList<MailEntity>
+    public class MailCollection : List<MailEntity>
     {
-        public void Save(ISession currentSession)
+        public MailCollection(IList<MailEntity> mails)
         {
-            ITransaction tran = currentSession.BeginTransaction();
-
-            foreach (MailEntity mailToSave in this)
-            {
-                Address foundAddress = Address.FindByAddress(mailToSave.From.MailAddress, currentSession);
-
-                if (foundAddress.Entity == null)
-                {
-                    currentSession.SaveOrUpdate(mailToSave.From);
-                }
-                else
-                {
-                    mailToSave.From = foundAddress.Entity;
-                }
-
-                currentSession.SaveOrUpdate(mailToSave);
-            }
-
-            tran.Commit();
-            currentSession.Flush();
-        }
-
-        public void loadMailAccount(MailAccount mailAccount)
-        {
-            foreach (MailEntity mail in this)
-            {
-                mail.MailAccountEntity = mailAccount.Entity;
-            }
+            this.AddRange(mails);
         }
     }
 }
