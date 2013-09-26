@@ -196,8 +196,6 @@
     <Compile Include="Controllers\AsyncMailsController.cs" />
     <Compile Include="DataAccessLayer\Entities\AddressEntity.cs" />
     <Compile Include="DataAccessLayer\Entities\ExtraEntity.cs" />
-    <Compile Include="DataAccessLayer\Entities\LogEntity.cs" />
-    <Compile Include="DataAccessLayer\Mappings\LogMap.cs" />
     <Compile Include="DataAccessLayer\Mappings\ExtraMap.cs" />
     <Compile Include="DataAccessLayer\Entities\LabelEntity.cs" />
     <Compile Include="DataAccessLayer\Entities\MailEntity.cs" />
@@ -206,6 +204,8 @@
     <Compile Include="DataAccessLayer\Mappings\LabelMap.cs" />
     <Compile Include="DataAccessLayer\Mappings\MailAccountMap.cs" />
     <Compile Include="DataAccessLayer\Mappings\MailMap.cs" />
+    <Compile Include="DataAccessLayer\Entities\UserEntity.cs" />
+    <Compile Include="DataAccessLayer\Mappings\UserMap.cs" />
     <Compile Include="DataAccessLayer\NHibernateManager.cs" />
     <Compile Include="Exceptions\ControllersExceptions\CookieNotFoundException.cs" />
     <Compile Include="Exceptions\Internationalization\DefaultLanguageNotSettedException.cs" />

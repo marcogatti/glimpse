@@ -12,8 +12,11 @@ namespace Glimpse.DataAccessLayer.Mappings
         public MailAccountMap()
         {
             Id(x => x.Id).Column("Id").GeneratedBy.Identity();
+            References<UserEntity>(x => x.User).Column("UserId")
+                                               .Cascade.None();
             Map(x => x.Address).Column("Address");
             Map(x => x.Password).Column("Password");
+            Map(x => x.Active).Column("Active");
 
             Table("MAILACCOUNT");
         }
