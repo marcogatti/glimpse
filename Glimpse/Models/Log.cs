@@ -1,4 +1,5 @@
-﻿using Glimpse.DataAccessLayer;
+﻿using Elmah;
+using Glimpse.DataAccessLayer;
 using Glimpse.DataAccessLayer.Entities;
 using NHibernate;
 using System;
@@ -8,22 +9,18 @@ using System.Web;
 
 namespace Glimpse.Models
 {
-    public class Log
+    public static class Log
     {
-        public LogEntity Entity { get; private set; }
+        public static void LogException(Exception exc, String contextualMessage = null)
+        {
+            Exception exceptionToLog;
 
-        public Log(LogEntity entity)
-        {
-            this.Entity = entity;
-        }
-        public void Save()
-        {
-            ISession session = NHibernateManager.OpenSession();
-            ITransaction tran = session.BeginTransaction();
-            session.SaveOrUpdate(this.Entity);
-            tran.Commit();
-            session.Flush();
-            session.Close();
+            if (contextualMessage != null)
+                exceptionToLog = new Exception(contextualMessage, exc);
+            else
+                exceptionToLog = exc;
+
+            Elmah.ErrorLog.GetDefault(null).Log(new Error(exceptionToLog));
         }
 
     }

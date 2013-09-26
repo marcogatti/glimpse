@@ -1,5 +1,6 @@
 ﻿using Glimpse.DataAccessLayer;
 using Glimpse.DataAccessLayer.Entities;
+using Glimpse.ErrorLogging;
 using Glimpse.Models;
 using NHibernate;
 using System;
@@ -17,7 +18,6 @@ namespace Glimpse.MailInterfaces
         private static Mutex tasksListLock = new Mutex(false);
 
         private static int MAILS_AMMOUNT_PER_PASS = 4;
-
 
         public static void StartSynchronization(String mailAddress)
         {
@@ -95,9 +95,8 @@ namespace Glimpse.MailInterfaces
             catch (Exception exc)
             {
                 EndSynchronization(task);
-
-                Log logger = new Log(new LogEntity(003, "Error generico SynchronizeAccount. Parametros: mailAddress(" + task.MailAccount.Entity.Address + ").", exc.StackTrace));
-                logger.Save();
+                Log.LogException(exc);
+                throw exc;
             }
         }
 

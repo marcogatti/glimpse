@@ -34,8 +34,8 @@ namespace Glimpse.Controllers
             }
             catch (Exception exc)
             {
-                Log logger = new Log(new LogEntity(002, "Error generico InboxMails. Parametros del mail: idMail(" + id.ToString() + ").", exc.StackTrace));
-                logger.Save();
+                Log.LogException(exc, "Error generico InboxMails. Parametros del mail: idMail(" + id.ToString() + ").");
+
                 return Json(new { success = false, message = "Error al obtener los mails" }, JsonRequestBehavior.AllowGet);
             }
             finally
@@ -61,8 +61,8 @@ namespace Glimpse.Controllers
             }
             catch (Exception exc)
             {
-                Log logger = new Log(new LogEntity(002, "Error generico GetMailBody. Parametros del mail: idMail(" + id.ToString() + ").", exc.StackTrace));
-                logger.Save();
+                Log.LogException(exc, "Error generico GetMailBody. Parametros del mail: idMail(" + id.ToString() + ").");
+
                 return Json(new { success = false, message = "Error al obtener el cuerpo del mail." }, JsonRequestBehavior.AllowGet);
             }
             finally
@@ -81,14 +81,14 @@ namespace Glimpse.Controllers
             }
             catch (SmtpException exc)
             {
-                Log logger = new Log(new LogEntity(002, "Error SMTP sendEmail. Parametros del mail: subjectMail(" + sendInfo.Subject + "), addressMail(" + sendInfo.ToAddress + ").", exc.StackTrace));
-                logger.Save();
+                Log.LogException(exc, "Error SMTP sendEmail. Parametros del mail: subjectMail(" + sendInfo.Subject + "), addressMail(" + sendInfo.ToAddress + ").");
+
                 return Json(new { success = false, address = sendInfo.ToAddress }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception exc)
             {
-                Log logger = new Log(new LogEntity(002, "Error generico sendEmail. Parametros del mail: subjectMail(" + sendInfo.Subject + "), addressMail(" + sendInfo.ToAddress + ").", exc.StackTrace));
-                logger.Save();
+                Log.LogException(exc, "Error generico sendEmail. Parametros del mail: subjectMail(" + sendInfo.Subject + "), addressMail(" + sendInfo.ToAddress + ").");
+
                 return Json(new { success = false, address = sendInfo.ToAddress }, JsonRequestBehavior.AllowGet);
             }
 
@@ -117,10 +117,10 @@ namespace Glimpse.Controllers
             }
             catch (Exception exc)
             {
-                Log logger = new Log(new LogEntity(002, "Error generico GetMailBody. Parametros del mail: initialDate("
-                    + initialDate.ToString() + "), finalDate(" + finalDate.ToString() + ").", exc.StackTrace));
-                logger.Save();
-                return Json(new { success = false, message = "Error al obtener los mail." }, JsonRequestBehavior.AllowGet);
+                Log.LogException(exc, "Error generico GetMailBody. Parametros del mail: initialDate("
+                    + initialDate.ToString() + "), finalDate(" + finalDate.ToString() + ").");
+
+                return Json(new { success = false, message = "Error al obtener los mails." }, JsonRequestBehavior.AllowGet);
             }
             finally
             {
@@ -147,9 +147,9 @@ namespace Glimpse.Controllers
             }
             catch (Exception exc)
             {
-                Log logger = new Log(new LogEntity(002, "Error generico GetMailsByAmount. Parametros del mail: amountOfMails("
-                    + amountOfMails + ").", exc.StackTrace));
-                logger.Save();
+                Log.LogException(exc, "Error generico GetMailsByAmount. Parametros del mail: amountOfMails("
+                    + amountOfMails + ").");
+
                 return Json(new { success = false, message = "Error al obtener los mails." }, JsonRequestBehavior.AllowGet);
             }
             finally
@@ -175,9 +175,9 @@ namespace Glimpse.Controllers
             }
             catch (Exception exc)
             {
-                Log logger = new Log(new LogEntity(002, "Error generico RemoveLabel. Parametros del mail: label("
-                    + label + "), gmID(" + gmID.ToString() + ").", exc.StackTrace));
-                logger.Save();
+                Log.LogException(exc, "Error generico RemoveLabel. Parametros del mail: label("
+                    + label + "), gmID(" + gmID.ToString() + ").");
+
                 return Json(new { success = false, message = "Error al obtener el cuerpo del mail." }, JsonRequestBehavior.AllowGet);
             }
             finally
