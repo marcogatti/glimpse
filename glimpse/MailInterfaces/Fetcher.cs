@@ -22,7 +22,7 @@ namespace Glimpse.MailInterfaces
         {
             this.receiver = new Connector().ImapLogin(username, password);
             this.accountMailboxesBySpecialProperty = new NameValueCollection();
-            this.loadMailboxesAndSpecialProperties(this.receiver.Command("LIST \"\" \"*\""));
+            this.LoadMailboxesAndSpecialProperties(this.receiver.Command("LIST \"\" \"*\""));
             this.currentOpenedMailbox = null;
         }
         public void SetLabels(IList<LabelEntity> labels)
@@ -110,19 +110,10 @@ namespace Glimpse.MailInterfaces
             Mailbox targetMailbox = this.GetMailbox(mailbox);
             List<Mail> retrievedMails = new List<Mail>();
             Int32[] mailsUIDs;
-
-            try
-            {
-                mailsUIDs = targetMailbox.Search("UID " + firstUID + ":" + lastUID);
-            }
-            catch (Exception exc)
-            {
-                Log.LogException(exc, "Error en el search de Uids, parametros: Mailbox: " + mailbox + " firstUid: " + firstUID + " lastUID " + lastUID );
-                return retrievedMails;
-            }
-           
             Mail retrievedMail;
 
+            mailsUIDs = this.CleanSearchResponse(this.receiver.Command("SEARCH UID " + firstUID + ":" + lastUID));
+         
             foreach (Int32 currentMailOrdinal in mailsUIDs)
             {
                 retrievedMail = this.FetchMail(targetMailbox, currentMailOrdinal);
@@ -296,7 +287,7 @@ namespace Glimpse.MailInterfaces
             }
             catch (Exception exc)
             {
-                Log.LogException(exc, "Error al traer un mail con IMAP.");
+                Log.LogException(exc, "Error al traer un mail con IMAP. Parametros: mailbox: " + targetMailbox.Name + ", mailOrdinal: " + mailOrdinal.ToString() + ".");
                 return null;
             }
 
@@ -336,7 +327,7 @@ namespace Glimpse.MailInterfaces
             this.AddLabelsToMail(retrievedMessage.HeaderFields["x-gm-labels"], retrievedMail);
             this.AddFlagsToMail(targetMailbox.Fetch.Flags(mailOrdinal).Merged, retrievedMail);
             if (retrievedMail.HasExtras)
-                this.loadAttachments(retrievedMail, retrievedMessage);
+                this.LoadAttachments(retrievedMail, retrievedMessage);
             return new Mail(retrievedMail);
         }
         private void CloseMailbox()
@@ -344,7 +335,7 @@ namespace Glimpse.MailInterfaces
             this.receiver.Close();
             this.currentOpenedMailbox = null;
         }
-        private void loadMailboxesAndSpecialProperties(string imapLISTResponse)
+        private void LoadMailboxesAndSpecialProperties(string imapLISTResponse)
         {
             /*imapResponse del tipo (incluyendo \r\n):
               (\HasNoChildren) "INBOX"
@@ -359,7 +350,7 @@ namespace Glimpse.MailInterfaces
             {
                 if (mailbox.Contains("\\All"))
                 {
-                    this.accountMailboxesBySpecialProperty.Add("All", this.stripMailboxName(mailbox));
+                    this.accountMailboxesBySpecialProperty.Add("All", this.StripMailboxName(mailbox));
                     continue;
                 }
                 if (mailbox.Contains("INBOX"))
@@ -369,41 +360,41 @@ namespace Glimpse.MailInterfaces
                 }
                 if (mailbox.Contains("\\Trash"))
                 {
-                    this.accountMailboxesBySpecialProperty.Add("Trash", this.stripMailboxName(mailbox));
+                    this.accountMailboxesBySpecialProperty.Add("Trash", this.StripMailboxName(mailbox));
                     continue;
                 }
                 if (mailbox.Contains("\\Junk"))
                 {
-                    this.accountMailboxesBySpecialProperty.Add("Junk", this.stripMailboxName(mailbox));
+                    this.accountMailboxesBySpecialProperty.Add("Junk", this.StripMailboxName(mailbox));
                     continue;
                 }
                 if (mailbox.Contains("\\Important"))
                 {
-                    this.accountMailboxesBySpecialProperty.Add("Important", this.stripMailboxName(mailbox));
+                    this.accountMailboxesBySpecialProperty.Add("Important", this.StripMailboxName(mailbox));
                     continue;
                 }
                 if (mailbox.Contains("\\Sent"))
                 {
-                    this.accountMailboxesBySpecialProperty.Add("Sent", this.stripMailboxName(mailbox));
+                    this.accountMailboxesBySpecialProperty.Add("Sent", this.StripMailboxName(mailbox));
                     continue;
                 }
                 if (mailbox.Contains("\\Flagged"))
                 {
-                    this.accountMailboxesBySpecialProperty.Add("Flagged", this.stripMailboxName(mailbox));
+                    this.accountMailboxesBySpecialProperty.Add("Flagged", this.StripMailboxName(mailbox));
                     continue;
                 }
                 if (mailbox.Contains("\\Drafts"))
                 {
-                    this.accountMailboxesBySpecialProperty.Add("Drafts", this.stripMailboxName(mailbox));
+                    this.accountMailboxesBySpecialProperty.Add("Drafts", this.StripMailboxName(mailbox));
                     continue;
                 }
                 if (mailbox.Contains("OK Success") || mailbox.Contains("Noselect"))
                     continue;
                 else
-                    this.accountMailboxesBySpecialProperty.Add("Tags", this.stripMailboxName(mailbox));
+                    this.accountMailboxesBySpecialProperty.Add("Tags", this.StripMailboxName(mailbox));
             }
         }
-        private void loadAttachments(MailEntity mail, Message message)
+        private void LoadAttachments(MailEntity mail, Message message)
         {
             ExtraEntity extra; //ExtraType: (0 = attachment) (1 = embbed object) (2 = unknown)
 
@@ -545,12 +536,23 @@ namespace Glimpse.MailInterfaces
             imapResponse = imapResponse.Trim();
             return imapResponse;
         }
-        private String stripMailboxName(String mailbox)
+        private String StripMailboxName(String mailbox)
         {
             //Input: (\HasNoChildren \Drafts) "[Gmail]/Borradores"
             //Output: [Gmail]/Borradores
             String mailboxName = mailbox.Substring(mailbox.IndexOf('"') + 1, mailbox.LastIndexOf('"') - mailbox.IndexOf('"') - 1);
             return mailboxName;
+        }
+        private Int32[] CleanSearchResponse(String imapResponse)
+        {
+            //"130926123033355 OK SEARCH completed (Success)\r\n* SEARCH 5 6 19 151 251\r\n"
+            imapResponse = imapResponse.Remove(0, imapResponse.LastIndexOf("SEARCH") + 7);
+            imapResponse = imapResponse.Replace("\r\n", String.Empty);
+            if(imapResponse == "\n") //si no devolvio numeros
+                return new Int32[0];
+            String[] numbersStrings = imapResponse.Split(new String[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+            Int32[] returnNumbers =  numbersStrings.Select(x => Int32.Parse(x)).ToArray();
+            return returnNumbers;
         }
         #endregion
     }
