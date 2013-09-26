@@ -2,31 +2,74 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using glimpse.ViewModels;
+using Glimpse.ViewModels;
+using Glimpse.Exceptions.ControllersExceptions;
 
-namespace glimpse.Helpers
+namespace Glimpse.Helpers
 {
     public class CookieHelper
     {
 
-        public static void addMailAddressCookie(UserViewModel user)
+        public const String LOGIN_COOKIE = "login-data";
+
+        private HttpCookieCollection responseCookies;
+        private HttpCookieCollection requestCookies;
+
+
+        public CookieHelper()
         {
-            HttpCookie myCookie = HttpContext.Current.Request.Cookies["Login"] ?? new HttpCookie("Login");
-            myCookie.Values["Email"] = user.Email;
-            myCookie.Values["Password"] = CryptoHelper.EncryptDefaultKey(user.Password);
-            myCookie.Expires = DateTime.Now.AddDays(1);
-            HttpContext.Current.Response.Cookies.Add(myCookie);
+            responseCookies = HttpContext.Current.Response.Cookies;
+            requestCookies = HttpContext.Current.Request.Cookies;
         }
 
-        public static UserViewModel getMailAddressCookie()
+        public CookieHelper(HttpCookieCollection requestCookies, HttpCookieCollection responseCookies)
         {
-            HttpCookie myCookie = HttpContext.Current.Request.Cookies["Login"];
-            UserViewModel user = new UserViewModel();
+            this.requestCookies = requestCookies;
+            this.responseCookies = responseCookies;
+        }
 
-            user.Email = myCookie.Values["Email"];
-            user.Password = myCookie.Values["Password"];
 
-            return user;
+        public HttpCookie addMailAddressCookie(String emailAddress)
+        {
+            return this.addMailAddressCookie(emailAddress, DateTime.Now.AddDays(365));
+        }
+
+        public HttpCookie addMailAddressCookie(String emailAddress, DateTime expirationDate)
+        {
+            HttpCookie myCookie = this.responseCookies[LOGIN_COOKIE] ?? new HttpCookie(LOGIN_COOKIE);
+            myCookie.Values["Email"] = emailAddress;
+            myCookie.Expires = expirationDate;
+            myCookie.HttpOnly = true;
+            this.responseCookies.Add(myCookie);
+
+            return myCookie;
+        }
+
+        public String getMailAddressFromCookie()
+        {
+            HttpCookie myCookie = this.requestCookies[LOGIN_COOKIE];
+
+            if (myCookie != null)
+            {
+                return myCookie.Values["Email"];
+
+            }
+            else
+            {
+                throw new CookieNotFoundException("Login cookie");
+            }
+        }
+
+        public void clearMailAddressCookie()
+        {
+            try
+            {
+                String address = this.getMailAddressFromCookie();
+
+                this.responseCookies.Remove(address);
+                this.addMailAddressCookie(address, DateTime.Now.AddMonths(-1));
+            }
+            catch (CookieNotFoundException){ /* Cookie already cleared or does not exist*/ }
         }
     }
 }

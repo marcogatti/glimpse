@@ -3,43 +3,82 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using glimpse.ViewModels;
-using glimpse.Helpers;
+using Glimpse.ViewModels;
+using Glimpse.Helpers;
 using System.Web.Security;
+using System.Xml;
+using Glimpse.Exceptions.MailInterfacesExceptions;
+using Glimpse.MailInterfaces;
+using Glimpse.DataAccessLayer.Entities;
+using Glimpse.Models;
 
-namespace glimpse.Controllers
+namespace Glimpse.Controllers
 {
     public class AccountController : Controller
     {
-        //
-        // GET: /Account/
+        public const String MAIL_INTERFACE = "mail-interface";
+
+
+        // GET: /Login
         [AllowAnonymous]
-        public ActionResult Index(string returnUrl)
-        {        
+        public ActionResult Login()
+        {
+            if (this.Request.UserLanguages.Count() > 0)
+            {
+                Session["Language"] = this.Request.UserLanguages[0].Substring(0, 2);
+            }
+            else
+            {
+                Session["Language"] = "en";
+            }
+            
             return View();
         }
 
-        //
-        // POST: /Account/
+        // POST: /Login
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public ActionResult Index(UserViewModel user, string returnUrl)
+        public ActionResult Login(UserViewModel user, string returnUrl)
         {
-            if (ModelState.IsValid)
+            try
             {
+                UpdateModel(user);
+
+                MailAccount mailAccount = new MailAccount(user.Email, user.Password);
+
+                mailAccount.SaveOrUpdate();
+                mailAccount.UpdateLabels();
+
+                Session[MAIL_INTERFACE] = mailAccount;
+
+                new CookieHelper().addMailAddressCookie(mailAccount.Entity.Address);
                 FormsAuthentication.SetAuthCookie(user.Email, user.rememberMe);
 
-                CookieHelper.addMailAddressCookie(user);
-
                 return RedirectToLocal(returnUrl);
+            } 
+            catch (InvalidAuthenticationException)
+            {
+                ModelState.AddModelError("", "The email address or password provided is incorrect.");
+                return View(user);
             }
-            ModelState.AddModelError("", "The user name or password provided is incorrect.");
-            return View(user);
+            catch (InvalidOperationException)
+            {
+                return View(user);
+            }
+
         }
 
-        #region Helpers
+        // GET: /Logout
+        [Authorize]
+        public ActionResult Logout()
+        {
+            FormsAuthentication.SignOut();
+            new CookieHelper().clearMailAddressCookie();
+            return Redirect("/");
+        }
 
+        [NonAction]
         private ActionResult RedirectToLocal(string returnUrl)
         {
             if (Url.IsLocalUrl(returnUrl))
@@ -51,9 +90,6 @@ namespace glimpse.Controllers
                 return RedirectToAction("Index", "Home");
             }
         }
-
-        #endregion Helpers
-
     }
 
 }

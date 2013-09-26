@@ -4,38 +4,43 @@ using System.Linq;
 using System.Web;
 using ActiveUp.Net.Mail;
 using ActiveUp.Net.Imap4;
-using glimpse.Exceptions.MailInterfacesExceptions;
+using Glimpse.Exceptions.MailInterfacesExceptions;
 
-namespace glimpse.MailInterfaces
+namespace Glimpse.MailInterfaces
 {
     public class Connector
     {
-        private Imap4Client Client { get; set; }
+        private Imap4Client ImapClient { get; set; }
 
-        public Connector()
+        public Imap4Client ImapLogin(String username, String password)
         {
-            this.Client = new Imap4Client();
+            this.ImapClient = new Imap4Client();
+            this.ImapConnect(true);
+            this.ImapAttemptLogin(username, password);
+            return this.ImapClient;
         }
 
-        public Imap4Client Login(String username, String password)
-        {
-            this.Connect(true);
-            this.Client.Login(username, password);
-
-            return this.Client;
-        }
-
-        private void Connect(Boolean requiresSSL)
+        private void ImapConnect(Boolean requiresSSL)
         {
             if (requiresSSL)
             {
-                Client.ConnectSsl("imap.gmail.com", 993);
+                this.ImapClient.ConnectSsl("imap.gmail.com", 993);
             }
             else
             {
-                throw new InvalidConnectionException("No se puede realizar conexion a Gmail sin SSL");
+                throw new InvalidConnectionException("No se puede realizar conexión a servidor IMAP de Gmail sin SSL.");
             }
         }
-
+        private void ImapAttemptLogin(String username, String password)
+        {
+            try
+            {
+                this.ImapClient.LoginFast(username, password);
+            }
+            catch(Imap4Exception imapException)
+            {
+                throw new InvalidAuthenticationException(imapException.Message, "El usuario o la contraseña son inválidos.");
+            }
+        }
     }
 }

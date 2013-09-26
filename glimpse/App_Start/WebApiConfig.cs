@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
 
-namespace glimpse
+namespace Glimpse
 {
     public static class WebApiConfig
     {
@@ -14,6 +14,7 @@ namespace glimpse
                 routeTemplate: "api/{controller}/{id}",
                 defaults: new { id = RouteParameter.Optional }
             );
+
         }
     }
 }

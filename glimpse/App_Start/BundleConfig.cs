@@ -1,7 +1,7 @@
 ﻿using System.Web;
 using System.Web.Optimization;
 
-namespace glimpse
+namespace Glimpse
 {
     public class BundleConfig
     {
@@ -19,7 +19,10 @@ namespace glimpse
                         "~/Scripts/jquery.validate*"));
 
             bundles.Add(new ScriptBundle("~/bundles/bootstrap").Include(
-                        "~/Scriptsbootstrap.js"));
+                        "~/Scripts/bootstrap.js"));
+
+            bundles.Add(new ScriptBundle("~/bundles/glimpse").Include(
+                        "~/Scripts/glimpse.js"));
 
             // Use the development version of Modernizr to develop with and learn from. Then, when you're
             // ready for production, use the build tool at http://modernizr.com to pick only the tests you need.
@@ -29,8 +32,16 @@ namespace glimpse
             bundles.Add(new StyleBundle("~/Content/css").Include("~/Content/site.css"));
 
             bundles.Add(new StyleBundle("~/bootstrap/css").Include(
-                        "~/Content/bootstrap.css",
-                        "~/Content/bootstrap-responsive.css"));
+                        "~/Content/bootstrap.css"));
+
+            bundles.Add(new StyleBundle("~/bootstrap-responsive/css").Include(
+                       "~/Content/bootstrap-responsive.css"));
+
+            bundles.Add(new StyleBundle("~/Home/css").Include(
+                       "~/Content/Home.css"));
+
+            bundles.Add(new StyleBundle("~/Login/css").Include(
+                       "~/Content/Login.css"));
 
             bundles.Add(new StyleBundle("~/Content/themes/base/css").Include(
                         "~/Content/themes/base/jquery.ui.core.css",
