@@ -81,8 +81,8 @@ function populateLabelColors() {
     ];
 
     var i = 0;
-    $("#labels-header").children(".label").each(function () { 
-    
+    $("#labels-header").children(".label").each(function () {
+
         var currentColor = glimpseColors[i];
 
         if (!$(this).data("system")) {
@@ -177,7 +177,7 @@ function setDragging() {
     //  Revisar (pedidos ajax innecesarios)
     $(window).mouseup(function () {
         $(window).unbind("mousemove");
-        if (wasDragging) {    
+        if (wasDragging) {
             setDateCoords();
             fetchMailsWithinActualPeriod();
             wasDragging = false;
@@ -202,8 +202,8 @@ function ageToDate(age) {
 
 function setDateCoords() {
 
-        newDateToday = ageToDate(minAge).toLocaleDateString(),
-        newDateLast = ageToDate(maxAge).toLocaleDateString();
+    newDateToday = ageToDate(minAge).toLocaleDateString(),
+    newDateLast = ageToDate(maxAge).toLocaleDateString();
 
     if (newDateToday === new Date().toLocaleDateString()) {
         newDateToday = "Hoy";
@@ -233,4 +233,44 @@ function setRefreshOnResize() {
         });
     });
 
+}
+
+var selectedLabel,
+    labelToAddIsSet = false;
+
+function setLabelsAdder() {
+    $.each($('.label'), function (index, actualLabel) {
+        $(this).mousedown(function (downEvent) {
+            downEvent.preventDefault();
+            selectedLabel = $(this).attr('data-name');
+            labelToAddIsSet = true;
+            console.log(labelToAddIsSet);
+        })
+    }
+    );
+}
+
+function clearLabelsToAdd() {
+    $(document).mouseup(function () {
+        labelToAddIsSet = false;
+        console.log(labelToAddIsSet);
+    }
+    );
+}
+
+function prepareCirclesToReceiveALabel() {
+    $(".circle").each(function () {
+        $(this).mouseup(function () {
+            if (labelToAddIsSet) {
+                console.log('Agregamos label: ' + selectedLabel + ' al mail: ' + $(this).attr('data-id'));
+            }
+        }
+        );
+    }
+    );
+}
+
+function setEverithingRelatedToAddLabelsToAMail() {
+    setLabelsAdder();
+    clearLabelsToAdd();
 }
