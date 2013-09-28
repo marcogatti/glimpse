@@ -42,7 +42,7 @@ function insertCircle(value) {
             " data-label0=", label0,
             " data-label1=", label1,
             " data-label2=", label2,
-            " data-age=", value.age
+            " data-age=", value.age,
         ];
 
         var newCircle = $("<div class='" + classes + "'" +
@@ -53,21 +53,26 @@ function insertCircle(value) {
         $("#email-container").append(newCircle);
         calculateEmailPosition(newCircle);
         prepareToReceiveLabels(newCircle);
-        setCirclePreview(newCircle);
+        setFullDisplay(newCircle);
         configureCircleHover(newCircle);
+        newCircle.popover({
+            "placement": "left",
+            "trigger": "hover",
+            "content": value.bodypeek,
+            "title": value.from.address
+        });
     }
-
 }
 
-function setCirclePreview(circle) {
+function setFullDisplay(circle) {
     circle.click(
         function () {
-            if (!isOnPreview(circle)) {
-                circle.addClass("preview");
-                circle.find(".centered").append("<div class='pre'>" + circle.data("bodypeek") + "</div>");
-            } else {
-                circle.find(".pre").remove();
-                circle.removeClass("preview");
+            //if (!isOnPreview(circle)) {
+            //    circle.addClass("preview");
+            //    circle.find(".centered").append("<div class='pre'>" + circle.data("bodypeek") + "</div>");
+            //} else {
+            //    circle.find(".pre").remove();
+            //    circle.removeClass("preview");
                 
                 var from = 'From: ' + circle.data("from"),
                     subject = circle.data("subject");
@@ -81,15 +86,15 @@ function setCirclePreview(circle) {
                 $("#body-modal").modal("show");
 
                 $.getJSON("async/GetMailBody/" + circle.data("id"), function (data) {
+                    hideProgressBar("#body-progress");
                     if (data.success == true) {
-                        hideProgressBar("#body-progress");
                         $(".modal-body").find("#bodyhtml").html(data.body);
                         markAsRead(circle);
 
                     } else alert(data.message);
                 });
             }
-        })
+        )
 }
 
 function fetchMailsAsync(initialDate, finalDate) {
@@ -116,7 +121,7 @@ function fetchRecentMails() {
 
     showProgressBar("#circles-progress");
 
-    $.getJSON("async/GetMailsByAmount?amountOfMails=10", function (data) {
+    $.getJSON("async/GetMailsByAmount?amountOfMails=15", function (data) {
 
         hideProgressBar("#circles-progress");
 
@@ -139,13 +144,6 @@ function fetchRecentMails() {
         calculateEmailsLeft();
 
     });
-    
-
-    //var dateBefore = new Date(),
-    //    dateToday = new Date();
-    //dateBefore.setDate(dateBefore.getDate() - 30);
-
-    //fetchMailsAsync(dateBefore, dateToday);
 }
 
 function fetchMailsWithinActualPeriod() {
@@ -163,14 +161,14 @@ function configureCircleHover(circle) {
         function () {
 
             dateTime.html(circle.data("date"));
-            //from.html(currentCircle.data("from"));
+            //from.html(circle.data("from"));
 
             dateTime.css("left", function () {
                 return parseInt(circle.css("left")) - 25 + 'px';
             });
 
             //from.css("top", function () {
-            //    return currentCircle.css("top");
+            //    return circle.css("top");
             //});
 
             $(".hidable").removeClass("hidden");
@@ -185,7 +183,6 @@ function configureCircleHover(circle) {
                         $(this).addClass("focused");
                     }
                 });
-
 
         }, function () {
             $(".hidable").addClass("hidden");
