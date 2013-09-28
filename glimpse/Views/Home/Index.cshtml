@@ -69,14 +69,29 @@
 
                 <ol id="labels-header" class="nav nav-list">
 
+                    <li class="nav-header">Carpetas</li>
+
+                    @{
+                        foreach (LabelViewModel label in ViewBag.Labels)
+                        {
+                            if (label.systemName != null)
+                            {
+                        <li class='label label-glimpse' data-name="@label.showName" data-system="@label.systemName">@label.showName</li> 
+                            }
+
+                        }
+                    }
+
                     <li class="nav-header">Etiquetas</li>
 
                     @{
                         foreach (LabelViewModel label in ViewBag.Labels)
                         {
-                            
-                        <li class='label label-glimpse' data-name="@label.showName" data-system="@label.systemName">@label.showName</li>                         
-                        
+                            if (label.systemName == null)
+                            {
+                        <li class='label label-glimpse' data-name="@label.showName" data-system="@label.systemName">@label.showName</li> 
+                            }
+
                         }
                     }
 
