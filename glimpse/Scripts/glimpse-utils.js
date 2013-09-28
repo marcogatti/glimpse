@@ -150,6 +150,10 @@ function setWheelZoom() {
     });
 }
 
+function setRefreshButtonBehaviour() {
+    $('#refresh').click(function () { fetchMailsWithinActualPeriod() });
+}
+
 function movePeriodShown(offset) {
     if (notNegative(minAge, offset)) {
         minAge += offset;
