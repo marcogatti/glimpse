@@ -49,5 +49,17 @@ namespace Glimpse.Models
 
             return new Label(labelEntity);
         }
+
+        public static Label FindByName(MailAccount mailAcccount, String labelName, ISession session)
+        {
+            LabelEntity labelEntity;
+
+            labelEntity = session.CreateCriteria<LabelEntity>()
+                                          .Add(Restrictions.Eq("MailAccountEntity", mailAcccount.Entity))
+                                          .Add(Restrictions.Eq("Name", labelName))
+                                          .UniqueResult<LabelEntity>();
+
+            return new Label(labelEntity);
+        }
     }
 }

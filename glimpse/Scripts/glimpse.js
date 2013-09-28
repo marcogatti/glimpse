@@ -8,5 +8,6 @@ $(document).ready(function () {
     setRefreshOnResize();
     prepareComposeDialog();
     setTransitionsCheckbox();
+    setEverithingRelatedToAddLabelsToAMail();
 })
 

@@ -244,7 +244,6 @@ function setLabelsAdder() {
             downEvent.preventDefault();
             selectedLabel = $(this).attr('data-name');
             labelToAddIsSet = true;
-            console.log(labelToAddIsSet);
         })
     }
     );
@@ -253,7 +252,6 @@ function setLabelsAdder() {
 function clearLabelsToAdd() {
     $(document).mouseup(function () {
         labelToAddIsSet = false;
-        console.log(labelToAddIsSet);
     }
     );
 }
@@ -262,13 +260,51 @@ function prepareCirclesToReceiveALabel() {
     $(".circle").each(function () {
         $(this).mouseup(function () {
             if (labelToAddIsSet) {
-                console.log('Agregamos label: ' + selectedLabel + ' al mail: ' + $(this).attr('data-id'));
+                addLabelToEmail(selectedLabel, $(this));
             }
         }
         );
     }
     );
 }
+
+function changeMailColour(mail, label) {
+
+    var label0 = mail.attr('data-label0'),
+        label1 = mail.attr('data-label1'),
+        label2 = mail.attr('data-label2');
+
+    if (label0 === "") {
+        mail.data('label0', label);
+    } else if (label1 === "") {
+        mail.data('label1', label);
+    } else if (label2 === "") {
+        mail.data('label2', label);
+    } else {
+        mail.data('label0', label);
+    }
+
+    calculateEmailColor(mail);
+}
+
+function addLabelToEmail(label, mail) {
+
+    // Validar que el label no sea un system label, igual tambien lo hace el server.
+
+    $.ajax({
+        type: "POST",
+        url: "async/AddLabel",
+        dataType: 'json',
+        error: function (jqXHR, textStatus, errorThrown) {
+            alert("No se pudo agregar el label.");
+        },
+        success: function () {
+            changeMailColour(mail, label);
+        },
+        data: { labelName: label, mailId: mail.attr('data-id') }
+    });
+}
+
 
 function setEverithingRelatedToAddLabelsToAMail() {
     setLabelsAdder();

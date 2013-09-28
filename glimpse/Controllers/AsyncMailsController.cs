@@ -21,6 +21,7 @@ namespace Glimpse.Controllers
     [Authorize]
     public class AsyncMailsController : Controller
     {
+        #region action methods
         //
         // GET: /AsyncMails/InboxMails
         public ActionResult InboxMails(int id = 0)
@@ -70,30 +71,6 @@ namespace Glimpse.Controllers
             {
                 session.Close();
             }
-        }
-
-        [HttpPost]
-        public ActionResult sendEmail(MailSentViewModel sendInfo)
-        {
-            try
-            {
-                MailAccount mailAccount = GetCurrentMailAccount();
-                mailAccount.SendMail(sendInfo.ToAddress, sendInfo.Body, sendInfo.Subject);
-            }
-            catch (SmtpException exc)
-            {
-                Log.LogException(exc, "Error SMTP sendEmail. Parametros del mail: subjectMail(" + sendInfo.Subject + "), addressMail(" + sendInfo.ToAddress + ").");
-
-                return Json(new { success = false, address = sendInfo.ToAddress }, JsonRequestBehavior.AllowGet);
-            }
-            catch (Exception exc)
-            {
-                Log.LogException(exc, "Error generico sendEmail. Parametros del mail: subjectMail(" + sendInfo.Subject + "), addressMail(" + sendInfo.ToAddress + ").");
-
-                return Json(new { success = false, address = sendInfo.ToAddress }, JsonRequestBehavior.AllowGet);
-            }
-
-            return Json(new { success = true, address = sendInfo.ToAddress }, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult GetMailsByDate(Int64 initial, Int64 final)
@@ -159,27 +136,37 @@ namespace Glimpse.Controllers
             }
         }
 
-        public ActionResult RemoveLabel(String label, UInt64 gmID)
+        public ActionResult RemoveLabel(String label, Int64 mailId)
         {
             ISession session = NHibernateManager.OpenSession();
 
             try
             {
                 MailAccount currentMailAccount = this.GetCurrentMailAccount();
-                currentMailAccount.RemoveMailLabel(label, gmID); //IMAP
-                Mail mail = new Mail(gmID, currentMailAccount, session);
-                mail.RemoveLabel(label, session);
+                Mail mail = new Mail(mailId, session);
+                Boolean success;
 
-                JsonResult result = Json(new { success = true }, JsonRequestBehavior.AllowGet);
+                if (mail.Entity.MailAccountEntity.Id == currentMailAccount.Entity.Id)
+                {
+                    mail.RemoveLabel(label, session); //DB
+                    currentMailAccount.RemoveMailLabel(label, mail.Entity.Gm_mid); //IMAP
+                    success = true;
+                }
+                else
+                {
+                    success = false;
+                }
+
+                JsonResult result = Json(new { success = success }, JsonRequestBehavior.AllowGet);
 
                 return result;
             }
             catch (Exception exc)
             {
                 Log.LogException(exc, "Error generico RemoveLabel. Parametros del mail: label("
-                    + label + "), gmID(" + gmID.ToString() + ").");
+                    + label + "), gmID(" + mailId.ToString() + ").");
 
-                return Json(new { success = false, message = "Error al obtener el cuerpo del mail." }, JsonRequestBehavior.AllowGet);
+                return Json(new { success = false, message = "Error al remover label." }, JsonRequestBehavior.AllowGet);
             }
             finally
             {
@@ -187,6 +174,68 @@ namespace Glimpse.Controllers
             }
         }
 
+        [HttpPost]
+        public ActionResult sendEmail(MailSentViewModel sendInfo)
+        {
+            try
+            {
+                MailAccount mailAccount = GetCurrentMailAccount();
+                mailAccount.SendMail(sendInfo.ToAddress, sendInfo.Body, sendInfo.Subject);
+            }
+            catch (SmtpException exc)
+            {
+                Log.LogException(exc, "Error SMTP sendEmail. Parametros del mail: subjectMail(" + sendInfo.Subject + "), addressMail(" + sendInfo.ToAddress + ").");
+
+                return Json(new { success = false, address = sendInfo.ToAddress }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception exc)
+            {
+                Log.LogException(exc, "Error generico sendEmail. Parametros del mail: subjectMail(" + sendInfo.Subject + "), addressMail(" + sendInfo.ToAddress + ").");
+
+                return Json(new { success = false, address = sendInfo.ToAddress }, JsonRequestBehavior.AllowGet);
+            }
+
+            return Json(new { success = true, address = sendInfo.ToAddress }, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public ActionResult AddLabel(String labelName, Int64 mailId)
+        {
+            bool success;
+
+            try
+            {
+                MailAccount mailAccount = GetCurrentMailAccount();
+
+                using (ISession session = NHibernateManager.OpenSession())
+                {
+                    ITransaction tran = session.BeginTransaction();
+
+                    Mail theMail = new Mail(mailId, session);
+                    Label theLabel = Label.FindByName(mailAccount, labelName, session);
+                    theMail.AddLabel(theLabel, session);
+                    mailAccount.AddLabelIMAP(theMail, theLabel);
+
+                    tran.Commit();
+                    session.Flush();
+
+                    success = true;
+                }
+
+            }
+            catch (Exception exc)
+            {
+                success = false;
+
+                Log.LogException(exc, "Error generico AddLabel. Parametros del mail: label(" + labelName + "), mailId(" + mailId.ToString() + ").");
+            }
+
+            return Json(new { success = success }, JsonRequestBehavior.AllowGet);
+        }
+
+        #endregion
+
+        #region private helpers
         private static DateTime ConvertFromJS(Int64 JSDate)
         {
             DateTime date = new DateTime(1970, 1, 1) + new TimeSpan(JSDate * 10000);
@@ -276,6 +325,6 @@ namespace Glimpse.Controllers
             }
             return mailAccount;
         }
-
+        #endregion
     }
 }
