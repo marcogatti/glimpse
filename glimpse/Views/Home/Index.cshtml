@@ -100,6 +100,7 @@
                 <i id="refresh" class="icon icon-refresh"></i>
             </div>
 
+
             <div id="date-today" class="coord date-coord"></div>
             <div id="date-last" class="coord date-coord"></div>
             <div id="dateTime" class="coord date-coord hidable hidden"></div>
@@ -110,11 +111,15 @@
 
     </div>
     <!--/row-->
+    <form class="form-inline pull-left">
+        <label>Cantidad máxima</label>
+        <input id="max-amount" type="number" min="1" max="100" value="30">
+    </form>
 
     <div class="row-fluid">
         <div class="pull-right">
             <label class="checkbox">
-                <input id="transitions-check" type="checkbox" value="">
+                <input id="transitions-check" type="checkbox" checked value="">
                 Desactivar animaciones (para equipos menos potentes)
             </label>
         </div>

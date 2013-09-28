@@ -102,7 +102,18 @@ function setTransitionsCheckbox() {
     });
 }
 
+function amountOfCirclesShown() {
 
+    var circles = [];
+
+    $(".circle").each(function () {
+        var currentAge = $(this).attr('data-age');
+        if (currentAge < maxAge && currentAge > minAge) {
+            circles.push($(this).data('id'));
+        }
+    });
+    return circles.length;
+}
 
 function currentPeriodShown() {
     return maxAge - minAge;
@@ -114,18 +125,21 @@ function notNegative(value1, value2) {
 
 function zoom(factor, zoomPoint) {
 
-    var movement = currentPeriodShown() * factor * 0.0002;
+    if (amountOfCirclesShown() < $("#max-amount").val() || (factor > 0)) {
 
-    maxAge -= (containerWidth() - zoomPoint) * movement;
+        var movement = currentPeriodShown() * factor * 0.0001;
 
-    var offset = zoomPoint * movement;
-    if (notNegative(minAge, offset)) {
-        minAge += offset;
+        maxAge -= (containerWidth() - zoomPoint) * movement;
+
+        var offset = zoomPoint * movement;
+        if (notNegative(minAge, offset)) {
+            minAge += offset;
+        }
+
+        setDateCoords();
+        fetchMailsWithinActualPeriod();
+        calculateEmailsLeft();
     }
-
-    setDateCoords();
-    fetchMailsWithinActualPeriod();
-    calculateEmailsLeft();
 }
 
 function configureZoom() {
