@@ -256,15 +256,29 @@ function setRefreshOnResize() {
 var selectedLabel,
     labelToAddIsSet = false;
 
+function labelDrag(ev) {
+    ev.dataTransfer.setData("Text", ev.target.id);
+}
+
 function setLabelsAdder() {
     $.each($('.label'), function (index, actualLabel) {
-        $(this).mousedown(function (downEvent) {
-            downEvent.preventDefault();
-            selectedLabel = $(this).attr('data-name');
-            labelToAddIsSet = true;
-        })
-    }
-    );
+
+        var currentLabel = $(this);
+        if (currentLabel.hasClass("custom-label")) {
+
+            currentLabel.attr("draggable", true);
+            currentLabel.attr("ondragstart", "labelDrag(event)");
+
+            currentLabel.mousedown(function (downEvent) {
+                selectedLabel = $(this).attr('data-name');
+                labelToAddIsSet = true;
+            });
+        } else {
+            $(this).mousedown(function(downEvent){
+                downEvent.preventDefault();
+            });
+        }
+    });
 }
 
 function clearLabelsToAdd() {
