@@ -23,10 +23,10 @@ namespace Glimpse.Models
         public MailAccount(MailAccountEntity accountEntity)
         {
             this.Entity = accountEntity;
+            this.mySender = new Sender(this.Entity.Address, this.Entity.Password);
         }
         public MailAccount(String address, String password)
             : this(new MailAccountEntity(address, password)) { }
-
 
         public Int32 getLastUIDExternalFrom(String mailbox)
         {
