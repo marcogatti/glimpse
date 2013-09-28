@@ -48,7 +48,7 @@ function insertCircle(value) {
     calculateEmailColor(newCircle);
     $("#email-container").append(newCircle);
     calculateEmailPosition(newCircle);
-
+    prepareToReceiveLabels(newCircle);
 }
 
 function setCirclePre() {

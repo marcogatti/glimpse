@@ -256,32 +256,29 @@ function clearLabelsToAdd() {
     );
 }
 
-function prepareCirclesToReceiveALabel() {
-    $(".circle").each(function () {
-        $(this).mouseup(function () {
-            if (labelToAddIsSet) {
-                addLabelToEmail(selectedLabel, $(this));
-            }
+function prepareToReceiveLabels(circle) {
+    circle.mouseup(function () {
+        if (labelToAddIsSet) {
+            addLabelToEmail(selectedLabel, $(this));
         }
-        );
     }
     );
 }
 
 function changeMailColour(mail, label) {
 
-    var label0 = mail.attr('data-label0'),
-        label1 = mail.attr('data-label1'),
-        label2 = mail.attr('data-label2');
-
-    if (label0 === "") {
+    if (mail.attr('data-label0') === "") {
         mail.data('label0', label);
-    } else if (label1 === "") {
+        mail.attr('data-label0', label);
+    } else if (mail.attr('data-label1') === "") {
         mail.data('label1', label);
-    } else if (label2 === "") {
+        mail.attr('data-label1', label);
+    } else if (mail.attr('data-label2') === "") {
         mail.data('label2', label);
+        mail.attr('data-label2', label);
     } else {
         mail.data('label0', label);
+        mail.attr('data-label0', label);
     }
 
     calculateEmailColor(mail);
