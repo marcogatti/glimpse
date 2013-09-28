@@ -31,7 +31,8 @@ namespace Glimpse.Models
             session.SaveOrUpdate(this.Entity);
         }
 
-        public static Label FindBySystemName(MailAccount account, String systemName, ISession session){
+        public static Label FindBySystemName(MailAccount account, String systemName, ISession session)
+        {
 
             LabelEntity labelEntity;
 
@@ -58,6 +59,9 @@ namespace Glimpse.Models
                                           .Add(Restrictions.Eq("MailAccountEntity", mailAcccount.Entity))
                                           .Add(Restrictions.Eq("Name", labelName))
                                           .UniqueResult<LabelEntity>();
+
+            if (labelEntity == null)
+                throw new GlimpseException("No se encontro el label");
 
             return new Label(labelEntity);
         }
