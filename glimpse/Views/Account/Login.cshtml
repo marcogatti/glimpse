@@ -16,9 +16,9 @@
         @Html.AntiForgeryToken()
         <h2 class="form-signin-heading">Welcome to glimpse</h2>
         @Html.ValidationSummary()
-        @Html.TextBoxFor(m => m.Email, new { type = "email", placeholder = "address@example.com", @class = "input-block-level" })
-        @Html.ValidationMessageFor(m => m.Email)
-        @Html.PasswordFor(m => m.Password, new { placeholder = "Password...", @class = "input-block-level" })
+        @Html.TextBoxFor(m => m.Username, new { placeholder = "Your Username or Email Address", @class = "input-block-level" })
+        @Html.ValidationMessageFor(m => m.Username)
+        @Html.PasswordFor(m => m.Password, new { placeholder = "Your Password", @class = "input-block-level" })
         @Html.ValidationMessageFor(m => m.Password)
         
         @Html.DisplayTextFor(m => m.rememberMe)

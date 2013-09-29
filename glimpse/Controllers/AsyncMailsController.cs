@@ -310,7 +310,7 @@ namespace Glimpse.Controllers
         }
         private MailAccount GetCurrentMailAccount()
         {
-            MailAccount mailAccount = (MailAccount)Session[AccountController.MAIL_INTERFACE];
+            MailAccount mailAccount = (MailAccount)Session[HomeController.MAIL_ACCOUNTS];
 
             if (!mailAccount.isConnected())
             {

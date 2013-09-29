@@ -15,42 +15,48 @@ using Glimpse.Models;
 using NHibernate;
 using Glimpse.DataAccessLayer;
 using System.Net.Sockets;
+using NHibernate.Criterion;
 
 namespace Glimpse.Controllers
 {
     [Authorize]
     public class HomeController : Controller
     {
+        public const String MAIL_ACCOUNTS = "mail-accounts";
         //
         // GET: /Home/
         public ActionResult Index()
         {
             ISession session = NHibernateManager.OpenSession();
 
-            String mailAddress = new CookieHelper().getMailAddressFromCookie();
+            String username = new CookieHelper().GetUserFromCookie();
             
-            MailAccount cookieMailAccount = MailAccount.FindByAddress(mailAddress, session);
+            User cookieUser = Glimpse.Models.User.FindByUsername(username, session);
 
-            if (cookieMailAccount == null)
+            if (cookieUser == null)
             {
-                session.Flush();
                 session.Close();
                 return this.LogOut();
             }
 
-            MailAccount mailAccount = (MailAccount)Session[AccountController.MAIL_INTERFACE];
+            User sessionUser = (User)Session[AccountController.USER_NAME];
 
-            if (mailAccount == null)
+            if (sessionUser == null)
             {
+                sessionUser = cookieUser;
+                Session[AccountController.USER_NAME] = sessionUser;
+            }
+
+            IList<MailAccount> mailAccounts = sessionUser.GetAccounts(session);
+            ViewBag.MailErrors = "";
+            foreach(MailAccount mailAccount in mailAccounts)
                 try
                 {
-                    mailAccount = cookieMailAccount;
-                    Session[AccountController.MAIL_INTERFACE] = mailAccount;
-                    mailAccount.connectFull();       
+                    mailAccount.connectFull();
                 }
                 catch (InvalidAuthenticationException)
                 {
-                    session.Flush();
+                    ViewBag.MailErrors += "Could not log in with " + mailAccount.Entity.Address + ", password is outdated.";
                     session.Close();
                     return this.LogOut();
                 }
@@ -58,17 +64,19 @@ namespace Glimpse.Controllers
                 {
                     Log.LogException(exc, "Error al conectar con IMAP");
                 }
-            }
 
-            MailsTasksHandler.StartSynchronization(mailAccount.Entity.Address);
+            MailAccount mainMailAccount = mailAccounts[0];
+            Session[HomeController.MAIL_ACCOUNTS] = mainMailAccount; //solo se guarda el primero por ahora
 
-            IList<LabelEntity> accountLabels = Label.FindByAccount(cookieMailAccount.Entity, session);
+            MailsTasksHandler.StartSynchronization(mainMailAccount.Entity.Address);
+
+            IList<LabelEntity> accountLabels = Label.FindByAccount(mainMailAccount.Entity, session);
             List<LabelViewModel> viewLabels = new List<LabelViewModel>(accountLabels.Count);
 
             foreach (LabelEntity label in accountLabels)
                 viewLabels.Add(new LabelViewModel(label.Name, label.SystemName));
 
-            ViewBag.Email = cookieMailAccount.Entity.Address;
+            ViewBag.Email = mainMailAccount.Entity.Address;
             ViewBag.Labels = viewLabels;
 
             session.Flush();

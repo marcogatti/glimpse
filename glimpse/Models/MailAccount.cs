@@ -23,11 +23,25 @@ namespace Glimpse.Models
         public MailAccount(MailAccountEntity accountEntity)
         {
             this.Entity = accountEntity;
+            this.Entity.Active = true;
             this.mySender = new Sender(this.Entity.Address, this.Entity.Password);
         }
         public MailAccount(String address, String password)
             : this(new MailAccountEntity(address, password)) { }
 
+        public void SetAsMainAccount(ISession session)
+        {
+            IList<MailAccountEntity> notMainMailAccounts = session.CreateCriteria<MailAccountEntity>()
+                                                                .Add(Restrictions.Eq("User", this.Entity.User))
+                                                                .Add(Restrictions.Not(Restrictions.Eq("Id", this.Entity.Id)))
+                                                                .List<MailAccountEntity>();
+            foreach(MailAccountEntity notMainAccount in notMainMailAccounts)
+            {
+                notMainAccount.Active = false;
+                new MailAccount(notMainAccount).SaveOrUpdate(session);
+            }
+            this.Entity.IsMainAccount = true;
+        }
         public Int32 getLastUIDExternalFrom(String mailbox)
         {
             return this.myFetcher.GetLastUIDFrom(mailbox);
@@ -126,11 +140,10 @@ namespace Glimpse.Models
 
             return mailAccountClone;
         }
-        public void UpdateLabels()
+        public void UpdateLabels(ISession session)
         {
             String tagsNames;
-            ISession session = NHibernateManager.OpenSession();
-            ITransaction tran = session.BeginTransaction();
+            
             NameValueCollection labelsByProperty = this.myFetcher.getLabels();
 
             IList<LabelEntity> databaseLabels = session.CreateCriteria<LabelEntity>()
@@ -155,13 +168,7 @@ namespace Glimpse.Models
                     this.RegisterLabel(label, session, databaseLabels);
                 }
             }
-
-            tran.Commit();
-
             setFetcherLabels(session);
-
-            session.Flush();
-            session.Close();
         }
 
         public void RemoveMailLabel(String label, UInt64 gmID)
@@ -195,22 +202,15 @@ namespace Glimpse.Models
             return mail;
         }
 
-        public virtual void SaveOrUpdate()
+        public virtual void SaveOrUpdate(ISession session)
         {
-            ISession session = NHibernateManager.OpenSession();
-            ITransaction tran = session.BeginTransaction();
-
             MailAccount oldAccount = FindByAddress(this.Entity.Address, session);
             if (oldAccount != null)
             {
                 oldAccount.Clone(this);
                 this.Entity = oldAccount.Entity;
             }
-
             session.SaveOrUpdate(this.Entity);
-
-            tran.Commit();
-            session.Close();
         }
         public static MailAccount FindByAddress(String emailAddress, ISession session)
         {
@@ -259,6 +259,11 @@ namespace Glimpse.Models
         public void Dispose()
         {
             this.myFetcher.Dispose();
+        }
+
+        public void SetUser(User user)
+        {
+            this.Entity.User = user.Entity;
         }
 
         private static void Save(List<Mail> mails)
