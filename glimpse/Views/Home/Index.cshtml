@@ -69,14 +69,29 @@
 
                 <ol id="labels-header" class="nav nav-list">
 
+                    <li class="nav-header">Carpetas</li>
+
+                    @{
+                        foreach (LabelViewModel label in ViewBag.Labels)
+                        {
+                            if (label.systemName != null)
+                            {
+                        <li class='label label-glimpse' data-name="@label.showName" data-system="@label.systemName">@label.showName</li> 
+                            }
+
+                        }
+                    }
+
                     <li class="nav-header">Etiquetas</li>
 
                     @{
                         foreach (LabelViewModel label in ViewBag.Labels)
                         {
-                            
-                        <li class='label label-glimpse' data-name="@label.showName" data-system="@label.systemName">@label.showName</li>                         
-                        
+                            if (label.systemName == null)
+                            {
+                        <li class='custom-label label label-glimpse' data-name="@label.showName" data-system="@label.systemName">@label.showName</li> 
+                            }
+
                         }
                     }
 
@@ -92,12 +107,14 @@
         </div>
         <!--/span-->
 
-        <div id="email-container" class="span10">
+        <div id="email-container" class="span10 well">
 
-            <div class="zoom">
-                <i id="zoom-in" class="icon-zoom icon-zoom-in icon-white"></i>
-                <i id="zoom-out" class="icon-zoom icon-zoom-out icon-white"></i>
+            <div class="icons">
+                <i id="zoom-in" class="icon icon-zoom-in"></i>
+                <i id="zoom-out" class="icon icon-zoom-out"></i>
+                <i id="refresh" class="icon icon-refresh"></i>
             </div>
+
 
             <div id="date-today" class="coord date-coord"></div>
             <div id="date-last" class="coord date-coord"></div>
@@ -109,11 +126,15 @@
 
     </div>
     <!--/row-->
+    <form class="form-inline pull-left">
+        <label>Cantidad máxima</label>
+        <input id="max-amount" type="number" min="1" max="100" value="30">
+    </form>
 
     <div class="row-fluid">
         <div class="pull-right">
             <label class="checkbox">
-                <input id="transitions-check" type="checkbox" value="">
+                <input id="transitions-check" type="checkbox" checked value="">
                 Desactivar animaciones (para equipos menos potentes)
             </label>
         </div>

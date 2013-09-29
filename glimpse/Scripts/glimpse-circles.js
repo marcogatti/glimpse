@@ -1,69 +1,81 @@
 ﻿var ownedCircles = [];
 
 function insertCircle(value) {
-    if (value.age > maxAge) {
-        maxAge = value.age;
+
+    if (ownedCircles.indexOf(value.id) === -1) {
+        ownedCircles.push(value.id);
+
+        if (value.age > maxAge) {
+            maxAge = value.age;
+        }
+
+        var date = new Date(parseInt(value.date.substr(6))).toGMTString(),
+            classes = "circle";
+
+        if (!$("#transitions-check").prop("checked")) {
+            classes += " transition";
+        }
+
+        if (!value.seen) {
+            classes += " new";
+        }
+
+        var label0, label1, label2;
+
+        if (value.labels[0] !== undefined) {
+            label0 = value.labels[0].name;
+        }
+        if (value.labels[1] !== undefined) {
+            label1 = value.labels[1].name;
+        }
+        if (value.labels[2] !== undefined) {
+            label2 = value.labels[2].name;
+        }
+
+        var dataAttributes = [
+            " data-id=", value.id,
+            " data-tid=", value.tid,
+            " data-subject=", value.subject,
+            " data-date=", date,
+            " data-from=", value.from.address,
+            " data-bodypeek=", value.bodypeek,
+            " data-label0=", label0,
+            " data-label1=", label1,
+            " data-label2=", label2,
+            " data-age=", value.age,
+        ];
+
+        var newCircle = $("<div class='" + classes + "'" +
+                            dataAttributes.join("'") +
+                            "'><div class='centered'><p>" + value.subject + "</p></div></div>");
+
+        calculateEmailColor(newCircle);
+        $("#email-container").append(newCircle);
+        calculateEmailPosition(newCircle);
+        prepareToReceiveLabels(newCircle);
+        setFullDisplay(newCircle);
+        configureCircleHover(newCircle);
+        newCircle.popover({
+            "placement": "left",
+            "trigger": "hover",
+            "content": value.bodypeek,
+            "title": value.from.address
+        });
     }
-
-    var date = new Date(parseInt(value.date.substr(6))).toGMTString(),
-        classes = "circle";
-
-    if(!$("#transitions-check").prop("checked")){
-        classes += " transition";
-    }
-
-    if (!value.seen) {
-        classes += " new";
-    }
-
-    var label0, label1, label2;
-
-    if (value.labels[0] !== undefined) {
-        label0 = value.labels[0].name;
-    }
-    if (value.labels[1] !== undefined) {
-        label1 = value.labels[1].name;
-    }
-    if (value.labels[2] !== undefined) {
-        label2 = value.labels[2].name;
-    }
-
-    var dataAttributes = [
-        " data-id=", value.id,
-        " data-tid=", value.tid,
-        " data-subject=", value.subject,
-        " data-date=", date,
-        " data-from=", value.from.address,
-        " data-bodypeek=", value.bodypeek,
-        " data-label0=", label0,
-        " data-label1=", label1,
-        " data-label2=", label2,
-        " data-age=", value.age
-    ];
-
-    var newCircle = $("<div class='" + classes + "'" +
-                        dataAttributes.join("'") +
-                        "'><div class='centered'><p>" + value.subject + "</p></div></div>");
-
-    calculateEmailColor(newCircle);
-    $("#email-container").append(newCircle);
-    calculateEmailPosition(newCircle);
-
 }
 
-function setCirclePre() {
-    $(".circle").click(
+function setFullDisplay(circle) {
+    circle.click(
         function () {
-            if (!isOnPreview($(this))) {
-                $(this).addClass("preview");
-                $(this).find(".centered").append("<div class='pre'>" + $(this).data("bodypeek") + "</div>");
-            } else {
-                $(this).find(".pre").remove();
-                $(this).removeClass("preview");
+            //if (!isOnPreview(circle)) {
+            //    circle.addClass("preview");
+            //    circle.find(".centered").append("<div class='pre'>" + circle.data("bodypeek") + "</div>");
+            //} else {
+            //    circle.find(".pre").remove();
+            //    circle.removeClass("preview");
                 
-                var from = 'From: ' + $(this).data("from"),
-                    subject = $(this).data("subject"),
-                    currentCircle = $(this);
+                var from = 'From: ' + circle.data("from"),
+                    subject = circle.data("subject");
 
                 $(".modal-body").find("h4").html(from);
                 $(".modal-header").find("h3").html(subject);
@@ -73,16 +85,16 @@ function setCirclePre() {
 
                 $("#body-modal").modal("show");
 
-                $.getJSON("async/GetMailBody/" + currentCircle.data("id"), function (data) {
+                $.getJSON("async/GetMailBody/" + circle.data("id"), function (data) {
+                    hideProgressBar("#body-progress");
                     if (data.success == true) {
-                        hideProgressBar("#body-progress");
                         $(".modal-body").find("#bodyhtml").html(data.body);
-                        markAsRead(currentCircle);
+                        markAsRead(circle);
 
                     } else alert(data.message);
                 });
             }
-        })
+        )
 }
 
 function fetchMailsAsync(initialDate, finalDate) {
@@ -97,30 +109,41 @@ function fetchMailsAsync(initialDate, finalDate) {
 
             $.each(data.mails, function (index, value) {
 
-                if (ownedCircles.indexOf(value.id) === -1) {
-                    ownedCircles.push(value.id);
                     insertCircle(value);
-                }              
             });
 
         } else alert(data.message);
-
-    }).done(function () {
-
-        configureCircleHover();
-        setCirclePre();
-        setDateCoords();
 
     });
 }
 
 function fetchRecentMails() {
 
-    var dateBefore = new Date(),
-        dateToday = new Date();
-    dateBefore.setDate(dateBefore.getDate() - 30);
+    showProgressBar("#circles-progress");
 
-    fetchMailsAsync(dateBefore, dateToday);
+    $.getJSON("async/GetMailsByAmount?amountOfMails=15", function (data) {
+
+        hideProgressBar("#circles-progress");
+
+        if (data.mails.length === 0) {
+            maxAge = minAge + 1000000000000;
+        }
+
+        if (data.success === true) {
+
+            $.each(data.mails, function (index, value) {
+
+                    insertCircle(value);
+            });
+
+        } else alert(data.message);
+
+    }).done(function () {
+
+        setDateCoords();
+        calculateEmailsLeft();
+
+    });
 }
 
 function fetchMailsWithinActualPeriod() {
@@ -128,33 +151,31 @@ function fetchMailsWithinActualPeriod() {
 }
 
 
-function configureCircleHover() {
+function configureCircleHover(circle) {
 
     var dateTime = $("#dateTime"),
         from = $("#from");
 
-    $(".circle").hover(
+    circle.hover(
 
         function () {
 
-            var currentCircle = $(this);
-
-            dateTime.html(currentCircle.data("date"));
-            //from.html(currentCircle.data("from"));
+            dateTime.html(circle.data("date"));
+            //from.html(circle.data("from"));
 
             dateTime.css("left", function () {
-                return parseInt(currentCircle.css("left")) - 25 + 'px';
+                return parseInt(circle.css("left")) - 25 + 'px';
             });
 
             //from.css("top", function () {
-            //    return currentCircle.css("top");
+            //    return circle.css("top");
             //});
 
             $(".hidable").removeClass("hidden");
 
-            currentCircle.addClass("selected");
+            circle.addClass("selected");
 
-            var currentTid = currentCircle.data("tid");
+            var currentTid = circle.data("tid");
 
             $('.circle').each(
                 function () {
@@ -162,7 +183,6 @@ function configureCircleHover() {
                         $(this).addClass("focused");
                     }
                 });
-
 
         }, function () {
             $(".hidable").addClass("hidden");

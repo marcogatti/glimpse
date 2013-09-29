@@ -22,11 +22,10 @@ namespace Glimpse.Models
         {
             this.Entity = entity;
         }
-        public Mail(UInt64 gmID, MailAccount mailAccount, ISession session)
+        public Mail(Int64 mailId, ISession session)
         {
             MailEntity entity = session.CreateCriteria<MailEntity>()
-                                    .Add(Restrictions.Eq("MailAccountEntity", mailAccount.Entity))
-                                    .Add(Restrictions.Eq("Gm_mid", gmID))
+                                    .Add(Restrictions.Eq("Id", mailId))
                                     .SetMaxResults(1)
                                     .UniqueResult<MailEntity>();
             this.Entity = entity;
@@ -37,8 +36,9 @@ namespace Glimpse.Models
             LabelEntity labelToRemove = this.Entity.Labels.First<LabelEntity>(x => x.Name == label);
             this.Entity.Labels.Remove(labelToRemove);
         }
- 
-        public static List<MailEntity> FindByMailAccount(MailAccount mailAccount, ISession session){
+
+        public static List<MailEntity> FindByMailAccount(MailAccount mailAccount, ISession session)
+        {
 
             List<MailEntity> foundMails = (List<MailEntity>)session.CreateCriteria<MailEntity>()
                                                         .Add(Restrictions.Eq("MailAccountEntity", mailAccount.Entity))
@@ -76,6 +76,26 @@ namespace Glimpse.Models
             this.Entity.CC = from.CC;
             this.Entity.BCC = from.BCC;
             this.Entity.Body = from.Body;
+        }
+
+        public void AddLabel(Label theLabel, ISession session)
+        {
+            if (!this.hasLabel(theLabel))
+            {
+                this.Entity.Labels.Add(theLabel.Entity);
+                this.Save(session);
+            }
+        }
+
+        public bool hasLabel(Label aLabel)
+        {
+            LabelEntity entity = (from label 
+                                  in this.Entity.Labels 
+                                  where label.MailAccountEntity.Id == aLabel.Entity.MailAccountEntity.Id && 
+                                        label.Name == aLabel.Entity.Name
+                                  select label).SingleOrDefault<LabelEntity>();
+
+            return entity != null;
         }
     }
 }

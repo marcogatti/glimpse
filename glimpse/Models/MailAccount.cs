@@ -23,10 +23,10 @@ namespace Glimpse.Models
         public MailAccount(MailAccountEntity accountEntity)
         {
             this.Entity = accountEntity;
+            this.mySender = new Sender(this.Entity.Address, this.Entity.Password);
         }
         public MailAccount(String address, String password)
             : this(new MailAccountEntity(address, password)) { }
-
 
         public Int32 getLastUIDExternalFrom(String mailbox)
         {
@@ -321,5 +321,19 @@ namespace Glimpse.Models
             this.Entity.Password = fromAccount.Entity.Password;
         }
 
+
+        public void AddLabelIMAP(Mail theMail, Label theLabel)
+        {
+            this.myFetcher.addMailTag(this.GetALLLabelName(), theLabel.Entity.Name, theMail.Entity.Gm_mid);
+        }
+
+        public string GetALLLabelName()
+        {
+            using (ISession session = NHibernateManager.OpenSession())
+            {
+                Label theLabel = Label.FindBySystemName(this, "ALL", session);
+                return theLabel.Entity.Name;
+            }
+        }
     }
 }

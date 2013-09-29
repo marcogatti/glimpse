@@ -31,7 +31,8 @@ namespace Glimpse.Models
             session.SaveOrUpdate(this.Entity);
         }
 
-        public static Label FindBySystemName(MailAccount account, String systemName, ISession session){
+        public static Label FindBySystemName(MailAccount account, String systemName, ISession session)
+        {
 
             LabelEntity labelEntity;
 
@@ -46,6 +47,21 @@ namespace Glimpse.Models
             {
                 throw new NotUniqueResultException(e, "Cuenta: " + account.Entity.Address + " ,SystemName Label: " + systemName);
             }
+
+            return new Label(labelEntity);
+        }
+
+        public static Label FindByName(MailAccount mailAcccount, String labelName, ISession session)
+        {
+            LabelEntity labelEntity;
+
+            labelEntity = session.CreateCriteria<LabelEntity>()
+                                          .Add(Restrictions.Eq("MailAccountEntity", mailAcccount.Entity))
+                                          .Add(Restrictions.Eq("Name", labelName))
+                                          .UniqueResult<LabelEntity>();
+
+            if (labelEntity == null)
+                throw new GlimpseException("No se encontro el label");
 
             return new Label(labelEntity);
         }

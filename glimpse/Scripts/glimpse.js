@@ -5,8 +5,10 @@ $(document).ready(function () {
     fetchRecentMails();
     setDragging();
     configureZoom();
+    setRefreshButtonBehaviour();
     setRefreshOnResize();
     prepareComposeDialog();
     setTransitionsCheckbox();
+    setEverithingRelatedToAddLabelsToAMail();
 })
 

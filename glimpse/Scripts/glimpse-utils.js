@@ -81,8 +81,8 @@ function populateLabelColors() {
     ];
 
     var i = 0;
-    $("#labels-header").children(".label").each(function () { 
-    
+    $("#labels-header").children(".label").each(function () {
+
         var currentColor = glimpseColors[i];
 
         if (!$(this).data("system")) {
@@ -102,7 +102,18 @@ function setTransitionsCheckbox() {
     });
 }
 
+function amountOfCirclesShown() {
 
+    var circles = [];
+
+    $(".circle").each(function () {
+        var currentAge = $(this).attr('data-age');
+        if (currentAge < maxAge && currentAge > minAge) {
+            circles.push($(this).data('id'));
+        }
+    });
+    return circles.length;
+}
 
 function currentPeriodShown() {
     return maxAge - minAge;
@@ -114,18 +125,21 @@ function notNegative(value1, value2) {
 
 function zoom(factor, zoomPoint) {
 
-    var movement = currentPeriodShown() * factor * 0.0002;
+    if (amountOfCirclesShown() < $("#max-amount").val() || (factor > 0)) {
 
-    maxAge -= (containerWidth() - zoomPoint) * movement;
+        var movement = currentPeriodShown() * factor * 0.0001;
 
-    var offset = zoomPoint * movement;
-    if (notNegative(minAge, offset)) {
-        minAge += offset;
+        maxAge -= (containerWidth() - zoomPoint) * movement;
+
+        var offset = zoomPoint * movement;
+        if (notNegative(minAge, offset)) {
+            minAge += offset;
+        }
+
+        setDateCoords();
+        fetchMailsWithinActualPeriod();
+        calculateEmailsLeft();
     }
-
-    setDateCoords();
-    fetchMailsWithinActualPeriod();
-    calculateEmailsLeft();
 }
 
 function configureZoom() {
@@ -148,6 +162,10 @@ function setWheelZoom() {
         event.preventDefault();
         zoom(deltaY, event.offsetX);
     });
+}
+
+function setRefreshButtonBehaviour() {
+    $('#refresh').click(function () { fetchMailsWithinActualPeriod() });
 }
 
 function movePeriodShown(offset) {
@@ -177,7 +195,7 @@ function setDragging() {
     //  Revisar (pedidos ajax innecesarios)
     $(window).mouseup(function () {
         $(window).unbind("mousemove");
-        if (wasDragging) {    
+        if (wasDragging) {
             setDateCoords();
             fetchMailsWithinActualPeriod();
             wasDragging = false;
@@ -202,8 +220,8 @@ function ageToDate(age) {
 
 function setDateCoords() {
 
-        newDateToday = ageToDate(minAge).toLocaleDateString(),
-        newDateLast = ageToDate(maxAge).toLocaleDateString();
+    newDateToday = ageToDate(minAge).toLocaleDateString(),
+    newDateLast = ageToDate(maxAge).toLocaleDateString();
 
     if (newDateToday === new Date().toLocaleDateString()) {
         newDateToday = "Hoy";
@@ -233,4 +251,91 @@ function setRefreshOnResize() {
         });
     });
 
+}
+
+var selectedLabel,
+    labelToAddIsSet = false;
+
+function labelDrag(ev) {
+    ev.dataTransfer.setData("Text", ev.target.id);
+}
+
+function setLabelsAdder() {
+    $.each($('.label'), function (index, actualLabel) {
+
+        var currentLabel = $(this);
+        if (currentLabel.hasClass("custom-label")) {
+
+            currentLabel.attr("draggable", true);
+            currentLabel.attr("ondragstart", "labelDrag(event)");
+
+            currentLabel.mousedown(function (downEvent) {
+                selectedLabel = $(this).attr('data-name');
+                labelToAddIsSet = true;
+            });
+        } else {
+            $(this).mousedown(function(downEvent){
+                downEvent.preventDefault();
+            });
+        }
+    });
+}
+
+function clearLabelsToAdd() {
+    $(document).mouseup(function () {
+        labelToAddIsSet = false;
+    }
+    );
+}
+
+function prepareToReceiveLabels(circle) {
+    circle.mouseup(function () {
+        if (labelToAddIsSet) {
+            addLabelToEmail(selectedLabel, $(this));
+        }
+    }
+    );
+}
+
+function changeMailColour(mail, label) {
+
+    if (mail.attr('data-label0') === "") {
+        mail.data('label0', label);
+        mail.attr('data-label0', label);
+    } else if (mail.attr('data-label1') === "") {
+        mail.data('label1', label);
+        mail.attr('data-label1', label);
+    } else if (mail.attr('data-label2') === "") {
+        mail.data('label2', label);
+        mail.attr('data-label2', label);
+    } else {
+        mail.data('label0', label);
+        mail.attr('data-label0', label);
+    }
+
+    calculateEmailColor(mail);
+}
+
+function addLabelToEmail(label, mail) {
+
+    // Validar que el label no sea un system label, igual tambien lo hace el server.
+
+    $.ajax({
+        type: "POST",
+        url: "async/AddLabel",
+        dataType: 'json',
+        error: function (jqXHR, textStatus, errorThrown) {
+            alert("No se pudo agregar el label.");
+        },
+        success: function () {
+            changeMailColour(mail, label);
+        },
+        data: { labelName: label, mailId: mail.attr('data-id') }
+    });
+}
+
+
+function setEverithingRelatedToAddLabelsToAMail() {
+    setLabelsAdder();
+    clearLabelsToAdd();
 }
