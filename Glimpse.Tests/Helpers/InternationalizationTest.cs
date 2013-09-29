@@ -9,7 +9,7 @@ namespace Glimpse.Tests.Helpers
     [TestFixture]
     public class InternationalizationTest
     {
-        private static String SUBPATH_TO_LAGUAGE_FILE = "/Internationalization/LanguageElements.xml";
+        private static String SUBPATH_TO_LAGUAGE_FILE = "/Helpers/LanguageElements.xml";
 
         private String testProjectRootDirectory;
         private InternationalizationHelper helperSpanish;

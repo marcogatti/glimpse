@@ -1,18 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
-using Glimpse.ViewModels;
-using Glimpse.Helpers;
-using System.Web.Security;
-using System.Xml;
+﻿using Glimpse.DataAccessLayer;
 using Glimpse.Exceptions.MailInterfacesExceptions;
-using Glimpse.MailInterfaces;
-using Glimpse.DataAccessLayer.Entities;
+using Glimpse.Helpers;
 using Glimpse.Models;
+using Glimpse.ViewModels;
 using NHibernate;
-using Glimpse.DataAccessLayer;
+using System;
+using System.Linq;
+using System.Web.Mvc;
+using System.Web.Security;
 
 namespace Glimpse.Controllers
 {
@@ -108,17 +103,17 @@ namespace Glimpse.Controllers
             }
         }
 
-        // GET: /Logout
         [Authorize]
         public ActionResult Logout()
         {
             FormsAuthentication.SignOut();
-            new CookieHelper().clearMailAddressCookie();
+            new CookieHelper().ClearUserCookie();
             MailAccount mailAccount = (MailAccount)Session[HomeController.MAIL_ACCOUNTS];
             if (mailAccount != null)
             {
                 mailAccount.Disconnect();
-                Session.Remove(USER_NAME);
+                Session.Remove(AccountController.USER_NAME);
+                Session.Remove(HomeController.MAIL_ACCOUNTS);
             }
             return Redirect("/");
         }

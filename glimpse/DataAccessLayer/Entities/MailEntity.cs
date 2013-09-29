@@ -20,10 +20,7 @@ namespace Glimpse.DataAccessLayer.Entities
         public virtual UInt64 Gm_mid { get; set; }
         public virtual DateTime Date { get; set; }
         public virtual String Subject { get; set; }
-        public virtual Int64 UidInbox { get; set; }
         public virtual Int64 UidTrash { get; set; }
-        public virtual Int64 UidSent { get; set; }
-        public virtual Int64 UidDraft { get; set; }
         public virtual Int64 UidSpam { get; set; }
         public virtual Int64 UidAll { get; set; }
         public virtual Boolean Answered { get; set; }

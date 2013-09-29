@@ -37,6 +37,21 @@ namespace Glimpse.Models
             this.Entity.Labels.Remove(labelToRemove);
         }
 
+        public String GetImapFolderName()
+        {
+            String systemName;
+            if (this.Entity.UidTrash > 0)
+                systemName = "Trash";
+            else if (this.Entity.UidSpam > 0)
+                systemName = "Junk";
+            else
+                systemName = "All";
+            return this.Entity.Labels
+                       .Where(x => x.SystemName == systemName)
+                       .Select(x => x.Name)
+                       .Single();
+        }
+
         public static List<MailEntity> FindByMailAccount(MailAccount mailAccount, ISession session)
         {
 
@@ -61,10 +76,7 @@ namespace Glimpse.Models
             this.Entity.Gm_mid = from.Gm_mid;
             this.Entity.Date = from.Date;
             this.Entity.Subject = from.Subject;
-            this.Entity.UidInbox = from.UidInbox;
             this.Entity.UidTrash = from.UidTrash;
-            this.Entity.UidSent = from.UidSent;
-            this.Entity.UidDraft = from.UidDraft;
             this.Entity.UidSpam = from.UidSpam;
             this.Entity.UidAll = from.UidAll;
             this.Entity.Answered = from.Answered;

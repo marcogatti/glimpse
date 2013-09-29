@@ -54,14 +54,14 @@ namespace Glimpse.Helpers
                 throw new CookieNotFoundException("Login cookie");
             }
         }
-        public void clearMailAddressCookie()
+        public void ClearUserCookie()
         {
             try
             {
-                String address = this.GetUserFromCookie();
+                String user = this.GetUserFromCookie();
 
-                this.responseCookies.Remove(address);
-                this.AddUsernameCookie(address, DateTime.Now.AddMonths(-1));
+                this.responseCookies.Remove(user);
+                this.AddUsernameCookie(user, DateTime.Now.AddMonths(-1));
             }
             catch (CookieNotFoundException){ /* Cookie already cleared or does not exist*/ }
         }

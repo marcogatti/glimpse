@@ -1,19 +1,12 @@
 ﻿using ActiveUp.Net.Mail;
 using Glimpse.DataAccessLayer;
 using Glimpse.DataAccessLayer.Entities;
-using Glimpse.Exceptions;
-using Glimpse.Helpers;
-using Glimpse.MailInterfaces;
 using Glimpse.Models;
 using Glimpse.ViewModels;
-using Newtonsoft.Json;
 using NHibernate;
-using NHibernate.Criterion;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Sockets;
-using System.Web;
 using System.Web.Mvc;
 
 namespace Glimpse.Controllers
@@ -21,50 +14,43 @@ namespace Glimpse.Controllers
     [Authorize]
     public class AsyncMailsController : Controller
     {
-        #region action methods
-        //
-        // GET: /AsyncMails/InboxMails
-        public ActionResult InboxMails(int id = 0)
-        {
-            ISession session = NHibernateManager.OpenSession();
+        #region Action Methods
+        //public ActionResult InboxMails(int id = 0)
+        //{
+        //    ISession session = NHibernateManager.OpenSession();
 
-            try
-            {
-                IList<Object> mailsToSend = this.FetchMails(id, session);
-                JsonResult result = Json(new { success = true, mails = mailsToSend }, JsonRequestBehavior.AllowGet);
-                return result;
-            }
-            catch (Exception exc)
-            {
-                Log.LogException(exc, "Error generico InboxMails. Parametros del mail: idMail(" + id.ToString() + ").");
+        //    try
+        //    {
+        //        IList<Object> mailsToSend = this.FetchMails(id, session);
+        //        JsonResult result = Json(new { success = true, mails = mailsToSend }, JsonRequestBehavior.AllowGet);
+        //        return result;
+        //    }
+        //    catch (Exception exc)
+        //    {
+        //        Log.LogException(exc, "Error generico InboxMails. Parametros del mail: idMail(" + id.ToString() + ").");
 
-                return Json(new { success = false, message = "Error al obtener los mails" }, JsonRequestBehavior.AllowGet);
-            }
-            finally
-            {
-                session.Flush();
-                session.Close();
-            }
-        }
-
+        //        return Json(new { success = false, message = "Error al obtener los mails" }, JsonRequestBehavior.AllowGet);
+        //    }
+        //    finally
+        //    {
+        //        session.Flush();
+        //        session.Close();
+        //    }
+        //}
         public ActionResult GetMailBody(Int64 id = 0)
         {
             ISession session = NHibernateManager.OpenSession();
-
             try
             {
-                MailAccount currentMailAccount = GetCurrentMailAccount();
+                MailAccount currentMailAccount = this.GetCurrentMailAccount();
+                String body = currentMailAccount.ReadMail(id, session);
 
-                Mail mail = currentMailAccount.ReadMail(id, session);
-
-                JsonResult result = Json(new { success = true, body = mail.Entity.Body }, JsonRequestBehavior.AllowGet);
-
+                JsonResult result = Json(new { success = true, body = body }, JsonRequestBehavior.AllowGet);
                 return result;
             }
             catch (Exception exc)
             {
                 Log.LogException(exc, "Error generico GetMailBody. Parametros del mail: idMail(" + id.ToString() + ").");
-
                 return Json(new { success = false, message = "Error al obtener el cuerpo del mail." }, JsonRequestBehavior.AllowGet);
             }
             finally
@@ -72,32 +58,26 @@ namespace Glimpse.Controllers
                 session.Close();
             }
         }
-
         public ActionResult GetMailsByDate(Int64 initial, Int64 final)
         {
-            DateTime initialDate = ConvertFromJS(initial);
-            DateTime finalDate = ConvertFromJS(final);
+            DateTime initialDate = AsyncMailsController.ConvertFromJS(initial);
+            DateTime finalDate = AsyncMailsController.ConvertFromJS(final);
 
             ISession session = NHibernateManager.OpenSession();
-
             try
             {
                 MailCollection mails;
                 List<Object> mailsToReturn = new List<object>();
-
                 MailAccount currentMailAccount = this.GetCurrentMailAccount();
                 mails = new MailCollection(currentMailAccount.GetMailsByDate(initialDate, finalDate, session));
                 mailsToReturn = this.PrepareToSend(mails);
 
                 JsonResult result = Json(new { success = true, mails = mailsToReturn }, JsonRequestBehavior.AllowGet);
-
                 return result;
             }
             catch (Exception exc)
             {
-                Log.LogException(exc, "Error generico GetMailBody. Parametros del mail: initialDate("
-                    + initialDate.ToString() + "), finalDate(" + finalDate.ToString() + ").");
-
+                Log.LogException(exc, "Fechas del metodo: initialDate(" + initialDate.ToString() + "), finalDate(" + finalDate.ToString() + ").");
                 return Json(new { success = false, message = "Error al obtener los mails." }, JsonRequestBehavior.AllowGet);
             }
             finally
@@ -105,29 +85,23 @@ namespace Glimpse.Controllers
                 session.Close();
             }
         }
-
         public ActionResult GetMailsByAmount(Int32 amountOfMails)
         {
             ISession session = NHibernateManager.OpenSession();
-
             try
             {
                 MailCollection mails;
                 List<Object> mailsToReturn = new List<object>();
-
                 MailAccount currentMailAccount = this.GetCurrentMailAccount();
                 mails = currentMailAccount.GetMailsByAmount(amountOfMails, session);
                 mailsToReturn = this.PrepareToSend(mails);
 
                 JsonResult result = Json(new { success = true, mails = mailsToReturn }, JsonRequestBehavior.AllowGet);
-
                 return result;
             }
             catch (Exception exc)
             {
-                Log.LogException(exc, "Error generico GetMailsByAmount. Parametros del mail: amountOfMails("
-                    + amountOfMails + ").");
-
+                Log.LogException(exc, "Parametros de la llamada: amountOfMails(" + amountOfMails + ").");
                 return Json(new { success = false, message = "Error al obtener los mails." }, JsonRequestBehavior.AllowGet);
             }
             finally
@@ -135,11 +109,9 @@ namespace Glimpse.Controllers
                 session.Close();
             }
         }
-
         public ActionResult RemoveLabel(String label, Int64 mailId)
         {
             ISession session = NHibernateManager.OpenSession();
-
             try
             {
                 MailAccount currentMailAccount = this.GetCurrentMailAccount();
@@ -158,14 +130,11 @@ namespace Glimpse.Controllers
                 }
 
                 JsonResult result = Json(new { success = success }, JsonRequestBehavior.AllowGet);
-
                 return result;
             }
             catch (Exception exc)
             {
-                Log.LogException(exc, "Error generico RemoveLabel. Parametros del mail: label("
-                    + label + "), gmID(" + mailId.ToString() + ").");
-
+                Log.LogException(exc, "Parametros de la llamada: label(" + label + "), gmID(" + mailId.ToString() + ").");
                 return Json(new { success = false, message = "Error al remover label." }, JsonRequestBehavior.AllowGet);
             }
             finally
@@ -179,33 +148,28 @@ namespace Glimpse.Controllers
         {
             try
             {
-                MailAccount mailAccount = GetCurrentMailAccount();
+                MailAccount mailAccount = this.GetCurrentMailAccount();
                 mailAccount.SendMail(sendInfo.ToAddress, sendInfo.Body, sendInfo.Subject);
+                return Json(new { success = true, address = sendInfo.ToAddress }, JsonRequestBehavior.AllowGet);
             }
             catch (SmtpException exc)
             {
-                Log.LogException(exc, "Error SMTP sendEmail. Parametros del mail: subjectMail(" + sendInfo.Subject + "), addressMail(" + sendInfo.ToAddress + ").");
-
+                Log.LogException(exc, "Parametros del mail a enviar: subjectMail(" + sendInfo.Subject + "), addressMail(" + sendInfo.ToAddress + ").");
                 return Json(new { success = false, address = sendInfo.ToAddress }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception exc)
             {
-                Log.LogException(exc, "Error generico sendEmail. Parametros del mail: subjectMail(" + sendInfo.Subject + "), addressMail(" + sendInfo.ToAddress + ").");
-
+                Log.LogException(exc, "Parametros de la llamada: subjectMail(" + sendInfo.Subject + "), addressMail(" + sendInfo.ToAddress + ").");
                 return Json(new { success = false, address = sendInfo.ToAddress }, JsonRequestBehavior.AllowGet);
             }
-
-            return Json(new { success = true, address = sendInfo.ToAddress }, JsonRequestBehavior.AllowGet);
         }
-
         [HttpPost]
         public ActionResult AddLabel(String labelName, Int64 mailId)
         {
             bool success;
-
             try
             {
-                MailAccount mailAccount = GetCurrentMailAccount();
+                MailAccount mailAccount = this.GetCurrentMailAccount();
 
                 using (ISession session = NHibernateManager.OpenSession())
                 {
@@ -213,29 +177,24 @@ namespace Glimpse.Controllers
 
                     Mail theMail = new Mail(mailId, session);
                     Label theLabel = Label.FindByName(mailAccount, labelName, session);
-                    theMail.AddLabel(theLabel, session);
-                    mailAccount.AddLabelIMAP(theMail, theLabel);
+                    theMail.AddLabel(theLabel, session); //DB
+                    mailAccount.AddLabelIMAP(theMail, theLabel); //IMAP
 
                     tran.Commit();
                     session.Flush();
-
                     success = true;
                 }
-
             }
             catch (Exception exc)
             {
                 success = false;
-
-                Log.LogException(exc, "Error generico AddLabel. Parametros del mail: label(" + labelName + "), mailId(" + mailId.ToString() + ").");
+                Log.LogException(exc, "Parametros de la llamada: label(" + labelName + "), mailId(" + mailId.ToString() + ").");
             }
 
             return Json(new { success = success }, JsonRequestBehavior.AllowGet);
         }
-
         #endregion
-
-        #region private helpers
+        #region Private Helpers
         private static DateTime ConvertFromJS(Int64 JSDate)
         {
             DateTime date = new DateTime(1970, 1, 1) + new TimeSpan(JSDate * 10000);
@@ -251,7 +210,6 @@ namespace Glimpse.Controllers
 
             return this.PrepareToSend(mails);
         }
-
         private List<Object> PrepareToSend(MailCollection mails)
         {
             List<Object> preparedMails = new List<Object>();
