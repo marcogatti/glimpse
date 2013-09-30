@@ -284,10 +284,6 @@ function setLabelsAdder() {
             }
             );
 
-            currentLabel.mousedown(function (downEvent) {
-                selectedLabel = $(this).attr('data-name');
-                labelToAddIsSet = true;
-            });
         } else {
             $(this).mousedown(function (downEvent) {
                 downEvent.preventDefault();
@@ -296,16 +292,14 @@ function setLabelsAdder() {
     });
 }
 
+function canReceiveThatLabel(label, mail) {
+    return !hasLabel(mail, label);
+}
+
 function prepareToReceiveLabels(circle) {
-    //circle.mouseup(function () {
-    //    
-    //        addLabelToEmail(selectedLabel, $(this));
-    //    }
-    //}
-    //);
 
     $(circle).on('dragover', function (ev) {
-        if (labelToAddIsSet) {
+        if (labelToAddIsSet && canReceiveThatLabel(selectedLabel, $(this))) {
             ev.preventDefault();
             ev.stopPropagation();
         }
