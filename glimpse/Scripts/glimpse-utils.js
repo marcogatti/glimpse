@@ -257,7 +257,8 @@ var selectedLabel,
     labelToAddIsSet = false;
 
 function labelDrag(ev) {
-    ev.dataTransfer.setData("Text", ev.target.id);
+    //ev.dataTransfer.setData("Text", ev.target.id);
+    ev.data.label.css('opacity', 0.4);
 }
 
 function setLabelsAdder() {
@@ -267,34 +268,56 @@ function setLabelsAdder() {
         if (currentLabel.hasClass("custom-label")) {
 
             currentLabel.attr("draggable", true);
-            currentLabel.attr("ondragstart", "labelDrag(event)");
+            //currentLabel.attr("ondragstart", "labelDrag(event)");
+
+            currentLabel.on('dragstart', { label: currentLabel }, function (ev) {
+                ev.data.label.css('opacity', 0.4);
+                ev.originalEvent.dataTransfer.setData("Text", ev.target.id);
+                selectedLabel = ev.data.label.attr('data-name');
+                labelToAddIsSet = true;
+            }
+            );
+
+            currentLabel.on('dragend', { label: currentLabel }, function (ev) {
+                ev.data.label.css('opacity', 1);
+                labelToAddIsSet = false;
+            }
+            );
 
             currentLabel.mousedown(function (downEvent) {
                 selectedLabel = $(this).attr('data-name');
                 labelToAddIsSet = true;
             });
         } else {
-            $(this).mousedown(function(downEvent){
+            $(this).mousedown(function (downEvent) {
                 downEvent.preventDefault();
             });
         }
     });
 }
 
-function clearLabelsToAdd() {
-    $(document).mouseup(function () {
-        labelToAddIsSet = false;
+function prepareToReceiveLabels(circle) {
+    //circle.mouseup(function () {
+    //    
+    //        addLabelToEmail(selectedLabel, $(this));
+    //    }
+    //}
+    //);
+
+    $(circle).on('dragover', function (ev) {
+        if (labelToAddIsSet) {
+            ev.preventDefault();
+            ev.stopPropagation();
+        }
     }
     );
-}
 
-function prepareToReceiveLabels(circle) {
-    circle.mouseup(function () {
+    $(circle).on('drop', function (ev) {
         if (labelToAddIsSet) {
             addLabelToEmail(selectedLabel, $(this));
         }
     }
-    );
+);
 }
 
 function changeMailColour(mail, label) {
@@ -337,5 +360,4 @@ function addLabelToEmail(label, mail) {
 
 function setEverithingRelatedToAddLabelsToAMail() {
     setLabelsAdder();
-    clearLabelsToAdd();
 }
