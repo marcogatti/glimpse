@@ -4,6 +4,7 @@ using Glimpse.DataAccessLayer.Entities;
 using Glimpse.Models;
 using Glimpse.ViewModels;
 using NHibernate;
+using NHibernate.Criterion;
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
@@ -15,28 +16,6 @@ namespace Glimpse.Controllers
     public class AsyncMailsController : Controller
     {
         #region Action Methods
-        //public ActionResult InboxMails(int id = 0)
-        //{
-        //    ISession session = NHibernateManager.OpenSession();
-
-        //    try
-        //    {
-        //        IList<Object> mailsToSend = this.FetchMails(id, session);
-        //        JsonResult result = Json(new { success = true, mails = mailsToSend }, JsonRequestBehavior.AllowGet);
-        //        return result;
-        //    }
-        //    catch (Exception exc)
-        //    {
-        //        Log.LogException(exc, "Error generico InboxMails. Parametros del mail: idMail(" + id.ToString() + ").");
-
-        //        return Json(new { success = false, message = "Error al obtener los mails" }, JsonRequestBehavior.AllowGet);
-        //    }
-        //    finally
-        //    {
-        //        session.Flush();
-        //        session.Close();
-        //    }
-        //}
         public ActionResult GetMailBody(Int64 id = 0)
         {
             ISession session = NHibernateManager.OpenSession();
@@ -44,6 +23,9 @@ namespace Glimpse.Controllers
             {
                 MailAccount currentMailAccount = this.GetCurrentMailAccount();
                 String body = currentMailAccount.ReadMail(id, session);
+
+                if (body.Contains("<img src=\"cid:"))
+                    this.InsertEmbeddedExtraUrl(ref body, id, session);
 
                 JsonResult result = Json(new { success = true, body = body }, JsonRequestBehavior.AllowGet);
                 return result;
@@ -56,6 +38,19 @@ namespace Glimpse.Controllers
             finally
             {
                 session.Close();
+            }
+        }
+        public FileResult GetImage(Int64 id)
+        {
+            try
+            {
+                Extra extra = Extra.FindByID(id);
+                return File(extra.Entity.Data, extra.Entity.FileType, extra.Entity.Name); 
+            }
+            catch (Exception exc)
+            {
+                Log.LogException(exc, "Parametros de la llamada: idExtra(" + id.ToString() + ").");
+                return null;
             }
         }
         public ActionResult GetMailsByDate(Int64 initial, Int64 final)
@@ -200,16 +195,6 @@ namespace Glimpse.Controllers
             DateTime date = new DateTime(1970, 1, 1) + new TimeSpan(JSDate * 10000);
             return date;
         }
-        private List<Object> FetchMails(int amountOfEmails, ISession session)
-        {
-            MailAccount mailAccount = GetCurrentMailAccount();
-
-            MailManager manager = new MailManager(mailAccount);
-
-            MailCollection mails = manager.GetMailsFrom("INBOX", amountOfEmails, session);
-
-            return this.PrepareToSend(mails);
-        }
         private List<Object> PrepareToSend(MailCollection mails)
         {
             List<Object> preparedMails = new List<Object>();
@@ -282,6 +267,24 @@ namespace Glimpse.Controllers
                 }
             }
             return mailAccount;
+        }
+        private void InsertEmbeddedExtraUrl(ref String body, Int64 mailID, ISession session)
+        {
+            MailEntity mailEntity = session.CreateCriteria<MailEntity>()
+                                           .Add(Restrictions.Eq("Id", mailID))
+                                           .UniqueResult<MailEntity>();
+
+            IList<ExtraEntity> embeddedExtras = session.CreateCriteria<ExtraEntity>()
+                                                  .Add(Restrictions.Eq("MailEntity", mailEntity))
+                                                  .Add(Expression.Disjunction()
+                                                        .Add(Restrictions.Eq("ExtraType", Convert.ToInt16(2)))
+                                                        .Add(Restrictions.Eq("ExtraType", Convert.ToInt16(1))))
+                                                  .List<ExtraEntity>();
+
+            foreach (ExtraEntity embeddedExtra in embeddedExtras)
+            {
+                body = body.Replace("cid:" +  embeddedExtra.EmbObjectContentId, Url.Action("GetImage", "AsyncMails", new { id = embeddedExtra.Id }, this.Request.Url.Scheme));
+            }
         }
         #endregion
     }

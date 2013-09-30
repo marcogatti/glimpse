@@ -430,7 +430,7 @@ namespace Glimpse.MailInterfaces
                     extra.Size = (UInt32)embeddedPart.Size;
                     extra.Data = embeddedPart.BinaryContent;
                     extra.MailEntity = mail;
-                    extra.EmbObjectContentId = embeddedPart.ContentId;
+                    extra.EmbObjectContentId = this.TrimAngularBrackets(embeddedPart.ContentId);
                     mail.Extras.Add(extra);
                 }
             }
@@ -445,7 +445,9 @@ namespace Glimpse.MailInterfaces
                     extra.Name = unknownPart.Filename;
                     extra.Size = (UInt32)unknownPart.Size;
                     extra.Data = unknownPart.BinaryContent;
+                    extra.EmbObjectContentId = this.TrimAngularBrackets(unknownPart.ContentId);
                     extra.MailEntity = mail;
+
                     mail.Extras.Add(extra);
                 }
             }
@@ -545,6 +547,11 @@ namespace Glimpse.MailInterfaces
             //Output: [Gmail]/Borradores
             String mailboxName = mailbox.Substring(mailbox.IndexOf('"') + 1, mailbox.LastIndexOf('"') - mailbox.IndexOf('"') - 1);
             return mailboxName;
+        }
+        private String TrimAngularBrackets(String phrase)
+        {
+            phrase = phrase.Remove(0, 1);
+            return phrase.Remove(phrase.Length - 1, 1);
         }
         private Int32[] CleanSearchResponse(String imapResponse)
         {

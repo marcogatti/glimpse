@@ -161,7 +161,7 @@ namespace Glimpse.Models
         }
         public String ReadMail(Int64 id, ISession session)
         {
-            ITransaction tran = session.BeginTransaction();
+            
             MailEntity mailEntity = session.CreateCriteria<MailEntity>()
                                  .Add(Restrictions.Eq("MailAccountEntity", this.Entity))
                                  .Add(Restrictions.Eq("Id", id))
@@ -169,12 +169,13 @@ namespace Glimpse.Models
             Mail mail = new Mail(mailEntity);
             if (mailEntity.Seen == false)
             {
+                ITransaction tran = session.BeginTransaction();
                 mail.Entity.Seen = true;
-                mail.Save(session);
+                String imapFolderName = mail.GetImapFolderName();
+                this.myFetcher.SetSeenFlag(imapFolderName, mail.Entity.Gm_mid, true); //IMAP
+                mail.Save(session); //DB
+                tran.Commit();
             }
-            String imapFolderName = mail.GetImapFolderName();
-            this.myFetcher.SetSeenFlag(imapFolderName, mail.Entity.Gm_mid, true);
-            tran.Commit();
             return mail.Entity.Body;
         }
 

@@ -244,12 +244,12 @@
     <Compile Include="MailInterfaces\MailsTasksHandler.cs" />
     <Compile Include="MailInterfaces\Sender.cs" />
     <Compile Include="Models\Address.cs" />
+    <Compile Include="Models\Extra.cs" />
     <Compile Include="Models\Label.cs" />
     <Compile Include="Models\Log.cs" />
     <Compile Include="Models\Mail.cs" />
     <Compile Include="Models\MailAccount.cs" />
     <Compile Include="Models\MailCollection.cs" />
-    <Compile Include="Models\MailManager.cs" />
     <Compile Include="Exceptions\CommonExceptions\NotUniqueResultException.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="ViewModels\LabelViewModel.cs" />
