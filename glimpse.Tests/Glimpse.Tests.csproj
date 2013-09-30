@@ -171,7 +171,7 @@
     <Compile Include="DAL\MailAccountTest.cs" />
     <Compile Include="DAL\MailTest.cs" />
     <Compile Include="DAL\NHibernateTest.cs" />
-    <Compile Include="Internationalization\InternationalizationTest.cs" />
+    <Compile Include="Helpers\InternationalizationTest.cs" />
     <Compile Include="MailInterfaces\ConnectorTest.cs" />
     <Compile Include="MailInterfaces\SenderTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -180,7 +180,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="App.config" />
-    <Content Include="Internationalization\LanguageElements.xml" />
+    <Content Include="Helpers\LanguageElements.xml" />
     <Content Include="MailInterfaces\ReadSign.jpg" />
   </ItemGroup>
   <ItemGroup>

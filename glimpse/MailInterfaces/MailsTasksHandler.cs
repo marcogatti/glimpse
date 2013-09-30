@@ -1,6 +1,7 @@
 ﻿using Glimpse.DataAccessLayer;
 using Glimpse.DataAccessLayer.Entities;
 using Glimpse.ErrorLogging;
+using Glimpse.Exceptions.MailInterfacesExceptions;
 using Glimpse.Models;
 using NHibernate;
 using System;
@@ -15,66 +16,105 @@ namespace Glimpse.MailInterfaces
 {
     public class MailsTasksHandler
     {
-        private static Dictionary<string, MailsTask> tasksList = new Dictionary<string, MailsTask>();
-        private static Mutex tasksListLock = new Mutex(false);
+        private static Dictionary<string, MailsTask> TasksList = new Dictionary<string, MailsTask>();
+        private static Mutex TasksListLock = new Mutex(false);
 
-        private static int MAILS_AMMOUNT_PER_PASS = 4;
+        private static int MAILS_AMMOUNT_PER_ROUND = 4;
 
         public static void StartSynchronization(String mailAddress)
         {
-            bool taskIsWorking;
-            MailAccount mailAccount;
-            MailsTask newTask;
+            MailAccount mailAccountAll;
+            MailsTask newAllTask;
+            MailsTask newTaskTrash;
+            MailsTask newSpamTask;
+            String mailAddressAll = mailAddress + "/ALL";
+            String mailAddressTrash = mailAddress + "/TRASH";
+            String mailAddressSpam = mailAddress + "/SPAM";
 
-            LockTasksList();
+            MailsTasksHandler.LockTasksList();
 
-            if (tasksList.ContainsKey(mailAddress) && tasksList[mailAddress].IsWorking)
-                taskIsWorking = true;
-            else
-                taskIsWorking = false;
-
-            UnlockTasksList();
-
-            if (taskIsWorking)
+            if ((MailsTasksHandler.TasksList.ContainsKey(mailAddressAll) && MailsTasksHandler.TasksList[mailAddressAll].IsWorking) ||
+                (MailsTasksHandler.TasksList.ContainsKey(mailAddressTrash) && MailsTasksHandler.TasksList[mailAddressTrash].IsWorking) ||
+                (MailsTasksHandler.TasksList.ContainsKey(mailAddressSpam) && MailsTasksHandler.TasksList[mailAddressSpam].IsWorking))
+            {
+                MailsTasksHandler.UnlockTasksList(); //alguna tarea se encuentra trabajando
                 return;
+            }
+
+            MailsTasksHandler.UnlockTasksList();
 
             using (ISession session = NHibernateManager.OpenSession())
             {
-                mailAccount = MailAccount.FindByAddress(mailAddress, session);
-
+                mailAccountAll = MailAccount.FindByAddress(mailAddress, session);
                 try
                 {
-                    mailAccount.connectFull();
+                    mailAccountAll.connectFull();
+                }
+                catch (NullReferenceException exc)
+                {
+                    Log.LogException(exc, "Direccion inexistente en la base de datos: " + mailAccountAll + ".");
+                    return;
+                }
+                catch (InvalidAuthenticationException exc)
+                {
+                    Log.LogException(exc, "No se pudo conectar a imap con la direccion: " + mailAddress + ", ha cambiado el password.");
+                    return;
                 }
                 catch (SocketException exc)
                 {
-                    Log.LogException(exc, "No se pudo conectar a imap");
+                    Log.LogException(exc, "No se pudo conectar a imap con la direccion: " + mailAddress + ".");
                     return;
                 }
+                Label allLabel = Label.FindBySystemName(mailAccountAll, "All", session);
+                Label trashLabel = Label.FindBySystemName(mailAccountAll, "Trash", session);
+                Label spamLabel = Label.FindBySystemName(mailAccountAll, "Junk", session);
 
-                Label label = Label.FindBySystemName(mailAccount, "INBOX", session);
-                Int64 lastUidExternal = mailAccount.getLastUIDExternalFrom("INBOX"); //TODO: Deshardcodear
-                Int64 firstUidExternal = mailAccount.getFirstUIDExternalFrom("INBOX"); //TODO: Deshardcodear
-                Int64 lastUidLocal = mailAccount.GetLastUIDLocalFromALL(session);
-                Int64 firstUidLocal = mailAccount.GetFirstUIDLocalFromALL(session);
-
-                newTask = new MailsTask(lastUidLocal, firstUidLocal, lastUidExternal, firstUidExternal, label, mailAccount);
-
-                session.Close();     
+                newAllTask = new MailsTask(mailAccountAll.GetUIDLocal(session, allLabel.Entity.SystemName, true), //lastUidLocal
+                                             mailAccountAll.GetUIDLocal(session, allLabel.Entity.SystemName, false), //firstUidLocal
+                                             mailAccountAll.GetUIDExternalFrom(allLabel.Entity.Name, true), //lastUidExternal
+                                             mailAccountAll.GetUIDExternalFrom(allLabel.Entity.Name, false), //firstUidExternal
+                                             allLabel,
+                                             mailAccountAll);
+                newTaskTrash = new MailsTask(mailAccountAll.GetUIDLocal(session, trashLabel.Entity.SystemName, true), //lastUidLocal
+                                             mailAccountAll.GetUIDLocal(session, trashLabel.Entity.SystemName, false), //firstUidLocal
+                                             mailAccountAll.GetUIDExternalFrom(trashLabel.Entity.Name, true), //lastUidExternal
+                                             mailAccountAll.GetUIDExternalFrom(trashLabel.Entity.Name, false), //firstUidExternal
+                                             trashLabel,
+                                             null);
+                newSpamTask = new MailsTask(mailAccountAll.GetUIDLocal(session, spamLabel.Entity.SystemName, true), //lastUidLocal
+                                             mailAccountAll.GetUIDLocal(session, spamLabel.Entity.SystemName, false), //firstUidLocal
+                                             mailAccountAll.GetUIDExternalFrom(spamLabel.Entity.Name, true), //lastUidExternal
+                                             mailAccountAll.GetUIDExternalFrom(spamLabel.Entity.Name, false), //firstUidExternal
+                                             spamLabel,
+                                             null);
+                session.Close();
             }
-
-            if (newTask.HasFinished)
+            if (!newAllTask.HasFinished) //puede ser que no se necesite sincronizar dependiendo de los numeros
             {
-                return;
+                MailsTasksHandler.LockTasksList();
+                MailsTasksHandler.TasksList[mailAddressAll] = newAllTask;
+                MailsTasksHandler.UnlockTasksList();
+                MailsTasksHandler.StartMailsTask(newAllTask);
             }
-
-            LockTasksList();
-            tasksList[mailAccount.Entity.Address] = newTask;
-            UnlockTasksList();
-
-            StartMailsTask(newTask);
+            if (!newTaskTrash.HasFinished)
+            {
+                MailAccount mailAccountTrash = mailAccountAll.Clone(); //crear otra conexion a IMAP
+                newTaskTrash.SetMailAccount(mailAccountTrash);
+                MailsTasksHandler.LockTasksList();
+                MailsTasksHandler.TasksList[mailAddressTrash] = newTaskTrash;
+                MailsTasksHandler.UnlockTasksList();
+                MailsTasksHandler.StartMailsTask(newTaskTrash);
+            }
+            if (!newSpamTask.HasFinished)
+            {
+                MailAccount mailAccountSpam = mailAccountAll.Clone(); //crear otra conexion a IMAP
+                newSpamTask.SetMailAccount(mailAccountSpam);
+                MailsTasksHandler.LockTasksList();
+                MailsTasksHandler.TasksList[mailAddressSpam] = newSpamTask;
+                MailsTasksHandler.UnlockTasksList();
+                MailsTasksHandler.StartMailsTask(newSpamTask);
+            }
         }
-
         private static void StartMailsTask(MailsTask task)
         {
             Task.Factory.StartNew(() => SynchronizeAccount(task));
@@ -86,58 +126,65 @@ namespace Glimpse.MailInterfaces
             {
                 if (!task.HasFinishedForward)
                 {
-                    SynchronizeForward(task);
+                    MailsTasksHandler.SynchronizeForward(task);
                 }
                 else if (!task.HasFinishedBackward)
                 {
-                    SynchronizeBackward(task);
+                    MailsTasksHandler.SynchronizeBackward(task);
                 }
 
                 if (task.HasFinished)
                 {
-                    EndSynchronization(task);
+                    MailsTasksHandler.EndSynchronization(task);
                     return;
                 }
 
-                StartMailsTask(task);
-
+                MailsTasksHandler.StartMailsTask(task);
             }
             catch (Exception exc)
             {
-                EndSynchronization(task);
-                Log.LogException(exc);
+                MailsTasksHandler.EndSynchronization(task);
+                Log.LogException(exc, "Error sincronizando cuenta, parametros: mailAccount:" +
+                                             task.MailAccount.Entity.Address + " lowestUidLocal:" +
+                                             task.LowestUidLocal.ToString() + " lowestUidExternal:"+
+                                             task.LowestUidExternal.ToString() + " highestUidLocal:" +
+                                             task.HighestUidLocal.ToString() + " highestUidExternal:" +
+                                             task.HighestUidExternal.ToString() + " hasFinished:" +
+                                             task.HasFinished.ToString() + " hasFinishedForward:" +
+                                             task.HasFinishedForward.ToString() + " nextUidForward:" +
+                                             task.NextUidForward.ToString() + " hasFinishedBackward:" +
+                                             task.HasFinishedBackward.ToString() + " nextUidBackward:" +
+                                             task.NextUidBackward.ToString() + " labelName:" + 
+                                             task.Label.Entity.Name);
                 throw exc;
             }
         }
-
         private static void SynchronizeBackward(MailsTask task)
         {
             Int64 toUid, fromUid;
 
             toUid = task.NextUidBackward;
-            fromUid = GetFromUid(toUid, task.LowestUidExternal - 1); // En el backward queremos que traiga el LowestUidExternal
+            fromUid = MailsTasksHandler.GetFromUid(toUid, task.LowestUidExternal - 1); // En el backward queremos que traiga el LowestUidExternal
 
             task.MailAccount.FetchAndSaveMails(task.Label, fromUid, toUid);
 
             task.Dirty = true;
 
-            task.NextUidBackward = GetFollowingNextUid(fromUid);
+            task.NextUidBackward = MailsTasksHandler.GetFollowingNextUid(fromUid);
         }
-
         private static void SynchronizeForward(MailsTask task)
         {
             Int64 toUid, fromUid;
 
             toUid = task.NextUidForward;
-            fromUid = GetFromUid(toUid, task.HighestUidLocal); // En el forward no queremos el HighestUidLocal porque ya lo tenemos
+            fromUid = MailsTasksHandler.GetFromUid(toUid, task.HighestUidLocal); // En el forward no queremos el HighestUidLocal porque ya lo tenemos
 
             task.MailAccount.FetchAndSaveMails(task.Label, fromUid, toUid);
 
             task.Dirty = true;
 
-            task.NextUidForward = GetFollowingNextUid(fromUid);
+            task.NextUidForward = MailsTasksHandler.GetFollowingNextUid(fromUid);
         }
-
         private static void EndSynchronization(MailsTask task)
         {
             task.Working = false;
@@ -151,13 +198,12 @@ namespace Glimpse.MailInterfaces
             else
                 return fromUid - 1; //muevo el puntero una posicion atras de que recien me traje
         }
-
         private static Int64 GetFromUid(Int64 toUid, Int64 UidLimit)
         {
             Int64 fromUid;
 
-            if (toUid - MAILS_AMMOUNT_PER_PASS > UidLimit)
-                fromUid = toUid - MAILS_AMMOUNT_PER_PASS;
+            if (toUid - MAILS_AMMOUNT_PER_ROUND > UidLimit)
+                fromUid = toUid - MAILS_AMMOUNT_PER_ROUND;
             else
                 fromUid = UidLimit + 1;
             return fromUid;
@@ -165,12 +211,11 @@ namespace Glimpse.MailInterfaces
 
         private static void UnlockTasksList()
         {
-            tasksListLock.ReleaseMutex();
+            MailsTasksHandler.TasksListLock.ReleaseMutex();
         }
-
         private static void LockTasksList()
         {
-            tasksListLock.WaitOne();
+            MailsTasksHandler.TasksListLock.WaitOne();
         }
     }
 
@@ -185,44 +230,7 @@ namespace Glimpse.MailInterfaces
         internal Int64 NextUidBackward { get; set; }
         internal Label Label { get; set; }
         internal MailAccount MailAccount { get; set; }
-
-        public bool IsWorking
-        {
-            get
-            {
-                return this.Working;
-            }
-        }
         public bool Dirty { get; set; }
-
-        public bool HasFinishedBackward
-        {
-            get
-            {
-                return (this.LowestUidExternal > this.NextUidBackward) // Si el puntero al siguiente queda dentras de lo que existe en IMAP.
-                    || (this.LowestUidExternal >= this.LowestUidLocal); // Si tengo lo mismo o mas en la base que en IMAP 
-            }
-        }
-
-        public bool HasFinishedForward
-        {
-            get
-            {
-                return (this.HighestUidLocal >= this.NextUidForward) // Si el puntero al siguiente esta detras del que tenemos en la base
-                    || (this.HighestUidExternal <= this.HighestUidLocal) // Si tengo lo mismo o mas en la base que en IMAP
-                    || (this.LowestUidExternal > this.NextUidForward); // Si el puntero al siguiente queda por debajo lo que existe en IMAP
-            }
-        }
-
-        public bool HasFinished
-        {
-            get
-            {
-                return this.HasFinishedForward && this.HasFinishedBackward;
-            }
-        }
-
-
 
         public MailsTask(Int64 lastUidLocal, Int64 firstUidLocal, Int64 lastUidExternal, Int64 firstUidExternal, Label label, MailAccount mailAccount)
         {
@@ -235,6 +243,42 @@ namespace Glimpse.MailInterfaces
             this.Dirty = false;
             this.Working = true;
             this.MailAccount = mailAccount;
+        }
+
+        public void SetMailAccount(MailAccount mailAccount)
+        {
+            this.MailAccount = mailAccount;
+        }
+        public bool IsWorking
+        {
+            get
+            {
+                return this.Working;
+            }
+        }
+        public bool HasFinishedBackward
+        {
+            get
+            {
+                return (this.LowestUidExternal > this.NextUidBackward) // Si el puntero al siguiente queda dentras de lo que existe en IMAP.
+                    || (this.LowestUidExternal >= this.LowestUidLocal); // Si tengo lo mismo o mas en la base que en IMAP 
+            }
+        }
+        public bool HasFinishedForward
+        {
+            get
+            {
+                return (this.HighestUidLocal >= this.NextUidForward) // Si el puntero al siguiente esta detras del que tenemos en la base
+                    || (this.HighestUidExternal <= this.HighestUidLocal) // Si tengo lo mismo o mas en la base que en IMAP
+                    || (this.LowestUidExternal > this.NextUidForward); // Si el puntero al siguiente queda por debajo lo que existe en IMAP
+            }
+        }
+        public bool HasFinished
+        {
+            get
+            {
+                return this.HasFinishedForward && this.HasFinishedBackward;
+            }
         }
     }
 }

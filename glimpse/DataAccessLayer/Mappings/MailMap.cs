@@ -20,10 +20,7 @@ namespace Glimpse.DataAccessLayer.Mappings
             Map(x => x.Gm_mid).Column("Gm_mid");
             Map(x => x.Date).Column("Date");
             Map(x => x.Subject).Column("Subject");
-            Map(x => x.UidInbox).Column("UidInbox");
             Map(x => x.UidTrash).Column("UidTrash");
-            Map(x => x.UidSent).Column("UidSent");
-            Map(x => x.UidDraft).Column("UidDraft");
             Map(x => x.UidSpam).Column("UidSpam");
             Map(x => x.UidAll).Column("UidAll");
             Map(x => x.Answered).Column("Answered");

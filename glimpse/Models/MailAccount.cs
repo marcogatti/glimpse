@@ -1,15 +1,12 @@
-﻿using Glimpse.DataAccessLayer;
+﻿using ActiveUp.Net.Mail;
+using Glimpse.DataAccessLayer;
 using Glimpse.DataAccessLayer.Entities;
 using Glimpse.MailInterfaces;
 using NHibernate;
 using NHibernate.Criterion;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using ActiveUp.Net.Mail;
 using System.Collections.Specialized;
-using Glimpse.Helpers;
 
 namespace Glimpse.Models
 {
@@ -23,19 +20,28 @@ namespace Glimpse.Models
         public MailAccount(MailAccountEntity accountEntity)
         {
             this.Entity = accountEntity;
+            this.Entity.Active = true;
             this.mySender = new Sender(this.Entity.Address, this.Entity.Password);
         }
         public MailAccount(String address, String password)
             : this(new MailAccountEntity(address, password)) { }
 
-        public Int32 getLastUIDExternalFrom(String mailbox)
+        public void SetAsMainAccount(ISession session)
         {
-            return this.myFetcher.GetLastUIDFrom(mailbox);
+            IList<MailAccountEntity> notMainMailAccounts = session.CreateCriteria<MailAccountEntity>()
+                                                                .Add(Restrictions.Eq("User", this.Entity.User))
+                                                                .Add(Restrictions.Not(Restrictions.Eq("Id", this.Entity.Id)))
+                                                                .List<MailAccountEntity>();
+            foreach(MailAccountEntity notMainAccount in notMainMailAccounts)
+            {
+                notMainAccount.Active = false;
+                new MailAccount(notMainAccount).SaveOrUpdate(session);
+            }
+            this.Entity.IsMainAccount = true;
         }
-
-        public Int64 getFirstUIDExternalFrom(String mailbox)
+        public Int32 GetUIDExternalFrom(String mailbox, Boolean max)
         {
-            return this.myFetcher.GetFirstUIDFrom(mailbox);
+            return this.myFetcher.GetLimitUIDFrom(mailbox, max);
         }
 
         public List<Mail> getMailsFromHigherThan(string mailbox, Int64 lastUID)
@@ -50,37 +56,27 @@ namespace Glimpse.Models
 
         public MailCollection GetMailsByDate(DateTime initialDate, DateTime finalDate, ISession session)
         {
-            MailCollection mails;
-            IList<MailEntity> databaseMails = new List<MailEntity>();
-
-            databaseMails = session.CreateCriteria<MailEntity>()
+            //TODO: Ver el tema de las fechas para diferenciar mails de las 3 carpetas
+            IList<MailEntity> databaseMails = session.CreateCriteria<MailEntity>()
                                                   .Add(Restrictions.Eq("MailAccountEntity", this.Entity))
                                                   .Add(Restrictions.Between("Date", initialDate, finalDate))
                                                   .List<MailEntity>();
-
-            mails = new MailCollection(databaseMails);
-
-            return mails;
+            return new MailCollection(databaseMails);
         }
         public MailCollection GetMailsByAmount(Int32 amountOfMails, ISession session)
         {
-            MailCollection mails;
-            IList<MailEntity> databaseMails;
-
-            databaseMails = session.CreateCriteria<MailEntity>()
+            //TODO: Ver el tema de las fechas para diferenciar mails de las 3 carpetas
+            IList<MailEntity> databaseMails = session.CreateCriteria<MailEntity>()
                                                   .Add(Restrictions.Eq("MailAccountEntity", this.Entity))
                                                   .AddOrder(Order.Desc("Date"))
                                                   .SetMaxResults(amountOfMails)
                                                   .List<MailEntity>();
-
-            mails = new MailCollection(databaseMails);
-
-            return mails;
+            return new MailCollection(databaseMails);
         }
 
         public void connectLight()
         {
-            if (this.myFetcher == null || !this.myFetcher.isConnected())
+            if (this.myFetcher == null || !this.myFetcher.IsConnected())
                 this.myFetcher = new Fetcher(this.Entity.Address, this.Entity.Password);
         }
         public void connectFull()
@@ -90,7 +86,6 @@ namespace Glimpse.Models
             using (ISession session = NHibernateManager.OpenSession())
             {
                 this.setFetcherLabels(session);
-
                 session.Close();
             }
         }
@@ -99,7 +94,7 @@ namespace Glimpse.Models
             if (this.myFetcher == null)
                 return false;
 
-            return this.myFetcher.isConnected();
+            return this.myFetcher.IsConnected();
         }
         public void Disconnect()
         {
@@ -113,24 +108,19 @@ namespace Glimpse.Models
 
             using (ISession session = NHibernateManager.OpenSession())
             {
-
                 entity = MailAccount.FindByAddress(this.Entity.Address, session).Entity;
-
                 mailAccountClone = new MailAccount(entity);
 
                 if (this.isConnected())
                     mailAccountClone.connectFull();
-
                 session.Close();
             }
-
             return mailAccountClone;
         }
-        public void UpdateLabels()
+        public void UpdateLabels(ISession session)
         {
             String tagsNames;
-            ISession session = NHibernateManager.OpenSession();
-            ITransaction tran = session.BeginTransaction();
+            
             NameValueCollection labelsByProperty = this.myFetcher.getLabels();
 
             IList<LabelEntity> databaseLabels = session.CreateCriteria<LabelEntity>()
@@ -155,18 +145,12 @@ namespace Glimpse.Models
                     this.RegisterLabel(label, session, databaseLabels);
                 }
             }
-
-            tran.Commit();
-
-            setFetcherLabels(session);
-
-            session.Flush();
-            session.Close();
+            this.setFetcherLabels(session);
         }
 
         public void RemoveMailLabel(String label, UInt64 gmID)
         {
-            this.myFetcher.removeMailTag(label, gmID);
+            this.myFetcher.RemoveMailTag(label, gmID);
         }
 
         public void SendMail(String toAddresses, String body, String subject)
@@ -175,42 +159,35 @@ namespace Glimpse.Models
 
             this.mySender.sendMail(recipients, body, subject);
         }
-        public Mail ReadMail(Int64 id, ISession session)
+        public String ReadMail(Int64 id, ISession session)
         {
-            ITransaction tran = session.BeginTransaction();
-
+            
             MailEntity mailEntity = session.CreateCriteria<MailEntity>()
                                  .Add(Restrictions.Eq("MailAccountEntity", this.Entity))
                                  .Add(Restrictions.Eq("Id", id))
                                  .UniqueResult<MailEntity>();
-            mailEntity.Seen = true;
-
             Mail mail = new Mail(mailEntity);
-            mail.Save(session);
-
-            this.myFetcher.setSeenFlag("[Gmail]/Todos", mail.Entity.Gm_mid, true);
-
-            tran.Commit();
-
-            return mail;
+            if (mailEntity.Seen == false)
+            {
+                ITransaction tran = session.BeginTransaction();
+                mail.Entity.Seen = true;
+                String imapFolderName = mail.GetImapFolderName();
+                this.myFetcher.SetSeenFlag(imapFolderName, mail.Entity.Gm_mid, true); //IMAP
+                mail.Save(session); //DB
+                tran.Commit();
+            }
+            return mail.Entity.Body;
         }
 
-        public virtual void SaveOrUpdate()
+        public virtual void SaveOrUpdate(ISession session)
         {
-            ISession session = NHibernateManager.OpenSession();
-            ITransaction tran = session.BeginTransaction();
-
             MailAccount oldAccount = FindByAddress(this.Entity.Address, session);
             if (oldAccount != null)
             {
                 oldAccount.Clone(this);
                 this.Entity = oldAccount.Entity;
             }
-
             session.SaveOrUpdate(this.Entity);
-
-            tran.Commit();
-            session.Close();
         }
         public static MailAccount FindByAddress(String emailAddress, ISession session)
         {
@@ -224,24 +201,38 @@ namespace Glimpse.Models
                 return new MailAccount(account);
         }
 
-        public Int64 GetLastUIDLocalFromALL(ISession session)
+        public Int64 GetUIDLocal(ISession session, String labelSystemName, Boolean max)
         {
-            Int64 lastDatabaseUID = session.CreateCriteria<MailEntity>()
+            String imapDatabaseField;
+            Int64 lastDatabaseUID;
+
+            switch (labelSystemName)
+            {
+                case "Trash":
+                    imapDatabaseField = "UidTrash";
+                    break;
+                case "Junk":
+                    imapDatabaseField = "UidSpam";
+                    break;
+                default:
+                    imapDatabaseField = "UidAll";
+                    break;
+            }
+            if (max) //maximo
+            {
+                lastDatabaseUID = session.CreateCriteria<MailEntity>()
                                       .Add(Restrictions.Eq("MailAccountEntity", this.Entity))
-                                      .SetProjection(Projections.Max("UidInbox"))
+                                      .SetProjection(Projections.Max(imapDatabaseField))
                                       .UniqueResult<Int64>();
-
-            return lastDatabaseUID;
-        }
-
-        public Int64 GetFirstUIDLocalFromALL(ISession session)
-        {
-            Int64 lastDatabaseUID = session.CreateCriteria<MailEntity>()
+            }
+            else //minimo
+            {
+                lastDatabaseUID = session.CreateCriteria<MailEntity>()
                                       .Add(Restrictions.Eq("MailAccountEntity", this.Entity))
-                                      .SetProjection(Projections.Min("UidInbox"))
+                                      .SetProjection(Projections.Min(imapDatabaseField))
                                       .UniqueResult<Int64>();
-
-            return lastDatabaseUID;
+            }
+            return lastDatabaseUID; //devuelve 0 si no existen mails
         }
 
         public void FetchAndSaveMails(Label label, Int64 fromUid, Int64 toUid)
@@ -259,6 +250,11 @@ namespace Glimpse.Models
         public void Dispose()
         {
             this.myFetcher.Dispose();
+        }
+
+        public void SetUser(User user)
+        {
+            this.Entity.User = user.Entity;
         }
 
         private static void Save(List<Mail> mails)
@@ -324,7 +320,7 @@ namespace Glimpse.Models
 
         public void AddLabelIMAP(Mail theMail, Label theLabel)
         {
-            this.myFetcher.addMailTag(this.GetALLLabelName(), theLabel.Entity.Name, theMail.Entity.Gm_mid);
+            this.myFetcher.AddMailTag(theMail.GetImapFolderName(), theLabel.Entity.Name, theMail.Entity.Gm_mid);
         }
 
         public string GetALLLabelName()

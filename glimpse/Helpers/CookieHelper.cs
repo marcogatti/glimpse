@@ -15,43 +15,38 @@ namespace Glimpse.Helpers
         private HttpCookieCollection responseCookies;
         private HttpCookieCollection requestCookies;
 
-
         public CookieHelper()
         {
             responseCookies = HttpContext.Current.Response.Cookies;
             requestCookies = HttpContext.Current.Request.Cookies;
         }
-
         public CookieHelper(HttpCookieCollection requestCookies, HttpCookieCollection responseCookies)
         {
             this.requestCookies = requestCookies;
             this.responseCookies = responseCookies;
         }
 
-
-        public HttpCookie addMailAddressCookie(String emailAddress)
+        public HttpCookie AddUsernameCookie(String username)
         {
-            return this.addMailAddressCookie(emailAddress, DateTime.Now.AddDays(365));
+            return this.AddUsernameCookie(username, DateTime.Now.AddDays(365));
         }
-
-        public HttpCookie addMailAddressCookie(String emailAddress, DateTime expirationDate)
+        public HttpCookie AddUsernameCookie(String username, DateTime expirationDate)
         {
             HttpCookie myCookie = this.responseCookies[LOGIN_COOKIE] ?? new HttpCookie(LOGIN_COOKIE);
-            myCookie.Values["Email"] = emailAddress;
+            myCookie.Values["User"] = username;
             myCookie.Expires = expirationDate;
             myCookie.HttpOnly = true;
             this.responseCookies.Add(myCookie);
 
             return myCookie;
         }
-
-        public String getMailAddressFromCookie()
+        public String GetUserFromCookie()
         {
             HttpCookie myCookie = this.requestCookies[LOGIN_COOKIE];
 
             if (myCookie != null)
             {
-                return myCookie.Values["Email"];
+                return myCookie.Values["User"];
 
             }
             else
@@ -59,15 +54,14 @@ namespace Glimpse.Helpers
                 throw new CookieNotFoundException("Login cookie");
             }
         }
-
-        public void clearMailAddressCookie()
+        public void ClearUserCookie()
         {
             try
             {
-                String address = this.getMailAddressFromCookie();
+                String user = this.GetUserFromCookie();
 
-                this.responseCookies.Remove(address);
-                this.addMailAddressCookie(address, DateTime.Now.AddMonths(-1));
+                this.responseCookies.Remove(user);
+                this.AddUsernameCookie(user, DateTime.Now.AddMonths(-1));
             }
             catch (CookieNotFoundException){ /* Cookie already cleared or does not exist*/ }
         }

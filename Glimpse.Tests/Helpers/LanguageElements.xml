@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<modules>
+  <module id="dummy">
+    <texts id="Login" comment="titulo de la vista de inicio de sesión">
+      <text lang="es">Por favor iniciá sesión</text>
+      <text lang="en">Please log in</text>
+    </texts>
+  </module>
+  <module id="pepe">
+    <texts id="Login" comment="titulo de la vista de inicio de sesión">
+      <text lang="es">Por favor iniciá sesión</text>
+      <text lang="en">Please log in</text>
+    </texts>
+  </module>
+</modules>

@@ -16,13 +16,13 @@ namespace Glimpse.Tests.DAL
         [TestFixtureSetUp]
         public void Open_Nhibernate_Session()
         {
-            session = NHibernateManager.OpenSession();
+            this.session = NHibernateManager.OpenSession();
         }
 
         [Test]
         public void Search_For_Mail_With_Max_Int_Id_Returns_Null_Result()
         {
-            MailEntity myMail = session.CreateCriteria<MailEntity>()
+            MailEntity myMail = this.session.CreateCriteria<MailEntity>()
                                     .Add(Restrictions.Eq("Id", Int64.MaxValue))
                                     .UniqueResult<MailEntity>();
             Assert.IsNull(myMail);
@@ -31,7 +31,7 @@ namespace Glimpse.Tests.DAL
         [Test]
         public void Search_For_Mail_With_Id_1_And_Return_Unique_Result()
         {
-            MailEntity myMail = session.CreateCriteria<MailEntity>()
+            MailEntity myMail = this.session.CreateCriteria<MailEntity>()
                                     .Add(Restrictions.Eq("Id", Convert.ToInt64(1)))
                                     .UniqueResult<MailEntity>();
             Assert.NotNull(myMail);
@@ -40,11 +40,17 @@ namespace Glimpse.Tests.DAL
         [Test]
         public void Search_For_Labels_Returns_Results()
         {
-            List<LabelEntity> labels = (List<LabelEntity>)session.CreateCriteria<LabelEntity>()
+            List<LabelEntity> labels = (List<LabelEntity>)this.session.CreateCriteria<LabelEntity>()
                                     .Add(Restrictions.Eq("Name","INBOX"))
                                     .List<LabelEntity>();
 
             Assert.IsNotEmpty(labels);
+        }
+
+        [TestFixtureTearDown]
+        public void Close_Hibernate_Session()
+        {
+            this.session.Clear();
         }
     }
 }

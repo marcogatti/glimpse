@@ -47,8 +47,7 @@ namespace Glimpse.Tests
             Assert.AreEqual("Martin Hoomer", retrievedMails[8].Entity.From.Name);
             Assert.IsTrue(retrievedMails[7].Entity.Body.Contains("</span><span class=\"\">Estrategia de entrenamiento.</span></p>"));
             Assert.IsTrue(retrievedMails[6].Entity.HasExtras);
-            Assert.AreEqual(11, retrievedMails[5].Entity.UidInbox);
-            Assert.IsTrue(retrievedMails[4].Entity.UidDraft <= 0 && retrievedMails[6].Entity.UidSent <= 0 && retrievedMails[1].Entity.UidSpam <= 0);
+            Assert.IsTrue(retrievedMails[1].Entity.UidSpam <= 0);
             Assert.IsTrue(retrievedMails[3].Entity.ToAddress.Contains("imap.sealed@gmail.com") && retrievedMails[3].Entity.ToAddress.Contains("test.imap.505@gmail.com"));
             Assert.IsTrue(retrievedMails[10].Entity.Flagged && retrievedMails[7].Entity.Seen && !retrievedMails[10].Entity.Seen);
         }
@@ -58,11 +57,11 @@ namespace Glimpse.Tests
         {
             Int32 startingMailsAmount = this.myFetcher.GetAmountOfMailsFrom("MyLabel");
 
-            this.myFetcher.removeMailTag("MyLabel", 1444284171273707784);
+            this.myFetcher.RemoveMailTag("MyLabel", 1444284171273707784);
             Int32 actualLabelAmountOfMails = this.myFetcher.GetAmountOfMailsFrom("MyLabel");
             Assert.AreEqual(startingMailsAmount - 1, actualLabelAmountOfMails);
 
-            this.myFetcher.addMailTag("[Gmail]/Todos", "MyLabel", 1444284171273707784);
+            this.myFetcher.AddMailTag("[Gmail]/Todos", "MyLabel", 1444284171273707784);
             actualLabelAmountOfMails = this.myFetcher.GetAmountOfMailsFrom("MyLabel");
             Assert.AreEqual(startingMailsAmount, actualLabelAmountOfMails);
         }
@@ -74,7 +73,7 @@ namespace Glimpse.Tests
             Int32 startingLabelMailsAmount = this.myFetcher.GetAmountOfMailsFrom("MyLabel");
             Int32 startingTrashMailsAmount = this.myFetcher.GetAmountOfMailsFrom("[Gmail]/Papelera");
 
-            this.myFetcher.moveToTrash("MyLabel", 1444287040399823000);
+            this.myFetcher.MoveToTrash("MyLabel", 1444287040399823000);
             Int32 actualAllMailsAmount = this.myFetcher.GetAmountOfMailsFrom("[Gmail]/Todos");
             Int32 actualLabelMailAmount = this.myFetcher.GetAmountOfMailsFrom("MyLabel");
             Int32 actualTrashMailAmount = this.myFetcher.GetAmountOfMailsFrom("[Gmail]/Papelera");
@@ -83,7 +82,7 @@ namespace Glimpse.Tests
             Assert.AreEqual(startingLabelMailsAmount - 1, actualLabelMailAmount);
             Assert.AreEqual(startingAllMailsAmount - 1, actualAllMailsAmount);
 
-            this.myFetcher.removeFromTrash("MyLabel", 1444287040399823000);
+            this.myFetcher.RemoveFromTrash("MyLabel", 1444287040399823000);
             actualAllMailsAmount = this.myFetcher.GetAmountOfMailsFrom("[Gmail]/Todos");
             actualLabelMailAmount = this.myFetcher.GetAmountOfMailsFrom("MyLabel");
             actualTrashMailAmount = this.myFetcher.GetAmountOfMailsFrom("[Gmail]/Papelera");
@@ -101,9 +100,9 @@ namespace Glimpse.Tests
             if (labelMails[0].Entity.Subject != "Email para MyLabel, Test de Flags")
                 Assert.Fail("El email levantado no es el correcto. El email debe tener subject: Email para MyLabel, Test de Flags.");
 
-            this.myFetcher.setAnsweredFlag("MyLabel2", 1444291302611131331, true);
-            this.myFetcher.setSeenFlag("MyLabel2", 1444291302611131331, true);
-            this.myFetcher.setFlaggedFlag("MyLabel2", 1444291302611131331, true);
+            this.myFetcher.SetAnsweredFlag("MyLabel2", 1444291302611131331, true);
+            this.myFetcher.SetSeenFlag("MyLabel2", 1444291302611131331, true);
+            this.myFetcher.SetFlaggedFlag("MyLabel2", 1444291302611131331, true);
 
             labelMails = this.myFetcher.GetMailsDataFrom("MyLabel2", 1);
 
@@ -111,9 +110,9 @@ namespace Glimpse.Tests
             Assert.True(labelMails[0].Entity.Seen);
             Assert.True(labelMails[0].Entity.Flagged);
 
-            this.myFetcher.setAnsweredFlag("MyLabel2", 1444291302611131331, false);
-            this.myFetcher.setSeenFlag("MyLabel2", 1444291302611131331, false);
-            this.myFetcher.setFlaggedFlag("MyLabel2", 1444291302611131331, false);
+            this.myFetcher.SetAnsweredFlag("MyLabel2", 1444291302611131331, false);
+            this.myFetcher.SetSeenFlag("MyLabel2", 1444291302611131331, false);
+            this.myFetcher.SetFlaggedFlag("MyLabel2", 1444291302611131331, false);
 
             labelMails = this.myFetcher.GetMailsDataFrom("MyLabel2", 1);
 

@@ -1,74 +1,81 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
-using Glimpse.Helpers;
-using Glimpse.ViewModels;
-using Glimpse.MailInterfaces;
-using System.Web.Security;
-using Glimpse.Exceptions.ControllersExceptions;
-using Glimpse.Exceptions.MailInterfacesExceptions;
-using Glimpse.Exceptions;
+﻿using Glimpse.DataAccessLayer;
 using Glimpse.DataAccessLayer.Entities;
+using Glimpse.Exceptions.MailInterfacesExceptions;
+using Glimpse.Helpers;
+using Glimpse.MailInterfaces;
 using Glimpse.Models;
+using Glimpse.ViewModels;
 using NHibernate;
-using Glimpse.DataAccessLayer;
+using System;
+using System.Collections.Generic;
 using System.Net.Sockets;
+using System.Web.Mvc;
 
 namespace Glimpse.Controllers
 {
     [Authorize]
     public class HomeController : Controller
     {
-        //
-        // GET: /Home/
+        public const String MAIL_ACCOUNTS = "mail-accounts";
+
         public ActionResult Index()
         {
             ISession session = NHibernateManager.OpenSession();
 
-            String mailAddress = new CookieHelper().getMailAddressFromCookie();
+            String username = new CookieHelper().GetUserFromCookie();
             
-            MailAccount cookieMailAccount = MailAccount.FindByAddress(mailAddress, session);
+            User cookieUser = Glimpse.Models.User.FindByUsername(username, session);
 
-            if (cookieMailAccount == null)
+            if (cookieUser == null)
             {
-                session.Flush();
                 session.Close();
                 return this.LogOut();
             }
 
-            MailAccount mailAccount = (MailAccount)Session[AccountController.MAIL_INTERFACE];
+            User sessionUser = (User)Session[AccountController.USER_NAME]; //siempre null la primera vez
 
-            if (mailAccount == null)
+            if (sessionUser == null)
             {
+                sessionUser = cookieUser;
+                Session[AccountController.USER_NAME] = sessionUser;
+            }
+            else if (sessionUser.Entity.Id != cookieUser.Entity.Id || sessionUser.Entity.Password != cookieUser.Entity.Password)
+            {
+                //si el cookie tiene un usuario diferente al de la sesion
+                session.Close();
+                return this.LogOut();
+            }
+
+            IList<MailAccount> mailAccounts = sessionUser.GetAccounts(session);
+            ViewBag.MailErrors = "";
+            foreach(MailAccount mailAccount in mailAccounts)
                 try
                 {
-                    mailAccount = cookieMailAccount;
-                    Session[AccountController.MAIL_INTERFACE] = mailAccount;
-                    mailAccount.connectFull();       
+                    mailAccount.connectFull();
                 }
-                catch (InvalidAuthenticationException)
+                catch (InvalidAuthenticationException exc)
                 {
-                    session.Flush();
-                    session.Close();
-                    return this.LogOut();
+                    Log.LogException(exc, "No se puede conectar con IMAP, cambio el password de :" + mailAccount.Entity.Address + ".");
+                    ViewBag.MailErrors += "Could not log in with " + mailAccount.Entity.Address + ", password was changed.";
+                    //TODO: ver como mostrar los mailAccounts que no se pudieron conectar en la Vista
                 }
                 catch (SocketException exc)
                 {
-                    Log.LogException(exc, "Error al conectar con IMAP");
+                    Log.LogException(exc, "Error al conectar con IMAP.");
                 }
-            }
 
-            MailsTasksHandler.StartSynchronization(mailAccount.Entity.Address);
+            MailAccount mainMailAccount = mailAccounts[0];
+            Session[HomeController.MAIL_ACCOUNTS] = mainMailAccount; //solo se guarda el primero por ahora
 
-            IList<LabelEntity> accountLabels = Label.FindByAccount(cookieMailAccount.Entity, session);
+            MailsTasksHandler.StartSynchronization(mainMailAccount.Entity.Address);
+
+            IList<LabelEntity> accountLabels = Label.FindByAccount(mainMailAccount.Entity, session);
             List<LabelViewModel> viewLabels = new List<LabelViewModel>(accountLabels.Count);
 
             foreach (LabelEntity label in accountLabels)
                 viewLabels.Add(new LabelViewModel(label.Name, label.SystemName));
 
-            ViewBag.Email = cookieMailAccount.Entity.Address;
+            ViewBag.Username = sessionUser.Entity.Username;
             ViewBag.Labels = viewLabels;
 
             session.Flush();
