@@ -1,4 +1,5 @@
 ﻿using Glimpse.DataAccessLayer;
+using Glimpse.DataAccessLayer.Entities;
 using Glimpse.Exceptions.MailInterfacesExceptions;
 using Glimpse.Helpers;
 using Glimpse.Models;
@@ -39,6 +40,7 @@ namespace Glimpse.Controllers
         {
             User user;
             MailAccount mailAccount;
+            MailAccount existingMailAccount;
             ISession session = NHibernateManager.OpenSession();
             ITransaction tran = session.BeginTransaction();
             try
@@ -51,6 +53,7 @@ namespace Glimpse.Controllers
                     mailAccount = new MailAccount(userView.Username, cipherPassword);
                     mailAccount.connectLight(); //si pasa este punto es que los datos ingresados son correctos
                     user = Glimpse.Models.User.FindByUsername(userView.Username, session);
+                    existingMailAccount = MailAccount.FindByAddress(userView.Username, session);
 
                     if (user == null)
                     {
@@ -62,7 +65,12 @@ namespace Glimpse.Controllers
                         user.Entity.Password = cipherPassword;
                         user.SaveOrUpdate(session);
                     }
-
+                    if (existingMailAccount != null && existingMailAccount.Entity.User.Username != user.Entity.Username)
+                    {
+                        this.ModelState.AddModelError("User", "Email account already associated with another account.");
+                        tran.Rollback();
+                        return View(userView);
+                    }
                     mailAccount.SetUser(user);
                     mailAccount.SetAsMainAccount(session);
                     mailAccount.SaveOrUpdate(session);

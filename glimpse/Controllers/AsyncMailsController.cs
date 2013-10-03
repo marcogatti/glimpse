@@ -1,6 +1,7 @@
 ﻿using ActiveUp.Net.Mail;
 using Glimpse.DataAccessLayer;
 using Glimpse.DataAccessLayer.Entities;
+using Glimpse.MailInterfaces;
 using Glimpse.Models;
 using Glimpse.ViewModels;
 using NHibernate;
@@ -146,6 +147,11 @@ namespace Glimpse.Controllers
                 MailAccount mailAccount = this.GetCurrentMailAccount();
                 mailAccount.SendMail(sendInfo.ToAddress, sendInfo.Body, sendInfo.Subject);
                 return Json(new { success = true, address = sendInfo.ToAddress }, JsonRequestBehavior.AllowGet);
+            }
+            catch (InvalidRecipientsException exc)
+            {
+                Log.LogException(exc, "Parametros del mail a enviar: subjectMail(" + sendInfo.Subject + "), addressMail(" + sendInfo.ToAddress + ").");
+                return Json(new { success = false, address = sendInfo.ToAddress }, JsonRequestBehavior.AllowGet);
             }
             catch (SmtpException exc)
             {

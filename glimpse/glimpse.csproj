@@ -226,6 +226,7 @@
     <Compile Include="Exceptions\Internationalization\DefaultLanguageNotSettedException.cs" />
     <Compile Include="Exceptions\Internationalization\LanguageElementNotFoundException.cs" />
     <Compile Include="Exceptions\GlimpseException.cs" />
+    <Compile Include="Exceptions\MailInterfacesExceptions\InvalidRecipientsException.cs" />
     <Compile Include="Exceptions\MailInterfacesExceptions\NoRecipientsException.cs" />
     <Compile Include="Exceptions\MailInterfacesExceptions\InvalidAuthenticationException.cs" />
     <Compile Include="Exceptions\MailInterfacesExceptions\InvalidConnectionException.cs" />

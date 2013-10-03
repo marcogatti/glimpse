@@ -35,15 +35,27 @@ namespace Glimpse.MailInterfaces
             this.checkRecipients(recipients);
             SmtpMessage newMail = new SmtpMessage();
 
-            SetMailSender(newMail);
+            this.SetMailSender(newMail);
+            Sender.SetMailBody(bodyHTML, newMail);
+            Sender.SetMailRecipients(recipients, subject, CC, BCC, newMail);
+            Sender.SetMailAttachments(attachments, newMail);
 
-            SetMailBody(bodyHTML, newMail);
-
-            SetMailRecipients(recipients, subject, CC, BCC, newMail);
-
-            SetMailAttachments(attachments, newMail);
-
-            newMail.SendSsl("smtp.gmail.com", 465, this.senderAddress, CryptoHelper.DecryptDefaultKey(this.password), SaslMechanism.Login);
+            try
+            {
+                newMail.SendSsl("smtp.gmail.com", 465, this.senderAddress, CryptoHelper.DecryptDefaultKey(this.password), SaslMechanism.Login);
+            }
+            catch (SmtpException exc)
+            {
+                if (exc.Message.Contains("Command \"rcpt to: ") && exc.Message.Contains(" failed"))
+                {
+                    throw new InvalidRecipientsException("La direccion " + this.ParseWrongReceipt(exc.Message) +
+                                                         " no es valida.", exc);
+                }
+                else
+                {
+                    throw exc;
+                }
+            }
         }
 
         private static void SetMailAttachments(AttachmentCollection attachments, SmtpMessage newMail)
@@ -94,6 +106,13 @@ namespace Glimpse.MailInterfaces
         {
             if (recipients.Count == 0)
                 throw new NoRecipientsException("Debe existir por lo menos un destinatario.");
+        }
+        private String ParseWrongReceipt(String smtpResponse)
+        {
+            //respuesta del tipo: "Command "rcpt to: <qweqwe>" failed : 553-5.1.2 We weren't able to find the recipient domain. Please check for any"
+            smtpResponse = smtpResponse.Remove(smtpResponse.IndexOf(" failed") - 2);
+            smtpResponse = smtpResponse.Remove(0, smtpResponse.IndexOf("<")+ 1);
+            return smtpResponse;
         }
     }
 }

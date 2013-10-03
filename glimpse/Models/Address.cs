@@ -48,7 +48,7 @@ namespace Glimpse.Models
             ActiveUp.Net.Mail.AddressCollection addresses = new AddressCollection();
             String[] recipients = new String[toAddresses.Split(new String[] { "," }, StringSplitOptions.RemoveEmptyEntries).Length];
 
-            toAddresses = System.Text.RegularExpressions.Regex.Replace(toAddresses, @"\s+", ","); //reemplaza todos los espacios por ""
+            toAddresses = System.Text.RegularExpressions.Regex.Replace(toAddresses, @"\s+|;", ","); //reemplaza todos los espacios por ""
             recipients = toAddresses.Split(new String[] { "," }, StringSplitOptions.RemoveEmptyEntries);
 
             foreach (String recipient in recipients)
