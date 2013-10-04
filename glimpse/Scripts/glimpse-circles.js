@@ -71,15 +71,19 @@ function setPreviewDisplay(circle) {
         event.preventDefault();
         event.stopPropagation();
 
-        $(this).addClass('mail-clicked');
-
-        $(document).one('click', this, function(innerEvent){
-            unsetPreviewDisplay(innerEvent.data);
-        }
-        );
+        setMailClicked(this);
     }
     );
 
+}
+
+function setMailClicked(circle) {
+    $(circle).addClass('mail-clicked');
+
+    $(document).one('click', circle, function (innerEvent) {
+        unsetPreviewDisplay(innerEvent.data);
+    }
+    );
 }
 
 function unsetPreviewDisplay(circle) {

@@ -308,10 +308,21 @@ function prepareToReceiveLabels(circle) {
 
     $(circle).on('drop', function (ev) {
         if (labelToAddIsSet) {
-            addLabelToEmail(selectedLabel, $(this));
+            if (isClicked(this)) {
+                $('.mail-clicked').each(function () {
+                    addLabelToEmail(selectedLabel, $(this));
+                }
+                );
+            } else {
+                addLabelToEmail(selectedLabel, $(this));
+            }
         }
     }
 );
+}
+
+function isClicked(circle) {
+    return $(circle).hasClass('mail-clicked');
 }
 
 function changeMailColour(mail, label) {
