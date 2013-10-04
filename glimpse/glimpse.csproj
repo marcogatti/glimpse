@@ -473,6 +473,7 @@
     <Content Include="Scripts\ckeditor\skins\moono\images\refresh.png" />
     <Content Include="Scripts\ckeditor\styles.js" />
     <Content Include="Scripts\glimpse-circles.js" />
+    <Content Include="Scripts\glimpse-fetcher.js" />
     <Content Include="Scripts\glimpse-sender.js" />
     <Content Include="Scripts\glimpse-utils.js" />
     <Content Include="Scripts\glimpse.js" />

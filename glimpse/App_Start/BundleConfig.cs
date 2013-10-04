@@ -24,6 +24,7 @@ namespace Glimpse
             bundles.Add(new ScriptBundle("~/bundles/glimpse").Include(
                         "~/Scripts/glimpse-utils.js",
                         "~/Scripts/glimpse-sender.js",
+                        "~/Scripts/glimpse-fetcher.js",
                         "~/Scripts/glimpse-circles.js",
                         "~/Scripts/glimpse.js"));
 
