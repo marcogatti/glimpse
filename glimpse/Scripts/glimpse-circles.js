@@ -59,43 +59,97 @@ function insertCircle(value) {
 
         calculateEmailPosition(newCircle);
         prepareToReceiveLabels(newCircle);
+        setPreviewDisplay(newCircle);
         setFullDisplay(newCircle);
         configureCircleHover(newCircle);
-
-        newCircle.popover({
-            "placement": "left",
-            "trigger": "click",
-            "content": value.bodypeek,
-            "title": value.from.address
-        });
     }
+}
+
+function setPreviewDisplay(circle) {
+
+    $(circle).click(function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        setMailClicked(this);
+
+        $(circle).unbind('click');
+
+        $(circle).one('click', circle, function (innerEvent) {
+            innerEvent.stopPropagation();
+            unsetMailClicked(innerEvent.data);
+            innerEvent.data.unbind('click');
+            setPreviewDisplay(innerEvent.data);
+        }
+        );
+
+        $(document).one('click', circle, function (innerEvent) {
+            innerEvent.stopPropagation();
+            unsetMailClicked(innerEvent.data);
+            innerEvent.data.unbind('click');
+            setPreviewDisplay(innerEvent.data);
+        }
+        );
+
+    }
+    );
+
+}
+
+function setMailClicked(circle) {
+
+    $(circle).attr('mail-clicked', true);
+
+    $(circle).animate({
+        width: '150',
+        height: '150',
+        marginLeft: '-37.5',
+        marginTop: '-37.5'
+    }, 200);
+}
+
+function unsetMailClicked(circle) {
+    $(circle).attr('mail-clicked', false);
+
+    $(circle).animate({
+        width: '75',
+        height: '75',
+        marginLeft: '0',
+        marginTop: '0'
+    }, 200);
+}
+
+function isClicked(circle) {
+    return $(circle).attr('mail-clicked');
 }
 
 function setFullDisplay(circle) {
     circle.dblclick(
         function () {
 
-                var from = 'From: ' + circle.data("from"),
-                    subject = circle.data("subject");
+            var from = 'From: ' + circle.data("from"),
+                subject = circle.data("subject");
 
-                $(".modal-body").find("h4").html(from);
-                $(".modal-header").find("h3").html(subject);
+            var from = 'From: ' + circle.data("from"),
+                subject = circle.data("subject");
 
-                $(".modal-body").find("#bodyhtml").html("");
-                showProgressBar("#body-progress");
+            $(".modal-body").find("h4").html(from);
+            $(".modal-header").find("h3").html(subject);
 
-                $("#body-modal").modal("show");
+            $(".modal-body").find("#bodyhtml").html("");
+            showProgressBar("#body-progress");
 
-                $.getJSON("async/GetMailBody/" + circle.data("id"), function (data) {
-                    hideProgressBar("#body-progress");
-                    if (data.success == true) {
-                        $(".modal-body").find("#bodyhtml").html(data.body);
-                        markAsRead(circle);
+            $("#body-modal").modal("show");
 
-                    } else alert(data.message);
-                });
-            }
-        )
+            $.getJSON("async/GetMailBody/" + circle.data("id"), function (data) {
+                hideProgressBar("#body-progress");
+                if (data.success == true) {
+                    $(".modal-body").find("#bodyhtml").html(data.body);
+                    markAsRead(circle);
+
+                } else alert(data.message);
+            });
+        });
 }
 
 function configureCircleHover(circle) {
@@ -166,22 +220,23 @@ function calculateEmailColor(circle) {
     }
 
     circle.css('background', '-webkit-radial-gradient(circle, ' + innerColor + midColor + outsetColor + ')');
+
 }
 
 function calculateEmailPosition(circle) {
 
     var margin = parseInt($(".circle").css('width'), 10);
 
-        var left = (circle.attr('data-age') - minAge) / currentPeriodShown(),
-            top = (circle.attr('data-from').charCodeAt(0) - "a".charCodeAt(0) + 2) / alphabetSize();
+    var left = (circle.attr('data-age') - minAge) / currentPeriodShown(),
+        top = (circle.attr('data-from').charCodeAt(0) - "a".charCodeAt(0) + 2) / alphabetSize();
 
-        circle.css('top', function () {
-            return top * (containerHeight() - margin) + 'px';
-        });
+    circle.css('top', function () {
+        return top * (containerHeight() - margin) + 'px';
+    });
 
-        circle.css('left', function () {
-            return left * (containerWidth() - margin) + 'px';
-        });
+    circle.css('left', function () {
+        return left * (containerWidth() - margin) + 'px';
+    });
 }
 
 function calculateEmailsLeft() {

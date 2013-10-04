@@ -304,7 +304,14 @@ function prepareToReceiveLabels(circle) {
 
     $(circle).on('drop', function (ev) {
         if (labelToAddIsSet) {
-            addLabelToEmail(selectedLabel, $(this));
+            if (isClicked(this)) {
+                $('[mail-clicked|=true]').each(function () {
+                    addLabelToEmail(selectedLabel, $(this));
+                }
+                );
+            } else {
+                addLabelToEmail(selectedLabel, $(this));
+            }
         }
     }
 );
