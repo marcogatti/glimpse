@@ -53,6 +53,7 @@ function insertCircle(value) {
         $("#email-container").append(newCircle);
         calculateEmailPosition(newCircle);
         prepareToReceiveLabels(newCircle);
+        setPreviewDisplay(newCircle);
         setFullDisplay(newCircle);
         configureCircleHover(newCircle);
         newCircle.popover({
@@ -64,8 +65,29 @@ function insertCircle(value) {
     }
 }
 
+function setPreviewDisplay(circle) {
+    
+    $(circle).click(function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        $(this).addClass('mail-preview');
+
+        $(document).click(this, function(innerEvent){
+            unsetPreviewDisplay(innerEvent.data);
+        }
+        );
+    }
+    );
+
+}
+
+function unsetPreviewDisplay(circle) {
+    $(circle).removeClass('mail-preview');
+}
+
 function setFullDisplay(circle) {
-    circle.click(
+    circle.dblclick(
         function () {
             //if (!isOnPreview(circle)) {
             //    circle.addClass("preview");
@@ -73,27 +95,27 @@ function setFullDisplay(circle) {
             //} else {
             //    circle.find(".pre").remove();
             //    circle.removeClass("preview");
-                
-                var from = 'From: ' + circle.data("from"),
-                    subject = circle.data("subject");
 
-                $(".modal-body").find("h4").html(from);
-                $(".modal-header").find("h3").html(subject);
+            var from = 'From: ' + circle.data("from"),
+                subject = circle.data("subject");
 
-                $(".modal-body").find("#bodyhtml").html("");
-                showProgressBar("#body-progress");
+            $(".modal-body").find("h4").html(from);
+            $(".modal-header").find("h3").html(subject);
 
-                $("#body-modal").modal("show");
+            $(".modal-body").find("#bodyhtml").html("");
+            showProgressBar("#body-progress");
 
-                $.getJSON("async/GetMailBody/" + circle.data("id"), function (data) {
-                    hideProgressBar("#body-progress");
-                    if (data.success == true) {
-                        $(".modal-body").find("#bodyhtml").html(data.body);
-                        markAsRead(circle);
+            $("#body-modal").modal("show");
 
-                    } else alert(data.message);
-                });
-            }
+            $.getJSON("async/GetMailBody/" + circle.data("id"), function (data) {
+                hideProgressBar("#body-progress");
+                if (data.success == true) {
+                    $(".modal-body").find("#bodyhtml").html(data.body);
+                    markAsRead(circle);
+
+                } else alert(data.message);
+            });
+        }
         )
 }
 
@@ -109,7 +131,7 @@ function fetchMailsAsync(initialDate, finalDate) {
 
             $.each(data.mails, function (index, value) {
 
-                    insertCircle(value);
+                insertCircle(value);
             });
 
         } else alert(data.message);
@@ -133,7 +155,7 @@ function fetchRecentMails() {
 
             $.each(data.mails, function (index, value) {
 
-                    insertCircle(value);
+                insertCircle(value);
             });
 
         } else alert(data.message);
@@ -197,48 +219,48 @@ function markAsRead(circle) {
 
 function calculateEmailColor(circle) {
 
-        var innerColor,
-            ringColor,
-            outsetColor,
-            shadow;
+    var innerColor,
+        ringColor,
+        outsetColor,
+        shadow;
 
-        if (circle.data('label0') !== "") {
-            innerColor = labelColors[circle.data('label0')];
-        }
-        if (circle.data('label1') !== "") {
-            ringColor = labelColors[circle.data('label1')];
-            shadow = 'inset 0 0 0 12px ' + ringColor;
-        }
+    if (circle.data('label0') !== "") {
+        innerColor = labelColors[circle.data('label0')];
+    }
+    if (circle.data('label1') !== "") {
+        ringColor = labelColors[circle.data('label1')];
+        shadow = 'inset 0 0 0 12px ' + ringColor;
+    }
 
-        shadow += ', 0 0 0 8px ';
+    shadow += ', 0 0 0 8px ';
 
-        if (circle.data('label2') !== "") {
-            outsetColor = labelColors[circle.data('label2')];
-            shadow += outsetColor;
-        }
+    if (circle.data('label2') !== "") {
+        outsetColor = labelColors[circle.data('label2')];
+        shadow += outsetColor;
+    }
 
-        circle.css({
-            'color': innerColor,
-            'background-color': innerColor,
-            'box-shadow': shadow,
-            '-webkit-box-shadow': shadow,
-        });
+    circle.css({
+        'color': innerColor,
+        'background-color': innerColor,
+        'box-shadow': shadow,
+        '-webkit-box-shadow': shadow,
+    });
 }
 
 function calculateEmailPosition(circle) {
 
     var margin = parseInt($(".circle").css('width'), 10);
 
-        var left = (circle.attr('data-age') - minAge) / currentPeriodShown(),
-            top = (circle.attr('data-from').charCodeAt(0) - "a".charCodeAt(0) + 2) / alphabetSize();
+    var left = (circle.attr('data-age') - minAge) / currentPeriodShown(),
+        top = (circle.attr('data-from').charCodeAt(0) - "a".charCodeAt(0) + 2) / alphabetSize();
 
-        circle.css('top', function () {
-            return top * (containerHeight() - margin) + 'px';
-        });
+    circle.css('top', function () {
+        return top * (containerHeight() - margin) + 'px';
+    });
 
-        circle.css('left', function () {
-            return left * (containerWidth() - margin) + 'px';
-        });
+    circle.css('left', function () {
+        return left * (containerWidth() - margin) + 'px';
+    });
 }
 
 function calculateEmailsLeft() {
