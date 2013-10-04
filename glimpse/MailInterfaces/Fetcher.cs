@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Web;
+using System.Text.RegularExpressions;
 
 namespace Glimpse.MailInterfaces
 {
@@ -304,11 +305,15 @@ namespace Glimpse.MailInterfaces
                 retrievedMail.Body = retrievedMessage.BodyHtml.Text;
             else
                 retrievedMail.Body = retrievedMessage.BodyText.Text;
-            if (retrievedMessage.BodyText.Text.Length >= 125)
-                retrievedMail.BodyPeek = retrievedMessage.BodyText.Text.Substring(0, 125);
+
+            string shortBody = retrievedMessage.BodyHtml.TextStripped;
+            shortBody = Regex.Replace(shortBody, @"\s+", " ");
+
+            if (shortBody.Length > 80)
+                retrievedMail.BodyPeek = shortBody.Substring(0, 80);
             else
-                retrievedMail.BodyPeek = retrievedMessage.BodyText.Text.Substring(0, retrievedMessage.BodyText.Text.Length);
-            retrievedMail.BodyPeek = System.Text.RegularExpressions.Regex.Replace(retrievedMail.BodyPeek, @"\s+", " ");
+                retrievedMail.BodyPeek = shortBody;
+
             retrievedMail.From = fromAddress;
 
             Boolean unknownPartsHaveAttachments = false;
