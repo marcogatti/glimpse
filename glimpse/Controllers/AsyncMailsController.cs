@@ -231,7 +231,8 @@ namespace Glimpse.Controllers
                     tid = mail.Gm_tid,
                     seen = mail.Seen,
                     flagged = mail.Flagged,
-                    labels = currentLabels
+                    labels = currentLabels,
+                    importance = mail.Importance
                 };
 
                 preparedMails.Add(anEmail);

@@ -43,6 +43,7 @@ function insertCircle(value) {
             " data-label1=", label1,
             " data-label2=", label2,
             " data-age=", value.age,
+            " data-importance=", value.importance
         ];
 
         var newCircle = $("<div class='" + classes + "'" +
