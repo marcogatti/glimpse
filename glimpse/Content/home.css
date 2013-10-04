@@ -35,12 +35,17 @@ hr {
     /*  Color de emails sin etiqueta    */
     color: rgb(159, 182, 205);
     background-color: rgb(159, 182, 205);
+
+        -webkit-box-shadow: 0 0 1px 2px;
+        box-shadow: 0 0 1px 2px;
+
     /*  Habilitar aceleracion por hardware  */
     transform: translate3d(0,0,0);
     -webkit-transform: translate3d(0,0,0);
     -moz-transform: translate3d(0,0,0);
     -o-transform: translate3d(0,0,0);
     -ms-transform: translate3d(0,0,0);
+
     transition: opacity 1s;
     -webkit-transition: opacity 1s;
 }
@@ -89,7 +94,8 @@ hr {
 }
 
 .circle.focused {
-    -webkit-box-shadow: 0 0 8px 8px rgb(154, 230, 164);
+    -webkit-box-shadow: 0 0 4px 4px;
+    box-shadow: 0 0 4px 4px;
     /*opacity: 1;*/
 }
 
@@ -114,18 +120,25 @@ hr {
     border-width: 5px;
 }
 
-.circle.preview {
-    transform: scale(1.5);
-    -webkit-transform: scale(1.5);
+.circle.importance1 {
+    -webkit-transform: scale(0.7);
+    transform: scale(0.7);
 }
+.circle.importance2 {
+    -webkit-transform: scale(0.85);
+    transform: scale(0.85);
+}
+.circle.importance3 {
 
-    .circle.preview p {
-        font-size: small;
-    }
-
-    .circle.preview .pre {
-        font-size: xx-small;
-    }
+}
+.circle.importance4 {
+    -webkit-transform: scale(1.15);
+    transform: scale(1.15);
+}
+.circle.importance5 {
+    -webkit-transform: scale(1.3);
+    transform: scale(1.3);
+}
 
 @-webkit-keyframes blink {
     from {

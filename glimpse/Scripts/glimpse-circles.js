@@ -16,6 +16,8 @@ function insertCircle(value) {
             classes += " transition";
         }
 
+        classes += " importance" + value.importance;
+
         if (!value.seen) {
             classes += " new";
         }
@@ -215,6 +217,7 @@ function calculateEmailColor(circle) {
 
         //  para que se muestren bien los de único label
         midColor = ', ' + innerColor;
+        circle.css('color', innerColor);
     }
 
     if (circle.data('label1') !== "") {
