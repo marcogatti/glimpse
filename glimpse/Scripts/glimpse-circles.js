@@ -53,8 +53,8 @@ function insertCircle(value) {
         newCircle.css("opacity", 0);
         $("#email-container").append(newCircle);
         
-        setInterval(function () {
-            newCircle.css("opacity", 1);
+        setTimeout(function () {
+            newCircle.css("opacity", 0.9);
         }, 100);
 
         calculateEmailPosition(newCircle);
@@ -64,7 +64,7 @@ function insertCircle(value) {
 
         newCircle.popover({
             "placement": "left",
-            "trigger": "hover",
+            "trigger": "click",
             "content": value.bodypeek,
             "title": value.from.address
         });
@@ -72,7 +72,7 @@ function insertCircle(value) {
 }
 
 function setFullDisplay(circle) {
-    circle.click(
+    circle.dblclick(
         function () {
 
                 var from = 'From: ' + circle.data("from"),
@@ -144,32 +144,28 @@ function markAsRead(circle) {
 
 function calculateEmailColor(circle) {
 
-        var innerColor,
-            ringColor,
-            outsetColor,
-            shadow;
+    var innerColor = '',
+        midColor = '',
+        outsetColor = '';
 
-        if (circle.data('label0') !== "") {
-            innerColor = labelColors[circle.data('label0')];
-        }
-        if (circle.data('label1') !== "") {
-            ringColor = labelColors[circle.data('label1')];
-            shadow = 'inset 0 0 0 12px ' + ringColor;
-        }
+    if (circle.data('label0') !== "") {
+        innerColor = labelColors[circle.data('label0')];
 
-        shadow += ', 0 0 0 8px ';
+        //  para que se muestren bien los de único label
+        midColor = ', ' + innerColor;
+    }
 
-        if (circle.data('label2') !== "") {
-            outsetColor = labelColors[circle.data('label2')];
-            shadow += outsetColor;
-        }
+    if (circle.data('label1') !== "") {
+        midColor = ', ';
+        midColor += labelColors[circle.data('label1')];
+    }
 
-        circle.css({
-            'color': innerColor,
-            'background-color': innerColor,
-            'box-shadow': shadow,
-            '-webkit-box-shadow': shadow,
-        });
+    if (circle.data('label2') !== "") {
+        outsetColor = ', ';
+        outsetColor += labelColors[circle.data('label2')];
+    }
+
+    circle.css('background', '-webkit-radial-gradient(circle, ' + innerColor + midColor + outsetColor + ')');
 }
 
 function calculateEmailPosition(circle) {
