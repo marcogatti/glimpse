@@ -73,32 +73,54 @@ function setPreviewDisplay(circle) {
 
         setMailClicked(this);
 
-        $(document).one('click', circle, function (innerEvent) {
+        $(circle).unbind('click');
+
+        $(circle).one('click', circle, function (innerEvent) {
+            innerEvent.stopPropagation();
             unsetMailClicked(innerEvent.data);
+            innerEvent.data.unbind('click');
             setPreviewDisplay(innerEvent.data);
         }
         );
 
-        $(circle).one('click', circle, function (innerEvent) {
+        $(document).one('click', circle, function (innerEvent) {
+            innerEvent.stopPropagation();
             unsetMailClicked(innerEvent.data);
+            innerEvent.data.unbind('click');
             setPreviewDisplay(innerEvent.data);
         }
         );
+
     }
     );
 
 }
 
 function setMailClicked(circle) {
-    $(circle).addClass('mail-clicked');
+
+    $(circle).attr('mail-clicked', true);
+
+    $(circle).animate({
+        width: '150',
+        height: '150',
+        marginLeft: '-37.5',
+        marginTop: '-37.5'
+    }, 200);
 }
 
 function unsetMailClicked(circle) {
-    $(circle).removeClass('mail-clicked');
+    $(circle).attr('mail-clicked', false);
+
+    $(circle).animate({
+        width: '75',
+        height: '75',
+        marginLeft: '0',
+        marginTop: '0'
+    }, 200);
 }
 
 function isClicked(circle) {
-    return $(circle).hasClass('mail-clicked');
+    return $(circle).attr('mail-clicked');
 }
 
 function setFullDisplay(circle) {

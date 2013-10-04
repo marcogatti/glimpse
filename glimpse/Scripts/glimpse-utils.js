@@ -309,7 +309,7 @@ function prepareToReceiveLabels(circle) {
     $(circle).on('drop', function (ev) {
         if (labelToAddIsSet) {
             if (isClicked(this)) {
-                $('.mail-clicked').each(function () {
+                $('[mail-clicked|=true]').each(function () {
                     addLabelToEmail(selectedLabel, $(this));
                 }
                 );
