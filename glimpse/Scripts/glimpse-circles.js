@@ -50,11 +50,18 @@ function insertCircle(value) {
                             "'><div class='centered'><p>" + value.subject + "</p></div></div>");
 
         calculateEmailColor(newCircle);
+        newCircle.css("opacity", 0);
         $("#email-container").append(newCircle);
+        
+        setInterval(function () {
+            newCircle.css("opacity", 1);
+        }, 100);
+
         calculateEmailPosition(newCircle);
         prepareToReceiveLabels(newCircle);
         setFullDisplay(newCircle);
         configureCircleHover(newCircle);
+
         newCircle.popover({
             "placement": "left",
             "trigger": "hover",
