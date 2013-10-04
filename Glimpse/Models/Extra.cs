@@ -27,5 +27,13 @@ namespace Glimpse.Models
             session.Close();
             return new Extra(extraEntity);
         }
+        public static IList<ExtraEntity> FindByMailId(Int64 mailID, ISession session)
+        {
+            IList<ExtraEntity> mailExtras = session.CreateCriteria<ExtraEntity>()
+                                            .Add(Restrictions.Eq("MailEntity.Id", mailID))
+                                            .Add(Restrictions.Eq("ExtraType", Convert.ToInt16(0)))
+                                            .List<ExtraEntity>();
+            return mailExtras;
+        }
     }
 }

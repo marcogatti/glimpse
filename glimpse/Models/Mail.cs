@@ -1,22 +1,15 @@
-﻿using Glimpse.DataAccessLayer;
-using Glimpse.DataAccessLayer.Entities;
+﻿using Glimpse.DataAccessLayer.Entities;
 using NHibernate;
 using NHibernate.Criterion;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 
 namespace Glimpse.Models
 {
     public class Mail
     {
         public MailEntity Entity { get; private set; }
-
-        public void setFrom(AddressEntity from)
-        {
-            this.Entity.From = from;
-        }
 
         public Mail(MailEntity entity)
         {
@@ -31,12 +24,38 @@ namespace Glimpse.Models
             this.Entity = entity;
         }
 
+        public bool HasLabel(Label aLabel)
+        {
+            LabelEntity entity = (from label
+                                  in this.Entity.Labels
+                                  where label.MailAccountEntity.Id == aLabel.Entity.MailAccountEntity.Id &&
+                                        label.Name == aLabel.Entity.Name
+                                  select label).SingleOrDefault<LabelEntity>();
+
+            return entity != null;
+        }
         public void RemoveLabel(String label, ISession session)
         {
             LabelEntity labelToRemove = this.Entity.Labels.First<LabelEntity>(x => x.Name == label);
             this.Entity.Labels.Remove(labelToRemove);
         }
+        public void SetFrom(AddressEntity from)
+        {
+            this.Entity.From = from;
+        }
 
+        public void AddLabel(Label theLabel, ISession session)
+        {
+            if (!this.HasLabel(theLabel))
+            {
+                this.Entity.Labels.Add(theLabel.Entity);
+                this.Save(session);
+            }
+        }
+        public void Save(ISession session)
+        {
+            session.SaveOrUpdate(this.Entity);
+        }
         public String GetImapFolderName()
         {
             String systemName;
@@ -61,11 +80,6 @@ namespace Glimpse.Models
             return foundMails;
         }
 
-        public void Save(ISession session)
-        {
-            session.SaveOrUpdate(this.Entity);
-        }
-
         private void Clone(MailEntity from)
         {
             this.Entity.MailAccountEntity = from.MailAccountEntity;
@@ -88,26 +102,6 @@ namespace Glimpse.Models
             this.Entity.CC = from.CC;
             this.Entity.BCC = from.BCC;
             this.Entity.Body = from.Body;
-        }
-
-        public void AddLabel(Label theLabel, ISession session)
-        {
-            if (!this.hasLabel(theLabel))
-            {
-                this.Entity.Labels.Add(theLabel.Entity);
-                this.Save(session);
-            }
-        }
-
-        public bool hasLabel(Label aLabel)
-        {
-            LabelEntity entity = (from label 
-                                  in this.Entity.Labels 
-                                  where label.MailAccountEntity.Id == aLabel.Entity.MailAccountEntity.Id && 
-                                        label.Name == aLabel.Entity.Name
-                                  select label).SingleOrDefault<LabelEntity>();
-
-            return entity != null;
         }
     }
 }

@@ -17,7 +17,7 @@ namespace Glimpse.DataAccessLayer.Mappings
             Map(x => x.Size).Column("Size");
             Map(x => x.ExtraType).Column("ExtraType");
             Map(x => x.EmbObjectContentId).Column("EmbObjectContentId");
-            Map(x => x.Data).Column("Data");
+            Map(x => x.Data).Column("Data").LazyLoad();
             References<MailEntity>(x => x.MailEntity).Column("MailId")
                                                     .Cascade.None();
 

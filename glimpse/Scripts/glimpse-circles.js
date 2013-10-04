@@ -154,7 +154,7 @@ function setFullDisplay(circle) {
             $.getJSON("async/GetMailBody/" + circle.data("id"), function (data) {
                 hideProgressBar("#body-progress");
                 if (data.success == true) {
-                    $(".modal-body").find("#bodyhtml").html(data.body);
+                    $(".modal-body").find("#bodyhtml").html(data.mail.body);
                     markAsRead(circle);
 
                 } else alert(data.message);

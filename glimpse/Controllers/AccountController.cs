@@ -51,7 +51,7 @@ namespace Glimpse.Controllers
                 if (Glimpse.Models.User.IsEmail(userView.Username)) //si es un email
                 {
                     mailAccount = new MailAccount(userView.Username, cipherPassword);
-                    mailAccount.connectLight(); //si pasa este punto es que los datos ingresados son correctos
+                    mailAccount.ConnectLight(); //si pasa este punto es que los datos ingresados son correctos
                     user = Glimpse.Models.User.FindByUsername(userView.Username, session);
                     existingMailAccount = MailAccount.FindByAddress(userView.Username, session);
 

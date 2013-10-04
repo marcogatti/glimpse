@@ -51,7 +51,7 @@ namespace Glimpse.Controllers
             foreach(MailAccount mailAccount in mailAccounts)
                 try
                 {
-                    mailAccount.connectFull();
+                    mailAccount.ConnectFull();
                 }
                 catch (InvalidAuthenticationException exc)
                 {

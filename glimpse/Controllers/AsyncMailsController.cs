@@ -25,10 +25,14 @@ namespace Glimpse.Controllers
                 MailAccount currentMailAccount = this.GetCurrentMailAccount();
                 String body = currentMailAccount.ReadMail(id, session);
 
+                IList<ExtraEntity> mailExtras = Extra.FindByMailId(id, session);
+
                 if (body.Contains("<img src=\"cid:"))
                     this.InsertEmbeddedExtraUrl(ref body, id, session);
 
-                JsonResult result = Json(new { success = true, body = body }, JsonRequestBehavior.AllowGet);
+                var returnInfo = this.PrepareBodyMail(body, mailExtras);
+
+                JsonResult result = Json(new { success = true, mail = returnInfo }, JsonRequestBehavior.AllowGet);
                 return result;
             }
             catch (Exception exc)
@@ -66,7 +70,7 @@ namespace Glimpse.Controllers
                 List<Object> mailsToReturn = new List<object>();
                 MailAccount currentMailAccount = this.GetCurrentMailAccount();
                 mails = new MailCollection(currentMailAccount.GetMailsByDate(initialDate, finalDate, session));
-                mailsToReturn = this.PrepareToSend(mails);
+                mailsToReturn = this.PrepareHomeMails(mails);
 
                 JsonResult result = Json(new { success = true, mails = mailsToReturn }, JsonRequestBehavior.AllowGet);
                 return result;
@@ -90,7 +94,7 @@ namespace Glimpse.Controllers
                 List<Object> mailsToReturn = new List<object>();
                 MailAccount currentMailAccount = this.GetCurrentMailAccount();
                 mails = currentMailAccount.GetMailsByAmount(amountOfMails, session);
-                mailsToReturn = this.PrepareToSend(mails);
+                mailsToReturn = this.PrepareHomeMails(mails);
 
                 JsonResult result = Json(new { success = true, mails = mailsToReturn }, JsonRequestBehavior.AllowGet);
                 return result;
@@ -201,7 +205,7 @@ namespace Glimpse.Controllers
             DateTime date = new DateTime(1970, 1, 1) + new TimeSpan(JSDate * 10000);
             return date;
         }
-        private List<Object> PrepareToSend(MailCollection mails)
+        private List<Object> PrepareHomeMails(MailCollection mails)
         {
             List<Object> preparedMails = new List<Object>();
 
@@ -258,15 +262,36 @@ namespace Glimpse.Controllers
             }
             return returnLabels;
         }
+        private Object PrepareBodyMail(String body, IList<ExtraEntity> extras)
+        {
+            List<Object> extrasMetadata = new List<object>();
+
+            foreach (ExtraEntity extra in extras)
+            {
+                Object anExtra = new
+                {
+                    id = extra.Id,
+                    name = extra.Name,
+                    size = extra.Size
+                };
+                extrasMetadata.Add(anExtra);
+            }
+            Object returnInfo = new 
+            {
+                body = body,
+                extras = extrasMetadata
+            };
+            return returnInfo;
+        }
         private MailAccount GetCurrentMailAccount()
         {
             MailAccount mailAccount = (MailAccount)Session[HomeController.MAIL_ACCOUNTS];
 
-            if (!mailAccount.isConnected())
+            if (!mailAccount.IsConnected())
             {
                 try
                 {
-                    mailAccount.connectFull();
+                    mailAccount.ConnectFull();
                 }
                 catch (SocketException exc)
                 {

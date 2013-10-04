@@ -48,7 +48,7 @@ namespace Glimpse.MailInterfaces
                 mailAccountAll = MailAccount.FindByAddress(mailAddress, session);
                 try
                 {
-                    mailAccountAll.connectFull();
+                    mailAccountAll.ConnectFull();
                 }
                 catch (NullReferenceException exc)
                 {
