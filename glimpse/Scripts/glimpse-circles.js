@@ -71,9 +71,9 @@ function setPreviewDisplay(circle) {
         event.preventDefault();
         event.stopPropagation();
 
-        $(this).addClass('mail-preview');
+        $(this).addClass('mail-clicked');
 
-        $(document).click(this, function(innerEvent){
+        $(document).one('click', this, function(innerEvent){
             unsetPreviewDisplay(innerEvent.data);
         }
         );
@@ -83,7 +83,7 @@ function setPreviewDisplay(circle) {
 }
 
 function unsetPreviewDisplay(circle) {
-    $(circle).removeClass('mail-preview');
+    $(circle).removeClass('mail-clicked');
 }
 
 function setFullDisplay(circle) {
