@@ -321,10 +321,6 @@ function prepareToReceiveLabels(circle) {
 );
 }
 
-function isClicked(circle) {
-    return $(circle).hasClass('mail-clicked');
-}
-
 function changeMailColour(mail, label) {
 
     if (mail.attr('data-label0') === "") {

@@ -66,12 +66,24 @@ function insertCircle(value) {
 }
 
 function setPreviewDisplay(circle) {
-    
+
     $(circle).click(function (event) {
         event.preventDefault();
         event.stopPropagation();
 
         setMailClicked(this);
+
+        $(document).one('click', circle, function (innerEvent) {
+            unsetMailClicked(innerEvent.data);
+            setPreviewDisplay(innerEvent.data);
+        }
+        );
+
+        $(circle).one('click', circle, function (innerEvent) {
+            unsetMailClicked(innerEvent.data);
+            setPreviewDisplay(innerEvent.data);
+        }
+        );
     }
     );
 
@@ -79,15 +91,14 @@ function setPreviewDisplay(circle) {
 
 function setMailClicked(circle) {
     $(circle).addClass('mail-clicked');
-
-    $(document).one('click', circle, function (innerEvent) {
-        unsetPreviewDisplay(innerEvent.data);
-    }
-    );
 }
 
-function unsetPreviewDisplay(circle) {
+function unsetMailClicked(circle) {
     $(circle).removeClass('mail-clicked');
+}
+
+function isClicked(circle) {
+    return $(circle).hasClass('mail-clicked');
 }
 
 function setFullDisplay(circle) {
