@@ -67,13 +67,7 @@ function insertCircle(value) {
 function setFullDisplay(circle) {
     circle.click(
         function () {
-            //if (!isOnPreview(circle)) {
-            //    circle.addClass("preview");
-            //    circle.find(".centered").append("<div class='pre'>" + circle.data("bodypeek") + "</div>");
-            //} else {
-            //    circle.find(".pre").remove();
-            //    circle.removeClass("preview");
-                
+
                 var from = 'From: ' + circle.data("from"),
                     subject = circle.data("subject");
 
@@ -96,60 +90,6 @@ function setFullDisplay(circle) {
             }
         )
 }
-
-function fetchMailsAsync(initialDate, finalDate) {
-
-    showProgressBar("#circles-progress");
-
-    $.getJSON("async/GetMailsByDate?initial=" + initialDate.getTime() + "&final=" + finalDate.getTime(), function (data) {
-
-        hideProgressBar("#circles-progress");
-
-        if (data.success === true) {
-
-            $.each(data.mails, function (index, value) {
-
-                    insertCircle(value);
-            });
-
-        } else alert(data.message);
-
-    });
-}
-
-function fetchRecentMails() {
-
-    showProgressBar("#circles-progress");
-
-    $.getJSON("async/GetMailsByAmount?amountOfMails=15", function (data) {
-
-        hideProgressBar("#circles-progress");
-
-        if (data.mails.length === 0) {
-            maxAge = minAge + 1000000000000;
-        }
-
-        if (data.success === true) {
-
-            $.each(data.mails, function (index, value) {
-
-                    insertCircle(value);
-            });
-
-        } else alert(data.message);
-
-    }).done(function () {
-
-        setDateCoords();
-        calculateEmailsLeft();
-
-    });
-}
-
-function fetchMailsWithinActualPeriod() {
-    fetchMailsAsync(ageToDate(maxAge), ageToDate(minAge));
-}
-
 
 function configureCircleHover(circle) {
 
@@ -261,21 +201,4 @@ function calculateEmailsLeft() {
 
 
     });
-}
-
-function setLabelSelection() {
-    $(".label-glimpse").on('click', function () {
-        $(this).toggleClass('label-hidden');
-        var currentLabel = $(this).html();
-
-        $(".circle").each(function () {
-            if (hasLabel($(this), currentLabel)) {
-                $(this).toggleClass("hidden");
-            }
-        });
-    });
-}
-
-function hasLabel(circle, label) {
-    return ([circle.data("label0"), circle.data("label1"), circle.data("label2")].indexOf(label) != -1);
 }

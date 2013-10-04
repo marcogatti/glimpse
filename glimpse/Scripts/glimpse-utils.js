@@ -15,53 +15,53 @@ function alphabetSize() {
     return "z".charCodeAt(0) - "a".charCodeAt(0) + 2;
 }
 
-function clearCanvas() {
-    document.getElementById('gridCanvas').getContext('2d').clearRect(0, 0, containerWidth(), containerHeight());
-}
+//function clearCanvas() {
+//    document.getElementById('gridCanvas').getContext('2d').clearRect(0, 0, containerWidth(), containerHeight());
+//}
 
-function drawGrid() {
+//function drawGrid() {
 
-    clearCanvas();
+//    clearCanvas();
 
-    var containerBorder = parseInt($("#email-container").css("border-width"), 10),
-    //grid width and height
-        bw = containerWidth() - containerBorder,
-        bh = containerHeight() - containerBorder,
+//    var containerBorder = parseInt($("#email-container").css("border-width"), 10),
+//    //grid width and height
+//        bw = containerWidth() - containerBorder,
+//        bh = containerHeight() - containerBorder,
 
-    //padding around grid
-     p = 0,
+//    //padding around grid
+//     p = 0,
 
-    //size of canvas
-     cw = bw,
-     ch = bh,
+//    //size of canvas
+//     cw = bw,
+//     ch = bh,
 
-     canvas = $('canvas').attr({ width: cw, height: ch }),
+//     canvas = $('canvas').attr({ width: cw, height: ch }),
 
-     context = canvas.get(0).getContext("2d");
+//     context = canvas.get(0).getContext("2d");
 
-    function squareSize() {
-        return containerHeight() / alphabetSize();
-    }
+//    function squareSize() {
+//        return containerHeight() / alphabetSize();
+//    }
 
-    function drawBoard() {
-        var x = 0;
+//    function drawBoard() {
+//        var x = 0;
 
-        for (x = 0; x <= bw; x += squareSize()) {
-            context.moveTo(0.5 + x + p, p);
-            context.lineTo(0.5 + x + p, bh + p);
-        }
+//        for (x = 0; x <= bw; x += squareSize()) {
+//            context.moveTo(0.5 + x + p, p);
+//            context.lineTo(0.5 + x + p, bh + p);
+//        }
 
-        for (x = 0; x <= bh; x += squareSize()) {
-            context.moveTo(p, 0.5 + x + p);
-            context.lineTo(bw + p, 0.5 + x + p);
-        }
+//        for (x = 0; x <= bh; x += squareSize()) {
+//            context.moveTo(p, 0.5 + x + p);
+//            context.lineTo(bw + p, 0.5 + x + p);
+//        }
 
-        context.strokeStyle = "#CDCDCD";
-        context.stroke();
-    }
+//        context.strokeStyle = "#CDCDCD";
+//        context.stroke();
+//    }
 
-    drawBoard();
-}
+//    drawBoard();
+//}
 
 function populateLabelColors() {
 
@@ -231,10 +231,6 @@ function setDateCoords() {
     $("#date-last").html(newDateLast);
 }
 
-function isOnPreview(circle) {
-    return circle.hasClass("preview");
-}
-
 function hideProgressBar(bar) {
     $(bar).css("visibility", "hidden");
 }
@@ -351,7 +347,23 @@ function addLabelToEmail(label, mail) {
     });
 }
 
-
 function setEverithingRelatedToAddLabelsToAMail() {
     setLabelsAdder();
+}
+
+function setLabelSelection() {
+    $(".label-glimpse").on('click', function () {
+        $(this).toggleClass('label-hidden');
+        var currentLabel = $(this).html();
+
+        $(".circle").each(function () {
+            if (hasLabel($(this), currentLabel)) {
+                $(this).toggleClass("hidden");
+            }
+        });
+    });
+}
+
+function hasLabel(circle, label) {
+    return ([circle.data("label0"), circle.data("label1"), circle.data("label2")].indexOf(label) != -1);
 }
