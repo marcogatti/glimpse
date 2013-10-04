@@ -63,11 +63,6 @@ hr {
         margin-right: -0.25em; /* Adjusts for spacing */
     }
 
-.mail-clicked {
-    width: 150px;
-    height: 150px;
-}
-
 .centered {
     width: 75px;
     font-style: normal;
@@ -106,6 +101,18 @@ hr {
 }
 
 .circle.selected {
+    overflow: visible;
+    z-index: +10;
+    text-shadow: 0 0 1px #fff, 0 2px 4px rgba(0,0,0,1);
+}
+
+.circle.previewed {
+    /*box-shadow: inset 0 0 0 8px rgba(255,255,255,0.4), 0 0 32px 4px;
+    -webkit-box-shadow: inset 0 0 0 8px rgba(255,255,255,0.4), 0 0 32px 4px;
+    -moz-box-shadow: inset 0 0 0 8px rgba(255,255,255,0.4), 0 0 32px 4px;
+    -o-box-shadow: inset 0 0 0 8px rgba(255,255,255,0.4), 0 0 32px 4px;
+    -ms-box-shadow: inset 0 0 0 8px rgba(255,255,255,0.4), 0 0 32px 4px;*/
+    opacity: 1;
     overflow: visible;
     z-index: +10;
     text-shadow: 0 0 1px #fff, 0 2px 4px rgba(0,0,0,1);

@@ -47,7 +47,7 @@ function insertCircle(value) {
 
         var newCircle = $("<div class='" + classes + "'" +
                             dataAttributes.join("'") +
-                            "'><div class='centered'><p>" + value.subject + "</p></div></div>");
+                            "'><div class='centered'><p content=true>" + value.subject + "</p></div></div>");
 
         calculateEmailColor(newCircle);
         $("#email-container").append(newCircle);
@@ -99,17 +99,22 @@ function setPreviewDisplay(circle) {
 function setMailClicked(circle) {
 
     $(circle).attr('mail-clicked', true);
+    $(circle).addClass('previewed');
 
     $(circle).animate({
         width: '150',
         height: '150',
         marginLeft: '-37.5',
-        marginTop: '-37.5'
+        marginTop: '-37.5',
     }, 200);
+
+    $(circle).find('[content|=true]').text($(circle).attr('data-bodypeek'));
 }
 
 function unsetMailClicked(circle) {
+
     $(circle).attr('mail-clicked', false);
+    $(circle).removeClass('previewed');
 
     $(circle).animate({
         width: '75',
@@ -117,6 +122,8 @@ function unsetMailClicked(circle) {
         marginLeft: '0',
         marginTop: '0'
     }, 200);
+
+    $(circle).find('[content|=true]').text($(circle).attr('data-subject'));
 }
 
 function isClicked(circle) {
