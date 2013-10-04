@@ -359,16 +359,41 @@ function setEverithingRelatedToAddLabelsToAMail() {
 }
 
 function setLabelSelection() {
-    $(".label-glimpse").on('click', function () {
+    $(".custom-label").on('click', function () {
         $(this).toggleClass('label-hidden');
         var currentLabel = $(this).html();
 
         $(".circle").each(function () {
-            if (hasLabel($(this), currentLabel)) {
-                $(this).toggleClass("hidden");
+            if (toBeHidden($(this))) {
+                $(this).addClass("hidden");
+            } else {
+                $(this).removeClass("hidden");
             }
         });
     });
+}
+
+function getLabels(circle) {
+    var labels = [];
+    
+    if (circle.data('label0') !== "") {
+        labels.push(circle.data('label0'));
+    }
+    if (circle.data('label1') !== "") {
+        labels.push(circle.data('label1'));
+    }
+    if (circle.data('label2') !== "") {
+        labels.push(circle.data('label2'));
+    }
+    return labels;
+}
+
+function toBeHidden(circle) {
+    return !getLabels(circle).some(isActive);
+}
+
+function isActive(label) {
+    return !$("li:contains(" + label + ")").hasClass("label-hidden");
 }
 
 function hasLabel(circle, label) {
