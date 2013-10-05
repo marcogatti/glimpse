@@ -1,23 +1,22 @@
-﻿using Glimpse.DataAccessLayer;
-using Glimpse.DataAccessLayer.Entities;
+﻿using Glimpse.DataAccessLayer.Entities;
 using Glimpse.Exceptions.ModelsExceptions;
 using NHibernate;
 using NHibernate.Criterion;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
-using System.Web;
 
 namespace Glimpse.Models
 {
     public class User
     {
         public UserEntity Entity { get; private set; }
+        public IList<MailAccount> mailAccounts { get; set; }
 
         public User(UserEntity entity)
         {
             this.Entity = entity;
+            this.mailAccounts = new List<MailAccount>();
         }
         public User(String username, String password)
         {
@@ -25,19 +24,42 @@ namespace Glimpse.Models
             this.Entity.Username = username;
             this.Entity.Password = password;
             this.Entity.ShowTutorial = true;
+            this.mailAccounts = new List<MailAccount>();
         }
 
-        public IList<MailAccount> GetAccounts(ISession session)
+        public void AddAccount(MailAccount mailAccount)
         {
-            IList<MailAccount> mailAccounts = new List<MailAccount>();
+            this.mailAccounts.Add(mailAccount);
+        }
+        public void UpdateAccounts(ISession session)
+        {
+            IList<MailAccount> databaseMailAccounts = new List<MailAccount>();
             IList<MailAccountEntity> mailAccountEntities = session.CreateCriteria<MailAccountEntity>()
                                                                   .Add(Restrictions.Eq("User", this.Entity))
                                                                   .List<MailAccountEntity>();
             foreach (MailAccountEntity entity in mailAccountEntities)
             {
-                mailAccounts.Add(new MailAccount(entity));
+                databaseMailAccounts.Add(new MailAccount(entity));
             }
-            return mailAccounts;
+            this.mailAccounts = databaseMailAccounts;
+        }
+        public void UpdateLabels(ISession session)
+        {
+            foreach (MailAccount mailAccount in this.mailAccounts)
+            {
+                mailAccount.UpdateLabels(session);
+            }
+        }
+        public void ConnectLight()
+        {
+            foreach (MailAccount mailAccount in this.mailAccounts)
+            {
+                mailAccount.ConnectLight();
+            }
+        }
+        public IList<MailAccount> GetAccounts()
+        {
+            return this.mailAccounts;
         }
         public void SaveOrUpdate(ISession session)
         {
@@ -55,11 +77,18 @@ namespace Glimpse.Models
                 throw new WrongPasswordException("La contraseña ingresada es incorrecta.");
             }
         }
+        public void Disconnect()
+        {
+            foreach (MailAccount mailAccount in this.mailAccounts)
+            {
+                mailAccount.Disconnect();
+            }
+        }
+
         public static bool IsEmail(String phrase)
         {
             return Regex.IsMatch(phrase, @"^[A-Za-z0-9]([\w\.\-]*)@([A-Za-z0-9-]+)((\.(\w){2,3})+)$");
         }
-        
         public static User FindByUsername(String username, ISession session)
         {
             UserEntity userEntity = session.CreateCriteria<UserEntity>()
@@ -71,6 +100,5 @@ namespace Glimpse.Models
             }
             return null;
         }
-
     }
 }

@@ -1,15 +1,13 @@
-﻿using ActiveUp.Net.Imap4;
-using ActiveUp.Net.Mail;
+﻿using ActiveUp.Net.Mail;
 using Glimpse.DataAccessLayer.Entities;
 using Glimpse.Exceptions.MailInterfacesExceptions;
 using Glimpse.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Linq;
-using System.Web;
-using System.Text.RegularExpressions;
 using System.Globalization;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Glimpse.MailInterfaces
 {
@@ -34,6 +32,10 @@ namespace Glimpse.MailInterfaces
         public bool IsConnected()
         {
             return this.Receiver.IsConnected;
+        }
+        public bool IsFullyConnected()
+        {
+            return this.AccountLabels != null && this.IsConnected();
         }
         public NameValueCollection getLabels()
         {

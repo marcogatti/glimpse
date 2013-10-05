@@ -1,16 +1,12 @@
 ﻿using Glimpse.DataAccessLayer;
-using Glimpse.DataAccessLayer.Entities;
-using Glimpse.ErrorLogging;
 using Glimpse.Exceptions.MailInterfacesExceptions;
 using Glimpse.Models;
 using NHibernate;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace Glimpse.MailInterfaces
 {

@@ -50,7 +50,6 @@ namespace Glimpse.Models
 
             return new Label(labelEntity);
         }
-
         public static Label FindByName(MailAccount mailAcccount, String labelName, ISession session)
         {
             LabelEntity labelEntity;
@@ -64,6 +63,19 @@ namespace Glimpse.Models
                 throw new GlimpseException("No se encontro el label");
 
             return new Label(labelEntity);
+        }
+        public static List<LabelEntity> RemoveDuplicates(List<LabelEntity> dupLabels)
+        {
+            List<LabelEntity> uniqueLabels = new List<LabelEntity>();
+            foreach (LabelEntity label in dupLabels)
+            {
+                if (uniqueLabels.Any(x => x.Name == label.Name || 
+                    (x.SystemName == label.SystemName && x.Name == label.Name)))
+                    continue;
+                else
+                    uniqueLabels.Add(label);
+            }
+            return uniqueLabels;
         }
     }
 }

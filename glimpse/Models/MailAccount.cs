@@ -94,6 +94,12 @@ namespace Glimpse.Models
                 return false;
             return this.MyFetcher.IsConnected();
         }
+        public bool IsFullyConnected()
+        {
+            if (this.MyFetcher == null)
+                return false;
+            return this.MyFetcher.IsFullyConnected();
+        }
 
         public Int64 GetUIDLocal(ISession session, String labelSystemName, Boolean max)
         {
@@ -183,7 +189,8 @@ namespace Glimpse.Models
         }
         public void Disconnect()
         {
-            this.MyFetcher.CloseClient();
+            if(this.MyFetcher != null)
+                this.MyFetcher.CloseClient();
         }
         public void FetchAndSaveMails(Label label, Int64 fromUid, Int64 toUid)
         {

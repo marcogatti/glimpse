@@ -9,6 +9,7 @@ using NHibernate;
 using NHibernate.Criterion;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Web.Mvc;
@@ -19,12 +20,12 @@ namespace Glimpse.Controllers
     public class AsyncMailsController : Controller
     {
         #region Action Methods
-        public ActionResult GetMailBody(Int64 id = 0)
+        public ActionResult GetMailBody(Int64 id = 0, Int64 mailAccountId = 0)
         {
             ISession session = NHibernateManager.OpenSession();
             try
             {
-                MailAccount currentMailAccount = this.GetCurrentMailAccount();
+                MailAccount currentMailAccount = this.GetMailAccount(mailAccountId);
                 String body = currentMailAccount.ReadMail(id, session);
 
                 IList<ExtraEntity> mailExtras = Extra.FindByMailId(id, session);
@@ -60,7 +61,7 @@ namespace Glimpse.Controllers
                 return null;
             }
         }
-        public ActionResult GetMailsByDate(Int64 initial, Int64 final)
+        public ActionResult GetMailsByDate(Int64 initial, Int64 final, Int64 mailAccountId = 0)
         {
             DateTime initialDate = AsyncMailsController.ConvertFromJS(initial);
             DateTime finalDate = AsyncMailsController.ConvertFromJS(final);
@@ -70,7 +71,7 @@ namespace Glimpse.Controllers
             {
                 MailCollection mails;
                 List<Object> mailsToReturn = new List<object>();
-                MailAccount currentMailAccount = this.GetCurrentMailAccount();
+                MailAccount currentMailAccount = this.GetMailAccount(mailAccountId);
                 mails = new MailCollection(currentMailAccount.GetMailsByDate(initialDate, finalDate, session));
                 mailsToReturn = this.PrepareHomeMails(mails);
 
@@ -87,14 +88,14 @@ namespace Glimpse.Controllers
                 session.Close();
             }
         }
-        public ActionResult GetMailsByAmount(Int32 amountOfMails)
+        public ActionResult GetMailsByAmount(Int32 amountOfMails, Int64 mailAccountId = 0)
         {
             ISession session = NHibernateManager.OpenSession();
             try
             {
                 MailCollection mails;
                 List<Object> mailsToReturn = new List<object>();
-                MailAccount currentMailAccount = this.GetCurrentMailAccount();
+                MailAccount currentMailAccount = this.GetMailAccount(mailAccountId);
                 mails = currentMailAccount.GetMailsByAmount(amountOfMails, session);
                 mailsToReturn = this.PrepareHomeMails(mails);
 
@@ -113,13 +114,13 @@ namespace Glimpse.Controllers
         }
 
         [HttpPost]
-        public ActionResult TrashMail(Int64 id)
+        public ActionResult TrashMail(Int64 id, Int64 mailAccountId = 0)
         {
             ISession session = NHibernateManager.OpenSession();
             ITransaction tran = session.BeginTransaction();
             try
             {
-                MailAccount mailAccount = this.GetCurrentMailAccount();
+                MailAccount mailAccount = this.GetMailAccount(mailAccountId);
                 Mail mail = new Mail(id, session);
                 if (mail == null)
                     throw new Exception("Mail inexistente: " + id.ToString() + ".");
@@ -145,11 +146,11 @@ namespace Glimpse.Controllers
             }
         }
         [HttpPost]
-        public ActionResult sendEmail(MailSentViewModel sendInfo)
+        public ActionResult sendEmail(MailSentViewModel sendInfo, Int64 mailAccountId = 0)
         {
             try
             {
-                MailAccount mailAccount = this.GetCurrentMailAccount();
+                MailAccount mailAccount = this.GetMailAccount(mailAccountId);
                 mailAccount.SendMail(sendInfo.ToAddress, sendInfo.Body, sendInfo.Subject);
                 return Json(new { success = true, address = sendInfo.ToAddress }, JsonRequestBehavior.AllowGet);
             }
@@ -170,12 +171,12 @@ namespace Glimpse.Controllers
             }
         }
         [HttpPost]
-        public ActionResult AddLabel(String labelName, Int64 mailId)
+        public ActionResult AddLabel(String labelName, Int64 mailId, Int64 mailAccountId = 0)
         {
             bool success;
             try
             {
-                MailAccount mailAccount = this.GetCurrentMailAccount();
+                MailAccount mailAccount = this.GetMailAccount(mailAccountId);
 
                 using (ISession session = NHibernateManager.OpenSession())
                 {
@@ -199,12 +200,12 @@ namespace Glimpse.Controllers
             return Json(new { success = success }, JsonRequestBehavior.AllowGet);
         }
         [HttpPost]
-        public ActionResult RemoveLabel(String label, Int64 mailId)
+        public ActionResult RemoveLabel(String label, Int64 mailId, Int64 mailAccountId = 0)
         {
             ISession session = NHibernateManager.OpenSession();
             try
             {
-                MailAccount currentMailAccount = this.GetCurrentMailAccount();
+                MailAccount currentMailAccount = this.GetMailAccount(mailAccountId);
                 Mail mail = new Mail(mailId, session);
                 Boolean success;
 
@@ -232,7 +233,7 @@ namespace Glimpse.Controllers
                 session.Close();
             }
         }
-        [HttpPost] //Hay que testearlo
+        [HttpPost] //Hay que testearlo y pasarlo al AccountController
         public ActionResult ResetPassword(String username)
         {
             ISession session = NHibernateManager.OpenSession();
@@ -265,7 +266,7 @@ namespace Glimpse.Controllers
                 session.Close();
             }
         }
-        [HttpPost] //Hay que testearlo
+        [HttpPost] //Hay que testearlo y pasarlo al AccountController
         public ActionResult ChangePassword(String username, String oldPassword, String newPassword)
         {
             ISession session = NHibernateManager.OpenSession();
@@ -313,11 +314,8 @@ namespace Glimpse.Controllers
 
             foreach (MailEntity mail in mails)
             {
-
                 Int64 currentAge = DateTime.Now.Ticks - mail.Date.Ticks;
-
                 List<Object> currentLabels = PrepareLabels(mail.Labels);
-
                 Object anEmail = new
                 {
                     id = mail.Id,
@@ -340,16 +338,13 @@ namespace Glimpse.Controllers
                     labels = currentLabels,
                     importance = mail.Importance
                 };
-
                 preparedMails.Add(anEmail);
             }
-
             return preparedMails;
         }
         private List<Object> PrepareLabels(IList<LabelEntity> labels)
         {
             List<Object> returnLabels = new List<object>();
-
             foreach (LabelEntity label in labels)
             {
                 if (label.SystemName == null)
@@ -367,7 +362,6 @@ namespace Glimpse.Controllers
         private Object PrepareBodyMail(String body, IList<ExtraEntity> extras)
         {
             List<Object> extrasMetadata = new List<object>();
-
             foreach (ExtraEntity extra in extras)
             {
                 Object anExtra = new
@@ -385,22 +379,12 @@ namespace Glimpse.Controllers
             };
             return returnInfo;
         }
-        private MailAccount GetCurrentMailAccount()
+        private MailAccount GetMailAccount(Int64 id)
         {
-            MailAccount mailAccount = (MailAccount)Session[HomeController.MAIL_ACCOUNTS];
-
-            if (!mailAccount.IsConnected())
-            {
-                try
-                {
-                    mailAccount.ConnectFull();
-                }
-                catch (SocketException exc)
-                {
-                    Log.LogException(exc, "Error al conectar con IMAP");
-                }
-            }
-            return mailAccount;
+            User user = (User)Session[AccountController.USER_NAME];
+            IList<MailAccount> mailAccounts = user.GetAccounts();
+            //return mailAccounts.Where<MailAccount>(x => x.Entity.Id == id).Single<MailAccount>();
+            return mailAccounts[0]; //harcodeado para que funcione hasta que la vista mande los ids
         }
         private String GenerateRandomPassword(Int16 size)
         {
@@ -419,14 +403,12 @@ namespace Glimpse.Controllers
             MailEntity mailEntity = session.CreateCriteria<MailEntity>()
                                            .Add(Restrictions.Eq("Id", mailID))
                                            .UniqueResult<MailEntity>();
-
             IList<ExtraEntity> embeddedExtras = session.CreateCriteria<ExtraEntity>()
                                                   .Add(Restrictions.Eq("MailEntity", mailEntity))
                                                   .Add(Expression.Disjunction()
                                                         .Add(Restrictions.Eq("ExtraType", Convert.ToInt16(2)))
                                                         .Add(Restrictions.Eq("ExtraType", Convert.ToInt16(1))))
                                                   .List<ExtraEntity>();
-
             foreach (ExtraEntity embeddedExtra in embeddedExtras)
             {
                 body = body.Replace("cid:" +  embeddedExtra.EmbObjectContentId, Url.Action("GetImage", "AsyncMails", new { id = embeddedExtra.Id }, this.Request.Url.Scheme));

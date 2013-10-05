@@ -14,9 +14,8 @@ namespace Glimpse.Controllers
 {
     public class AccountController : Controller
     {
-        public const String USER_NAME = "user-name";
+        public const String USER_NAME = "Username";
 
-        // GET: /Login
         [AllowAnonymous]
         public ActionResult Login()
         {
@@ -32,7 +31,6 @@ namespace Glimpse.Controllers
             return View();
         }
 
-        // POST: /Login
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -75,7 +73,7 @@ namespace Glimpse.Controllers
                     mailAccount.SetAsMainAccount(session);
                     mailAccount.SaveOrUpdate(session);
                     mailAccount.UpdateLabels(session);
-                    mailAccount.Disconnect();
+                    user.AddAccount(mailAccount);
                 }
                 else //si es un usuario glimpse
                 {
@@ -85,18 +83,22 @@ namespace Glimpse.Controllers
                         this.ModelState.AddModelError("User", "Username doesn't exist");
                         return View(userView);
                     }
+                    user.UpdateAccounts(session);
+                    user.ConnectLight();
+                    user.UpdateLabels(session);
                 }
 
                 new CookieHelper().AddUsernameCookie(user.Entity.Username);
                 FormsAuthentication.SetAuthCookie(userView.Username, userView.rememberMe);
-
                 tran.Commit();
+                Session[AccountController.USER_NAME] = user;
 
                 return RedirectToLocal(returnUrl);
             }
             catch (InvalidOperationException)
             {
                 //model state invalido
+                tran.Rollback();
                 return View(userView);
             }
             catch (InvalidAuthenticationException)
@@ -116,12 +118,11 @@ namespace Glimpse.Controllers
         {
             FormsAuthentication.SignOut();
             new CookieHelper().ClearUserCookie();
-            MailAccount mailAccount = (MailAccount)Session[HomeController.MAIL_ACCOUNTS];
-            if (mailAccount != null)
+            User user = (User)Session[AccountController.USER_NAME];
+            if (user != null)
             {
-                mailAccount.Disconnect();
+                user.Disconnect();
                 Session.Remove(AccountController.USER_NAME);
-                Session.Remove(HomeController.MAIL_ACCOUNTS);
             }
             return Redirect("/");
         }
