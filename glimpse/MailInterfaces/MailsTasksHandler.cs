@@ -31,17 +31,8 @@ namespace Glimpse.MailInterfaces
             String mailAddressTrash = mailAddress + "/TRASH";
             String mailAddressSpam = mailAddress + "/SPAM";
 
-            MailsTasksHandler.LockTasksList();
-
-            if ((MailsTasksHandler.TasksList.ContainsKey(mailAddressAll) && MailsTasksHandler.TasksList[mailAddressAll].IsWorking) ||
-                (MailsTasksHandler.TasksList.ContainsKey(mailAddressTrash) && MailsTasksHandler.TasksList[mailAddressTrash].IsWorking) ||
-                (MailsTasksHandler.TasksList.ContainsKey(mailAddressSpam) && MailsTasksHandler.TasksList[mailAddressSpam].IsWorking))
-            {
-                MailsTasksHandler.UnlockTasksList(); //alguna tarea se encuentra trabajando
-                return;
-            }
-
-            MailsTasksHandler.UnlockTasksList();
+            if (MailsTasksHandler.IsAnyWorking(new String[]  { mailAddressAll, mailAddressTrash, mailAddressSpam} ))
+                return; //alguna tarea se encuentra trabajando
 
             using (ISession session = NHibernateManager.OpenSession())
             {
@@ -113,6 +104,54 @@ namespace Glimpse.MailInterfaces
                 MailsTasksHandler.TasksList[mailAddressSpam] = newSpamTask;
                 MailsTasksHandler.UnlockTasksList();
                 MailsTasksHandler.StartMailsTask(newSpamTask);
+            }
+        }
+        public static void SynchronizeTrash(String mailAddress)
+        {
+            MailAccount mailAccountTrash;
+            MailsTask newTaskTrash;
+            String mailAddressTrash = mailAddress + "/TRASH";
+
+            if (MailsTasksHandler.IsWorking(mailAddressTrash))
+                return;
+
+            using (ISession session = NHibernateManager.OpenSession())
+            {
+                mailAccountTrash = MailAccount.FindByAddress(mailAddress, session);
+                try
+                {
+                    mailAccountTrash.ConnectFull();
+                }
+                catch (NullReferenceException exc)
+                {
+                    Log.LogException(exc, "Direccion inexistente en la base de datos: " + mailAccountTrash + ".");
+                    return;
+                }
+                catch (InvalidAuthenticationException exc)
+                {
+                    Log.LogException(exc, "No se pudo conectar a imap con la direccion: " + mailAddress + ", ha cambiado el password.");
+                    return;
+                }
+                catch (SocketException exc)
+                {
+                    Log.LogException(exc, "No se pudo conectar a imap con la direccion: " + mailAddress + ".");
+                    return;
+                }
+                Label trashLabel = Label.FindBySystemName(mailAccountTrash, "Trash", session);
+                newTaskTrash = new MailsTask(mailAccountTrash.GetUIDLocal(session, trashLabel.Entity.SystemName, true),
+                                             mailAccountTrash.GetUIDLocal(session, trashLabel.Entity.SystemName, false),
+                                             mailAccountTrash.GetUIDExternalFrom(trashLabel.Entity.Name, true),
+                                             mailAccountTrash.GetUIDExternalFrom(trashLabel.Entity.Name, false),
+                                             trashLabel,
+                                             mailAccountTrash);
+                session.Close();
+            }
+            if (!newTaskTrash.HasFinished)
+            {
+                MailsTasksHandler.LockTasksList();
+                MailsTasksHandler.TasksList[mailAddressTrash] = newTaskTrash;
+                MailsTasksHandler.UnlockTasksList();
+                MailsTasksHandler.StartMailsTask(newTaskTrash);
             }
         }
         private static void StartMailsTask(MailsTask task)
@@ -209,6 +248,32 @@ namespace Glimpse.MailInterfaces
             return fromUid;
         }
 
+        private static Boolean IsWorking(String taskName)
+        {
+            MailsTasksHandler.LockTasksList();
+            if (MailsTasksHandler.TasksList.ContainsKey(taskName) && MailsTasksHandler.TasksList[taskName].IsWorking)
+            {
+                MailsTasksHandler.UnlockTasksList();
+                return true;
+            }
+            MailsTasksHandler.UnlockTasksList();
+            return false;
+        }
+        private static Boolean IsAnyWorking(String[] tasksNames)
+        {
+            MailsTasksHandler.LockTasksList();
+            Boolean anyIsWorking = false;
+            foreach (String taskName in tasksNames)
+            {
+                if (MailsTasksHandler.TasksList.ContainsKey(taskName) && MailsTasksHandler.TasksList[taskName].IsWorking)
+                {
+                    anyIsWorking = true;
+                    break;
+                }
+            }
+            MailsTasksHandler.UnlockTasksList();
+            return anyIsWorking;
+        }
         private static void UnlockTasksList()
         {
             MailsTasksHandler.TasksListLock.ReleaseMutex();

@@ -34,16 +34,10 @@ namespace Glimpse.Models
 
             return entity != null;
         }
-        public void RemoveLabel(String label, ISession session)
-        {
-            LabelEntity labelToRemove = this.Entity.Labels.First<LabelEntity>(x => x.Name == label);
-            this.Entity.Labels.Remove(labelToRemove);
-        }
         public void SetFrom(AddressEntity from)
         {
             this.Entity.From = from;
         }
-
         public void AddLabel(Label theLabel, ISession session)
         {
             if (!this.HasLabel(theLabel))
@@ -51,6 +45,15 @@ namespace Glimpse.Models
                 this.Entity.Labels.Add(theLabel.Entity);
                 this.Save(session);
             }
+        }
+        public void RemoveLabel(String label, ISession session)
+        {
+            LabelEntity labelToRemove = this.Entity.Labels.First<LabelEntity>(x => x.Name == label);
+            this.Entity.Labels.Remove(labelToRemove);
+        }
+        public void Delete(ISession session)
+        {
+            session.Delete(this.Entity);
         }
         public void Save(ISession session)
         {

@@ -111,40 +111,37 @@ namespace Glimpse.Controllers
                 session.Close();
             }
         }
-        public ActionResult RemoveLabel(String label, Int64 mailId)
+
+        [HttpPost]
+        public ActionResult TrashMail(Int64 id)
         {
             ISession session = NHibernateManager.OpenSession();
+            ITransaction tran = session.BeginTransaction();
             try
             {
-                MailAccount currentMailAccount = this.GetCurrentMailAccount();
-                Mail mail = new Mail(mailId, session);
-                Boolean success;
+                MailAccount mailAccount = this.GetCurrentMailAccount();
+                Mail mail = new Mail(id, session);
+                if (mail == null)
+                    throw new Exception("Mail inexistente: " + id.ToString() + ".");
+                mail.Delete(session); //DB
+                mailAccount.MoveToTrash(mail); //IMAP
+                MailsTasksHandler.SynchronizeTrash(mailAccount.Entity.Address);
+                tran.Commit();
 
-                if (mail.Entity.MailAccountEntity.Id == currentMailAccount.Entity.Id)
-                {
-                    mail.RemoveLabel(label, session); //DB
-                    currentMailAccount.RemoveMailLabel(label, mail.Entity.Gm_mid); //IMAP
-                    success = true;
-                }
-                else
-                {
-                    success = false;
-                }
-
-                JsonResult result = Json(new { success = success }, JsonRequestBehavior.AllowGet);
+                JsonResult result = Json(new { success = true }, JsonRequestBehavior.AllowGet);
                 return result;
             }
             catch (Exception exc)
             {
-                Log.LogException(exc, "Parametros de la llamada: label(" + label + "), gmID(" + mailId.ToString() + ").");
-                return Json(new { success = false, message = "Error al remover label." }, JsonRequestBehavior.AllowGet);
+                tran.Rollback();
+                Log.LogException(exc, "Parametros de la llamada: mailID(" + id.ToString() + ").");
+                return Json(new { success = false, message = exc.Message }, JsonRequestBehavior.AllowGet);
             }
             finally
             {
                 session.Close();
             }
         }
-
         [HttpPost]
         public ActionResult sendEmail(MailSentViewModel sendInfo)
         {
@@ -198,6 +195,40 @@ namespace Glimpse.Controllers
                 Log.LogException(exc, "Parametros de la llamada: label(" + labelName + "), mailId(" + mailId.ToString() + ").");
             }
             return Json(new { success = success }, JsonRequestBehavior.AllowGet);
+        }
+        [HttpPost]
+        public ActionResult RemoveLabel(String label, Int64 mailId)
+        {
+            ISession session = NHibernateManager.OpenSession();
+            try
+            {
+                MailAccount currentMailAccount = this.GetCurrentMailAccount();
+                Mail mail = new Mail(mailId, session);
+                Boolean success;
+
+                if (mail.Entity.MailAccountEntity.Id == currentMailAccount.Entity.Id)
+                {
+                    mail.RemoveLabel(label, session); //DB
+                    currentMailAccount.RemoveMailLabel(label, mail.Entity.Gm_mid); //IMAP
+                    success = true;
+                }
+                else
+                {
+                    success = false;
+                }
+
+                JsonResult result = Json(new { success = success }, JsonRequestBehavior.AllowGet);
+                return result;
+            }
+            catch (Exception exc)
+            {
+                Log.LogException(exc, "Parametros de la llamada: label(" + label + "), gmID(" + mailId.ToString() + ").");
+                return Json(new { success = false, message = "Error al remover label." }, JsonRequestBehavior.AllowGet);
+            }
+            finally
+            {
+                session.Close();
+            }
         }
         [HttpPost] //Hay que testearlo
         public ActionResult ResetPassword(String username)
