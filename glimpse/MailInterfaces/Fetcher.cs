@@ -9,6 +9,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Web;
 using System.Text.RegularExpressions;
+using System.Globalization;
 
 namespace Glimpse.MailInterfaces
 {
@@ -70,8 +71,9 @@ namespace Glimpse.MailInterfaces
             Mailbox targetMailbox = this.GetMailbox(this.AccountMailboxesBySpecialProperty["All"]);
             if (this.CurrentOpenedMailbox.MessageCount == 0)
                 return DateTime.Today;
-            var nvCol = targetMailbox.Fetch.HeaderLines(1, new String[] { "date" });
-            return DateTime.Parse(nvCol["date"]);
+            //var nvCol = targetMailbox.Fetch.HeaderLines(1, new String[] { "date" });
+            //return DateTime.Parse(nvCol["date"]);
+            return DateTime.Today.AddYears(-1);
         }
 
         #region Mail Retrieving Methods
