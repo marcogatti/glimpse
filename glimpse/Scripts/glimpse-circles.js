@@ -52,8 +52,7 @@ function insertCircle(value) {
             " data-importance=", value.importance
         ];
 
-        var newCircle = $("<div class='" + classes + "'" +
-                            dataAttributes.join("'") +
+        var newCircle = $("<div class='" + classes + "'" + dataAttributes.join("'") + "' title='" + value.from.address +
                             "'><div class='centered'><p content=true>" + value.subject.substr(0, 50) + "</p></div></div>");
 
         calculateEmailColor(newCircle);

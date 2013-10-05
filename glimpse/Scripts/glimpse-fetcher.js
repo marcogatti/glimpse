@@ -28,7 +28,7 @@ function fetchRecentMails() {
         hideProgressBar("#circles-progress");
 
         if (data.mails.length === 0) {
-            maxAge = minAge + 5000000000000;
+            maxAge = minAge + 10000000000000;
         }
 
         if (data.success === true) {

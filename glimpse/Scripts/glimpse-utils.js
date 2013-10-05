@@ -119,21 +119,20 @@ function currentPeriodShown() {
     return maxAge - minAge;
 }
 
-function notNegative(value1, value2) {
-    return value1 + value2 >= 0;
-}
-
 function zoom(factor, zoomPoint) {
 
     if (amountOfCirclesShown() < $("#max-amount").val() || (factor > 0)) {
 
         var movement = currentPeriodShown() * factor * 0.0001;
 
-        maxAge -= (containerWidth() - zoomPoint) * movement;
+        var offsetRight = (containerWidth() - zoomPoint) * movement;
+        if (allowedMovementRight(-offsetRight)) {
+            maxAge -= offsetRight;
+        }
 
-        var offset = zoomPoint * movement;
-        if (notNegative(minAge, offset)) {
-            minAge += offset;
+        var offsetLeft = zoomPoint * movement;
+        if (allowedMovementLeft(offsetLeft)) {
+            minAge += offsetLeft;
         }
 
         setDateCoords();
@@ -164,16 +163,19 @@ function setWheelZoom() {
     });
 }
 
-function setRefreshButtonBehaviour() {
-    $('#refresh').click(function () { fetchMailsWithinActualPeriod() });
+function allowedMovementRight(offset){
+    return maxAge + offset < oldestAge;
+}
+function allowedMovementLeft(offset) {
+    return minAge + offset > 0;
 }
 
 function movePeriodShown(offset) {
-    if (notNegative(minAge, offset)) {
+    if (allowedMovementLeft(offset) && allowedMovementRight(offset)) {
         minAge += offset;
         maxAge += offset;
+        calculateEmailsLeft();
     }
-    calculateEmailsLeft();
 }
 
 function setDragging() {
@@ -210,6 +212,10 @@ function setDateCoordsPosition() {
     $("#date-last").css("left", function () {
         return parseInt(containerWidth(), 10) - parseInt($("#date-last").css("width")) + 'px';
     });
+}
+
+function setRefreshButtonBehaviour() {
+    $('#refresh').click(function () { fetchMailsWithinActualPeriod() });
 }
 
 function ageToDate(age) {

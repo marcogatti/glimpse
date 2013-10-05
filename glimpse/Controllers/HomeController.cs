@@ -78,7 +78,7 @@ namespace Glimpse.Controllers
 
             ViewBag.Username = sessionUser.Entity.Username;
             ViewBag.Labels = viewLabels;
-            ViewBag.oldestDate = DateTime.Now.Ticks - oldestMailDate.Ticks;
+            ViewBag.OldestAge = DateTime.Now.Ticks - oldestMailDate.Ticks;
 
             session.Flush();
             session.Close();
