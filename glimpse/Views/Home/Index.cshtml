@@ -42,14 +42,37 @@
     </div>
 </div>
 
-<div id="body-modal" class="modal hide fade in" style="display: none;">
+<div id="mail-view" class="modal hide fade in" style="display: none;">
     <div class="modal-header">
         <a class="close" data-dismiss="modal">×</a>
-        <h3>De: </h3>
+        <table style="width: 90%">
+            <tr style="width: 100%">
+                <td style="width: 80%">
+                    <p id="mail-view-subject">Subject</p>
+                </td>
+                <td style="border-left: solid thin">
+                    <div id="mail-view-date" class="pull-right">20/10/2013</div>
+                </td>
+            </tr>
+        </table>
     </div>
     <div class="modal-body">
-        <h4>Asunto</h4>
-        <div id="bodyhtml"></div>
+        <table class="mail-view-addresses">
+            <tr>
+                <td colspan="2">
+                    <p id="mail-view-from">From</p>
+                </td>
+            </tr>
+            <tr>
+                <td class="mail-view-address">
+                    <p id="mail-view-to">To</p>
+                </td>
+                <td class="mail-view-address">
+                    <p id="mail-view-cc">CC</p>
+                </td>
+            </tr>
+        </table>
+        <div id="mail-view-body"></div>
         <div id="body-progress" class="progress progress-striped active">
             <div class="bar" style="width: 100%;">Cargando...</div>
         </div>
@@ -151,9 +174,18 @@
     <div class="ui-dialog-content">
         <table style="width: 100%;">
             <tbody>
-                <tr><td><textarea rows="1" placeholder="Destinatarios..." id="email-to" class="compose-text"></textarea></td></tr>
-                <tr><td><textarea rows="1" placeholder="Asunto..." id="email-subject" class="compose-text"></textarea></td></tr>
-                <tr><td><textarea cols="80" id="text_editor" rows="10"></textarea></td></tr>
+                <tr>
+                    <td>
+                        <textarea rows="1" placeholder="Destinatarios..." id="email-to" class="compose-text"></textarea></td>
+                </tr>
+                <tr>
+                    <td>
+                        <textarea rows="1" placeholder="Asunto..." id="email-subject" class="compose-text"></textarea></td>
+                </tr>
+                <tr>
+                    <td>
+                        <textarea cols="80" id="text_editor" rows="10"></textarea></td>
+                </tr>
             </tbody>
         </table>
     </div>

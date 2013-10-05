@@ -236,3 +236,22 @@ div.icons {
     min-height: 22px;
     max-height: 66px;
 }
+
+.mail-view-addresses {
+    width: 100%;
+    border: solid;
+    border-width: 2px;
+}
+
+.mail-view-address {
+    width: 50%;
+    border: solid;
+    border-width: 1px;
+}
+
+#mail-view-from {
+    width: 100%;
+}
+#mail-view-date {
+    text-align: center;
+}

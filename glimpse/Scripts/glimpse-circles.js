@@ -45,6 +45,9 @@ function insertCircle(value) {
             " data-label1=", label1,
             " data-label2=", label2,
             " data-age=", value.age,
+            " data-cc=", value.cc,
+            " data-bcc=", value.bcc,
+            " data-to=", value.to,
             " data-importance=", value.importance
         ];
 
@@ -55,7 +58,7 @@ function insertCircle(value) {
         calculateEmailColor(newCircle);
         newCircle.css("opacity", 0);
         $("#email-container").append(newCircle);
-        
+
         setTimeout(function () {
             newCircle.css("opacity", 0.9);
         }, 100);
@@ -137,24 +140,25 @@ function setFullDisplay(circle) {
     circle.dblclick(
         function () {
 
-            var from = 'From: ' + circle.data("from"),
-                subject = circle.data("subject");
+            var view_modal = $("#mail-view");
+            from = 'From: ' + circle.data("from"),
+            subject = circle.data("subject"),
+            cc = 'CC: ' + circle.data("cc"),
+            to = 'To: ' + circle.data("to");
 
-            var from = 'From: ' + circle.data("from"),
-                subject = circle.data("subject");
+            view_modal.find("#mail-view-from").html(from);
+            view_modal.find("#mail-view-to").html(to);
+            view_modal.find("#mail-view-cc").html(cc);
+            view_modal.find("#mail-view-subject").html(subject);
 
-            $(".modal-body").find("h4").html(from);
-            $(".modal-header").find("h3").html(subject);
-
-            $(".modal-body").find("#bodyhtml").html("");
             showProgressBar("#body-progress");
 
-            $("#body-modal").modal("show");
+            view_modal.modal("show");
 
             $.getJSON("async/GetMailBody/" + circle.data("id"), function (data) {
                 hideProgressBar("#body-progress");
                 if (data.success == true) {
-                    $(".modal-body").find("#bodyhtml").html(data.mail.body);
+                    view_modal.find("#mail-view-body").html(data.mail.body);
                     markAsRead(circle);
 
                 } else alert(data.message);
