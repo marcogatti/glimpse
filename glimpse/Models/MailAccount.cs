@@ -222,6 +222,13 @@ namespace Glimpse.Models
             }
             session.SaveOrUpdate(this.Entity);
         }
+        public static void SendResetPasswordMail(User user, String newPassword, ISession session)
+        {
+            MailAccount mailAccount = MailAccount.FindMainMailAccount(user.Entity.Username, session);
+            if (mailAccount == null)
+                throw new Exception("Usuario: " + user.Entity.Username + " no posee mailAccount primario.");
+            Sender.SendResetPasswordMail(user.Entity.Username, mailAccount.Entity.Address, newPassword);
+        }
         public static MailAccount FindByAddress(String emailAddress, ISession session)
         {
             MailAccountEntity account = session.CreateCriteria<MailAccountEntity>()
@@ -231,6 +238,14 @@ namespace Glimpse.Models
                 return null;
             else
                 return new MailAccount(account);
+        }
+        public static MailAccount FindMainMailAccount(String username, ISession session)
+        {
+            MailAccountEntity entity = session.CreateCriteria<MailAccountEntity>()
+                                            .Add(Restrictions.Eq("User.Username", username))
+                                            .Add(Restrictions.Eq("IsMainAccount", true))
+                                            .UniqueResult<MailAccountEntity>();
+            return new MailAccount(entity);
         }
         #endregion
         #region Private Methods

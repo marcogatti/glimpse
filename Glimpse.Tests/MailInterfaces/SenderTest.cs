@@ -61,5 +61,13 @@ namespace Glimpse.Tests.MailInterfaces
             this.mySender.sendMail(newMail);
             Assert.Pass();
         }
+
+        [Test]
+        [Explicit]
+        public void EXP_Send_Reset_Mail_Sends_Correctly()
+        {
+            Sender.SendResetPasswordMail("myGlimpseUsername", "test.imap.506@gmail.com", "myNewPassword");
+            Assert.Pass();
+        }
     }
 }

@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using ActiveUp.Net.Mail;
-using Glimpse.MailInterfaces;
+﻿using ActiveUp.Net.Mail;
 using Glimpse.Exceptions.MailInterfacesExceptions;
 using Glimpse.Helpers;
+using System;
+using System.Text;
 
 namespace Glimpse.MailInterfaces
 {
@@ -24,7 +21,7 @@ namespace Glimpse.MailInterfaces
 
         public void sendMail(SmtpMessage newMail)
         {
-            this.checkRecipients(newMail.To);
+            this.CheckRecipients(newMail.To);
             //mail.SendSsl crea la conexión, manda los 3 parámetros de SMPT (MAIL, RCPT y DATA) y cierra la conexión
             newMail.SendSsl("smtp.gmail.com", 465, this.senderAddress, CryptoHelper.DecryptDefaultKey(this.password), SaslMechanism.Login);
         }
@@ -32,7 +29,7 @@ namespace Glimpse.MailInterfaces
                              AddressCollection CC = null, AddressCollection BCC = null,
                              AttachmentCollection attachments = null)
         {
-            this.checkRecipients(recipients);
+            this.CheckRecipients(recipients);
             SmtpMessage newMail = new SmtpMessage();
 
             this.SetMailSender(newMail);
@@ -58,29 +55,47 @@ namespace Glimpse.MailInterfaces
             }
         }
 
+        public static void SendResetPasswordMail(String username, String mailAddress, String newPassword)
+        {
+            SmtpMessage resetMail = new SmtpMessage();
+            AddressCollection to = new AddressCollection();
+
+            resetMail.From = new Address("GlimpseInnovationSystems@gmail.com");
+            resetMail.BodyText.Text = "Usted ha olvidado la contraseña de su usuario Glimpse: " + username +
+                                      ".\nLa nueva contraseña autogenerada es: \"" + newPassword + "\"." + 
+                                      "\nDeberá ingresar con ésta clave la próxima vez que ingrese a Glimpse.";
+            resetMail.BodyText.ContentTransferEncoding = ContentTransferEncoding.QuotedPrintable;
+            resetMail.BodyText.Charset = "ISO-8859-1";
+            resetMail.BodyText.Format = BodyFormat.Text;
+
+            String encodedSubject = "=?ISO-8859-1?B?";
+            Encoding iso = Encoding.GetEncoding("ISO-8859-1");
+            encodedSubject += Convert.ToBase64String(iso.GetBytes("Nueva Contraseña Glimpse"), Base64FormattingOptions.InsertLineBreaks);
+            encodedSubject += "?=";
+            resetMail.Subject = encodedSubject;
+
+            to.Add(new Address(mailAddress));
+            resetMail.To = to;
+            resetMail.SendSsl("smtp.gmail.com", 465, "glimpseinnovationsystems@gmail.com", "poiewq123890", SaslMechanism.Login);
+        }
         private static void SetMailAttachments(AttachmentCollection attachments, SmtpMessage newMail)
         {
             if (attachments != null)
                 foreach (Attachment attachment in attachments)
                     newMail.Attachments.Add(attachment);
         }
-        
-        private void SetMailSender(SmtpMessage newMail)
-        {
-            if (this.senderName != null)
-                newMail.From = new Address(this.senderAddress, this.senderName);
-            else
-                newMail.From = new Address(this.senderAddress);
-        }
-
         private static void SetMailRecipients(AddressCollection recipients, String subject, AddressCollection CC, AddressCollection BCC, SmtpMessage newMail)
         {
-            newMail.Subject = subject;
+            //=?ISO-8859-1?B?0fHR8dHx0fG0tLS0b/PztLRv8w==?=
+            String encodedSubject = "=?ISO-8859-1?B?";
+            Encoding iso = Encoding.GetEncoding("ISO-8859-1");
+            encodedSubject += Convert.ToBase64String(iso.GetBytes(subject), Base64FormattingOptions.InsertLineBreaks);
+            encodedSubject += "?=";
+            newMail.Subject = encodedSubject;
             newMail.To = recipients;
             newMail.Cc = CC ?? new AddressCollection();
             newMail.Bcc = BCC ?? new AddressCollection();
         }
-
         private static void SetMailBody(String bodyHTML, SmtpMessage newMail)
         {
             if (bodyHTML != null)
@@ -101,8 +116,15 @@ namespace Glimpse.MailInterfaces
             newMail.BodyText.Charset = "ISO-8859-1";
             newMail.BodyText.Format = BodyFormat.Text;
         }
-
-        private void checkRecipients(AddressCollection recipients)
+        
+        private void SetMailSender(SmtpMessage newMail)
+        {
+            if (this.senderName != null)
+                newMail.From = new Address(this.senderAddress, this.senderName);
+            else
+                newMail.From = new Address(this.senderAddress);
+        }
+        private void CheckRecipients(AddressCollection recipients)
         {
             if (recipients.Count == 0)
                 throw new NoRecipientsException("Debe existir por lo menos un destinatario.");

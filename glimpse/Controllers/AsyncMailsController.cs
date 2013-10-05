@@ -1,6 +1,7 @@
 ﻿using ActiveUp.Net.Mail;
 using Glimpse.DataAccessLayer;
 using Glimpse.DataAccessLayer.Entities;
+using Glimpse.Helpers;
 using Glimpse.MailInterfaces;
 using Glimpse.Models;
 using Glimpse.ViewModels;
@@ -9,6 +10,7 @@ using NHibernate.Criterion;
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
+using System.Text;
 using System.Web.Mvc;
 
 namespace Glimpse.Controllers
@@ -195,8 +197,75 @@ namespace Glimpse.Controllers
                 success = false;
                 Log.LogException(exc, "Parametros de la llamada: label(" + labelName + "), mailId(" + mailId.ToString() + ").");
             }
-
             return Json(new { success = success }, JsonRequestBehavior.AllowGet);
+        }
+        [HttpPost] //Hay que testearlo
+        public ActionResult ResetPassword(String username)
+        {
+            ISession session = NHibernateManager.OpenSession();
+            ITransaction tran = session.BeginTransaction();
+            try
+            {
+                String newPassword = this.GenerateRandomPassword(16);
+                String newPasswordEnc = CryptoHelper.EncryptDefaultKey(newPassword);
+
+                tran = session.BeginTransaction();
+
+                User user = Glimpse.Models.User.FindByUsername(username, session);
+                if (user == null)
+                    throw new Exception("Usuario inexistente: " + username + ".");
+                user.ChangePassword(user.Entity.Password, newPasswordEnc, session);
+                MailAccount.SendResetPasswordMail(user, newPassword, session);
+                tran.Commit();
+
+                JsonResult result = Json(new { success = true, message = "La contraseña ha sido reinicializada." }, JsonRequestBehavior.AllowGet);
+                return result;
+            }
+            catch (Exception exc)
+            {
+                tran.Rollback();
+                Log.LogException(exc);
+                return Json(new { success = false, message = "Error al reiniciar la contraseña." }, JsonRequestBehavior.AllowGet);
+            }
+            finally
+            {
+                session.Close();
+            }
+        }
+        [HttpPost] //Hay que testearlo
+        public ActionResult ChangePassword(String username, String oldPassword, String newPassword)
+        {
+            ISession session = NHibernateManager.OpenSession();
+            ITransaction tran = session.BeginTransaction();
+            try
+            {
+                String oldPasswordEnc = CryptoHelper.EncryptDefaultKey(oldPassword);
+                String newPasswordEnc = CryptoHelper.EncryptDefaultKey(newPassword);
+
+                User user = Glimpse.Models.User.FindByUsername(username, session);
+                if (user == null)
+                    throw new Exception("Usuario inexistente.");
+                user.ChangePassword(oldPasswordEnc, newPasswordEnc, session);
+
+                JsonResult result = Json(new { success = true, message = "La contraseña ha sido reinicializada." }, JsonRequestBehavior.AllowGet);
+                return result;
+            }
+            catch (WrongClassException exc)
+            {
+                tran.Rollback();
+                Log.LogException(exc);
+                return Json(new { success = false, message = exc.Message }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception exc)
+            {
+                tran.Rollback();
+                Log.LogException(exc);
+                return Json(new { success = false, message = "Error al reiniciar la contraseña." }, JsonRequestBehavior.AllowGet);
+            }
+            finally
+            {
+                session.Close();
+            }
         }
         #endregion
         #region Private Helpers
@@ -299,6 +368,18 @@ namespace Glimpse.Controllers
                 }
             }
             return mailAccount;
+        }
+        private String GenerateRandomPassword(Int16 size)
+        {
+            StringBuilder builder = new StringBuilder();
+            Random random = new Random();
+            char ch;
+            for (Int16 i = 0; i < size; i++)
+            {
+                ch = Convert.ToChar(Convert.ToInt32(Math.Floor(26 * random.NextDouble() + 65)));
+                builder.Append(ch);
+            }
+            return CryptoHelper.EncryptDefaultKey(builder.ToString());
         }
         private void InsertEmbeddedExtraUrl(ref String body, Int64 mailID, ISession session)
         {
