@@ -1,5 +1,4 @@
 ﻿using Glimpse.DataAccessLayer;
-using Glimpse.DataAccessLayer.Entities;
 using Glimpse.Exceptions.MailInterfacesExceptions;
 using Glimpse.Helpers;
 using Glimpse.Models;

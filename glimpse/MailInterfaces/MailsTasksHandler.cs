@@ -15,7 +15,7 @@ namespace Glimpse.MailInterfaces
         private static Dictionary<string, MailsTask> TasksList = new Dictionary<string, MailsTask>();
         private static Mutex TasksListLock = new Mutex(false);
 
-        private static int MAILS_AMMOUNT_PER_ROUND = 4;
+        private static int MAILS_AMOUNT_PER_ROUND = 4;
 
         public static void StartSynchronization(String mailAddress)
         {
@@ -78,6 +78,9 @@ namespace Glimpse.MailInterfaces
             }
             if (!newAllTask.HasFinished) //puede ser que no se necesite sincronizar dependiendo de los numeros
             {
+                if (newAllTask.HighestUidLocal != 0) //si no es la primera vez, que sincronice hacia adelante sin limites
+                    newAllTask.SetUnlimitedForwarding(true);
+                newAllTask.SetForwardOnly(true); //TODO: ver criterio cuando no deberia ser solo para adelante
                 MailsTasksHandler.LockTasksList();
                 MailsTasksHandler.TasksList[mailAddressAll] = newAllTask;
                 MailsTasksHandler.UnlockTasksList();
@@ -197,28 +200,28 @@ namespace Glimpse.MailInterfaces
         private static void SynchronizeBackward(MailsTask task)
         {
             Int64 toUid, fromUid;
+            Int32 amountOfMails = 0;
 
             toUid = task.NextUidBackward;
             fromUid = MailsTasksHandler.GetFromUid(toUid, task.LowestUidExternal - 1); // En el backward queremos que traiga el LowestUidExternal
 
-            task.MailAccount.FetchAndSaveMails(task.Label, fromUid, toUid);
-
+            task.MailAccount.FetchAndSaveMails(task.Label, fromUid, toUid, ref amountOfMails);
             task.Dirty = true;
-
             task.NextUidBackward = MailsTasksHandler.GetFollowingNextUid(fromUid);
+            task.FetchedAmount += amountOfMails;
         }
         private static void SynchronizeForward(MailsTask task)
         {
             Int64 toUid, fromUid;
+            Int32 amountOfMails = 0;
 
             toUid = task.NextUidForward;
             fromUid = MailsTasksHandler.GetFromUid(toUid, task.HighestUidLocal); // En el forward no queremos el HighestUidLocal porque ya lo tenemos
 
-            task.MailAccount.FetchAndSaveMails(task.Label, fromUid, toUid);
-
+            task.MailAccount.FetchAndSaveMails(task.Label, fromUid, toUid, ref amountOfMails);
             task.Dirty = true;
-
             task.NextUidForward = MailsTasksHandler.GetFollowingNextUid(fromUid);
+            task.FetchedAmount += amountOfMails;
         }
         private static void EndSynchronization(MailsTask task)
         {
@@ -237,8 +240,8 @@ namespace Glimpse.MailInterfaces
         {
             Int64 fromUid;
 
-            if (toUid - MAILS_AMMOUNT_PER_ROUND > UidLimit)
-                fromUid = toUid - MAILS_AMMOUNT_PER_ROUND;
+            if (toUid - MAILS_AMOUNT_PER_ROUND > UidLimit)
+                fromUid = toUid - MAILS_AMOUNT_PER_ROUND;
             else
                 fromUid = UidLimit + 1;
             return fromUid;
@@ -282,13 +285,18 @@ namespace Glimpse.MailInterfaces
 
     public class MailsTask
     {
+        internal const Int32 MaxSynchroAmount = 250;
+
         internal bool Working { get; set; }
+        internal bool ForceOnlyForward { get; set; }
+        internal bool UnlimitedForwarding { get; set; }
         internal Int64 HighestUidExternal { get; set; }
         internal Int64 LowestUidExternal { get; set; }
         internal Int64 HighestUidLocal { get; set; }
         internal Int64 LowestUidLocal { get; set; }
         internal Int64 NextUidForward { get; set; }
         internal Int64 NextUidBackward { get; set; }
+        internal Int32 FetchedAmount { get; set; }
         internal Label Label { get; set; }
         internal MailAccount MailAccount { get; set; }
         public bool Dirty { get; set; }
@@ -304,8 +312,19 @@ namespace Glimpse.MailInterfaces
             this.Dirty = false;
             this.Working = true;
             this.MailAccount = mailAccount;
+            this.FetchedAmount = 0;
+            this.ForceOnlyForward = false;
+            this.UnlimitedForwarding = false;
         }
 
+        public void SetForwardOnly(Boolean forwardOnly)
+        {
+            this.ForceOnlyForward = forwardOnly;
+        }
+        public void SetUnlimitedForwarding(Boolean unlimitedForwarding)
+        {
+            this.UnlimitedForwarding = unlimitedForwarding;
+        }
         public void SetMailAccount(MailAccount mailAccount)
         {
             this.MailAccount = mailAccount;
@@ -322,7 +341,9 @@ namespace Glimpse.MailInterfaces
             get
             {
                 return (this.LowestUidExternal > this.NextUidBackward) // Si el puntero al siguiente queda dentras de lo que existe en IMAP.
-                    || (this.LowestUidExternal >= this.LowestUidLocal); // Si tengo lo mismo o mas en la base que en IMAP 
+                    || (this.LowestUidExternal >= this.LowestUidLocal) // Si tengo lo mismo o mas en la base que en IMAP 
+                    || (this.FetchedAmount >= MailsTask.MaxSynchroAmount)
+                    || (this.ForceOnlyForward);
             }
         }
         public bool HasFinishedForward
@@ -331,7 +352,8 @@ namespace Glimpse.MailInterfaces
             {
                 return (this.HighestUidLocal >= this.NextUidForward) // Si el puntero al siguiente esta detras del que tenemos en la base
                     || (this.HighestUidExternal <= this.HighestUidLocal) // Si tengo lo mismo o mas en la base que en IMAP
-                    || (this.LowestUidExternal > this.NextUidForward); // Si el puntero al siguiente queda por debajo lo que existe en IMAP
+                    || (this.LowestUidExternal > this.NextUidForward) // Si el puntero al siguiente queda por debajo lo que existe en IMAP
+                    || (this.UnlimitedForwarding == true ? false : this.FetchedAmount >= MailsTask.MaxSynchroAmount);
             }
         }
         public bool HasFinished

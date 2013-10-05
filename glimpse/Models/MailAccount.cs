@@ -152,7 +152,6 @@ namespace Glimpse.Models
                                                   .List<MailEntity>();
             return new MailCollection(databaseMails);
         }
-
         public String ReadMail(Int64 id, ISession session)
         {
             MailEntity mailEntity = session.CreateCriteria<MailEntity>()
@@ -192,7 +191,7 @@ namespace Glimpse.Models
             if(this.MyFetcher != null)
                 this.MyFetcher.CloseClient();
         }
-        public void FetchAndSaveMails(Label label, Int64 fromUid, Int64 toUid)
+        public void FetchAndSaveMails(Label label, Int64 fromUid, Int64 toUid, ref Int32 amountOfMails)
         {
             List<Mail> mails = this.MyFetcher.GetMailsBetweenUID(label.Entity.Name, (int)fromUid, (int)toUid);
             foreach (Mail mail in mails)
@@ -200,6 +199,7 @@ namespace Glimpse.Models
                 mail.Entity.MailAccountEntity = this.Entity;
             }
             MailAccount.Save(mails);
+            amountOfMails = mails.Count;
         }
         public void SendMail(String toAddresses, String body, String subject)
         {
