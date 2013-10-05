@@ -231,6 +231,7 @@
     <Compile Include="Exceptions\MailInterfacesExceptions\InvalidAuthenticationException.cs" />
     <Compile Include="Exceptions\MailInterfacesExceptions\InvalidConnectionException.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Exceptions\ModelsExceptions\WrongPasswordException.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -514,9 +515,7 @@
     <Content Include="Views\Account\Login.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Exceptions\ModelsExceptions\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Content Include="packages.config" />
   </ItemGroup>

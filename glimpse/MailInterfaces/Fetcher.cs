@@ -286,6 +286,7 @@ namespace Glimpse.MailInterfaces
                 retrievedMessage = targetMailbox.Fetch.MessageObjectPeekWithGMailExtensions(mailOrdinal);
                 retrievedMail.Gm_tid = UInt64.Parse(this.CleanIMAPResponse(Receiver.Command("FETCH " + mailOrdinal + " (X-GM-THRID)"), "X-GM-THRID"));
                 retrievedMail.Gm_mid = UInt64.Parse(this.CleanIMAPResponse(Receiver.Command("FETCH " + mailOrdinal + " (X-GM-MSGID)"), "X-GM-MSGID"));
+                String response = this.Receiver.Command("FETCH " + mailOrdinal + " BODY.PEEK[HEADER.FIELDS (SUBJECT)]");
                 thisUid = targetMailbox.Fetch.Uid(mailOrdinal);
                 thisFlags = targetMailbox.Fetch.Flags(mailOrdinal).Merged;
             }
