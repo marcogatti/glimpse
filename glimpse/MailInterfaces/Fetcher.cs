@@ -564,6 +564,8 @@ namespace Glimpse.MailInterfaces
         }
         private String TrimAngularBrackets(String phrase)
         {
+            if (phrase == null)
+                return null;
             phrase = phrase.Remove(0, 1);
             return phrase.Remove(phrase.Length - 1, 1);
         }
