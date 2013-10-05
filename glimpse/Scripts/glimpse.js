@@ -1,5 +1,6 @@
 $(document).ready(function () {
 
+    loadLabels();
     setDateCoordsPosition();
     populateLabelColors();
     fetchRecentMails();

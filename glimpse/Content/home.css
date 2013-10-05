@@ -163,18 +163,23 @@ hr {
     font-style: normal;
     font-family: 'Open Sans', Arial, sans-serif;
     width: 50px;
-    /*color: white;*/
-    text-shadow: 0 1px 2px white;
+    color: white;
+    text-shadow: 0 2px 4px #000
 }
 
+    .coord.hidable {
+        text-align: center;
+        color: #000;
+        background-color: #f5f5f5;
+        opacity: 0.9;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+        font-size: small;
+        z-index: 10;
+        border-radius: 10%;
+    }
+
 #dateTime {
-    text-align: center;
     width: 125px;
-    color: #fff;
-    background-color: rgba(0, 0, 0, 0.9);
-    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.7);
-    font-size: small;
-    border-radius: 5%;
 }
 
 #date-last {
@@ -184,6 +189,7 @@ hr {
 /*  Para alineacion vertical de la coordenada "from"    */
 #from {
     line-height: 75px;
+    width: 75px;
 }
 
 .hidden {

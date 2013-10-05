@@ -94,33 +94,7 @@
                 <ol id="labels-header" class="nav nav-list">
 
                     <li class="nav-header">Carpetas</li>
-
-                    @{
-                        String[] unwantedSystemLabels = new String[] {"Important", "Flagged", "Drafts", "All"};
-                        
-                        foreach (LabelViewModel label in ViewBag.Labels)
-                        {
-                            if (!unwantedSystemLabels.Any(x => x == label.systemName) && label.systemName != null)
-                            {
-                        <li class='label label-glimpse' data-name="@label.showName" data-system="@label.systemName">@label.showName</li> 
-                            }
-
-                        }
-                    }
-
                     <li class="nav-header">Etiquetas</li>
-
-                    @{
-                        foreach (LabelViewModel label in ViewBag.Labels)
-                        {
-                            if (label.systemName == null)
-                            {
-                        <li class='custom-label label label-glimpse' data-name="@label.showName">@label.showName</li> 
-                            }
-
-                        }
-                        <li class='custom-label label label-glimpse' data-name="others">Sin etiqueta</li> 
-                    }
 
                 </ol>
 
@@ -135,6 +109,7 @@
         <!--/span-->
 
         <script>
+            var labels = @Html.Raw(Json.Encode(ViewBag.Labels));
             var oldestAge = @ViewBag.OldestAge;
         </script>
 
