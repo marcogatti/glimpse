@@ -78,6 +78,7 @@ namespace Glimpse.MailInterfaces
             resetMail.To = to;
             resetMail.SendSsl("smtp.gmail.com", 465, "glimpseinnovationsystems@gmail.com", "poiewq123890", SaslMechanism.Login);
         }
+
         private static void SetMailAttachments(AttachmentCollection attachments, SmtpMessage newMail)
         {
             if (attachments != null)

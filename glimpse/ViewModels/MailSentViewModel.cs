@@ -8,6 +8,7 @@ namespace Glimpse.ViewModels
 {
     public class MailSentViewModel
     {
+        [AllowHtml]
         public String ToAddress { get; set; }
 
         [AllowHtml]

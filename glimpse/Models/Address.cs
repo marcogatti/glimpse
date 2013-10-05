@@ -45,17 +45,43 @@ namespace Glimpse.Models
 
         public static AddressCollection ParseAddresses(String toAddresses)
         {
+            /*test.imap.performance@gmail.com, "Simpson Marge" <test.imap.performance@gmail.com>,
+             * "Simpson Bart" <ezequiel.lopez.2009@hotmail.com>, , "Simpson Bart" <ezequiel.lopez.2009@hotmail.com>,
+             * "Simpson Maggie" <ezequiel.lopez.2010@hotmail.com>, */
+            String recipientName, line;
+            String[] inlineRecipients;
             ActiveUp.Net.Mail.AddressCollection addresses = new AddressCollection();
-            String[] recipients = new String[toAddresses.Split(new String[] { "," }, StringSplitOptions.RemoveEmptyEntries).Length];
 
-            toAddresses = System.Text.RegularExpressions.Regex.Replace(toAddresses, @"\s+|;", ","); //reemplaza todos los espacios por ""
-            recipients = toAddresses.Split(new String[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+            toAddresses = toAddresses.Replace("<", String.Empty);
+            toAddresses = toAddresses.Replace(">", String.Empty);
+            String[] recipients = toAddresses.Split(new String[] { ",", ";" }, StringSplitOptions.RemoveEmptyEntries);
 
-            foreach (String recipient in recipients)
+            foreach (String recipientLine in recipients)
             {
-                addresses.Add(new ActiveUp.Net.Mail.Address(recipient));
-            }
+                line = recipientLine;
+                if (recipientLine.Contains("\""))
+                {
+                    recipientName = recipientLine.Substring(recipientLine.IndexOf("\"") + 1, recipientLine.LastIndexOf("\"") - recipientLine.IndexOf("\"") - 1);
+                    line = recipientLine.Remove(0, recipientLine.LastIndexOf("\"") + 1);
+                }
+                else
+                {
+                    recipientName = "";
+                }
+                line = System.Text.RegularExpressions.Regex.Replace(line, @"\s+", " ");
+                inlineRecipients = line.Split(new String[] { " " }, StringSplitOptions.RemoveEmptyEntries);
 
+                for (Int16 currentInlineRecipient = 0; currentInlineRecipient < inlineRecipients.Length; currentInlineRecipient++)
+                {
+                    if (inlineRecipients[currentInlineRecipient] == " " || inlineRecipients[currentInlineRecipient] == "\"" ||
+                        inlineRecipients[currentInlineRecipient] == ":")
+                        continue;
+                    if (currentInlineRecipient == 0 && recipientName != "")
+                        addresses.Add(new ActiveUp.Net.Mail.Address(inlineRecipients[currentInlineRecipient], recipientName));
+                    else
+                        addresses.Add(new ActiveUp.Net.Mail.Address(inlineRecipients[currentInlineRecipient]));
+                }
+            }
             return addresses;
         }
 

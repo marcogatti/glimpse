@@ -71,8 +71,21 @@ namespace Glimpse.MailInterfaces
             Mailbox targetMailbox = this.GetMailbox(this.AccountMailboxesBySpecialProperty["All"]);
             if (this.CurrentOpenedMailbox.MessageCount == 0)
                 return DateTime.Today;
-            //var nvCol = targetMailbox.Fetch.HeaderLines(1, new String[] { "date" });
-            //return DateTime.Parse(nvCol["date"]);
+            var nvCol = targetMailbox.Fetch.HeaderLines(1, new String[] { "date" });
+            String dateString = nvCol["date"];
+            var formatStrings = new string[] { "ddd, d MMM yyyy HH:mm:ss zzz", "ddd, d MMM yyyy HH:mm:ss zzzz",
+                                               "ddd, dd MMM yyyy HH:mm:ss zzz", "ddd, dd MMM yyyy HH:mm:ss zzzz" };
+            DateTime returnDateTime;
+            if (dateString.Contains("(PDT)"))
+                dateString = dateString.Remove(dateString.IndexOf("(PDT)") - 1);
+            if (dateString.Contains("(GMT)"))
+                dateString = dateString.Remove(dateString.IndexOf("(GMT)") - 1);
+            if (dateString.Contains("(CEST)"))
+                dateString = dateString.Remove(dateString.IndexOf("(CEST)") - 1);
+            if (dateString.Contains("(UTC)"))
+                dateString = dateString.Remove(dateString.IndexOf("(UTC)") - 1);
+            if (DateTime.TryParseExact(dateString, formatStrings, new CultureInfo("en-US"), DateTimeStyles.None, out returnDateTime))
+                return returnDateTime;
             return DateTime.Today.AddYears(-1);
         }
 
