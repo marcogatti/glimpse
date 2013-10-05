@@ -47,7 +47,7 @@ function prepareComposeDialog() {
         autoOpen: false,
         closeOnEscape: true,
         draggable: true,
-        height: 400,
+        height: 500,
         width: 600,
         minWidth: 400,
         minHeight: 200,
@@ -70,7 +70,19 @@ function prepareComposeDialog() {
         ]
     });
     $("#compose").on("click", function () {
-        $("#compose_pannel").dialog("open");
-        editor = CKEDITOR.replace('text_editor');
+        $("#compose_pannel").dialog("open");      
     });
+}
+
+
+function initializeMailEditor() {
+    editor = CKEDITOR.replace('text_editor');
+}
+
+function displayComposeDialog() {
+    $("#compose_pannel").dialog("open");
+}
+
+function setMailEditorText(text) {
+    editor.setData(text);
 }
