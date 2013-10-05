@@ -61,17 +61,20 @@ namespace Glimpse.Models
         }
         public String GetImapFolderName()
         {
-            String systemName;
-            if (this.Entity.UidTrash > 0)
-                systemName = "Trash";
-            else if (this.Entity.UidSpam > 0)
-                systemName = "Junk";
-            else
-                systemName = "All";
+            String systemName = this.GetSystemFolderName();
             return this.Entity.Labels
                        .Where(x => x.SystemName == systemName)
                        .Select(x => x.Name)
                        .Single();
+        }
+        public String GetSystemFolderName()
+        {
+            if (this.Entity.UidTrash > 0)
+                return "Trash";
+            else if (this.Entity.UidSpam > 0)
+                return "Junk";
+            else
+                return "All";
         }
 
         public static List<MailEntity> FindByMailAccount(MailAccount mailAccount, ISession session)

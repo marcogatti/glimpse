@@ -123,9 +123,11 @@ namespace Glimpse.Controllers
                 Mail mail = new Mail(id, session);
                 if (mail == null)
                     throw new Exception("Mail inexistente: " + id.ToString() + ".");
+                String systemFolder = mail.GetSystemFolderName();
                 mail.Delete(session); //DB
-                mailAccount.MoveToTrash(mail); //IMAP
-                MailsTasksHandler.SynchronizeTrash(mailAccount.Entity.Address);
+                mailAccount.TrashMail(mail, systemFolder); //IMAP
+                if(systemFolder != "Trash")
+                    MailsTasksHandler.SynchronizeTrash(mailAccount.Entity.Address);
                 tran.Commit();
 
                 JsonResult result = Json(new { success = true }, JsonRequestBehavior.AllowGet);
