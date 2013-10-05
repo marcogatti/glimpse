@@ -207,9 +207,12 @@ namespace Glimpse.Models
         {
             this.MyFetcher.RemoveMailTag(label, gmID);
         }
-        public void MoveToTrash(Mail mail)
+        public void TrashMail(Mail mail, String systemFolderName)
         {
-            this.MyFetcher.MoveToTrash(mail.GetImapFolderName(), mail.Entity.Gm_mid);
+            if (systemFolderName == "Trash")
+                this.MyFetcher.DeleteFromTrash(mail.Entity.Gm_mid);
+            else
+                this.MyFetcher.MoveToTrash(mail.GetImapFolderName(), mail.Entity.Gm_mid);
         }
         public Int32 GetUIDExternalFrom(String mailbox, Boolean max)
         {
