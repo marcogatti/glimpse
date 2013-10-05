@@ -111,13 +111,15 @@ hr {
     -moz-box-shadow: inset 0 0 0 8px rgba(255,255,255,0.4), 0 0 32px 4px;
     -o-box-shadow: inset 0 0 0 8px rgba(255,255,255,0.4), 0 0 32px 4px;
     -ms-box-shadow: inset 0 0 0 8px rgba(255,255,255,0.4), 0 0 32px 4px;*/
+    animation: none !important;
+    -webkit-animation: none !important;
     opacity: 1;
     overflow: visible;
     z-index: +10;
     text-shadow: 0 0 1px #fff, 0 2px 4px rgba(0,0,0,1);
-    border-style: dotted;
+    border-style: dashed;
     border-color: black;
-    border-width: 5px;
+    border-width: 2px;
 }
 
 .circle.importance1 {
