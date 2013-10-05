@@ -1,5 +1,6 @@
 ﻿using Glimpse.DataAccessLayer;
 using Glimpse.DataAccessLayer.Entities;
+using Glimpse.Exceptions.ModelsExceptions;
 using NHibernate;
 using NHibernate.Criterion;
 using System;
@@ -42,7 +43,18 @@ namespace Glimpse.Models
         {
             session.SaveOrUpdate(this.Entity);
         }
-
+        public void ChangePassword(String oldPassword, String newPassword, ISession session)
+        {
+            if (this.Entity.Password == oldPassword)
+            {
+                this.Entity.Password = newPassword;
+                this.SaveOrUpdate(session);
+            }
+            else
+            {
+                throw new WrongPasswordException("La contraseña ingresada es incorrecta.");
+            }
+        }
         public static bool IsEmail(String phrase)
         {
             return Regex.IsMatch(phrase, @"^[A-Za-z0-9]([\w\.\-]*)@([A-Za-z0-9-]+)((\.(\w){2,3})+)$");
