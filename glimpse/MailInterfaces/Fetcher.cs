@@ -30,15 +30,15 @@ namespace Glimpse.MailInterfaces
         {
             this.AccountLabels = labels;
         }
-        public NameValueCollection getLabels()
-        {
-            return this.AccountMailboxesBySpecialProperty;
-        }
         public bool IsConnected()
         {
             return this.Receiver.IsConnected;
         }
-        
+        public NameValueCollection getLabels()
+        {
+            return this.AccountMailboxesBySpecialProperty;
+        }
+
         public Int32 GetLimitUIDFrom(String mailbox, Boolean max)
         {
             if (max) //maximo
@@ -64,6 +64,14 @@ namespace Glimpse.MailInterfaces
         {
             this.GetMailbox(mailbox); //Se asegura que se encuentra seleccionado el mailbox en IMAP
             return Int32.Parse(this.CleanIMAPResponse(this.Receiver.Command("UID SEARCH X-GM-MSGID " + gmMailID.ToString()), "SEARCH", false));
+        }
+        public DateTime GetLowestMailDate()
+        {
+            Mailbox targetMailbox = this.GetMailbox(this.AccountMailboxesBySpecialProperty["All"]);
+            if (this.CurrentOpenedMailbox.MessageCount == 0)
+                return DateTime.Today;
+            var nvCol = targetMailbox.Fetch.HeaderLines(1, new String[] { "date" });
+            return DateTime.Parse(nvCol["date"]);
         }
 
         #region Mail Retrieving Methods
