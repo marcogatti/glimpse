@@ -38,3 +38,8 @@
         margin-bottom: 15px;
         padding: 7px 9px;
     }
+
+#registration-view {
+    text-align: center;
+    /*background-color: #e5e5e5;*/
+}

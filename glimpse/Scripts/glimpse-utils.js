@@ -406,3 +406,29 @@ function isActive(label) {
 function hasLabel(circle, label) {
     return ([circle.data("label0"), circle.data("label1"), circle.data("label2")].indexOf(label) != -1);
 }
+
+function loadLabels() {
+
+    var unwantedSystemLabels = ["Important", "Flagged", "Drafts", "All"];
+
+    for (var i = labels.length-1; i >= 0; i--) {
+
+        var currentLabel = labels[i];
+        if (currentLabel.systemName === null) {
+            $(".nav-header:contains('Etiquetas')").after(
+                "<li class='custom-label label label-glimpse' data-name=" + currentLabel.showName + ">" + currentLabel.showName + "</li>"
+            );
+        } else
+            if (unwantedSystemLabels.indexOf(currentLabel.systemName) === -1 && currentLabel.systemName != null) {
+                $(".nav-header:contains('Carpetas')").after(
+               "<li class='label label-glimpse' data-name=" + currentLabel.showName +
+               " data-system=" + currentLabel.systemName + ">" + currentLabel.showName + "</li>"
+           );
+            }
+    }
+
+    $(".nav-header:contains('Etiquetas')").after(
+                "<li class='custom-label label label-glimpse' data-name='others'>Sin etiqueta</li>"
+            );
+
+}

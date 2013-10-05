@@ -153,15 +153,15 @@ function configureCircleHover(circle) {
         function () {
 
             dateTime.html(circle.data("date"));
-            //from.html(circle.data("from"));
+            from.html(circle.data("from").substr(0, 10) + "...");
 
             dateTime.css("left", function () {
                 return parseInt(circle.css("left")) - 25 + 'px';
             });
 
-            //from.css("top", function () {
-            //    return circle.css("top");
-            //});
+            from.css("top", function () {
+                return circle.css("top");
+            });
 
             $(".hidable").removeClass("hidden");
 
