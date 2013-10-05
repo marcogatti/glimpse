@@ -18,6 +18,7 @@ namespace Glimpse.DataAccessLayer.Mappings
             Map(x => x.Password).Column("Password");
             Map(x => x.Active).Column("Active");
             Map(x => x.IsMainAccount).Column("IsMainAccount");
+            Map(x => x.OldestMailDate).Column("OldestMailDate");
 
             Table("MAILACCOUNT");
         }

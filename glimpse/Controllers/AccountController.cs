@@ -70,6 +70,7 @@ namespace Glimpse.Controllers
                     }
                     mailAccount.SetUser(user);
                     mailAccount.SetAsMainAccount(session);
+                    mailAccount.SetOldestMailDate();
                     mailAccount.SaveOrUpdate(session);
                     mailAccount.UpdateLabels(session);
                     user.AddAccount(mailAccount);

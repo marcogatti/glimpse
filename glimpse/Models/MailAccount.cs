@@ -57,6 +57,18 @@ namespace Glimpse.Models
         {
             this.Entity.User = user.Entity;
         }
+        public void SetOldestMailDate()
+        {
+            if (this.MyFetcher == null)
+            {
+                this.Entity.OldestMailDate = DateTime.Now.AddYears(-1);
+                return;
+            }
+            else
+            {
+                this.Entity.OldestMailDate = this.MyFetcher.GetOldestMailDate(250);
+            }
+        }
         public void Dispose()
         {
             this.MyFetcher.Dispose();
@@ -224,10 +236,6 @@ namespace Glimpse.Models
         public Int32 GetUIDExternalFrom(String mailbox, Boolean max)
         {
             return this.MyFetcher.GetLimitUIDFrom(mailbox, max);
-        }
-        public DateTime GetLowestMailDate()
-        {
-            return this.MyFetcher.GetLowestMailDate();
         }
         #endregion
 

@@ -15,6 +15,8 @@ namespace Glimpse.DataAccessLayer.Mappings
             Map(x => x.Username).Column("Username");
             Map(x => x.Password).Column("Password");
             Map(x => x.ShowTutorial).Column("ShowTutorial");
+            Map(x => x.Firstname).Column("Firstname");
+            Map(x => x.Lastname).Column("Lastname");
 
             Table("USER");
         }

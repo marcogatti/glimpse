@@ -46,16 +46,17 @@ namespace Glimpse.Models
         public void UpdateLabels(ISession session)
         {
             foreach (MailAccount mailAccount in this.mailAccounts)
-            {
                 mailAccount.UpdateLabels(session);
-            }
+        }
+        public void SetOldestMailDates()
+        {
+            foreach (MailAccount mailAccount in this.mailAccounts)
+                mailAccount.SetOldestMailDate();
         }
         public void ConnectLight()
         {
             foreach (MailAccount mailAccount in this.mailAccounts)
-            {
                 mailAccount.ConnectLight();
-            }
         }
         public IList<MailAccount> GetAccounts()
         {
@@ -80,9 +81,7 @@ namespace Glimpse.Models
         public void Disconnect()
         {
             foreach (MailAccount mailAccount in this.mailAccounts)
-            {
                 mailAccount.Disconnect();
-            }
         }
 
         public static bool IsEmail(String phrase)

@@ -8,6 +8,7 @@ using Glimpse.ViewModels;
 using NHibernate;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using System.Web.Mvc;
@@ -61,7 +62,10 @@ namespace Glimpse.Controllers
                     }
                 }
                 accountLabels = Label.RemoveDuplicates(accountLabels);
-                DateTime oldestMailDate = mailAccounts[0].GetLowestMailDate(); //TODO: buscar en la base de datos
+                DateTime oldestMailDate = mailAccounts.OrderBy(x => x.Entity.OldestMailDate)
+                                                      .Take(1)
+                                                      .Select(x => x.Entity.OldestMailDate)
+                                                      .Single();
 
                 foreach (LabelEntity label in accountLabels)
                     viewLabels.Add(new LabelViewModel(label.Name, label.SystemName));

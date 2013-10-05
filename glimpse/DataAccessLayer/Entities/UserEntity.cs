@@ -11,5 +11,7 @@ namespace Glimpse.DataAccessLayer.Entities
         public virtual String Username { get; set; }
         public virtual String Password { get; set; }
         public virtual Boolean ShowTutorial { get; set; }
+        public virtual String Firstname { get; set; }
+        public virtual String Lastname { get; set; }
     }
 }

@@ -17,6 +17,7 @@ namespace Glimpse.DataAccessLayer.Entities
         public virtual String Password { get; set; }
         public virtual Boolean Active { get; set; }
         public virtual Boolean IsMainAccount { get; set; }
+        public virtual DateTime OldestMailDate { get; set; }
 
         public MailAccountEntity() { }
 
