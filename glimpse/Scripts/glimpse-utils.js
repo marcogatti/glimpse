@@ -406,3 +406,4 @@ function isActive(label) {
 function hasLabel(circle, label) {
     return ([circle.data("label0"), circle.data("label1"), circle.data("label2")].indexOf(label) != -1);
 }
+

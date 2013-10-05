@@ -5,8 +5,14 @@
     @Styles.Render("~/Login/css")
 }
 
+@section scripts{
+    @Scripts.Render("~/bundles/registration")
+
+    <script src="~/Scripts/glimpse-register.js"></script>
+}
+
 @{
-    ViewBag.Title = "Login";
+    ViewBag.Title = "Glimpse";
 }
 
 <div class="container">
@@ -14,18 +20,37 @@
     @using (Html.BeginForm("Login", "Account", FormMethod.Post, new { @class = "form-signin" }))
     {
         @Html.AntiForgeryToken()
-        <h2 class="form-signin-heading">Welcome to glimpse</h2>
+        <h2 class="form-signin-heading">Bienvenido a Glimpse</h2>
         @Html.ValidationSummary()
-        @Html.TextBoxFor(m => m.Username, new { placeholder = "Your Username or Email Address", @class = "input-block-level" })
+        @Html.TextBoxFor(m => m.Username, new { placeholder = "Tu usuario o dirección de correo...", @class = "input-block-level" })
         @Html.ValidationMessageFor(m => m.Username)
-        @Html.PasswordFor(m => m.Password, new { placeholder = "Your Password", @class = "input-block-level" })
+        @Html.PasswordFor(m => m.Password, new { placeholder = "Tu contraseña...", @class = "input-block-level" })
         @Html.ValidationMessageFor(m => m.Password)
         
         @Html.DisplayTextFor(m => m.rememberMe)
-        @Html.CheckBoxFor(m => m.rememberMe, new { @class = "input-block-level" })
+        <table>
+            <td>
+                @Html.CheckBoxFor(m => m.rememberMe, new { id="RememberMe", @class = "input-block-level" })
+            </td>
+            <td>
+                <label for="RememberMe">Recordarme</label >
+            </td>
+        </table>
         
-
+        
         <input class="btn btn-large btn-primary" type="submit" value="Entrar" />
-    
+        <a href="#" id="registration-link">Crear nueva cuenta Glimpse</a>
     }
+    <div id="registration-view" class="modal hide fade in" style="display: none;">
+        <div class="modal-header">
+            <a class="close" data-dismiss="modal">×</a>
+            <p>Crea tu cuenta Glimpse</p>
+        </div>
+        <div class="modal-body">
+        </div>
+        <div class="modal-footer">
+            <input class="btn btn-large btn-success" type="submit" value="Crear cuenta"/>
+        </div>
+    </div>
 </div>
+
