@@ -71,12 +71,14 @@ namespace Glimpse.Controllers
 
             IList<LabelEntity> accountLabels = Label.FindByAccount(mainMailAccount.Entity, session);
             List<LabelViewModel> viewLabels = new List<LabelViewModel>(accountLabels.Count);
+            DateTime oldestMailDate = mainMailAccount.GetLowestMailDate();
 
             foreach (LabelEntity label in accountLabels)
                 viewLabels.Add(new LabelViewModel(label.Name, label.SystemName));
 
             ViewBag.Username = sessionUser.Entity.Username;
             ViewBag.Labels = viewLabels;
+            ViewBag.oldestDate = DateTime.Now.Ticks - oldestMailDate.Ticks;
 
             session.Flush();
             session.Close();

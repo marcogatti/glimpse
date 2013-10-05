@@ -146,6 +146,7 @@ namespace Glimpse.Models
                                                   .List<MailEntity>();
             return new MailCollection(databaseMails);
         }
+
         public String ReadMail(Int64 id, ISession session)
         {
             MailEntity mailEntity = session.CreateCriteria<MailEntity>()
@@ -206,9 +207,17 @@ namespace Glimpse.Models
         {
             this.MyFetcher.RemoveMailTag(label, gmID);
         }
+        public void MoveToTrash(Mail mail)
+        {
+            this.MyFetcher.MoveToTrash(mail.GetImapFolderName(), mail.Entity.Gm_mid);
+        }
         public Int32 GetUIDExternalFrom(String mailbox, Boolean max)
         {
             return this.MyFetcher.GetLimitUIDFrom(mailbox, max);
+        }
+        public DateTime GetLowestMailDate()
+        {
+            return this.MyFetcher.GetLowestMailDate();
         }
         #endregion
 
