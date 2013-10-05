@@ -22,6 +22,10 @@ function insertCircle(value) {
             classes += " new";
         }
 
+        var labels = [];
+        for (var i = 0; i < value.labels.length; i++) {
+            labels.push(value.labels[i].name);
+        }
         var label0, label1, label2;
 
         if (value.labels[0] !== undefined) {
@@ -50,7 +54,7 @@ function insertCircle(value) {
 
         var newCircle = $("<div class='" + classes + "'" +
                             dataAttributes.join("'") +
-                            "'><div class='centered'><p content=true>" + value.subject + "</p></div></div>");
+                            "'><div class='centered'><p content=true>" + value.subject.substr(0, 50) + "</p></div></div>");
 
         calculateEmailColor(newCircle);
         newCircle.css("opacity", 0);

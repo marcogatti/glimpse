@@ -85,7 +85,7 @@ function populateLabelColors() {
 
         var currentColor = glimpseColors[i];
 
-        if (!$(this).data("system")) {
+        if (!$(this).data("system") && $(this).data("name") !== "others") {
 
             $(this).css("background-color", currentColor);
             labelColors[$(this).data("name")] = currentColor;
@@ -361,7 +361,6 @@ function setEverithingRelatedToAddLabelsToAMail() {
 function setLabelSelection() {
     $(".custom-label").on('click', function () {
         $(this).toggleClass('label-hidden');
-        var currentLabel = $(this).html();
 
         $(".circle").each(function () {
             if (toBeHidden($(this))) {
@@ -378,6 +377,8 @@ function getLabels(circle) {
     
     if (circle.data('label0') !== "") {
         labels.push(circle.data('label0'));
+    } else {
+        labels.push("others");
     }
     if (circle.data('label1') !== "") {
         labels.push(circle.data('label1'));
@@ -393,7 +394,7 @@ function toBeHidden(circle) {
 }
 
 function isActive(label) {
-    return !$("li:contains(" + label + ")").hasClass("label-hidden");
+    return !$("li[data-name='" + label + "']").hasClass("label-hidden");
 }
 
 function hasLabel(circle, label) {

@@ -74,6 +74,8 @@ hr {
     font-family: 'Open Sans', Arial, sans-serif;
     display: inline-block;
     vertical-align: middle;
+    line-height: 15px;
+    text-indent: 5px;
 }
     /*  */
 
