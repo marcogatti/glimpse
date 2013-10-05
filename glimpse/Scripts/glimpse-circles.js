@@ -59,6 +59,10 @@ function insertCircle(value) {
         calculateEmailColor(newCircle);
         newCircle.css("opacity", 0);
         $("#email-container").append(newCircle);
+
+        if (toBeHidden(newCircle)) {
+            newCircle.addClass("hidden");
+        }
         
         setTimeout(function () {
             newCircle.css("opacity", 0.9);
@@ -262,7 +266,6 @@ function calculateEmailsLeft() {
 
     $(".circle").each(function () {
         var currentAge = $(this).attr('data-age');
-
         if (currentAge < furthestAgeRight && currentAge > furthestAgeLeft) {
 
             var left = (currentAge - minAge) / currentPeriodShown();
@@ -271,7 +274,5 @@ function calculateEmailsLeft() {
                 return left * (containerWidth() - margin) + 'px';
             });
         }
-
-
     });
 }
