@@ -136,36 +136,6 @@ function isClicked(circle) {
     return $(circle).attr('mail-clicked');
 }
 
-function setFullDisplay(circle) {
-    circle.dblclick(
-        function () {
-
-            var view_modal = $("#mail-view");
-            from = 'From: ' + circle.data("from"),
-            subject = circle.data("subject"),
-            cc = 'CC: ' + circle.data("cc"),
-            to = 'To: ' + circle.data("to");
-
-            view_modal.find("#mail-view-from").html(from);
-            view_modal.find("#mail-view-to").html(to);
-            view_modal.find("#mail-view-cc").html(cc);
-            view_modal.find("#mail-view-subject").html(subject);
-
-            showProgressBar("#body-progress");
-
-            view_modal.modal("show");
-
-            $.getJSON("async/GetMailBody/" + circle.data("id"), function (data) {
-                hideProgressBar("#body-progress");
-                if (data.success == true) {
-                    view_modal.find("#mail-view-body").html(data.mail.body);
-                    markAsRead(circle);
-
-                } else alert(data.message);
-            });
-        });
-}
-
 function configureCircleHover(circle) {
 
     var dateTime = $("#dateTime"),
