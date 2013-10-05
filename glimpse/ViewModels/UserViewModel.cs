@@ -28,7 +28,7 @@ namespace Glimpse.ViewModels
 
         [Required]
         //caracteres validos para un passoword de email segun RFC, entre 6 y 20 caracteres
-        [RegularExpression(@"^(?!.{20})[A-Za-z0-9\!#\$%&'\*\.\+\-/=\?\^`\{|\}~]{6,20}",
+        [RegularExpression(@"^(?!.{20})[A-Za-z0-9\!#\$%&'\*\.\+\-/=\?\^`\{|\}~_]{6,20}",
                            ErrorMessage= "Invalid password characters")]
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
