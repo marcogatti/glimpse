@@ -18,13 +18,11 @@ namespace Glimpse.Models
             this.Entity = entity;
         }
 
-        public static Extra FindByID(Int64 id)
+        public static Extra FindByID(Int64 id, ISession session)
         {
-            ISession session = NHibernateManager.OpenSession();
             ExtraEntity extraEntity = session.CreateCriteria<ExtraEntity>()
                                          .Add(Restrictions.Eq("Id", id))
                                          .UniqueResult<ExtraEntity>();
-            session.Close();
             return new Extra(extraEntity);
         }
         public static IList<ExtraEntity> FindByMailId(Int64 mailID, ISession session)

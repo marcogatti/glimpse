@@ -50,15 +50,20 @@ namespace Glimpse.Controllers
         }
         public FileResult GetImage(Int64 id)
         {
+            ISession session = NHibernateManager.OpenSession();
             try
             {
-                Extra extra = Extra.FindByID(id);
-                return File(extra.Entity.Data, extra.Entity.FileType, extra.Entity.Name); 
+                Extra extra = Extra.FindByID(id, session);
+                return File(extra.Entity.Data, extra.Entity.FileType, extra.Entity.Name);
             }
             catch (Exception exc)
             {
                 Log.LogException(exc, "Parametros de la llamada: idExtra(" + id.ToString() + ").");
                 return null;
+            }
+            finally
+            {
+                session.Close();
             }
         }
         public ActionResult GetMailsByDate(Int64 initial, Int64 final, Int64 mailAccountId = 0)
