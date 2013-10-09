@@ -37,7 +37,7 @@ namespace Glimpse.MailInterfaces
         {
             return this.AccountLabels != null && this.IsConnected();
         }
-        public NameValueCollection getLabels()
+        public NameValueCollection GetLabels()
         {
             return this.AccountMailboxesBySpecialProperty;
         }
@@ -221,6 +221,18 @@ namespace Glimpse.MailInterfaces
             Int32 mailUID = this.GetMailUID(this.AccountMailboxesBySpecialProperty["Trash"], gmMailID);
             targetMailbox.UidDeleteMessage(mailUID, true);
             this.CurrentOpenedMailbox.MessageCount--;
+        }
+        public void RenameLabel(String oldLabelName, String newLabelName)
+        {
+            Mailbox targetMailbox = this.GetMailbox(oldLabelName);
+            targetMailbox.Rename(newLabelName);
+            this.ReplaceLabelName(oldLabelName, newLabelName);
+        }
+        public void DeleteLabel(String labelName)
+        {
+            Mailbox targetMailbox = this.GetMailbox(labelName);
+            targetMailbox.Delete();
+            this.RemoveLabel(labelName);
         }
         #endregion
 
@@ -488,6 +500,37 @@ namespace Glimpse.MailInterfaces
                     mail.Extras.Add(extra);
                 }
             }
+        }
+        private void ReplaceLabelName(String oldLabel, String newLabel)
+        {
+            this.AccountMailboxesBySpecialProperty["Tags"] = this.AccountMailboxesBySpecialProperty["Tags"].Replace(oldLabel, newLabel);
+            if (this.AccountLabels != null)
+                this.AccountLabels.Where(x => x.Name == oldLabel).Single().Name = newLabel;
+            
+        }
+        private void RemoveLabel(String labelName)
+        {
+            String tags = this.AccountMailboxesBySpecialProperty["Tags"];
+            if (tags == null || tags == "")
+                return;
+            else if (tags == labelName)
+                this.AccountMailboxesBySpecialProperty["Tags"] = String.Empty;
+            else
+            {
+                String[] individualTags = tags.Split(',');
+                String newTagString = "";
+                foreach (String individualTag in individualTags)
+                {
+                    if (individualTag == labelName)
+                        continue;
+                    else
+                        newTagString += individualTag + ',';
+                }
+                this.AccountMailboxesBySpecialProperty["Tags"] = newTagString.Trim(',');
+            }
+
+            if (this.AccountLabels != null)
+                this.AccountLabels.Remove(this.AccountLabels.Where(x => x.Name == labelName).Single());
         }
         private void AddUIDToMail(String mailbox, Int64 UID, MailEntity mail)
         {

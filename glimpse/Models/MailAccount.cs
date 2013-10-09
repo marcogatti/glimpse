@@ -73,12 +73,23 @@ namespace Glimpse.Models
         {
             this.MyFetcher.Dispose();
         }
+        public void Delete(ISession session)
+        {
+            this.Entity.Active = false;
+            this.SaveOrUpdate(session);
+            IList<MailEntity> mails = Mail.FindByMailAccount(this, session);
+            foreach (MailEntity mail in mails)
+            {
+                new Mail(mail).Delete(session);
+            }
+        }
         public void UpdateLabels(ISession session)
         {
             String tagsNames;
-            NameValueCollection labelsByProperty = this.MyFetcher.getLabels();
+            NameValueCollection labelsByProperty = this.MyFetcher.GetLabels();
             IList<LabelEntity> databaseLabels = session.CreateCriteria<LabelEntity>()
                                                .Add(Restrictions.Eq("MailAccountEntity", this.Entity))
+                                               .Add(Restrictions.Eq("Active", true))
                                                .List<LabelEntity>();
             this.RegisterLabel(labelsByProperty["INBOX"], session, databaseLabels, "INBOX");
             this.RegisterLabel(labelsByProperty["All"], session, databaseLabels, "All");
@@ -226,6 +237,14 @@ namespace Glimpse.Models
         {
             this.MyFetcher.RemoveMailTag(label, gmID);
         }
+        public void RenameLabel(String oldLabelName, String newLabelName)
+        {
+            this.MyFetcher.RenameLabel(oldLabelName, newLabelName);
+        }
+        public void DeleteLabel(String labelName)
+        {
+            this.MyFetcher.DeleteLabel(labelName);
+        }
         public void TrashMail(Mail mail, String systemFolderName)
         {
             if (systemFolderName == "Trash")
@@ -260,6 +279,7 @@ namespace Glimpse.Models
         {
             MailAccountEntity account = session.CreateCriteria<MailAccountEntity>()
                                           .Add(Restrictions.Eq("Address", emailAddress))
+                                          .Add(Restrictions.Eq("Active", true))
                                           .UniqueResult<MailAccountEntity>();
             if (account == null)
                 return null;
@@ -271,6 +291,7 @@ namespace Glimpse.Models
             MailAccountEntity entity = session.CreateCriteria<MailAccountEntity>()
                                             .Add(Restrictions.Eq("User.Username", username))
                                             .Add(Restrictions.Eq("IsMainAccount", true))
+                                            .Add(Restrictions.Eq("Active", true))
                                             .UniqueResult<MailAccountEntity>();
             return new MailAccount(entity);
         }
@@ -298,6 +319,7 @@ namespace Glimpse.Models
             labelEntity.Name = labelName;
             labelEntity.MailAccountEntity = this.Entity;
             labelEntity.SystemName = systemName;
+            labelEntity.Active = true;
             Label label = new Label(labelEntity);
             label.SaveOrUpdate(session);
         }

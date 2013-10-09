@@ -18,19 +18,29 @@ namespace Glimpse.Models
             this.Entity = labelEntity;
         }
 
-        public static IList<LabelEntity> FindByAccount(MailAccountEntity account, ISession session)
+        public void Rename(String oldName, String newName, ISession session)
         {
-            IList<LabelEntity> labels = session.CreateCriteria<LabelEntity>()
-                                              .Add(Restrictions.Eq("MailAccountEntity", account))
-                                              .List<LabelEntity>();
-            return labels;
+            this.Entity.Name = this.Entity.Name.Replace(oldName, newName);
+            this.SaveOrUpdate(session);
         }
-
+        public void Delete(ISession session)
+        {
+            this.Entity.Active = false; //Trigger en DB borra links con mails
+            this.SaveOrUpdate(session);
+        }
         public void SaveOrUpdate(ISession session)
         {
             session.SaveOrUpdate(this.Entity);
         }
 
+        public static IList<LabelEntity> FindByAccount(MailAccountEntity account, ISession session)
+        {
+            IList<LabelEntity> labels = session.CreateCriteria<LabelEntity>()
+                                              .Add(Restrictions.Eq("MailAccountEntity", account))
+                                              .Add(Restrictions.Eq("Active", true))
+                                              .List<LabelEntity>();
+            return labels;
+        }
         public static Label FindBySystemName(MailAccount account, String systemName, ISession session)
         {
 
@@ -41,6 +51,7 @@ namespace Glimpse.Models
                 labelEntity = session.CreateCriteria<LabelEntity>()
                                           .Add(Restrictions.Eq("MailAccountEntity", account.Entity))
                                           .Add(Restrictions.Eq("SystemName", systemName))
+                                          .Add(Restrictions.Eq("Active", true))
                                           .UniqueResult<LabelEntity>();
             }
             catch (NHibernate.HibernateException e)
@@ -57,10 +68,11 @@ namespace Glimpse.Models
             labelEntity = session.CreateCriteria<LabelEntity>()
                                           .Add(Restrictions.Eq("MailAccountEntity", mailAcccount.Entity))
                                           .Add(Restrictions.Eq("Name", labelName))
+                                          .Add(Restrictions.Eq("Active", true))
                                           .UniqueResult<LabelEntity>();
 
             if (labelEntity == null)
-                throw new GlimpseException("No se encontro el label");
+                throw new GlimpseException("No se encontro el label.");
 
             return new Label(labelEntity);
         }

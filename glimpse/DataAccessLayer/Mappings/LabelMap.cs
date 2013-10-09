@@ -17,6 +17,7 @@ namespace Glimpse.DataAccessLayer.Mappings
             Map(x => x.ColorR).Column("ColorR");
             Map(x => x.ColorG).Column("ColorG");
             Map(x => x.ColorB).Column("ColorB");
+            Map(x => x.Active).Column("Active");
             References<MailAccountEntity>(x => x.MailAccountEntity).Column("MailAccountId")
                                                                     .Cascade.None();
             

@@ -1,6 +1,7 @@
 ﻿using ActiveUp.Net.Mail;
 using Glimpse.DataAccessLayer;
 using Glimpse.DataAccessLayer.Entities;
+using Glimpse.Exceptions;
 using Glimpse.Helpers;
 using Glimpse.MailInterfaces;
 using Glimpse.Models;
@@ -191,9 +192,8 @@ namespace Glimpse.Controllers
                     Label theLabel = Label.FindByName(mailAccount, labelName, session);
                     theMail.AddLabel(theLabel, session); //DB
                     mailAccount.AddLabelIMAP(theMail, theLabel); //IMAP
-
                     tran.Commit();
-                    session.Flush();
+
                     success = true;
                 }
             }
@@ -232,6 +232,65 @@ namespace Glimpse.Controllers
             {
                 Log.LogException(exc, "Parametros de la llamada: label(" + label + "), gmID(" + mailId.ToString() + ").");
                 return Json(new { success = false, message = "Error al remover label." }, JsonRequestBehavior.AllowGet);
+            }
+            finally
+            {
+                session.Close();
+            }
+        }
+        [HttpPost]
+        public ActionResult RenameLabel(String oldLabelName, String newLabelName, Int64 mailAccountId = 0)
+        {
+            ISession session = NHibernateManager.OpenSession();
+            ITransaction tran = session.BeginTransaction();
+            try
+            {
+                MailAccount currentMailAccount = this.GetMailAccount(mailAccountId);
+                IList<LabelEntity> labels = Label.FindByAccount(currentMailAccount.Entity, session);
+                labels = labels.Where(x => x.Name.Contains(oldLabelName) && x.SystemName == null).ToList();
+                foreach (LabelEntity label in labels)
+                {
+                    new Label(label).Rename(oldLabelName, newLabelName, session); //BD
+                }
+                currentMailAccount.RenameLabel(oldLabelName, newLabelName); //IMAP
+                tran.Commit();
+
+                JsonResult result = Json(new { success = true }, JsonRequestBehavior.AllowGet);
+                return result;
+            }
+            catch (Exception exc)
+            {
+                tran.Rollback();
+                Log.LogException(exc, "Parametros del metodo: oldLabelName(" + oldLabelName +
+                                      "), newLabelName(" + newLabelName + "), mailAccountId(" + mailAccountId.ToString() + ").");
+                return Json(new { success = false, message = "Error al renombrar label." }, JsonRequestBehavior.AllowGet);
+            }
+            finally
+            {
+                session.Close();
+            }
+        }
+        [HttpPost]
+        public ActionResult DeleteLabel(String labelName, Int64 mailAccountId = 0)
+        {
+            ISession session = NHibernateManager.OpenSession();
+            ITransaction tran = session.BeginTransaction();
+            try
+            {
+                MailAccount currentMailAccount = this.GetMailAccount(mailAccountId);
+                Label labelToDelete = Label.FindByName(currentMailAccount, labelName, session);
+                labelToDelete.Delete(session); //BD
+                currentMailAccount.DeleteLabel(labelName); //IMAP
+                tran.Commit();
+
+                JsonResult result = Json(new { success = true }, JsonRequestBehavior.AllowGet);
+                return result;
+            }
+            catch (Exception exc)
+            {
+                tran.Rollback();
+                Log.LogException(exc, "Parametros del metodo: labelName(" + labelName + "), mailAccountId(" + mailAccountId.ToString() + ").");
+                return Json(new { success = false, message = "Error al eliminar label." }, JsonRequestBehavior.AllowGet);
             }
             finally
             {

@@ -15,5 +15,6 @@ namespace Glimpse.DataAccessLayer.Entities
         public virtual UInt16 ColorR { get; set; }
         public virtual UInt16 ColorG { get; set; }
         public virtual UInt16 ColorB { get; set; }
+        public virtual Boolean Active { get; set; }
     }
 }

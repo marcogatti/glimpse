@@ -36,6 +36,7 @@ namespace Glimpse.Models
             IList<MailAccount> databaseMailAccounts = new List<MailAccount>();
             IList<MailAccountEntity> mailAccountEntities = session.CreateCriteria<MailAccountEntity>()
                                                                   .Add(Restrictions.Eq("User", this.Entity))
+                                                                  .Add(Restrictions.Eq("Active", true))
                                                                   .List<MailAccountEntity>();
             foreach (MailAccountEntity entity in mailAccountEntities)
             {
