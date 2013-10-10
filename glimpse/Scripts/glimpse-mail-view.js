@@ -10,6 +10,7 @@
             cc = 'CC: ' + circle.data("cc"),
             to = 'To: ' + circle.data("to");
 
+            setViewMailBody(view_modal,'');
             view_modal.find("#mail-view-from").html(from);
             view_modal.find("#mail-view-to").html(to);
             view_modal.find("#mail-view-cc").html(cc);
@@ -22,13 +23,17 @@
             $.getJSON("async/GetMailBody/" + circle.data("id"), function (data) {
                 hideProgressBar("#body-progress");
                 if (data.success == true) {
-                    view_modal.find("#mail-view-body").html(data.mail.body);
+                    setViewMailBody(view_modal, data.mail.body);
                     markAsRead(circle);
                     setMailViewerActions(view_modal, circle, data.mail.body);
 
                 } else alert(data.message);
             });
         });
+}
+
+function setViewMailBody(view_modal, body) {
+    view_modal.find("#mail-view-body").html(body);
 }
 
 function setMailViewerActions(view_modal, circle, body) {

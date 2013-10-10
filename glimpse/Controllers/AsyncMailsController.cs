@@ -406,15 +406,13 @@ namespace Glimpse.Controllers
             List<Object> returnLabels = new List<object>();
             foreach (LabelEntity label in labels)
             {
-                if (label.SystemName == null)
+                returnLabels.Add(new
                 {
-                    returnLabels.Add(new
-                    {
-                        name = label.Name,
-                        system_name = label.SystemName,
-                        mail_account = label.MailAccountEntity.Id
-                    });
-                }
+                    name = label.Name,
+                    system_name = label.SystemName,
+                    mail_account = label.MailAccountEntity.Id
+                });
+
             }
             return returnLabels;
         }
