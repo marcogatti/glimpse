@@ -7,8 +7,6 @@
 
 @section scripts{
     @Scripts.Render("~/bundles/registration")
-
-    <script src="~/Scripts/glimpse-register.js"></script>
 }
 
 @{
@@ -23,67 +21,32 @@
         <h2 class="form-signin-heading">Bienvenido a Glimpse</h2>
         @Html.ValidationSummary()
         @Html.TextBoxFor(m => m.Username, new { placeholder = "Tu usuario o dirección de correo...", @class = "input-block-level" })
-        @Html.ValidationMessageFor(m => m.Username)
         @Html.PasswordFor(m => m.Password, new { placeholder = "Tu contraseña...", @class = "input-block-level" })
-        @Html.ValidationMessageFor(m => m.Password)
-        
-        @Html.DisplayTextFor(m => m.rememberMe)
-        <table>
-            <td>
-                @Html.CheckBoxFor(m => m.rememberMe, new { id = "RememberMe", @class = "input-block-level" })
-            </td>
-            <td>
-                <label for="RememberMe">Recordarme</label>
-            </td>
-        </table>
-        
         
         <input class="btn btn-large btn-primary" type="submit" value="Entrar" />
-        <a href="#" id="registration-link">Crear nueva cuenta Glimpse</a>
+        <a class="btn btn-link" id="registration-link">Crear nueva cuenta Glimpse</a>
     }
-
 
     <div id="registration-view" class="modal hide fade in" style="display: none;">
         <div>
-            <a class="close" data-dismiss="modal">x</a>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
         </div>
-        <form class="form-horizontal" role="form">
-            <div class="modal-body">
-                <div class="form-group">
-                    <label for="firstname" class="col-lg-2 control-label">Nombre</label>
-                    <div class="col-lg-10">
-                        <input class="form-control" type="text" id="firstname" placeholder="Nombre...">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="lastname" class="col-lg-2 control-label">Apellido</label>
-                    <div class="col-lg-10">
-                        <input class="form-control" type="text" id="lastname" placeholder="Apellido...">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="userName" class="col-lg-2 control-label">Nombre de usuario</label>
-                    <div class="col-lg-10">
-                        <input class="form-control" type="text" id="userName" placeholder="Elegí tu nombre de usuario">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="password" class="col-lg-2 control-label">Contraseña</label>
-                    <div class="col-lg-10">
-                        <input class="form-control" type="password" id="password" placeholder="Ingresá tu contraseña">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="passwordConfirmation" class="col-lg-2 control-label">Confirmacion de contraseña</label>
-                    <div class="col-lg-10">
-                        <input class="form-control" type="password" id="passwordConfirmation" placeholder="Repetí tu contraseña">
-                    </div>
-                </div>
-            </div>
-            <div>
-                <input class="btn btn-primary" type="submit" value="Siguiente" />
-            </div>
-        </form>
+
+        @using (Html.BeginForm("Login", "Account", FormMethod.Post, new { @class = "registration-modal" }))
+        {
+            @Html.AntiForgeryToken()
+            <h3 class="form-signin-heading" id="regitration-view-title">Crea tu usuario Glimpse</h3>
+            @Html.TextBoxFor(m => m.Firstname, new { placeholder = "Escribí tu nombre...", @class = "input-block-level" })
+            @Html.TextBoxFor(m => m.Lastname, new { placeholder = "Escribí tu apellido...", @class = "input-block-level" })
+            @Html.TextBoxFor(m => m.Username, new { placeholder = "Elegí un nombre de usuario...", @class = "input-block-level" })
+            @Html.PasswordFor(m => m.Password, new { placeholder = "Ingresá tu contraseña...", @class = "input-block-level" })
+            @Html.PasswordFor(m => m.ConfirmationPassword, new { placeholder = "Confirmá tu contraseña...", @class = "input-block-level" })
+            
+            <input class="btn btn-default" id="registration-next-btn" type="submit" value="Siguiente" />
+            <input class="btn btn-default" id="registration-back-btn" type="submit" value="Volver" />
+            <input class="btn btn-primary" id="registration-register-btn" type="submit" value="Registrar usuario" />
+        }
     </div>
+
 </div>
 
