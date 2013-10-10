@@ -271,6 +271,10 @@ div.icons {
     vertical-align: middle;
 }
 
+#mail-view-body-container {
+    max-height: 300px;
+}
+
 blockquote {
     margin-top: 10px;
     margin-bottom: 10px;
