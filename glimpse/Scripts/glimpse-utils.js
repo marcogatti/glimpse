@@ -278,10 +278,17 @@ function setLabelsAdder() {
         var currentLabel = $(this);
         if (currentLabel.hasClass("custom-label")) {
 
+            if (currentLabel.data('name') === 'others') {
+                currentLabel.mousedown(function (event) {
+                    event.preventDefault();
+                });
+                return;
+            }
+
             currentLabel.attr("draggable", true);
-            //currentLabel.attr("ondragstart", "labelDrag(event)");
 
             currentLabel.on('dragstart', { label: currentLabel }, function (ev) {
+
                 ev.data.label.css('opacity', 0.4);
                 ev.originalEvent.dataTransfer.setData("Text", ev.target.id);
                 selectedLabel = ev.data.label.attr('data-name');
