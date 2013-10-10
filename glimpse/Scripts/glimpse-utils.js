@@ -310,6 +310,7 @@ function canReceiveThatLabel(label, mail) {
 function prepareToReceiveLabels(circle) {
 
     $(circle).on('dragover', function (ev) {
+        if (selectedLabel === 'others') return;
         if (labelToAddIsSet && canReceiveThatLabel(selectedLabel, $(this))) {
             ev.preventDefault();
             ev.stopPropagation();
@@ -394,7 +395,7 @@ function isActive(label) {
 }
 
 function hasLabel(circle, label) {
-    return ([circle.data("label0"), circle.data("label1"), circle.data("label2")].indexOf(label) != -1);
+    return (getLabels(circle).indexOf(label) != -1);
 }
 
 function loadLabels() {
