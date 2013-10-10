@@ -3,6 +3,9 @@
     labelColors = {},
     editor;
 
+var unwantedSystemLabels = ["Important", "Flagged", "Drafts", "All"];
+
+
 function containerHeight() {
     return $("#email-container").height();
 }
@@ -323,23 +326,16 @@ function prepareToReceiveLabels(circle) {
 );
 }
 
-function changeMailColour(mail, label) {
+function changeMailColour(circle, label) {
 
-    if (mail.attr('data-label0') === "") {
-        mail.data('label0', label);
-        mail.attr('data-label0', label);
-    } else if (mail.attr('data-label1') === "") {
-        mail.data('label1', label);
-        mail.attr('data-label1', label);
-    } else if (mail.attr('data-label2') === "") {
-        mail.data('label2', label);
-        mail.attr('data-label2', label);
-    } else {
-        mail.data('label0', label);
-        mail.attr('data-label0', label);
+    var customLabels = getLabels(circle);
+    if (customLabels[0] === "") {
+        customLabels = [];
     }
+    customLabels.push(label);
+    circle.data("custom-labels", customLabels);
 
-    calculateEmailColor(mail);
+    calculateEmailColor(circle);
 }
 
 function addLabelToEmail(label, mail) {
@@ -379,20 +375,8 @@ function setLabelSelection() {
 }
 
 function getLabels(circle) {
-    var labels = [];
-    
-    if (circle.data('label0') !== "") {
-        labels.push(circle.data('label0'));
-    } else {
-        labels.push("others");
-    }
-    if (circle.data('label1') !== "") {
-        labels.push(circle.data('label1'));
-    }
-    if (circle.data('label2') !== "") {
-        labels.push(circle.data('label2'));
-    }
-    return labels;
+   
+    return circle.data("custom-labels").toString().split(",");
 }
 
 function toBeHidden(circle) {
@@ -409,23 +393,25 @@ function hasLabel(circle, label) {
 
 function loadLabels() {
 
-    var unwantedSystemLabels = ["Important", "Flagged", "Drafts", "All"];
-
     for (var i = labels.length-1; i >= 0; i--) {
 
         var currentLabel = labels[i];
         if (currentLabel.systemName === null) {
             $(".nav-header:contains('Etiquetas')").after(
-                "<li class='custom-label label label-glimpse' data-name=" + currentLabel.showName + ">" + currentLabel.showName + "</li>"
+                "<li class='custom-label label label-glimpse' data-name='" + currentLabel.showName + "'>" + currentLabel.showName + "</li>"
             );
         } else
             if (unwantedSystemLabels.indexOf(currentLabel.systemName) === -1 && currentLabel.systemName != null) {
+                
                 $(".nav-header:contains('Carpetas')").after(
-               "<li class='label label-glimpse' data-name=" + currentLabel.showName +
+               "<li class='label label-glimpse label-hidden' data-name=" + currentLabel.showName +
                " data-system=" + currentLabel.systemName + ">" + currentLabel.showName + "</li>"
            );
             }
     }
+
+    $(".label-glimpse:contains('INBOX')").removeClass("label-hidden");
+
 
     $(".nav-header:contains('Etiquetas')").after(
                 "<li class='custom-label label label-glimpse' data-name='others'>Sin etiqueta</li>"
