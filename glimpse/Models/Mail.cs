@@ -51,6 +51,26 @@ namespace Glimpse.Models
             LabelEntity labelToRemove = this.Entity.Labels.First<LabelEntity>(x => x.Name == label);
             this.Entity.Labels.Remove(labelToRemove);
         }
+        public void SetImportance(UInt16 newImportance, ISession session)
+        {
+            if ((newImportance >= 5 && this.Entity.Importance == 5) ||
+                (newImportance <= 1 && this.Entity.Importance == 1) ||
+                (newImportance == this.Entity.Importance))
+                return;
+            else if (newImportance == this.Entity.Importance + 1 || newImportance == this.Entity.Importance - 1)
+            {
+                this.Entity.Importance = newImportance;
+                this.Save(session);
+            }
+        }
+        public void Archieve(ISession session)
+        {
+            if (this.Entity.Labels.Any(x => x.SystemName == "INBOX"))
+            {
+                this.Entity.Labels.Remove(this.Entity.Labels.Where(x => x.SystemName == "INBOX").Single());
+                this.Save(session);
+            }
+        }
         public void Delete(ISession session)
         {
             session.Delete(this.Entity);

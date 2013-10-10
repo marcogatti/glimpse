@@ -250,6 +250,7 @@ div.icons {
 .mail-view-addresses {
     width: 100%;
     margin-bottom: 5px;
+    background-color:  aliceblue;
 }
 
 .mail-view-address {
