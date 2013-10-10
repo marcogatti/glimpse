@@ -1,7 +1,6 @@
 ﻿using ActiveUp.Net.Mail;
 using Glimpse.DataAccessLayer;
 using Glimpse.DataAccessLayer.Entities;
-using Glimpse.Exceptions;
 using Glimpse.Helpers;
 using Glimpse.MailInterfaces;
 using Glimpse.Models;
@@ -11,7 +10,6 @@ using NHibernate.Criterion;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Sockets;
 using System.Text;
 using System.Web.Mvc;
 
@@ -49,7 +47,7 @@ namespace Glimpse.Controllers
                 session.Close();
             }
         }
-        public FileResult GetImage(Int64 id)
+        public FileResult GetFile(Int64 id)
         {
             ISession session = NHibernateManager.OpenSession();
             try
@@ -304,14 +302,11 @@ namespace Glimpse.Controllers
             ITransaction tran = session.BeginTransaction();
             try
             {
-                String newPassword = this.GenerateRandomPassword(16);
-                String newPasswordEnc = CryptoHelper.EncryptDefaultKey(newPassword);
-
-                tran = session.BeginTransaction();
-
                 User user = Glimpse.Models.User.FindByUsername(username, session);
                 if (user == null)
                     throw new Exception("Usuario inexistente: " + username + ".");
+                String newPassword = this.GenerateRandomPassword(16);
+                String newPasswordEnc = CryptoHelper.EncryptDefaultKey(newPassword);
                 user.ChangePassword(user.Entity.Password, newPasswordEnc, session);
                 MailAccount.SendResetPasswordMail(user, newPassword, session);
                 tran.Commit();
@@ -475,7 +470,7 @@ namespace Glimpse.Controllers
                                                   .List<ExtraEntity>();
             foreach (ExtraEntity embeddedExtra in embeddedExtras)
             {
-                body = body.Replace("cid:" +  embeddedExtra.EmbObjectContentId, Url.Action("GetImage", "AsyncMails", new { id = embeddedExtra.Id }, this.Request.Url.Scheme));
+                body = body.Replace("cid:" +  embeddedExtra.EmbObjectContentId, Url.Action("GetFile", "AsyncMails", new { id = embeddedExtra.Id }, this.Request.Url.Scheme));
             }
         }
         #endregion

@@ -18,10 +18,10 @@ namespace Glimpse.Models
 
         #region Public Methods
         public MailAccount(String address, String password) : this(new MailAccountEntity(address, password)) { }
-        public MailAccount(MailAccountEntity accountEntity)
+        public MailAccount(MailAccountEntity accountEntity, Boolean isActive = true)
         {
             this.Entity = accountEntity;
-            this.Entity.Active = true;
+            this.Entity.Active = isActive;
             this.MySender = new Sender(this.Entity.Address, this.Entity.Password);
         }
         public MailAccount Clone()
@@ -30,7 +30,7 @@ namespace Glimpse.Models
             MailAccountEntity entity;
             using (ISession session = NHibernateManager.OpenSession())
             {
-                entity = MailAccount.FindByAddress(this.Entity.Address, session).Entity;
+                entity = MailAccount.FindByAddress(this.Entity.Address, session, false).Entity;
                 mailAccountClone = new MailAccount(entity);
 
                 if (this.IsConnected())
@@ -73,15 +73,10 @@ namespace Glimpse.Models
         {
             this.MyFetcher.Dispose();
         }
-        public void Delete(ISession session)
+        public void Deactivate(ISession session)
         {
             this.Entity.Active = false;
             this.SaveOrUpdate(session);
-            IList<MailEntity> mails = Mail.FindByMailAccount(this, session);
-            foreach (MailEntity mail in mails)
-            {
-                new Mail(mail).Delete(session);
-            }
         }
         public void UpdateLabels(ISession session)
         {
@@ -260,10 +255,11 @@ namespace Glimpse.Models
 
         public virtual void SaveOrUpdate(ISession session)
         {
-            MailAccount oldAccount = FindByAddress(this.Entity.Address, session);
+            MailAccount oldAccount = MailAccount.FindByAddress(this.Entity.Address, session, false);
             if (oldAccount != null)
             {
-                oldAccount.Clone(this);
+                oldAccount.Entity.Address = this.Entity.Address;
+                oldAccount.Entity.Password = this.Entity.Password;
                 this.Entity = oldAccount.Entity;
             }
             session.SaveOrUpdate(this.Entity);
@@ -275,16 +271,18 @@ namespace Glimpse.Models
                 throw new Exception("Usuario: " + user.Entity.Username + " no posee mailAccount primario.");
             Sender.SendResetPasswordMail(user.Entity.Username, mailAccount.Entity.Address, newPassword);
         }
-        public static MailAccount FindByAddress(String emailAddress, ISession session)
+        public static MailAccount FindByAddress(String emailAddress, ISession session, Boolean activeRequired = true)
         {
-            MailAccountEntity account = session.CreateCriteria<MailAccountEntity>()
-                                          .Add(Restrictions.Eq("Address", emailAddress))
-                                          .Add(Restrictions.Eq("Active", true))
-                                          .UniqueResult<MailAccountEntity>();
+            ICriteria criteria = session.CreateCriteria<MailAccountEntity>()
+                                          .Add(Restrictions.Eq("Address", emailAddress));
+            if(activeRequired)
+                criteria.Add(Restrictions.Eq("Active", true));
+
+            MailAccountEntity account = criteria.UniqueResult<MailAccountEntity>();
             if (account == null)
                 return null;
             else
-                return new MailAccount(account);
+                return new MailAccount(account, false);
         }
         public static MailAccount FindMainMailAccount(String username, ISession session)
         {
@@ -322,11 +320,6 @@ namespace Glimpse.Models
             labelEntity.Active = true;
             Label label = new Label(labelEntity);
             label.SaveOrUpdate(session);
-        }
-        private void Clone(MailAccount fromAccount)
-        {
-            this.Entity.Address = fromAccount.Entity.Address;
-            this.Entity.Password = fromAccount.Entity.Password;
         }
         private static void Save(List<Mail> mails)
         {

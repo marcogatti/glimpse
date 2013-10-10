@@ -32,7 +32,7 @@ namespace Glimpse.MailInterfaces
 
             using (ISession session = NHibernateManager.OpenSession())
             {
-                mailAccountAll = MailAccount.FindByAddress(mailAddress, session);
+                mailAccountAll = MailAccount.FindByAddress(mailAddress, session, false);
                 try
                 {
                     mailAccountAll.ConnectFull();
@@ -116,7 +116,7 @@ namespace Glimpse.MailInterfaces
 
             using (ISession session = NHibernateManager.OpenSession())
             {
-                mailAccountTrash = MailAccount.FindByAddress(mailAddress, session);
+                mailAccountTrash = MailAccount.FindByAddress(mailAddress, session, false);
                 try
                 {
                     mailAccountTrash.ConnectFull();

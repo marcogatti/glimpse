@@ -46,14 +46,14 @@ namespace Glimpse.MailInterfaces
         {
             if (max) //maximo
             {
-                Mailbox targetMailbox = this.GetMailbox(mailbox);
+                Mailbox targetMailbox = this.OpenMailbox(mailbox);
                 Int32 amountOfMails = targetMailbox.MessageCount;
                 if (amountOfMails == 0) return 0;
                 return targetMailbox.Fetch.Uid(amountOfMails);
             }
             else //minimo
             {
-                Mailbox targetMailbox = this.GetMailbox(mailbox);
+                Mailbox targetMailbox = this.OpenMailbox(mailbox);
                 if (this.CurrentOpenedMailbox.MessageCount == 0) return 0;
                 return targetMailbox.Fetch.Uid(1);
             }
