@@ -48,31 +48,33 @@
         <table style="width: 90%">
             <tr style="width: 100%">
                 <td style="width: 80%">
-                    <p id="mail-view-subject">Subject</p>
+                    <div class="lead" id="mail-view-subject">
+                        <p>Subject</p>
+                    </div>
                 </td>
-                <td style="border-left: solid thin">
-                    <div id="mail-view-date" class="pull-right">20/10/2013</div>
+                <td>
+                    <div id="mail-view-date" class="pull-right label">20/10/2013</div>
                 </td>
             </tr>
         </table>
-    </div>
-    <div class="modal-body">
-        <table class="mail-view-addresses">
+        <table class="mail-view-addresses well well-lg">
             <tr>
                 <td colspan="2">
-                    <p id="mail-view-from">From</p>
+                    <p id="mail-view-from" class="mail-view-address">From</p>
                 </td>
             </tr>
             <tr>
-                <td class="mail-view-address">
-                    <p id="mail-view-to">To</p>
+                <td>
+                    <p class="mail-view-address" id="mail-view-to">To</p>
                 </td>
                 <td class="mail-view-address">
                     <p id="mail-view-cc">CC</p>
                 </td>
             </tr>
         </table>
-        <div id="mail-view-body"></div>
+    </div>
+    <div class="modal-body">
+        <div id="mail-view-body" class="well"></div>
         <div id="body-progress" class="progress progress-striped active">
             <div class="bar" style="width: 100%;">Cargando...</div>
         </div>

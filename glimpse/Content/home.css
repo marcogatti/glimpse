@@ -164,7 +164,7 @@ hr {
     font-family: 'Open Sans', Arial, sans-serif;
     width: 50px;
     color: white;
-    text-shadow: 0 2px 4px #000
+    text-shadow: 0 2px 4px #000;
 }
 
     .coord.hidable {
@@ -249,30 +249,32 @@ div.icons {
 
 .mail-view-addresses {
     width: 100%;
-    border: solid;
-    border-width: 2px;
+    margin-bottom: 5px;
 }
 
 .mail-view-address {
     width: 50%;
-    border: solid;
-    border-width: 1px;
+    vertical-align: middle;
 }
+
 
 #mail-view-from {
     width: 100%;
-    vertical-align: central;
+    vertical-align: middle;
 }
 
 #mail-view-date {
-    text-align: center;
-    vertical-align: central;
+    vertical-align: middle;
+}
+
+#mail-view-subject {
+    vertical-align: middle;
 }
 
 blockquote {
-  margin-top: 10px;
-  margin-bottom: 10px;
-  margin-left: 50px;
-  padding-left: 15px;
-  border-left: 3px solid #ccc;
-} 
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 50px;
+    padding-left: 15px;
+    border-left: 3px solid #ccc;
+}
