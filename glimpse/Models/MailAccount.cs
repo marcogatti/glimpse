@@ -106,6 +106,18 @@ namespace Glimpse.Models
             }
             this.SetFetcherLabels(session);
         }
+        public void SetReadFlag(Mail mail, Boolean seen, ISession session)
+        {
+            if (mail.Entity.Seen != seen)
+            {
+                ITransaction tran = session.BeginTransaction();
+                mail.Entity.Seen = seen;
+                mail.Save(session); //DB
+                String imapFolderName = mail.GetImapFolderName();
+                this.MyFetcher.SetSeenFlag(imapFolderName, mail.Entity.Gm_mid, seen); //IMAP
+                tran.Commit();
+            }
+        }
         public bool IsConnected()
         {
             if (this.MyFetcher == null)
@@ -179,12 +191,7 @@ namespace Glimpse.Models
             Mail mail = new Mail(mailEntity);
             if (mailEntity.Seen == false)
             {
-                ITransaction tran = session.BeginTransaction();
-                mail.Entity.Seen = true;
-                String imapFolderName = mail.GetImapFolderName();
-                mail.Save(session); //DB
-                this.MyFetcher.SetSeenFlag(imapFolderName, mail.Entity.Gm_mid, true); //IMAP
-                tran.Commit();
+                this.SetReadFlag(mail, true, session);
             }
             return mail.Entity.Body;
         }
@@ -239,6 +246,10 @@ namespace Glimpse.Models
         public void DeleteLabel(String labelName)
         {
             this.MyFetcher.DeleteLabel(labelName);
+        }
+        public void ArchieveMail(Mail mail)
+        {
+            this.MyFetcher.ArchiveMail(mail.Entity.Gm_mid);
         }
         public void TrashMail(Mail mail, String systemFolderName)
         {
