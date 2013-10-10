@@ -22,20 +22,16 @@ function insertCircle(value) {
             classes += " new";
         }
 
-        var labels = [];
-        for (var i = 0; i < value.labels.length; i++) {
-            labels.push(value.labels[i].name);
-        }
-        var label0, label1, label2;
+        var systemLabels = [],
+            customLabels = [];
 
-        if (value.labels[0] !== undefined) {
-            label0 = value.labels[0].name;
-        }
-        if (value.labels[1] !== undefined) {
-            label1 = value.labels[1].name;
-        }
-        if (value.labels[2] !== undefined) {
-            label2 = value.labels[2].name;
+        for (var i = 0; i < value.labels.length; i++) {
+            if (value.labels[i].system_name === null) {
+                customLabels.push(value.labels[i].name);
+            } else
+            if (unwantedSystemLabels.indexOf(value.labels[i].system_name) === -1) {
+                systemLabels.push(value.labels[i].name);
+            }
         }
 
         var dataAttributes = [
@@ -45,14 +41,13 @@ function insertCircle(value) {
             " data-date=", date,
             " data-from=", value.from.address,
             " data-bodypeek=", value.bodypeek,
-            " data-label0=", label0,
-            " data-label1=", label1,
-            " data-label2=", label2,
             " data-age=", value.age,
             " data-cc=", value.cc,
             " data-bcc=", value.bcc,
             " data-to=", value.to,
-            " data-importance=", value.importance
+            " data-importance=", value.importance,
+            " data-custom-labels=", customLabels,
+            " data-system-labels=", systemLabels
         ];
 
         var newCircle = $("<div class='" + classes + "'" + dataAttributes.join("'") + "' title='" + value.from.address +
@@ -188,31 +183,24 @@ function markAsRead(circle) {
 }
 
 function calculateEmailColor(circle) {
+    
+    var customLabels = getLabels(circle);
 
-    var innerColor = '',
-        midColor = '',
-        outsetColor = '';
+    var fill = "",
+        i;
 
-    if (circle.data('label0') !== "") {
-        innerColor = labelColors[circle.data('label0')];
+    for (i = 0; i < customLabels.length; i++) {
 
-        //  para que se muestren bien los de único label
-        midColor = ', ' + innerColor;
-        circle.css('color', innerColor);
+        fill += ", ";
+        fill += labelColors[customLabels[i]];
     }
 
-    if (circle.data('label1') !== "") {
-        midColor = ', ';
-        midColor += labelColors[circle.data('label1')];
+    //  hack para que se muestren bien los mails con un solo label
+    if (i === 1) {
+        fill += fill;
     }
 
-    if (circle.data('label2') !== "") {
-        outsetColor = ', ';
-        outsetColor += labelColors[circle.data('label2')];
-    }
-
-    circle.css('background', '-webkit-radial-gradient(circle, ' + innerColor + midColor + outsetColor + ')');
-
+    circle.css('background', '-webkit-radial-gradient(circle' + fill + ')');
 }
 
 function calculateEmailPosition(circle) {
