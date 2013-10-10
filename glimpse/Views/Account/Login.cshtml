@@ -7,8 +7,6 @@
 
 @section scripts{
     @Scripts.Render("~/bundles/registration")
-
-    <script src="~/Scripts/glimpse-register.js"></script>
 }
 
 @{
@@ -23,34 +21,32 @@
         <h2 class="form-signin-heading">Bienvenido a Glimpse</h2>
         @Html.ValidationSummary()
         @Html.TextBoxFor(m => m.Username, new { placeholder = "Tu usuario o dirección de correo...", @class = "input-block-level" })
-        @Html.ValidationMessageFor(m => m.Username)
         @Html.PasswordFor(m => m.Password, new { placeholder = "Tu contraseña...", @class = "input-block-level" })
-        @Html.ValidationMessageFor(m => m.Password)
-        
-        @Html.DisplayTextFor(m => m.rememberMe)
-        <table>
-            <td>
-                @Html.CheckBoxFor(m => m.rememberMe, new { id="RememberMe", @class = "input-block-level" })
-            </td>
-            <td>
-                <label for="RememberMe">Recordarme</label >
-            </td>
-        </table>
-        
         
         <input class="btn btn-large btn-primary" type="submit" value="Entrar" />
-        <a href="#" id="registration-link">Crear nueva cuenta Glimpse</a>
+        <a class="btn btn-link" id="registration-link">Crear nueva cuenta Glimpse</a>
     }
+
     <div id="registration-view" class="modal hide fade in" style="display: none;">
-        <div class="modal-header">
-            <a class="close" data-dismiss="modal">×</a>
-            <p>Crea tu cuenta Glimpse</p>
+        <div>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
         </div>
-        <div class="modal-body">
-        </div>
-        <div class="modal-footer">
-            <input class="btn btn-large btn-success" type="submit" value="Crear cuenta"/>
-        </div>
+
+        @using (Html.BeginForm("Login", "Account", FormMethod.Post, new { @class = "registration-modal" }))
+        {
+            @Html.AntiForgeryToken()
+            <h3 class="form-signin-heading" id="regitration-view-title">Crea tu usuario Glimpse</h3>
+            @Html.TextBoxFor(m => m.Firstname, new { placeholder = "Escribí tu nombre...", @class = "input-block-level" })
+            @Html.TextBoxFor(m => m.Lastname, new { placeholder = "Escribí tu apellido...", @class = "input-block-level" })
+            @Html.TextBoxFor(m => m.Username, new { placeholder = "Elegí un nombre de usuario...", @class = "input-block-level" })
+            @Html.PasswordFor(m => m.Password, new { placeholder = "Ingresá tu contraseña...", @class = "input-block-level" })
+            @Html.PasswordFor(m => m.ConfirmationPassword, new { placeholder = "Confirmá tu contraseña...", @class = "input-block-level" })
+            
+            <input class="btn btn-default" id="registration-next-btn" type="submit" value="Siguiente" />
+            <input class="btn btn-default" id="registration-back-btn" type="submit" value="Volver" />
+            <input class="btn btn-primary" id="registration-register-btn" type="submit" value="Registrar usuario" />
+        }
     </div>
+
 </div>
 
