@@ -10,7 +10,7 @@
             cc = 'CC: ' + circle.data("cc"),
             to = 'To: ' + circle.data("to");
 
-            setViewMailBody(view_modal,'');
+            setViewMailBody(view_modal, '');
             view_modal.find("#mail-view-from").html(from);
             view_modal.find("#mail-view-to").html(to);
             view_modal.find("#mail-view-cc").html(cc);
@@ -24,12 +24,46 @@
                 hideProgressBar("#body-progress");
                 if (data.success == true) {
                     setViewMailBody(view_modal, data.mail.body);
+                    setViewMailAttachments(view_modal, data.mail.extras)
                     markAsRead(circle);
                     setMailViewerActions(view_modal, circle, data.mail.body);
 
                 } else alert(data.message);
             });
         });
+}
+
+function setViewMailAttachments(view_modal, attachments) {
+
+    var listItem,
+        attachmentsUL,
+        attachmentsContainer;
+
+    attachmentsContainer = view_modal.find("#mail-view-attachments");
+    attachmentsContainer.html('');
+
+    if (attachments.length === 0) {
+        view_modal.find('#mail-view-attach-container').addClass('hidden');
+        attachmentsContainer.addClass('hidden');
+        return;
+    } else {
+        view_modal.find('#mail-view-attach-container').removeClass('hidden');
+        attachmentsContainer.removeClass('hidden');
+    }
+
+    attachmentsUL = $('<ul class="list-group"></ul>');
+
+    for (var i = 0; i < attachments.length; i++) {
+
+        listItem = $('<li class="list-group-item"></li>');
+
+        listItem.append($('<a href="/async/getimage/' + attachments[i].id + '">' + attachments[i].name + '    </a>'));
+        listItem.append($('<span class="badge">' + Math.floor(attachments[i].size/1024) + ' Kb</span>'));
+
+        attachmentsUL.append(listItem);
+    }
+
+    attachmentsContainer.append(attachmentsUL);
 }
 
 function setViewMailBody(view_modal, body) {
