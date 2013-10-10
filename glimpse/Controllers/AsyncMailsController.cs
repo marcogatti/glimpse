@@ -1,7 +1,6 @@
 ﻿using ActiveUp.Net.Mail;
 using Glimpse.DataAccessLayer;
 using Glimpse.DataAccessLayer.Entities;
-using Glimpse.Exceptions;
 using Glimpse.Helpers;
 using Glimpse.MailInterfaces;
 using Glimpse.Models;
@@ -11,7 +10,6 @@ using NHibernate.Criterion;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Sockets;
 using System.Text;
 using System.Web.Mvc;
 
@@ -49,11 +47,12 @@ namespace Glimpse.Controllers
                 session.Close();
             }
         }
-        public FileResult GetFile(Int64 id)
+        public FileResult GetFile(Int64 id, Int64 mailAccountId = 0)
         {
             ISession session = NHibernateManager.OpenSession();
             try
             {
+                this.GetMailAccount(mailAccountId); //valida que el mailAccoun pertenezca al User
                 Extra extra = Extra.FindByID(id, session);
                 return File(extra.Entity.Data, extra.Entity.FileType, extra.Entity.Name);
             }
@@ -297,6 +296,89 @@ namespace Glimpse.Controllers
                 session.Close();
             }
         }
+        [HttpPost]
+        public ActionResult ChangeImportance(Int64 mailId, Boolean isIncrease, Int64 mailAccountId = 0)
+        {
+            ISession session = NHibernateManager.OpenSession();
+            ITransaction tran = session.BeginTransaction();
+            try
+            {
+                MailAccount currentMailAccount = this.GetMailAccount(mailAccountId);
+                Mail theMail = new Mail(mailId, session);;
+                if(isIncrease)
+                    theMail.SetImportance((UInt16)(theMail.Entity.Importance + 1), session);
+                else
+                    theMail.SetImportance((UInt16)(theMail.Entity.Importance - 1), session);
+                tran.Commit();
+                JsonResult result = Json(new { success = true }, JsonRequestBehavior.AllowGet);
+                return result;
+            }
+            catch (Exception exc)
+            {
+                tran.Rollback();
+                Log.LogException(exc, "Parametros del metodo: mailId(" + mailId.ToString() +
+                                      "), isIncrease(" + isIncrease.ToString() + "), mailAccountId(" + mailAccountId.ToString() + ").");
+                return Json(new { success = false, message = "Error al aumentar importancia." }, JsonRequestBehavior.AllowGet);
+            }
+            finally
+            {
+                session.Close();
+            }
+        }
+        [HttpPost]
+        public ActionResult SetReadFlag(Int64 mailId, Boolean seenFlag, Int64 mailAccountId = 0)
+        {
+            ISession session = NHibernateManager.OpenSession();
+            try
+            {
+                MailAccount currentMailAccount = this.GetMailAccount(mailAccountId);
+                Mail mail = new Mail(mailId, session);
+                currentMailAccount.SetReadFlag(mail, seenFlag, session);
+
+                JsonResult result = Json(new { success = true }, JsonRequestBehavior.AllowGet);
+                return result;
+            }
+            catch (Exception exc)
+            {
+                Log.LogException(exc, "Parametros del metodo: mailId(" + mailId.ToString() +
+                                      "), seenFlag(" + seenFlag.ToString() + "), mailAccountId(" + mailAccountId.ToString() + ").");
+                return Json(new { success = false, message = "Error al marcar flag de leido." }, JsonRequestBehavior.AllowGet);
+            }
+            finally
+            {
+                session.Close();
+            }
+        }
+        [HttpPost]
+        public ActionResult ArchieveMail(Int64 mailId, Int64 mailAccountId = 0)
+        {
+            ISession session = NHibernateManager.OpenSession();
+            ITransaction tran = session.BeginTransaction();
+            try
+            {
+                MailAccount currentMailAccount = this.GetMailAccount(mailAccountId);
+                Mail mail = new Mail(mailId, session);
+                mail.Archieve(session);
+                currentMailAccount.ArchieveMail(mail);
+                tran.Commit();
+
+                JsonResult result = Json(new { success = true }, JsonRequestBehavior.AllowGet);
+                return result;
+            }
+            catch (Exception exc)
+            {
+                tran.Rollback();
+                Log.LogException(exc, "Parametros del metodo: mailId(" + mailId.ToString() +
+                                      "), mailAccountId(" + mailAccountId.ToString() + ").");
+                return Json(new { success = false, message = "Error al archivar mail." }, JsonRequestBehavior.AllowGet);
+            }
+            finally
+            {
+                session.Close();
+            }
+        }
+
+
         [HttpPost] //Hay que testearlo y pasarlo al AccountController
         public ActionResult ResetPassword(String username)
         {
@@ -304,14 +386,11 @@ namespace Glimpse.Controllers
             ITransaction tran = session.BeginTransaction();
             try
             {
-                String newPassword = this.GenerateRandomPassword(16);
-                String newPasswordEnc = CryptoHelper.EncryptDefaultKey(newPassword);
-
-                tran = session.BeginTransaction();
-
                 User user = Glimpse.Models.User.FindByUsername(username, session);
                 if (user == null)
                     throw new Exception("Usuario inexistente: " + username + ".");
+                String newPassword = this.GenerateRandomPassword(16);
+                String newPasswordEnc = CryptoHelper.EncryptDefaultKey(newPassword);
                 user.ChangePassword(user.Entity.Password, newPasswordEnc, session);
                 MailAccount.SendResetPasswordMail(user, newPassword, session);
                 tran.Commit();

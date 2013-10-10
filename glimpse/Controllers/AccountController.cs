@@ -50,7 +50,7 @@ namespace Glimpse.Controllers
                     mailAccount = new MailAccount(userView.Username, cipherPassword);
                     mailAccount.ConnectLight(); //si pasa este punto es que los datos ingresados son correctos
                     user = Glimpse.Models.User.FindByUsername(userView.Username, session);
-                    existingMailAccount = MailAccount.FindByAddress(userView.Username, session);
+                    existingMailAccount = MailAccount.FindByAddress(userView.Username, session, false);
 
                     if (user == null)
                     {
@@ -62,16 +62,22 @@ namespace Glimpse.Controllers
                         user.Entity.Password = cipherPassword;
                         user.SaveOrUpdate(session);
                     }
-                    if (existingMailAccount != null && existingMailAccount.Entity.User.Username != user.Entity.Username)
+
+                    if (existingMailAccount == null)
                     {
-                        this.ModelState.AddModelError("User", "Email account already associated with another account.");
-                        tran.Rollback();
-                        return View(userView);
+                        mailAccount.SetUser(user);
+                        mailAccount.SetOldestMailDate();
+                        mailAccount.Deactivate(session); //llama a saveOrUpdate adentro
                     }
-                    mailAccount.SetUser(user);
-                    mailAccount.SetAsMainAccount(session);
-                    mailAccount.SetOldestMailDate();
-                    mailAccount.SaveOrUpdate(session);
+                    else
+                    {
+                        if (existingMailAccount.Entity.Password != mailAccount.Entity.Password)
+                        {
+                            existingMailAccount.Entity.Password = mailAccount.Entity.Password;
+                            existingMailAccount.SaveOrUpdate(session);
+                        }
+                        mailAccount.Entity = existingMailAccount.Entity;
+                    }
                     mailAccount.UpdateLabels(session);
                     user.AddAccount(mailAccount);
                 }
@@ -80,7 +86,7 @@ namespace Glimpse.Controllers
                     user = Glimpse.Models.User.FindByUsername(userView.Username, session);
                     if (user == null)
                     {
-                        this.ModelState.AddModelError("User", "Username doesn't exist");
+                        this.ModelState.AddModelError("User", "Usuario inexistente.");
                         return View(userView);
                     }
                     user.UpdateAccounts(session);
@@ -104,7 +110,7 @@ namespace Glimpse.Controllers
             catch (InvalidAuthenticationException)
             {
                 tran.Rollback();
-                ModelState.AddModelError("", "The email address or password provided is incorrect.");
+                ModelState.AddModelError("", "La dirección de correo o la contraseña no son correctos.");
                 return View(userView);
             }
             finally
