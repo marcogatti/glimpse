@@ -43,7 +43,8 @@ namespace Glimpse
             bundles.Add(new StyleBundle("~/Content/css").Include("~/Content/site.css"));
 
             bundles.Add(new StyleBundle("~/bootstrap/css").Include(
-                        "~/Content/bootstrap.css"));
+                        "~/Content/bootstrap.css",
+                        "~/Content/our-bootstrap-new.css"));
 
             bundles.Add(new StyleBundle("~/bootstrap-responsive/css").Include(
                        "~/Content/bootstrap-responsive.css"));

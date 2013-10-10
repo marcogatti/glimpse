@@ -49,7 +49,7 @@ namespace Glimpse.Controllers
                 session.Close();
             }
         }
-        public FileResult GetImage(Int64 id)
+        public FileResult GetFile(Int64 id)
         {
             ISession session = NHibernateManager.OpenSession();
             try
@@ -473,7 +473,7 @@ namespace Glimpse.Controllers
                                                   .List<ExtraEntity>();
             foreach (ExtraEntity embeddedExtra in embeddedExtras)
             {
-                body = body.Replace("cid:" +  embeddedExtra.EmbObjectContentId, Url.Action("GetImage", "AsyncMails", new { id = embeddedExtra.Id }, this.Request.Url.Scheme));
+                body = body.Replace("cid:" +  embeddedExtra.EmbObjectContentId, Url.Action("GetFile", "AsyncMails", new { id = embeddedExtra.Id }, this.Request.Url.Scheme));
             }
         }
         #endregion

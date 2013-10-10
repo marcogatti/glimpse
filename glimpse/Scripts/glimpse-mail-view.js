@@ -57,7 +57,7 @@ function setViewMailAttachments(view_modal, attachments) {
 
         listItem = $('<li class="list-group-item"></li>');
 
-        listItem.append($('<a href="/async/getimage/' + attachments[i].id + '">' + attachments[i].name + '    </a>'));
+        listItem.append($('<a href="/async/getfile/' + attachments[i].id + '">' + attachments[i].name + '    </a>'));
         listItem.append($('<span class="badge">' + Math.floor(attachments[i].size/1024) + ' Kb</span>'));
 
         attachmentsUL.append(listItem);
