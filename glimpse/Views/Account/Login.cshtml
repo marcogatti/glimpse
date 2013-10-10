@@ -30,10 +30,10 @@
         @Html.DisplayTextFor(m => m.rememberMe)
         <table>
             <td>
-                @Html.CheckBoxFor(m => m.rememberMe, new { id="RememberMe", @class = "input-block-level" })
+                @Html.CheckBoxFor(m => m.rememberMe, new { id = "RememberMe", @class = "input-block-level" })
             </td>
             <td>
-                <label for="RememberMe">Recordarme</label >
+                <label for="RememberMe">Recordarme</label>
             </td>
         </table>
         
@@ -41,16 +41,49 @@
         <input class="btn btn-large btn-primary" type="submit" value="Entrar" />
         <a href="#" id="registration-link">Crear nueva cuenta Glimpse</a>
     }
+
+
     <div id="registration-view" class="modal hide fade in" style="display: none;">
-        <div class="modal-header">
-            <a class="close" data-dismiss="modal">×</a>
-            <p>Crea tu cuenta Glimpse</p>
+        <div>
+            <a class="close" data-dismiss="modal">x</a>
         </div>
-        <div class="modal-body">
-        </div>
-        <div class="modal-footer">
-            <input class="btn btn-large btn-success" type="submit" value="Crear cuenta"/>
-        </div>
+        <form class="form-horizontal" role="form">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="firstname" class="col-lg-2 control-label">Nombre</label>
+                    <div class="col-lg-10">
+                        <input class="form-control" type="text" id="firstname" placeholder="Nombre...">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="lastname" class="col-lg-2 control-label">Apellido</label>
+                    <div class="col-lg-10">
+                        <input class="form-control" type="text" id="lastname" placeholder="Apellido...">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="userName" class="col-lg-2 control-label">Nombre de usuario</label>
+                    <div class="col-lg-10">
+                        <input class="form-control" type="text" id="userName" placeholder="Elegí tu nombre de usuario">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="password" class="col-lg-2 control-label">Contraseña</label>
+                    <div class="col-lg-10">
+                        <input class="form-control" type="password" id="password" placeholder="Ingresá tu contraseña">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="passwordConfirmation" class="col-lg-2 control-label">Confirmacion de contraseña</label>
+                    <div class="col-lg-10">
+                        <input class="form-control" type="password" id="passwordConfirmation" placeholder="Repetí tu contraseña">
+                    </div>
+                </div>
+            </div>
+            <div>
+                <input class="btn btn-primary" type="submit" value="Siguiente" />
+            </div>
+        </form>
     </div>
 </div>
 
