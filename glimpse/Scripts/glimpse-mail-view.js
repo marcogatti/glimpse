@@ -5,16 +5,24 @@
         function () {
 
             var view_modal = $("#mail-view");
-            from = 'From: ' + circle.data("from"),
+            from = circle.data("from"),
             subject = circle.data("subject"),
-            cc = 'CC: ' + circle.data("cc"),
-            to = 'To: ' + circle.data("to");
+            cc = circle.data("cc"),
+            to = circle.data("to"),
+            date = new Date(circle.data('date')),
+            ccContainer = view_modal.find("#mail-view-cc-container");
 
             setViewMailBody(view_modal, '');
             view_modal.find("#mail-view-from").html(from);
             view_modal.find("#mail-view-to").html(to);
-            view_modal.find("#mail-view-cc").html(cc);
+            if (cc == "" || cc === null) {
+                ccContainer.addClass('hidden');
+            } else {
+                ccContainer.removeClass('hidden');
+                view_modal.find("#mail-view-cc").html(cc);
+            }
             view_modal.find("#mail-view-subject").html(subject);
+            view_modal.find("#mail-view-date").html(date.toLocaleString());
 
             showProgressBar("#body-progress");
 
@@ -58,7 +66,7 @@ function setViewMailAttachments(view_modal, attachments) {
         listItem = $('<li class="list-group-item"></li>');
 
         listItem.append($('<a href="/async/getfile/' + attachments[i].id + '">' + attachments[i].name + '    </a>'));
-        listItem.append($('<span class="badge">' + Math.floor(attachments[i].size/1024) + ' Kb</span>'));
+        listItem.append($('<span class="badge">' + Math.floor(attachments[i].size / 1024) + ' Kb</span>'));
 
         attachmentsUL.append(listItem);
     }

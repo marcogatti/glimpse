@@ -5,6 +5,12 @@
 
 var unwantedSystemLabels = ["Important", "Flagged", "Drafts", "All"];
 
+function preventSelectingNotUsefulThings() {
+    //$('body').mousedown(function (downEvent) {
+    //    downEvent.preventDefault();
+    //}
+    //);
+}
 
 function containerHeight() {
     return $("#email-container").height();
@@ -166,7 +172,7 @@ function setWheelZoom() {
     });
 }
 
-function allowedMovementRight(offset){
+function allowedMovementRight(offset) {
     return maxAge + offset < oldestAge;
 }
 function allowedMovementLeft(offset) {
@@ -375,7 +381,7 @@ function setLabelSelection() {
 }
 
 function getLabels(circle) {
-   
+
     return circle.data("custom-labels").toString().split(",");
 }
 
@@ -393,7 +399,7 @@ function hasLabel(circle, label) {
 
 function loadLabels() {
 
-    for (var i = labels.length-1; i >= 0; i--) {
+    for (var i = labels.length - 1; i >= 0; i--) {
 
         var currentLabel = labels[i];
         if (currentLabel.systemName === null) {
@@ -402,7 +408,7 @@ function loadLabels() {
             );
         } else
             if (unwantedSystemLabels.indexOf(currentLabel.systemName) === -1 && currentLabel.systemName != null) {
-                
+
                 $(".nav-header:contains('Carpetas')").after(
                "<li class='label label-glimpse label-hidden' data-name=" + currentLabel.showName +
                " data-system=" + currentLabel.systemName + ">" + currentLabel.showName + "</li>"

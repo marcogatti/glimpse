@@ -250,12 +250,13 @@ div.icons {
 .mail-view-addresses {
     width: 100%;
     margin-bottom: 5px;
-    background-color:  aliceblue;
+    background-color: aliceblue;
 }
 
 .mail-view-address {
     width: 50%;
-    vertical-align: middle;
+    vertical-align: baseline;
+    margin: 2px 2px 2px 2px;
 }
 
 
@@ -266,14 +267,32 @@ div.icons {
 
 #mail-view-date {
     vertical-align: middle;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
 }
 
 #mail-view-subject {
     vertical-align: middle;
+    margin-bottom: 5px;
+    max-height: 60px;
+}
+
+#mail-view-date-container {
+    margin-bottom: 5px;
 }
 
 #mail-view-body-container {
     max-height: 300px;
+}
+
+#mail-view-header {
+    max-height: 70px;
+    overflow-y: auto;
+}
+
+.mail-view-addresses .label {
+    margin-right: 4px;
 }
 
 blockquote {
