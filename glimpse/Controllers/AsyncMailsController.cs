@@ -204,7 +204,7 @@ namespace Glimpse.Controllers
             return Json(new { success = success }, JsonRequestBehavior.AllowGet);
         }
         [HttpPost]
-        public ActionResult RemoveLabel(String label, Int64 mailId, Int64 mailAccountId = 0)
+        public ActionResult RemoveLabel(String labelName, Int64 mailId, Int64 mailAccountId = 0)
         {
             ISession session = NHibernateManager.OpenSession();
             try
@@ -215,8 +215,8 @@ namespace Glimpse.Controllers
 
                 if (mail.Entity.MailAccountEntity.Id == currentMailAccount.Entity.Id)
                 {
-                    mail.RemoveLabel(label, session); //DB
-                    currentMailAccount.RemoveMailLabel(label, mail.Entity.Gm_mid); //IMAP
+                    mail.RemoveLabel(labelName, session); //DB
+                    currentMailAccount.RemoveMailLabel(labelName, mail.Entity.Gm_mid); //IMAP
                     success = true;
                 }
                 else
@@ -229,7 +229,7 @@ namespace Glimpse.Controllers
             }
             catch (Exception exc)
             {
-                Log.LogException(exc, "Parametros de la llamada: label(" + label + "), gmID(" + mailId.ToString() + ").");
+                Log.LogException(exc, "Parametros de la llamada: label(" + labelName + "), gmID(" + mailId.ToString() + ").");
                 return Json(new { success = false, message = "Error al remover label." }, JsonRequestBehavior.AllowGet);
             }
             finally

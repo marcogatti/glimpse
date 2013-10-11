@@ -108,29 +108,60 @@ function prepareToReceiveLabels(circle) {
 );
 }
 
-function changeMailColour(circle, label) {
+function addCircleColor(circle, label) {
 
-    var customLabels = getCustomLabels(circle);
-    customLabels.push(label);
-    circle.data("custom-labels", customLabels);
+    var newCustomLabels = getCustomLabels(circle);
+    newCustomLabels.push(label);
+    circle.data("custom-labels", newCustomLabels);
 
     calculateEmailColor(circle);
 }
 
-function addLabelToEmail(label, mail) {
+function addLabelToEmail(label, circle) {
 
     $.ajax({
         type: "POST",
         url: "async/AddLabel",
         dataType: 'json',
         error: function (jqXHR, textStatus, errorThrown) {
-            alert("No se pudo agregar el label.");
+            alert("No se pudo agregar la etiqueta.");
         },
         success: function () {
-            changeMailColour(mail, label);
+            addCircleColor(circle, label);
         },
-        data: { labelName: label, mailId: mail.attr('data-id') }
+        data: { labelName: label, mailId: circle.data('id') }
     });
+}
+
+function removeLabelFromEmail(label, circle) {
+
+    $.ajax({
+        type: "POST",
+        url: "async/RemoveLabel",
+        dataType: 'json',
+        error: function (jqXHR, textStatus, errorThrown) {
+            alert("No se pudo quitar la etiqueta.");
+        },
+        success: function () {
+            removeCircleColor(circle, label);
+        },
+        data: { labelName: label, mailId: circle.data('id') }
+    });
+}
+
+function removeCircleColor(circle, label) {
+
+    var index = getCustomLabels(circle).indexOf(label),
+        newCustomLabels;
+
+    if (index > -1) {
+        newCustomLabels = getCustomLabels(circle).splice(index, 1);
+    } else {
+        alert("El Email no contenía la etiqueta.");
+    }
+
+    circle.data("custom-labels", newCustomLabels);
+    calculateEmailColor(circle);
 }
 
 function setEverithingRelatedToAddLabelsToAMail() {
