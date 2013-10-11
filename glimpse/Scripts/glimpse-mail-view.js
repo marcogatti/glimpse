@@ -155,27 +155,26 @@ function moveToFollowingMail(view_modal, circle, nextMailSearcher) {
 }
 
 function getFollowingMailForward(circle) {
-    return getFollowingMail(circle, followingMailCriteriaForward);
+    return getFollowingMail(circle, criteriaForward);
 }
 
 function getFollowingMailBackward(circle) {
-    return getFollowingMail(circle, followingMailCriteriaBackward);
+    return getFollowingMail(circle, criteriaBackward);
 }
 
-function followingMailCriteriaForward(circle, circle_collection) {
+function followingMailWithCriteria(circle, circle_collection, criteria) {
 
     var current_id = circle.data('id'),
-        current_age = circle.data('age'),
-        next_circle,
-        actual_circle;
+    current_age = circle.data('age'),
+    next_circle,
+    actual_circle;
 
     for (var i = 0; i < circle_collection.length; i++) {
 
         actual_circle = $(circle_collection[i]);
 
         if ((actual_circle.data('id') !== current_id) &&
-           (actual_circle.data('age') >= current_age) &&
-           ((next_circle == null) || (actual_circle.data('age') < next_circle.data('age'))))
+            criteria(current_id, current_age, actual_circle, next_circle))
         {
             next_circle = actual_circle;
         }
@@ -184,25 +183,14 @@ function followingMailCriteriaForward(circle, circle_collection) {
     return next_circle != null ? next_circle : circle;
 }
 
-function followingMailCriteriaBackward(circle, circle_collection) {
+function criteriaBackward(current_id, current_age, actual_circle, next_circle) {
+    return (actual_circle.data('age') <= current_age) &&
+           ((next_circle == null) || (actual_circle.data('age') > next_circle.data('age')))
+}
 
-    var current_id = circle.data('id'),
-        current_age = circle.data('age'),
-        next_circle,
-        actual_circle;
-
-    for (var i = 0; i < circle_collection.length; i++) {
-
-        actual_circle = $(circle_collection[i]);
-
-        if ((actual_circle.data('id') !== current_id) &&
-           (actual_circle.data('age') <= current_age) &&
-           ((next_circle == null) || (actual_circle.data('age') > next_circle.data('age')))) {
-            next_circle = actual_circle;
-        }
-    }
-
-    return next_circle != null ? next_circle : circle;
+function criteriaForward(current_id, current_age, actual_circle, next_circle) {
+    return (actual_circle.data('age') >= current_age) &&
+           ((next_circle == null) || (actual_circle.data('age') < next_circle.data('age')))
 }
 
 function getFollowingMail(circle, followingCriteria) {
@@ -213,7 +201,7 @@ function getFollowingMail(circle, followingCriteria) {
 
     circles_in_thread = $('[data-mailaccount*="' + mailaccount_id + '"][data-tid*=' + tid + ']');
 
-    nextCircle = followingCriteria(circle, circles_in_thread);
+    nextCircle = followingMailWithCriteria(circle, circles_in_thread, followingCriteria);
 
     return nextCircle;
 }
