@@ -283,7 +283,7 @@ div.icons {
 }
 
 #mail-view-body-container {
-    max-height: 300px;
+    height: 300px;
 }
 
 #mail-view-header {
