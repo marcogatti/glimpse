@@ -6,6 +6,7 @@ using Glimpse.ViewModels;
 using NHibernate;
 using System;
 using System.Linq;
+using System.Net.Sockets;
 using System.Web.Mvc;
 using System.Web.Security;
 
@@ -111,6 +112,12 @@ namespace Glimpse.Controllers
             {
                 tran.Rollback();
                 ModelState.AddModelError("", "La dirección de correo o la contraseña no son correctos.");
+                return View(userView);
+            }
+            catch (Exception)
+            {
+                tran.Rollback();
+                ModelState.AddModelError("", "Existen problemas para iniciar sesión, intentalo de nuevo más tarde.");
                 return View(userView);
             }
             finally
