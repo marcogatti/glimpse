@@ -342,10 +342,7 @@ function prepareToReceiveLabels(circle) {
 
 function changeMailColour(circle, label) {
 
-    var customLabels = getLabels(circle);
-    if (customLabels[0] === "") {
-        customLabels = [];
-    }
+    var customLabels = getCustomLabels(circle);
     customLabels.push(label);
     circle.data("custom-labels", customLabels);
 
@@ -353,8 +350,6 @@ function changeMailColour(circle, label) {
 }
 
 function addLabelToEmail(label, mail) {
-
-    // Validar que el label no sea un system label, igual tambien lo hace el server.
 
     $.ajax({
         type: "POST",
@@ -375,7 +370,7 @@ function setEverithingRelatedToAddLabelsToAMail() {
 }
 
 function setLabelSelection() {
-    $(".custom-label").on('click', function () {
+    $(".custom-label:not(.custom-label[data-name^='others'])").on('click', function () {
         $(this).toggleClass('label-hidden');
 
         $(".circle").each(function () {
@@ -388,13 +383,17 @@ function setLabelSelection() {
     });
 }
 
-function getLabels(circle) {
+function getCustomLabels(circle) {
 
-    return circle.data("custom-labels").toString().split(",");
+    var labelsArray = circle.data("custom-labels").toString().split(",");
+    if (labelsArray[0] === "") {
+        labelsArray = [];
+    }
+    return labelsArray;
 }
 
 function toBeHidden(circle) {
-    return !getLabels(circle).some(isActive);
+    return !getCustomLabels(circle).some(isActive);
 }
 
 function isActive(label) {
@@ -402,7 +401,7 @@ function isActive(label) {
 }
 
 function hasLabel(circle, label) {
-    return (getLabels(circle).indexOf(label) != -1);
+    return (getCustomLabels(circle).indexOf(label) != -1);
 }
 
 function loadLabels() {

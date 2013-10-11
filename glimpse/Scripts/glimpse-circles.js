@@ -184,7 +184,7 @@ function markAsRead(circle) {
 
 function calculateEmailColor(circle) {
     
-    var customLabels = getLabels(circle);
+    var customLabels = getCustomLabels(circle);
 
     var fill = "",
         i;
