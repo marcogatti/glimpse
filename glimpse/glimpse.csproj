@@ -478,6 +478,7 @@
     <Content Include="Scripts\ckeditor\styles.js" />
     <Content Include="Scripts\glimpse-circles.js" />
     <Content Include="Scripts\glimpse-fetcher.js" />
+    <Content Include="Scripts\glimpse-labels.js" />
     <Content Include="Scripts\glimpse-mail-view.js" />
     <Content Include="Scripts\glimpse-sender.js" />
     <Content Include="Scripts\glimpse-utils.js" />
