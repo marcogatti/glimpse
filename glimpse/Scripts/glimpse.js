@@ -14,5 +14,6 @@ $(document).ready(function () {
     setTransitionsCheckbox();
     setEverithingRelatedToAddLabelsToAMail();
     initializeMailEditor();
+    initializeMailViewModal();
 })
 

@@ -1,4 +1,11 @@
-﻿function setFullDisplay(circle) {
+﻿function initializeMailViewModal() {
+
+    $('.modal-footer').mousedown(function (ev) {
+        ev.preventDefault();
+    });
+}
+
+function setFullDisplay(circle) {
 
     circle.dblclick(
 
@@ -142,8 +149,7 @@ function moveToFollowingMail(view_modal, circle, nextMailSearcher) {
     nextCircle = nextMailSearcher(circle);
 
     if (nextCircle.data('id') === circle.data('id') &&
-        nextCircle.data('mailaccount') === circle.data('mailaccount'))
-    {
+        nextCircle.data('mailaccount') === circle.data('mailaccount')) {
         setMailTraversingArrows(view_modal, circle);
         return false;
     }
@@ -174,8 +180,7 @@ function followingMailWithCriteria(circle, circle_collection, criteria) {
         actual_circle = $(circle_collection[i]);
 
         if ((actual_circle.data('id') !== current_id) &&
-            criteria(current_id, current_age, actual_circle, next_circle))
-        {
+            criteria(current_id, current_age, actual_circle, next_circle)) {
             next_circle = actual_circle;
         }
     }
