@@ -295,6 +295,12 @@ div.icons {
     margin-right: 4px;
 }
 
+.separator {
+    margin-left: 15px;
+    margin-right: 15px;
+    padding-top: 4px;
+}
+
 blockquote {
     margin-top: 10px;
     margin-bottom: 10px;

@@ -267,6 +267,8 @@
     <Content Include="Content\bootstrap-responsive.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\Home.css" />
+    <Content Include="Content\img\glyphicons-halflings-white.png" />
+    <Content Include="Content\img\glyphicons-halflings.png" />
     <Content Include="Content\Login.css" />
     <Content Include="Content\our-bootstrap-new.css" />
     <Content Include="Content\themes\base\images\animated-overlay.gif" />
