@@ -20,7 +20,7 @@ function populateLabelColors() {
     ];
 
     var i = 0;
-    $("#labels-header").children(".label").each(function () {
+    $(".custom-label:not(.custom-label[data-name^='others'])").each(function () {
 
         var currentColor = glimpseColors[i];
 
@@ -41,7 +41,7 @@ function labelDrag(ev) {
 }
 
 function setLabelsAdder() {
-    $.each($('.label'), function (index, actualLabel) {
+    $.each($(".custom-label"), function (index, actualLabel) {
 
         var currentLabel = $(this);
         if (currentLabel.hasClass("custom-label")) {
@@ -169,7 +169,7 @@ function setEverithingRelatedToAddLabelsToAMail() {
 }
 
 function setLabelSelection() {
-    $(".custom-label:not(.custom-label[data-name^='others'])").on('click', function () {
+    $(".custom-label").on('click', function () {
         $(this).toggleClass('label-hidden');
 
         $(".circle").each(function () {
@@ -185,14 +185,21 @@ function setLabelSelection() {
 function getCustomLabels(circle) {
 
     var labelsArray = circle.data("custom-labels").toString().split(",");
-    if (labelsArray[0] === "") {
+    if (labelsArray.length === 1 && labelsArray[0] === "") {
         labelsArray = [];
     }
     return labelsArray;
 }
 
 function toBeHidden(circle) {
-    return !getCustomLabels(circle).some(isActive);
+    var circleLabels = getCustomLabels(circle);
+
+    if (circleLabels.length === 0) {
+        return !isActive("others");
+    }
+    else {
+        return !getCustomLabels(circle).some(isActive);
+    }
 }
 
 function isActive(label) {
