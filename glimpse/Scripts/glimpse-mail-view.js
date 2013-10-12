@@ -7,6 +7,15 @@
 
 function setFullDisplay(circle) {
 
+    $('#mail-view-address-displayer').click(function (ev) {
+        ev.stopPropagation();
+        $(this).popover('show');
+    });
+
+    $(document).click(function () {
+        $('#mail-view-address-displayer').popover('hide');
+    });
+
     circle.dblclick(
 
         function () {
@@ -17,16 +26,16 @@ function setFullDisplay(circle) {
             cc = circle.data("cc"),
             to = circle.data("to"),
             date = new Date(circle.data('date')),
-            ccContainer = view_modal.find("#mail-view-cc-container");
+            ccContainer = $("#mail-view-cc-container");
 
             setViewMailBody(view_modal, '');
             view_modal.find("#mail-view-from").html(from);
-            view_modal.find("#mail-view-to").html(to);
+            $("#mail-view-to").html(to);
             if (cc == "" || cc === null) {
                 ccContainer.addClass('hidden');
             } else {
                 ccContainer.removeClass('hidden');
-                view_modal.find("#mail-view-cc").html(cc);
+                $("#mail-view-cc").html(cc);
             }
             view_modal.find("#mail-view-subject").html(subject);
             view_modal.find("#mail-view-date").html(date.toLocaleString());
@@ -125,7 +134,25 @@ function setMailViewerActions(view_modal, circle, body) {
     }
 );
     setMailTraversingArrows(view_modal, data.circle);
+
+    setAddressesDisplayer(view_modal, data.circle);
 }
+
+function setAddressesDisplayer(view_modal, circle) {
+
+    var options =
+    {
+        html: true,
+        placement: 'bottom',
+        trigger: 'manual',
+        content: function () {
+            return $('#addresses-content').html();
+        }
+    };
+
+    $('#mail-view-address-displayer').popover(options);
+}
+
 
 function setMailTraversingArrows(view_modal, circle) {
 
@@ -213,18 +240,18 @@ function getFollowingMail(circle, followingCriteria) {
 
 function setMailViewModalHeadData(view_modal, circle) {
 
-    var ccContainer = view_modal.find("#mail-view-cc-container"),
+    var ccContainer = $("#mail-view-cc-container"),
         data = getCircleData(circle),
         date = new Date(data.date);
 
 
     view_modal.find("#mail-view-from").html(data.from);
-    view_modal.find("#mail-view-to").html(data.to);
+    $("#mail-view-to").html(data.to);
     if (data.cc == "" || data.cc === null) {
         ccContainer.addClass('hidden');
     } else {
         ccContainer.removeClass('hidden');
-        view_modal.find("#mail-view-cc").html(data.cc);
+        $("#mail-view-cc").html(data.cc);
     }
     view_modal.find("#mail-view-subject").html(data.subject);
     view_modal.find("#mail-view-date").html(date.toLocaleString());
