@@ -137,7 +137,7 @@ function setMailViewerActions(view_modal, circle, body) {
 );
     setMailTraversingArrows(view_modal, data.circle);
 
-    setAddressesDisplayer(view_modal, data.circle);
+    setMailViewerLabels(view_modal, circle);
 }
 
 function setAddressesDisplayer() {
