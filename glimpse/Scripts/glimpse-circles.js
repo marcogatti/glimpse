@@ -242,21 +242,37 @@ function calculateEmailPosition(circle) {
     });
 }
 
-function calculateEmailsLeft() {
-    var margin = parseInt($(".circle").css('width'), 10);
-    var containerChunk = parseInt(currentPeriodShown() / 2),
-        furthestAgeRight = maxAge + containerChunk,
-        furthestAgeLeft = minAge - containerChunk;
+function surroundingCircles(factor, whatToDo) {
+    var containerChunk = parseInt(currentPeriodShown() * factor),
+      furthestAgeRight = maxAge + containerChunk,
+      furthestAgeLeft = minAge - containerChunk;
 
     $(".circle").each(function () {
         var currentAge = $(this).attr('data-age');
         if (currentAge < furthestAgeRight && currentAge > furthestAgeLeft) {
-
-            var left = (currentAge - minAge) / currentPeriodShown();
-
-            $(this).css('left', function () {
-                return left * (containerWidth() - margin) + 'px';
-            });
+            whatToDo($(this));
         }
     });
+}
+
+function calculateEmailsLeft(containerChunk) {
+
+    var r = $.Deferred();
+
+    var margin = parseInt($(".circle").css('width'), 10),
+        periodShown = currentPeriodShown();
+
+    surroundingCircles(containerChunk, function (circle) {
+
+        var left = (circle.data("age") - minAge) / periodShown;
+        circle.css('left', function () {
+            return left * (containerWidth() - margin) + 'px';
+        });
+    });
+
+    setTimeout(function () {
+        r.resolve();
+    }, 600);
+
+    return r;
 }

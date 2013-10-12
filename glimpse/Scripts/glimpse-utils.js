@@ -1,7 +1,8 @@
 ﻿var maxAge = 0,
     minAge = 0,
     labelColors = {},
-    editor;
+    editor,
+    readyToZoom = true;
 
 
 function preventSelectingNotUsefulThings() {
@@ -96,24 +97,41 @@ function currentPeriodShown() {
 
 function zoom(factor, zoomPoint) {
 
-    if (amountOfCirclesShown() < $("#max-amount").val() || (factor > 0)) {
+    //if (readyToZoom) {
 
-        var movement = currentPeriodShown() * factor * 0.0001;
+    //    readyToZoom = false;
+    //    setTimeout(function () {
+    //        readyToZoom = true;
+    //    }, 300);
 
-        var offsetRight = (containerWidth() - zoomPoint) * movement;
-        if (allowedMovementRight(-offsetRight)) {
-            maxAge -= offsetRight;
+        if (amountOfCirclesShown() < $("#max-amount").val() || (factor > 0)) {
+
+            var movement = currentPeriodShown() * factor * 0.0001;
+
+            var offsetRight = (containerWidth() - zoomPoint) * movement;
+            var offsetLeft = zoomPoint * movement;
+
+            if (maxAge - offsetRight > minAge + offsetLeft) {
+
+                if (allowedMovementRight(-offsetRight)) {
+                    maxAge -= offsetRight;
+                }
+                if (allowedMovementLeft(offsetLeft)) {
+                    minAge += offsetLeft;
+                }
+
+                setDateCoords();
+                fetchMailsWithinActualPeriod();
+
+                surroundingCircles(0.5, function (circle) {
+                    circle.addClass("transition");
+                });
+                calculateEmailsLeft(2).done(function () {
+                    $(".circle.transition").removeClass("transition");
+                });
+            }
         }
-
-        var offsetLeft = zoomPoint * movement;
-        if (allowedMovementLeft(offsetLeft)) {
-            minAge += offsetLeft;
-        }
-
-        setDateCoords();
-        fetchMailsWithinActualPeriod();
-        calculateEmailsLeft();
-    }
+    
 }
 
 function configureZoom() {
@@ -134,7 +152,16 @@ function setWheelZoom() {
     /*  zoom donde apunta el mouse  */
     $('#email-container').on('mousewheel', function (event, delta, deltaX, deltaY) {
         event.preventDefault();
-        zoom(deltaY, event.offsetX);
+
+        if (readyToZoom) {
+
+            readyToZoom = false;
+            setTimeout(function () {
+                readyToZoom = true;
+            }, 50);
+
+            zoom(deltaY, event.offsetX);
+        }
     });
 }
 
@@ -149,7 +176,7 @@ function movePeriodShown(offset) {
     if (allowedMovementLeft(offset) && allowedMovementRight(offset)) {
         minAge += offset;
         maxAge += offset;
-        calculateEmailsLeft();
+        calculateEmailsLeft(0.3);
     }
 }
 
