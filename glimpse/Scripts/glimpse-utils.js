@@ -356,6 +356,8 @@ function addLabelToEmail(label, mail) {
 
     // Validar que el label no sea un system label, igual tambien lo hace el server.
 
+    changeMailColour(mail, label);
+
     $.ajax({
         type: "POST",
         url: "async/AddLabel",
@@ -364,7 +366,7 @@ function addLabelToEmail(label, mail) {
             alert("No se pudo agregar el label.");
         },
         success: function () {
-            changeMailColour(mail, label);
+            // Hacer algo jeje
         },
         data: { labelName: label, mailId: mail.attr('data-id') }
     });

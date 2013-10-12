@@ -136,6 +136,8 @@ function setMailViewerActions(view_modal, circle, body) {
     setMailTraversingArrows(view_modal, data.circle);
 
     setAddressesDisplayer(view_modal, data.circle);
+
+    setMailViewerLabels(view_modal, data.circle);
 }
 
 function setAddressesDisplayer(view_modal, circle) {
@@ -151,6 +153,21 @@ function setAddressesDisplayer(view_modal, circle) {
     };
 
     $('#mail-view-address-displayer').popover(options);
+}
+
+function setMailViewerLabels(view_modal, circle) {
+
+    var labels = getLabels(circle),
+        labelElement;
+
+    $('#mail-view-labels').html('');
+
+    for (var i = 0; i < labels.length && i < 5; i++) {
+
+        labelElement = $('.custom-label[data-name="' + labels[i] + '"]').clone();
+        labelElement.removeAttr('draggable');
+        view_modal.find('#mail-view-labels').append(labelElement);
+    }
 }
 
 
@@ -231,7 +248,7 @@ function getFollowingMail(circle, followingCriteria) {
     mailaccount_id = circle.data('mailaccount');
     tid = circle.data('tid');
 
-    circles_in_thread = $('.circle[data-mailaccount*="' + mailaccount_id + '"][data-tid*=' + tid + ']');
+    circles_in_thread = $('.circle[data-mailaccount="' + mailaccount_id + '"][data-tid=' + tid + ']');
 
     nextCircle = followingMailWithCriteria(circle, circles_in_thread, followingCriteria);
 
