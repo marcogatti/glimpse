@@ -199,12 +199,12 @@ function criteriaForward(current_id, current_age, actual_circle, next_circle) {
 }
 
 function getFollowingMail(circle, followingCriteria) {
-    var tid, mailaccount_id, circles_in_thread, nextCircle;;
+    var tid, mailaccount_id, circles_in_thread, nextCircle;
 
     mailaccount_id = circle.data('mailaccount');
     tid = circle.data('tid');
 
-    circles_in_thread = $('[data-mailaccount*="' + mailaccount_id + '"][data-tid*=' + tid + ']');
+    circles_in_thread = $('.circle[data-mailaccount*="' + mailaccount_id + '"][data-tid*=' + tid + ']');
 
     nextCircle = followingMailWithCriteria(circle, circles_in_thread, followingCriteria);
 
