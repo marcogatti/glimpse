@@ -201,15 +201,24 @@ function ageToDate(age) {
 
 function setDateCoords() {
 
-    newDateToday = ageToDate(minAge).toLocaleDateString(),
-    newDateLast = ageToDate(maxAge).toLocaleDateString();
+    var newMinDate = ageToDate(minAge),
+        newMaxDate = ageToDate(maxAge),
+        diff = newMinDate - newMaxDate;
 
-    if (newDateToday === new Date().toLocaleDateString()) {
-        newDateToday = "Hoy";
+    diff = Math.round(diff / 1000 / 60 / 60 / 24)
+
+    newMinDate = newMinDate.toLocaleDateString();
+    if (newMinDate === new Date().toLocaleDateString()) {
+        newMinDate = "Hoy";
     }
 
-    $("#date-today").html(newDateToday);
-    $("#date-last").html(newDateLast);
+    var diffString = function () {
+        if (diff === 1) { return " día"; }
+        else { return " días"; }
+    }();
+
+    $("#date-today").html(newMinDate);
+    $("#date-last").html(diff.toString() + diffString + " atrás");
 }
 
 function hideProgressBar(bar) {

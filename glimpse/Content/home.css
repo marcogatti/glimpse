@@ -162,7 +162,7 @@ hr {
     text-align: center;
     font-style: normal;
     font-family: 'Open Sans', Arial, sans-serif;
-    width: 50px;
+    width: 75px;
     color: white;
     text-shadow: 0 2px 4px #000;
 }
@@ -180,10 +180,6 @@ hr {
 
 #dateTime {
     width: 125px;
-}
-
-#date-last {
-    direction: rtl;
 }
 
 /*  Para alineacion vertical de la coordenada "from"    */
