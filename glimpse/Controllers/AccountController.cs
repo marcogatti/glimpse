@@ -6,6 +6,7 @@ using Glimpse.Models;
 using Glimpse.ViewModels;
 using NHibernate;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Web.Mvc;
@@ -103,6 +104,13 @@ namespace Glimpse.Controllers
                     if (user == null)
                     {
                         this.ModelState.AddModelError("User", "Usuario inexistente.");
+                        tran.Rollback();
+                        return View(userView);
+                    }
+                    else if (CryptoHelper.DecryptDefaultKey(user.Entity.Password) != userView.Password)
+                    {
+                        this.ModelState.AddModelError("User", "Contraseña incorrecta.");
+                        tran.Rollback();
                         return View(userView);
                     }
                     user.UpdateAccounts(session);
@@ -144,31 +152,33 @@ namespace Glimpse.Controllers
         [AllowAnonymous]
         public ActionResult CreateUser(UserViewModel userView)
         {
+            IList<MailAccount> mailAccounts;
             String exceptionMessage = "";
             ISession session = NHibernateManager.OpenSession();
             ITransaction tran = session.BeginTransaction();
             try
             {
                 this.UpdateModel(userView); //corre todos los regex
-                this.ValidateUserGenericFields(userView, session); //nombre, apellido, usuarioGlimpse, contraseñas
-                this.ValidateUserMailaccounts(userView);
+                this.ValidateUserGenericFields(userView, session); //usuarioGlimpse y contraseñas de usuario
+                mailAccounts = this.ValidateUserMailAccounts(userView, session); //direcciones de correo y contraseñas
 
-                String cipherPassword = CryptoHelper.EncryptDefaultKey(userView.Password);
+                String cipherPassword = CryptoHelper.EncryptDefaultKey(userView);
 
                 User newUser = new User(userView.Username, cipherPassword, userView.Firstname, userView.Lastname);
-                foreach (MailAccountViewModel mailAccountView in userView.ListMailAccounts)
+                foreach (MailAccount mailAccount in mailAccounts)
                 {
-                    MailAccount mailAccount = new MailAccount(mailAccountView.Address, mailAccountView.Password);
                     mailAccount.SetUser(newUser);
                     mailAccount.SetOldestMailDate();
                     mailAccount.UpdateLabels(session);
-                    mailAccount.SaveOrUpdate(session);
-                    mailAccount.Disconnect();
+                    mailAccount.Activate(session); //saveOrUpdate adentro
                     newUser.AddAccount(mailAccount);
                 }
                 newUser.SaveOrUpdate(session);
                 tran.Commit();
-                return Json(new { success = true }, JsonRequestBehavior.AllowGet);
+
+                Session[AccountController.USER_NAME] = newUser;
+
+                return JavaScript("window.location = '" + Url.Action("Index", "Home") + "'");
             }
             catch (InvalidOperationException exc) //model state invalido
             {
@@ -231,7 +241,7 @@ namespace Glimpse.Controllers
                 Log.LogException(exc, "Parametros: userName:(" + userView.Username + "), userPassowrd( " + userView.Password +
                                       "), userConfirmPassword(" + userView.ConfirmationPassword + "), userFirstName(" + userView.Firstname +
                                       "), userLastName(" + userView.Lastname + ").");
-                return Json(new { success = false, message = "Error creando usuario." }, JsonRequestBehavior.AllowGet);
+                return Json(new { success = false, message = "Error validando usuario." }, JsonRequestBehavior.AllowGet);
             }
             finally
             {
@@ -277,21 +287,27 @@ namespace Glimpse.Controllers
                 throw new GlimpseException(exceptionMessage);
         }
         [NonAction]
-        private void ValidateUserMailaccounts(UserViewModel userView)
+        private IList<MailAccount> ValidateUserMailAccounts(UserViewModel userView, ISession session)
         {
             String exceptionMessage = "";
             Boolean hasMainAccount = false;
             Boolean checkMainAccounts = true;
+            IList<MailAccount> connectedMailAccounts = new List<MailAccount>();
+            MailAccount mailAccount;
+            MailAccount databaseMailAccount;
 
             foreach (MailAccountViewModel mailAccountView in userView.ListMailAccounts)
             {
+                #region Valida Credenciales
                 if (mailAccountView.Password == mailAccountView.ConfirmationPassword)
                 {
                     try
                     {
-                        new MailAccount(mailAccountView.Address, mailAccountView.Password).ConnectLight();
+                        mailAccount = new MailAccount(mailAccountView.Address, CryptoHelper.EncryptDefaultKey(mailAccountView));
+                        mailAccount.ConnectLight();
+                        connectedMailAccounts.Add(mailAccount);
                     }
-                    catch (InvalidAuthenticationException exc)
+                    catch (InvalidAuthenticationException)
                     {
                         exceptionMessage += "La dirección de correo (" + mailAccountView.Address +
                                             ") o la contraseña no son válidos.\n";
@@ -300,7 +316,8 @@ namespace Glimpse.Controllers
                 else
                     exceptionMessage += "Las contraseñas de la dirección: " + mailAccountView.Address + 
                                         " no son iguales.\n";
-
+                #endregion
+                #region Valida Cuentas Principales
                 if (hasMainAccount && mailAccountView.IsMainAccount && checkMainAccounts)
                 {
                     exceptionMessage += "Sólo puede existir una dirección de correo principal.\n";
@@ -308,15 +325,26 @@ namespace Glimpse.Controllers
                 }
                 else if (!hasMainAccount && mailAccountView.IsMainAccount)
                     hasMainAccount = true;
+                #endregion
+                #region Valida Unicidad en Base de datos
+                databaseMailAccount = MailAccount.FindByAddress(mailAccountView.Address, session, true);
+                if (databaseMailAccount != null)
+                    exceptionMessage += "La dirección: " + mailAccountView.Address + " ya se encuentra "+
+                                        "asociada a un usuario Glimpse.\n";
+                #endregion
             }
 
+            #region Validaciones de Requerimientos Obligatorios
             if (!hasMainAccount)
                 exceptionMessage += "Una dirección de correo debe ser indicada como principal.\n";
             if (userView.ListMailAccounts.Count == 0)
                 exceptionMessage += "El usuario Glimpse debe tener al menos una dirección de correo.\n";
+            #endregion
 
             if (exceptionMessage != "")
                 throw new GlimpseException(exceptionMessage);
+            else
+                return connectedMailAccounts; //para no tener que conectar de vuelta despues
         }
         #endregion
     }

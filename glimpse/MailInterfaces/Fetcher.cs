@@ -222,6 +222,11 @@ namespace Glimpse.MailInterfaces
             targetMailbox.UidDeleteMessage(mailUID, true);
             this.CurrentOpenedMailbox.MessageCount--;
         }
+        public void CreateLabel(String labelName)
+        {
+            this.Receiver.CreateMailbox(labelName);
+            this.AddNewLabel(labelName);
+        }
         public void RenameLabel(String oldLabelName, String newLabelName)
         {
             Mailbox targetMailbox = this.GetMailbox(oldLabelName);
@@ -500,6 +505,16 @@ namespace Glimpse.MailInterfaces
                     mail.Extras.Add(extra);
                 }
             }
+        }
+        private void AddNewLabel(String labelName)
+        {
+            if (this.AccountMailboxesBySpecialProperty["Tags"] == "")
+                this.AccountMailboxesBySpecialProperty["Tags"] = labelName;
+            else if(!this.AccountMailboxesBySpecialProperty["Tags"].Split(',').Any(x => x == labelName))
+                this.AccountMailboxesBySpecialProperty["Tags"] += "," + labelName;
+
+            if (!this.AccountLabels.Any(x => x.Name == labelName))
+                this.AccountLabels.Add(new LabelEntity(labelName, null));
         }
         private void ReplaceLabelName(String oldLabel, String newLabel)
         {

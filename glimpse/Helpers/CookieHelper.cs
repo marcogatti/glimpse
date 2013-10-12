@@ -37,7 +37,6 @@ namespace Glimpse.Helpers
             myCookie.Expires = expirationDate;
             myCookie.HttpOnly = true;
             this.responseCookies.Add(myCookie);
-
             return myCookie;
         }
         public String GetUserFromCookie()
@@ -45,21 +44,15 @@ namespace Glimpse.Helpers
             HttpCookie myCookie = this.requestCookies[LOGIN_COOKIE];
 
             if (myCookie != null)
-            {
                 return myCookie.Values["User"];
-
-            }
             else
-            {
                 throw new CookieNotFoundException("Login cookie");
-            }
         }
         public void ClearUserCookie()
         {
             try
             {
                 String user = this.GetUserFromCookie();
-
                 this.responseCookies.Remove(user);
                 this.AddUsernameCookie(user, DateTime.Now.AddMonths(-1));
             }

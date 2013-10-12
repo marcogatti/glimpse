@@ -75,6 +75,11 @@ namespace Glimpse.Models
         {
             this.MyFetcher.Dispose();
         }
+        public void Activate(ISession session)
+        {
+            this.Entity.Active = true;
+            this.SaveOrUpdate(session);
+        }
         public void Deactivate(ISession session)
         {
             this.Entity.Active = false;
@@ -240,6 +245,10 @@ namespace Glimpse.Models
         public void RemoveMailLabel(String label, UInt64 gmID)
         {
             this.MyFetcher.RemoveMailTag(label, gmID);
+        }
+        public void CreateLabel(String labelName)
+        {
+            this.MyFetcher.CreateLabel(labelName);
         }
         public void RenameLabel(String oldLabelName, String newLabelName)
         {
