@@ -32,10 +32,8 @@ hr {
     text-align: center;
     text-shadow: 0 0 1px #fff, 0 1px 2px rgba(0,0,0,1);
     cursor: pointer;
-
     /*  Color de emails sin etiqueta    */
     background-color: rgb(159, 182, 205);
-
     -webkit-box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.2) inset;
     box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.2) inset;
     /*  Habilitar aceleracion por hardware  */
@@ -44,7 +42,6 @@ hr {
     -moz-transform: translate3d(0,0,0);
     -o-transform: translate3d(0,0,0);
     -ms-transform: translate3d(0,0,0);
-
     -webkit-transition: opacity 0.5s, box-shadow 0.5s;
     transition: opacity 0.5s, box-shadow 0.5s;
 }
@@ -181,9 +178,11 @@ hr {
 #dateTime {
     width: 125px;
 }
+
 #date-last {
     text-align: end;
 }
+
 #date-today {
     text-align: start;
 }
@@ -279,7 +278,7 @@ div.icons {
     vertical-align: middle;
     margin-bottom: 5px;
     max-height: 60px;
-    width: 80%;
+    width: 100%;
     display: table-cell;
 }
 
@@ -291,11 +290,13 @@ div.icons {
     max-height: 120px;
     overflow-y: hidden;
     overflow-x: hidden;
+    width: 60px;
 }
 
 #mail-view-labels_subject {
     max-height: 120px;
     overflow: hidden;
+    width: 95%;
 }
 
 #mail-view-date-container {
