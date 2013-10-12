@@ -26,6 +26,11 @@ namespace Glimpse.Models
             this.Entity.ShowTutorial = true;
             this.mailAccounts = new List<MailAccount>();
         }
+        public User(String username, String password, String firstName, String lastName) : this(username, password)
+        {
+            this.Entity.Firstname = firstName;
+            this.Entity.Lastname = lastName;
+        }
 
         public void AddAccount(MailAccount mailAccount)
         {
@@ -88,6 +93,10 @@ namespace Glimpse.Models
         public static bool IsEmail(String phrase)
         {
             return Regex.IsMatch(phrase, @"^[A-Za-z0-9]([\w\.\-]*)@([A-Za-z0-9-]+)((\.(\w){2,3})+)$");
+        }
+        public static bool IsGlimpseUser(String phrase)
+        {
+            return Regex.IsMatch(phrase, @"^[A-Za-z]{1}[A-Za-z0-9]{3,15}$");
         }
         public static User FindByUsername(String username, ISession session)
         {

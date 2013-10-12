@@ -10,7 +10,6 @@ using Glimpse.Helpers;
 
 namespace Glimpse.ViewModels
 {
-    [Bind(Include = "Username, Password, rememberMe")]
     public class UserViewModel
     {
         [Required]
@@ -21,7 +20,7 @@ namespace Glimpse.ViewModels
                            @"([\w\.\-]*)" + //seguido de una combinacion de letras, numeros,  puntos o guiones (altos o bajos) 0 o mas veces
                            @"@([A-Za-z0-9-]+)" + //seguido de arroba y una combinacion de letras, numeros o guiones medios 1 o mas veces
                            @"((\.(\w){2,3})+)$", 
-                           ErrorMessage= "Username must a valid email or Glimpse Account")]
+                           ErrorMessage= "Nombre de usuario debe ser una dirección de correo o un nombre de usuario Glimpse válido.")]
         [DataType(DataType.Text)]
         [Display(Name = "Glimpse User or Email")]
         public String Username { get; set; }
@@ -29,28 +28,22 @@ namespace Glimpse.ViewModels
         [Required]
         //caracteres validos para un passoword de email segun RFC, entre 6 y 20 caracteres
         [RegularExpression(@"^(?!.{20})[A-Za-z0-9\!#\$%&'\*\.\+\-/=\?\^`\{|\}~_]{6,20}",
-                           ErrorMessage= "Invalid password characters")]
+                           ErrorMessage= "Caracteres de contraseña inválidos.")]
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public String Password { get; set; }
 
-        [Display(Name = "Remember me?")]
-        public bool rememberMe { get; set; }
-
+        [RegularExpression(@"^(\p{L}\p{M}*){2,16}$", ErrorMessage = "Caracteres de nombre inválidos.")]
         public String Firstname { get; set; }
 
+        [RegularExpression(@"^(\p{L}\p{M}*){2,16}$", ErrorMessage = "Caracteres de apellido inválidos.")]
         public String Lastname { get; set; }
 
+        [RegularExpression(@"^(?!.{20})[A-Za-z0-9\!#\$%&'\*\.\+\-/=\?\^`\{|\}~_]{6,20}",
+                           ErrorMessage = "Caracteres de contraseña inválidos.")]
+        [DataType(DataType.Password)]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public String ConfirmationPassword { get; set; }
-
-        public UserViewModel() { }
-
-        public UserViewModel(String email, String password)
-        {
-            this.Username = email;
-            this.Password = password;
-        }
-
     }
 }

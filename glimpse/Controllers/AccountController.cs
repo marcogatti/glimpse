@@ -1,10 +1,12 @@
 ﻿using Glimpse.DataAccessLayer;
+using Glimpse.Exceptions;
 using Glimpse.Exceptions.MailInterfacesExceptions;
 using Glimpse.Helpers;
 using Glimpse.Models;
 using Glimpse.ViewModels;
 using NHibernate;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
 using System.Web.Security;
@@ -95,15 +97,14 @@ namespace Glimpse.Controllers
                 }
 
                 new CookieHelper().AddUsernameCookie(user.Entity.Username);
-                FormsAuthentication.SetAuthCookie(userView.Username, userView.rememberMe);
+                FormsAuthentication.SetAuthCookie(userView.Username, true);
                 tran.Commit();
                 Session[AccountController.USER_NAME] = user;
 
                 return RedirectToLocal(returnUrl);
             }
-            catch (InvalidOperationException)
+            catch (InvalidOperationException) //model state invalido
             {
-                //model state invalido
                 tran.Rollback();
                 return View(userView);
             }
@@ -117,6 +118,72 @@ namespace Glimpse.Controllers
             {
                 session.Close();
             }
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public ActionResult CreateUser(UserViewModel userView)
+        {
+            String exceptionMessage = "";
+            ISession session = NHibernateManager.OpenSession();
+            ITransaction tran = session.BeginTransaction();
+            try
+            {
+                this.UpdateModel(userView); //corre todos los regex
+
+                if(!Glimpse.Models.User.IsGlimpseUser(userView.Username))
+                    exceptionMessage += "El nombre de usuario elegido no posee caracteres válidos.\n";
+                String cipherPassword = CryptoHelper.EncryptDefaultKey(userView.Password);
+                if (userView.Password != userView.ConfirmationPassword)
+                    exceptionMessage += "Las contraseñas ingresadas deben coincidir.\n";
+
+                User existingUser = Glimpse.Models.User.FindByUsername(userView.Username, session);
+                if (existingUser != null)
+                    exceptionMessage += "El nombre de usuario elegido ya existe.\n";
+
+                if (exceptionMessage != "")
+                    throw new GlimpseException(exceptionMessage);
+
+                User newUser = new User(userView.Username, cipherPassword, userView.Firstname, userView.Lastname);
+                newUser.SaveOrUpdate(session);
+                tran.Commit();
+                return Json(new { success = true }, JsonRequestBehavior.AllowGet);
+
+            }
+            catch (InvalidOperationException exc) //model state invalido
+            {
+                tran.Rollback();
+                IEnumerable<ModelState> wrongStates = this.ModelState.Values.Where(x => x.Errors.Count > 0);
+                foreach (ModelState wrongState in wrongStates)
+                {
+                    foreach (ModelError error in wrongState.Errors)
+                    {
+                        exceptionMessage += error.ErrorMessage;
+                    }
+                }
+                if (String.IsNullOrEmpty(exceptionMessage))
+                    exceptionMessage = exc.Message;
+                return Json(new { success = false, message = exceptionMessage }, JsonRequestBehavior.AllowGet);
+            }
+            catch (GlimpseException exc)
+            {
+                tran.Rollback();
+                Log.LogException(exc);
+                return Json(new { success = false, message = exceptionMessage }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception exc)
+            {
+                tran.Rollback();
+                Log.LogException(exc, "Parametros: userName:(" + userView.Username + "), userPassowrd( " + userView.Password +
+                                      "), userConfirmPassword(" + userView.ConfirmationPassword + "), userFirstName(" + userView.Firstname +
+                                      "), userLastName(" + userView.Lastname + ").");
+                return Json(new { success = false, message = "Error creando usuario." }, JsonRequestBehavior.AllowGet);
+            }
+            finally
+            {
+                session.Close();
+            }
+
         }
 
         [Authorize]
