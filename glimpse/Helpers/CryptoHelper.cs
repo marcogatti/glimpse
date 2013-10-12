@@ -152,5 +152,11 @@ namespace Glimpse.Helpers
 
             return buffer;
         }
+
+        [DebuggerNonUserCodeAttribute]
+        public static bool PasswordsMatch(string actualPassword, string comparingPassword)
+        {
+            return DecryptDefaultKey(actualPassword) == DecryptDefaultKey(comparingPassword);
+        }
     }
 }

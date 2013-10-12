@@ -11,5 +11,10 @@ namespace Glimpse.Exceptions.MailInterfacesExceptions
             : base(systemMessage, glimpseMessage)
         {
         }
+
+        public InvalidAuthenticationException(String glimpseMessage)
+            : base(glimpseMessage)
+        {
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Glimpse.DataAccessLayer;
+using Glimpse.Exceptions;
 using Glimpse.Exceptions.MailInterfacesExceptions;
 using Glimpse.Helpers;
 using Glimpse.Models;
@@ -6,6 +7,7 @@ using Glimpse.ViewModels;
 using NHibernate;
 using System;
 using System.Linq;
+using System.Net.Sockets;
 using System.Web.Mvc;
 using System.Web.Security;
 
@@ -15,6 +17,7 @@ namespace Glimpse.Controllers
     {
         public const String USER_NAME = "Username";
 
+        #region Action Methods
         [AllowAnonymous]
         public ActionResult Login()
         {
@@ -40,6 +43,8 @@ namespace Glimpse.Controllers
             MailAccount existingMailAccount;
             ISession session = NHibernateManager.OpenSession();
             ITransaction tran = session.BeginTransaction();
+            Boolean workingOffline = false;
+
             try
             {
                 this.UpdateModel(userView);
@@ -48,7 +53,15 @@ namespace Glimpse.Controllers
                 if (Glimpse.Models.User.IsEmail(userView.Username)) //si es un email
                 {
                     mailAccount = new MailAccount(userView.Username, cipherPassword);
-                    mailAccount.ConnectLight(); //si pasa este punto es que los datos ingresados son correctos
+                    try
+                    {
+                        mailAccount.ConnectLight(); //si pasa este punto es que los datos ingresados son correctos
+                    }
+                    catch (SocketException)
+                    {
+                        workingOffline = true;
+                        mailAccount.ValidateCredentials();
+                    }
                     user = Glimpse.Models.User.FindByUsername(userView.Username, session);
                     existingMailAccount = MailAccount.FindByAddress(userView.Username, session, false);
 
@@ -78,7 +91,10 @@ namespace Glimpse.Controllers
                         }
                         mailAccount.Entity = existingMailAccount.Entity;
                     }
-                    mailAccount.UpdateLabels(session);
+
+                    if(!workingOffline)
+                        mailAccount.UpdateLabels(session);
+
                     user.AddAccount(mailAccount);
                 }
                 else //si es un usuario glimpse
@@ -95,15 +111,14 @@ namespace Glimpse.Controllers
                 }
 
                 new CookieHelper().AddUsernameCookie(user.Entity.Username);
-                FormsAuthentication.SetAuthCookie(userView.Username, userView.rememberMe);
+                FormsAuthentication.SetAuthCookie(userView.Username, true);
                 tran.Commit();
                 Session[AccountController.USER_NAME] = user;
 
                 return RedirectToLocal(returnUrl);
             }
-            catch (InvalidOperationException)
+            catch (InvalidOperationException) //model state invalido
             {
-                //model state invalido
                 tran.Rollback();
                 return View(userView);
             }
@@ -112,6 +127,111 @@ namespace Glimpse.Controllers
                 tran.Rollback();
                 ModelState.AddModelError("", "La dirección de correo o la contraseña no son correctos.");
                 return View(userView);
+            }
+            catch (Exception)
+            {
+                tran.Rollback();
+                ModelState.AddModelError("", "Existen problemas para iniciar sesión, intentalo de nuevo más tarde.");
+                return View(userView);
+            }
+            finally
+            {
+                session.Close();
+            }
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public ActionResult CreateUser(UserViewModel userView)
+        {
+            String exceptionMessage = "";
+            ISession session = NHibernateManager.OpenSession();
+            ITransaction tran = session.BeginTransaction();
+            try
+            {
+                this.UpdateModel(userView); //corre todos los regex
+                this.ValidateUserGenericFields(userView, session); //nombre, apellido, usuarioGlimpse, contraseñas
+                this.ValidateUserMailaccounts(userView);
+
+                String cipherPassword = CryptoHelper.EncryptDefaultKey(userView.Password);
+
+                User newUser = new User(userView.Username, cipherPassword, userView.Firstname, userView.Lastname);
+                foreach (MailAccountViewModel mailAccountView in userView.ListMailAccounts)
+                {
+                    MailAccount mailAccount = new MailAccount(mailAccountView.Address, mailAccountView.Password);
+                    mailAccount.SetUser(newUser);
+                    mailAccount.SetOldestMailDate();
+                    mailAccount.UpdateLabels(session);
+                    mailAccount.SaveOrUpdate(session);
+                    mailAccount.Disconnect();
+                    newUser.AddAccount(mailAccount);
+                }
+                newUser.SaveOrUpdate(session);
+                tran.Commit();
+                return Json(new { success = true }, JsonRequestBehavior.AllowGet);
+            }
+            catch (InvalidOperationException exc) //model state invalido
+            {
+                tran.Rollback();
+                foreach (ModelState wrongState in this.ModelState.Values.Where(x => x.Errors.Count > 0))
+                    foreach (ModelError error in wrongState.Errors)
+                        exceptionMessage += error.ErrorMessage;
+                if (String.IsNullOrEmpty(exceptionMessage))
+                    exceptionMessage = exc.Message;
+                return Json(new { success = false, message = exceptionMessage }, JsonRequestBehavior.AllowGet);
+            }
+            catch (GlimpseException exc)
+            {
+                tran.Rollback();
+                Log.LogException(exc);
+                return Json(new { success = false, message = exceptionMessage }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception exc)
+            {
+                tran.Rollback();
+                Log.LogException(exc, "Parametros: userName:(" + userView.Username + "), userPassowrd( " + userView.Password +
+                                      "), userConfirmPassword(" + userView.ConfirmationPassword + "), userFirstName(" + userView.Firstname +
+                                      "), userLastName(" + userView.Lastname + ").");
+                return Json(new { success = false, message = "Error creando usuario." }, JsonRequestBehavior.AllowGet);
+            }
+            finally
+            {
+                session.Close();
+            }
+        }
+
+        [AllowAnonymous]
+        public ActionResult ValidateUserFields(UserViewModel userView)
+        {
+            String exceptionMessage = "";
+            ISession session = NHibernateManager.OpenSession();
+            try
+            {
+                this.UpdateModel(userView); //corre todos los regex
+                this.ValidateUserGenericFields(userView, session); //nombre, apellido, usuarioGlimpse, contraseñas
+
+                return Json(new { success = true }, JsonRequestBehavior.AllowGet);
+            }
+            catch (InvalidOperationException exc) //model state invalido
+            {
+                foreach (ModelState wrongState in this.ModelState.Values.Where(x => x.Errors.Count > 0))
+                    foreach (ModelError error in wrongState.Errors)
+                        exceptionMessage += error.ErrorMessage;
+                if (String.IsNullOrEmpty(exceptionMessage))
+                    exceptionMessage = exc.Message;
+                return Json(new { success = false, message = exceptionMessage }, JsonRequestBehavior.AllowGet);
+            }
+            catch (GlimpseException exc)
+            {
+                Log.LogException(exc);
+                return Json(new { success = false, message = exceptionMessage }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception exc)
+            {
+                Log.LogException(exc, "Parametros: userName:(" + userView.Username + "), userPassowrd( " + userView.Password +
+                                      "), userConfirmPassword(" + userView.ConfirmationPassword + "), userFirstName(" + userView.Firstname +
+                                      "), userLastName(" + userView.Lastname + ").");
+                return Json(new { success = false, message = "Error creando usuario." }, JsonRequestBehavior.AllowGet);
             }
             finally
             {
@@ -132,19 +252,72 @@ namespace Glimpse.Controllers
             }
             return Redirect("/");
         }
-
+        #endregion
+        #region Private Helpers
         [NonAction]
         private ActionResult RedirectToLocal(string returnUrl)
         {
             if (Url.IsLocalUrl(returnUrl))
-            {
                 return Redirect(returnUrl);
-            }
             else
-            {
                 return RedirectToAction("Index", "Home");
-            }
         }
-    }
+        [NonAction]
+        private void ValidateUserGenericFields(UserViewModel userView, ISession session)
+        {
+            String exceptionMessage = "";
 
+            if (!Glimpse.Models.User.IsGlimpseUser(userView.Username))
+                exceptionMessage += "El nombre de usuario elegido no posee caracteres válidos.\n";
+            if (userView.Password != userView.ConfirmationPassword)
+                exceptionMessage += "Las contraseñas ingresadas deben coincidir.\n";
+            if (Glimpse.Models.User.FindByUsername(userView.Username, session) != null)
+                exceptionMessage += "El nombre de usuario elegido ya existe.\n";
+            if (exceptionMessage != "")
+                throw new GlimpseException(exceptionMessage);
+        }
+        [NonAction]
+        private void ValidateUserMailaccounts(UserViewModel userView)
+        {
+            String exceptionMessage = "";
+            Boolean hasMainAccount = false;
+            Boolean checkMainAccounts = true;
+
+            foreach (MailAccountViewModel mailAccountView in userView.ListMailAccounts)
+            {
+                if (mailAccountView.Password == mailAccountView.ConfirmationPassword)
+                {
+                    try
+                    {
+                        new MailAccount(mailAccountView.Address, mailAccountView.Password).ConnectLight();
+                    }
+                    catch (InvalidAuthenticationException exc)
+                    {
+                        exceptionMessage += "La dirección de correo (" + mailAccountView.Address +
+                                            ") o la contraseña no son válidos.\n";
+                    }
+                }
+                else
+                    exceptionMessage += "Las contraseñas de la dirección: " + mailAccountView.Address + 
+                                        " no son iguales.\n";
+
+                if (hasMainAccount && mailAccountView.IsMainAccount && checkMainAccounts)
+                {
+                    exceptionMessage += "Sólo puede existir una dirección de correo principal.\n";
+                    checkMainAccounts = false;
+                }
+                else if (!hasMainAccount && mailAccountView.IsMainAccount)
+                    hasMainAccount = true;
+            }
+
+            if (!hasMainAccount)
+                exceptionMessage += "Una dirección de correo debe ser indicada como principal.\n";
+            if (userView.ListMailAccounts.Count == 0)
+                exceptionMessage += "El usuario Glimpse debe tener al menos una dirección de correo.\n";
+
+            if (exceptionMessage != "")
+                throw new GlimpseException(exceptionMessage);
+        }
+        #endregion
+    }
 }

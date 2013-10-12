@@ -47,7 +47,8 @@ function insertCircle(value) {
             " data-to=", value.to,
             " data-importance=", value.importance,
             " data-custom-labels=", customLabels,
-            " data-system-labels=", systemLabels
+            " data-system-labels=", systemLabels,
+            " data-mailaccount=", value.mailaccount
         ];
 
         var newCircle = $("<div class='" + classes + "'" + dataAttributes.join("'") + "' title='" + value.from.address +
@@ -71,6 +72,28 @@ function insertCircle(value) {
         setFullDisplay(newCircle);
         configureCircleHover(newCircle);
     }
+}
+
+function getCircleData(circle) {
+    var circleData = new Object;
+
+    circleData.id = circle.data('id');
+    circleData.tid = circle.data('tid');
+    circleData.subject = circle.data('subject');
+    circleData.date = circle.data('date');
+    circleData.address = circle.data('address');
+    circleData.bodypeek = circle.data('bodypeek');
+    circleData.age = circle.data('age');
+    circleData.cc = circle.data('cc');
+    circleData.bcc = circle.data('bcc');
+    circleData.to = circle.data('to');
+    circleData.from = circle.data('from');
+    circleData.importance = circle.data('importance');
+    circleData.customlabels = circle.data('customlabels');
+    circleData.systemlabels = circle.data('systemlabels');
+    circleData.mailaccount = circle.data('mailaccount');
+
+    return circleData;
 }
 
 function setPreviewDisplay(circle) {

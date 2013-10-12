@@ -1,6 +1,8 @@
 ﻿using ActiveUp.Net.Mail;
 using Glimpse.DataAccessLayer;
 using Glimpse.DataAccessLayer.Entities;
+using Glimpse.Exceptions.MailInterfacesExceptions;
+using Glimpse.Helpers;
 using Glimpse.MailInterfaces;
 using NHibernate;
 using NHibernate.Criterion;
@@ -46,7 +48,7 @@ namespace Glimpse.Models
                                                                 .Add(Restrictions.Eq("User", this.Entity.User))
                                                                 .Add(Restrictions.Not(Restrictions.Eq("Id", this.Entity.Id)))
                                                                 .List<MailAccountEntity>();
-            foreach(MailAccountEntity notMainAccount in notMainMailAccounts)
+            foreach (MailAccountEntity notMainAccount in notMainMailAccounts)
             {
                 notMainAccount.Active = false;
                 new MailAccount(notMainAccount).SaveOrUpdate(session);
@@ -213,7 +215,7 @@ namespace Glimpse.Models
         }
         public void Disconnect()
         {
-            if(this.MyFetcher != null)
+            if (this.MyFetcher != null)
                 this.MyFetcher.CloseClient();
         }
         public void FetchAndSaveMails(Label label, Int64 fromUid, Int64 toUid, ref Int32 amountOfMails)
@@ -286,7 +288,7 @@ namespace Glimpse.Models
         {
             ICriteria criteria = session.CreateCriteria<MailAccountEntity>()
                                           .Add(Restrictions.Eq("Address", emailAddress));
-            if(activeRequired)
+            if (activeRequired)
                 criteria.Add(Restrictions.Eq("Active", true));
 
             MailAccountEntity account = criteria.UniqueResult<MailAccountEntity>();
@@ -304,6 +306,16 @@ namespace Glimpse.Models
                                             .UniqueResult<MailAccountEntity>();
             return new MailAccount(entity);
         }
+        public void ValidateCredentials()
+        {
+            using (ISession session = NHibernateManager.OpenSession())
+            {
+                MailAccount correctMailAccount = MailAccount.FindByAddress(this.Entity.Address, session, false);
+                if (!CryptoHelper.PasswordsMatch(correctMailAccount.Entity.Password, this.Entity.Password))
+                    throw new InvalidAuthenticationException("Las credenciales ingresadas no son validas, usuario:" + this.Entity.Address);
+            }
+        }
+
         #endregion
         #region Private Methods
         private void SetFetcherLabels(ISession session)
