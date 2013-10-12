@@ -43,12 +43,13 @@ namespace Glimpse.Controllers
                 List<LabelViewModel> viewLabels = new List<LabelViewModel>();
                 foreach (MailAccount mailAccount in mailAccounts)
                 {
+                    accountLabels.AddRange(Label.FindByAccount(mailAccount.Entity, session));
+
                     try
                     {
                         if (!mailAccount.IsFullyConnected())
                             mailAccount.ConnectFull();
-                        Task.Factory.StartNew(() => MailsTasksHandler.StartSynchronization(mailAccount.Entity.Address));
-                        accountLabels.AddRange(Label.FindByAccount(mailAccount.Entity, session));
+                        Task.Factory.StartNew(() => MailsTasksHandler.StartSynchronization(mailAccount.Entity.Address));     
                     }
                     catch (InvalidAuthenticationException exc)
                     {

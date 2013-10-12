@@ -5,6 +5,12 @@
 
 var unwantedSystemLabels = ["Important", "Flagged", "Drafts", "All"];
 
+function preventSelectingNotUsefulThings() {
+    //$('body').mousedown(function (downEvent) {
+    //    downEvent.preventDefault();
+    //}
+    //);
+}
 
 function containerHeight() {
     return $("#email-container").height();
@@ -166,7 +172,7 @@ function setWheelZoom() {
     });
 }
 
-function allowedMovementRight(offset){
+function allowedMovementRight(offset) {
     return maxAge + offset < oldestAge;
 }
 function allowedMovementLeft(offset) {
@@ -272,10 +278,17 @@ function setLabelsAdder() {
         var currentLabel = $(this);
         if (currentLabel.hasClass("custom-label")) {
 
+            if (currentLabel.data('name') === 'others') {
+                currentLabel.mousedown(function (event) {
+                    event.preventDefault();
+                });
+                return;
+            }
+
             currentLabel.attr("draggable", true);
-            //currentLabel.attr("ondragstart", "labelDrag(event)");
 
             currentLabel.on('dragstart', { label: currentLabel }, function (ev) {
+
                 ev.data.label.css('opacity', 0.4);
                 ev.originalEvent.dataTransfer.setData("Text", ev.target.id);
                 selectedLabel = ev.data.label.attr('data-name');
@@ -304,6 +317,7 @@ function canReceiveThatLabel(label, mail) {
 function prepareToReceiveLabels(circle) {
 
     $(circle).on('dragover', function (ev) {
+        if (selectedLabel === 'others') return;
         if (labelToAddIsSet && canReceiveThatLabel(selectedLabel, $(this))) {
             ev.preventDefault();
             ev.stopPropagation();
@@ -375,7 +389,7 @@ function setLabelSelection() {
 }
 
 function getLabels(circle) {
-   
+
     return circle.data("custom-labels").toString().split(",");
 }
 
@@ -388,12 +402,12 @@ function isActive(label) {
 }
 
 function hasLabel(circle, label) {
-    return ([circle.data("label0"), circle.data("label1"), circle.data("label2")].indexOf(label) != -1);
+    return (getLabels(circle).indexOf(label) != -1);
 }
 
 function loadLabels() {
 
-    for (var i = labels.length-1; i >= 0; i--) {
+    for (var i = labels.length - 1; i >= 0; i--) {
 
         var currentLabel = labels[i];
         if (currentLabel.systemName === null) {
@@ -402,7 +416,7 @@ function loadLabels() {
             );
         } else
             if (unwantedSystemLabels.indexOf(currentLabel.systemName) === -1 && currentLabel.systemName != null) {
-                
+
                 $(".nav-header:contains('Carpetas')").after(
                "<li class='label label-glimpse label-hidden' data-name=" + currentLabel.showName +
                " data-system=" + currentLabel.systemName + ">" + currentLabel.showName + "</li>"

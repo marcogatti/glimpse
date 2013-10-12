@@ -53,29 +53,44 @@
                     </div>
                 </td>
                 <td>
-                    <div id="mail-view-date" class="pull-right label">20/10/2013</div>
+                    <div id="mail-view-date-container" class="pull-right lead panel panel-info">
+                        <div class="panel-heading">
+                            <h6 id="mail-view-date" class="panel-title"></h6>
+                        </div>
+                    </div>
                 </td>
             </tr>
         </table>
-        <table class="mail-view-addresses well well-lg">
-            <tr>
-                <td colspan="2">
-                    <p id="mail-view-from" class="mail-view-address">From</p>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <p class="mail-view-address" id="mail-view-to">To</p>
-                </td>
-                <td class="mail-view-address">
-                    <p id="mail-view-cc">CC</p>
-                </td>
-            </tr>
-        </table>
+        <div id="mail-view-header">
+            <table class="mail-view-addresses well well-lg">
+                <tr>
+                    <td colspan="2">
+                        <p class="mail-view-address">
+                            <span class="label label-info">From:</span>
+                            <span id="mail-view-from"></span>
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <p class="mail-view-address">
+                            <span class="label label-info">To:</span>
+                            <span id="mail-view-to"></span>
+                        </p>
+                    </td>
+                    <td>
+                        <p id="mail-view-cc-container" class="mail-view-address">
+                            <span class="label label-info">CC:</span>
+                            <span id="mail-view-cc"></span>
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
     </div>
     <div id="mail-view-body-container" class="modal-body">
         <div id="mail-view-body" class="well"></div>
-        <div class="panel panel-primary"  id="mail-view-attach-container">
+        <div class="panel panel-primary" id="mail-view-attach-container">
             <div class="panel-heading">
                 <h3 class="panel-title">Adjuntos:</h3>
             </div>
@@ -86,9 +101,14 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="#" class="btn mail-reply" data-dismiss="modal">Reply</a>
-        <a href="#" class="btn mail-replyall" data-dismiss="modal">Reply All</a>
-        <a href="#" class="btn mail-forward" data-dismiss="modal">Forward</a>
+        <a href="#" class="btn mail-forward" data-dismiss="modal">Reenviar</a>
+        <a href="#" class="btn mail-replyall" data-dismiss="modal">Responder a todos</a>
+        <a href="#" class="btn btn-info mail-reply" data-dismiss="modal">Responder</a>
+
+        <a id="mail-goback" href="#" class="btn pull-left" title="Ir atrás en la conversación"><i class="icon-chevron-left"></i></a>
+        <a id="mail-goforw" href="#" class="btn pull-left" title="Ir adelante en la conversación"><i class="icon-chevron-right"></i></a>
+        <span class="separator pull-left"><i class="icon-minus"></i></span>
+        <a href="#" class="btn btn-danger pull-left" data-dismiss="modal">Cerrar</a>
     </div>
 </div>
 

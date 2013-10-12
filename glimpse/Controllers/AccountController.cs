@@ -8,6 +8,7 @@ using NHibernate;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 using System.Web.Mvc;
 using System.Web.Security;
 
@@ -42,6 +43,8 @@ namespace Glimpse.Controllers
             MailAccount existingMailAccount;
             ISession session = NHibernateManager.OpenSession();
             ITransaction tran = session.BeginTransaction();
+            Boolean workingOffline = false;
+
             try
             {
                 this.UpdateModel(userView);
@@ -50,7 +53,15 @@ namespace Glimpse.Controllers
                 if (Glimpse.Models.User.IsEmail(userView.Username)) //si es un email
                 {
                     mailAccount = new MailAccount(userView.Username, cipherPassword);
-                    mailAccount.ConnectLight(); //si pasa este punto es que los datos ingresados son correctos
+                    try
+                    {
+                        mailAccount.ConnectLight(); //si pasa este punto es que los datos ingresados son correctos
+                    }
+                    catch (SocketException)
+                    {
+                        workingOffline = true;
+                        mailAccount.validateCredentials();
+                    }
                     user = Glimpse.Models.User.FindByUsername(userView.Username, session);
                     existingMailAccount = MailAccount.FindByAddress(userView.Username, session, false);
 
@@ -80,7 +91,10 @@ namespace Glimpse.Controllers
                         }
                         mailAccount.Entity = existingMailAccount.Entity;
                     }
-                    mailAccount.UpdateLabels(session);
+
+                    if(!workingOffline)
+                        mailAccount.UpdateLabels(session);
+
                     user.AddAccount(mailAccount);
                 }
                 else //si es un usuario glimpse
@@ -112,6 +126,12 @@ namespace Glimpse.Controllers
             {
                 tran.Rollback();
                 ModelState.AddModelError("", "La dirección de correo o la contraseña no son correctos.");
+                return View(userView);
+            }
+            catch (Exception)
+            {
+                tran.Rollback();
+                ModelState.AddModelError("", "Existen problemas para iniciar sesión, intentalo de nuevo más tarde.");
                 return View(userView);
             }
             finally

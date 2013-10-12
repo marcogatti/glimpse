@@ -1,5 +1,6 @@
 $(document).ready(function () {
 
+    preventSelectingNotUsefulThings();
     loadLabels();
     setDateCoordsPosition();
     populateLabelColors();
@@ -13,5 +14,6 @@ $(document).ready(function () {
     setTransitionsCheckbox();
     setEverithingRelatedToAddLabelsToAMail();
     initializeMailEditor();
+    initializeMailViewModal();
 })
 
