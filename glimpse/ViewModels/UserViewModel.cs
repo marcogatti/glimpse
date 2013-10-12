@@ -45,5 +45,8 @@ namespace Glimpse.ViewModels
         [DataType(DataType.Password)]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public String ConfirmationPassword { get; set; }
+
+        public List<MailAccountViewModel> ListMailAccounts { get; set; }
+
     }
 }

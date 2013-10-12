@@ -1,6 +1,7 @@
 ﻿using ActiveUp.Net.Mail;
 using Glimpse.DataAccessLayer;
 using Glimpse.DataAccessLayer.Entities;
+using Glimpse.Exceptions;
 using Glimpse.Helpers;
 using Glimpse.MailInterfaces;
 using Glimpse.Models;
@@ -176,35 +177,41 @@ namespace Glimpse.Controllers
             }
         }
         [HttpPost]
-        public ActionResult AddLabel(String labelName, Int64 mailId, Int64 mailAccountId = 0)
+        public ActionResult AddLabel(String labelName, Int64 mailId, Int64 mailMailAccountId = 0)
         {
-            bool success;
+            ISession session = NHibernateManager.OpenSession();
+            ITransaction tran = session.BeginTransaction();
             try
             {
-                MailAccount mailAccount = this.GetMailAccount(mailAccountId);
+                MailAccount mailAccount = this.GetMailAccount(mailMailAccountId);
+                Label theLabel = this.GetAccountLabel(labelName, mailAccount, session);
+                if(theLabel == null)
+                    return Json(new { success = false, message = "No se ha podido encontrar la etiqueta con el nombre:" + labelName + "." }, JsonRequestBehavior.AllowGet);
+                Mail theMail = new Mail(mailId, session);
 
-                using (ISession session = NHibernateManager.OpenSession())
-                {
-                    ITransaction tran = session.BeginTransaction();
+                if (theMail.Entity.MailAccountEntity.Id != theLabel.Entity.MailAccountEntity.Id) //si el mail no es del mismo MailAccount de la etiqueta
+                    this.CreateLabel(labelName, theLabel.Entity.MailAccountEntity.Id); //DB e IMAP
 
-                    Mail theMail = new Mail(mailId, session);
-                    Label theLabel = Label.FindByName(mailAccount, labelName, session);
-                    theMail.AddLabel(theLabel, session); //DB
-                    mailAccount.AddLabelIMAP(theMail, theLabel); //IMAP
-                    tran.Commit();
+                theMail.AddLabel(theLabel, session); //DB
+                mailAccount.AddLabelIMAP(theMail, theLabel); //IMAP
 
-                    success = true;
-                }
+                tran.Commit();
+                return Json(new { success = true }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception exc)
             {
-                success = false;
-                Log.LogException(exc, "Parametros de la llamada: label(" + labelName + "), mailId(" + mailId.ToString() + ").");
+                tran.Rollback();
+                Log.LogException(exc, "Parametros de la llamada: label(" + labelName + "), mailId(" +
+                                       mailId.ToString() + "), mailAccountId(" + mailMailAccountId + ").");
+                return Json(new { success = false }, JsonRequestBehavior.AllowGet);
             }
-            return Json(new { success = success }, JsonRequestBehavior.AllowGet);
+            finally
+            {
+                session.Close();
+            }
         }
         [HttpPost]
-        public ActionResult RemoveLabel(String label, Int64 mailId, Int64 mailAccountId = 0)
+        public ActionResult RemoveLabel(String labelName, Int64 mailId, Int64 mailAccountId = 0)
         {
             ISession session = NHibernateManager.OpenSession();
             try
@@ -215,8 +222,8 @@ namespace Glimpse.Controllers
 
                 if (mail.Entity.MailAccountEntity.Id == currentMailAccount.Entity.Id)
                 {
-                    mail.RemoveLabel(label, session); //DB
-                    currentMailAccount.RemoveMailLabel(label, mail.Entity.Gm_mid); //IMAP
+                    mail.RemoveLabel(labelName, session); //DB
+                    currentMailAccount.RemoveMailLabel(labelName, mail.Entity.Gm_mid); //IMAP
                     success = true;
                 }
                 else
@@ -229,7 +236,7 @@ namespace Glimpse.Controllers
             }
             catch (Exception exc)
             {
-                Log.LogException(exc, "Parametros de la llamada: label(" + label + "), gmID(" + mailId.ToString() + ").");
+                Log.LogException(exc, "Parametros de la llamada: label(" + labelName + "), gmID(" + mailId.ToString() + ").");
                 return Json(new { success = false, message = "Error al remover label." }, JsonRequestBehavior.AllowGet);
             }
             finally
@@ -263,6 +270,39 @@ namespace Glimpse.Controllers
                 Log.LogException(exc, "Parametros del metodo: oldLabelName(" + oldLabelName +
                                       "), newLabelName(" + newLabelName + "), mailAccountId(" + mailAccountId.ToString() + ").");
                 return Json(new { success = false, message = "Error al renombrar label." }, JsonRequestBehavior.AllowGet);
+            }
+            finally
+            {
+                session.Close();
+            }
+        }
+        [HttpPost]
+        public ActionResult CreateLabel(String labelName, Int64 mailAccountId = 0)
+        {
+            ISession session = NHibernateManager.OpenSession();
+            ITransaction tran = session.BeginTransaction();
+            try
+            {
+                MailAccount currentMailAccount = this.GetMailAccount(mailAccountId);
+                Label existingLabel = Label.FindByName(currentMailAccount, labelName, session);
+                if (existingLabel != null)
+                    return Json(new { success = false, message = "Ya existe una etiqueta con ese nombre." }, JsonRequestBehavior.AllowGet);
+                Label newLabel = new Label(new LabelEntity());
+                newLabel.Entity.SystemName = null;
+                newLabel.Entity.Name = labelName;
+                newLabel.Entity.Active = true;
+                newLabel.SaveOrUpdate(session); //BD
+                currentMailAccount.CreateLabel(labelName); //IMAP
+                tran.Commit();
+
+                JsonResult result = Json(new { success = true }, JsonRequestBehavior.AllowGet);
+                return result;
+            }
+            catch (Exception exc)
+            {
+                tran.Rollback();
+                Log.LogException(exc, "Parametros del metodo: labelName(" + labelName + "), mailAccountId(" + mailAccountId.ToString() + ").");
+                return Json(new { success = false, message = "Error al crear label." }, JsonRequestBehavior.AllowGet);
             }
             finally
             {
@@ -539,6 +579,25 @@ namespace Glimpse.Controllers
                 builder.Append(ch);
             }
             return CryptoHelper.EncryptDefaultKey(builder.ToString());
+        }
+        private Label GetAccountLabel(String labelName, MailAccount possibleMainAccount, ISession session)
+        {
+            User user = (User)Session[AccountController.USER_NAME];
+            IList<MailAccount> mailAccounts = user.GetAccounts();
+
+            //busco en el mailAccount del mismo mail primero
+            IList<LabelEntity> accountLabels = Label.FindByAccount(possibleMainAccount.Entity, session);
+            if (accountLabels.Any(x => x.Name == labelName))
+                return new Label(accountLabels.Where(x => x.Name == labelName).Single());
+
+            //si no esta, busco en el resto
+            foreach (MailAccount mailAccount in mailAccounts.Where(x => x.Entity != possibleMainAccount.Entity))
+            {
+                accountLabels = Label.FindByAccount(mailAccount.Entity, session);
+                if (accountLabels.Any(x => x.Name == labelName))
+                    return new Label(accountLabels.Where(x => x.Name == labelName).Single());
+            }
+            return null;
         }
         private void InsertEmbeddedExtraUrl(ref String body, Int64 mailID, ISession session)
         {

@@ -3,7 +3,6 @@
     labelColors = {},
     editor;
 
-var unwantedSystemLabels = ["Important", "Flagged", "Drafts", "All"];
 
 function preventSelectingNotUsefulThings() {
     //$('body').mousedown(function (downEvent) {
@@ -71,39 +70,6 @@ function alphabetSize() {
 
 //    drawBoard();
 //}
-
-function populateLabelColors() {
-
-    var glimpseColors = [
-
-    //  algunos de los colores de Gmail
-    "rgb(251, 76, 47)",   //  rojo
-    "rgb(22, 167, 101)",  //  verde
-    "rgb(255, 173, 70)",  //  naranja
-    "rgb(73, 134, 231)",  //  azul
-
-    //  otros
-    "LimeGreen",
-    "LightSeaGreen",
-    "Crimson",
-    "Indigo"
-    ];
-
-    var i = 0;
-    $("#labels-header").children(".label").each(function () {
-
-        var currentColor = glimpseColors[i];
-
-        if (!$(this).data("system") && $(this).data("name") !== "others") {
-
-            $(this).css("background-color", currentColor);
-            labelColors[$(this).data("name")] = currentColor;
-            i++;
-        }
-    });
-
-    setLabelSelection();
-}
 
 function setTransitionsCheckbox() {
     $("#transitions-check").click(function () {
@@ -233,17 +199,40 @@ function ageToDate(age) {
     return new Date(now - jsAge);
 }
 
+function getDiffString(diff, singular) {
+
+    if (diff === 1) { return " " + singular; }
+    else { return " " + singular + "s"; }
+}
+
 function setDateCoords() {
 
-    newDateToday = ageToDate(minAge).toLocaleDateString(),
-    newDateLast = ageToDate(maxAge).toLocaleDateString();
+    var newMinDate = ageToDate(minAge),
+        newMaxDate = ageToDate(maxAge),
+        diff = newMinDate - newMaxDate,
+        diffString;
 
-    if (newDateToday === new Date().toLocaleDateString()) {
-        newDateToday = "Hoy";
+    newMinDate = newMinDate.toLocaleDateString();
+    if (newMinDate === new Date().toLocaleDateString()) {
+        newMinDate = "Hoy";
     }
 
-    $("#date-today").html(newDateToday);
-    $("#date-last").html(newDateLast);
+    var effectiveDiff = Math.round(diff / 1000 / 60 / 60 / 24);
+
+    if (effectiveDiff !== 0) {
+        diffString = getDiffString(effectiveDiff, "día");
+    } else {
+        effectiveDiff = Math.round(diff / 1000 / 60 / 60);
+        if (effectiveDiff !== 0) {
+            diffString = getDiffString(effectiveDiff, "hora");
+        } else {
+            effectiveDiff = Math.round(diff / 1000 / 60);
+            diffString = getDiffString(effectiveDiff, "minuto");
+        }
+    }
+
+    $("#date-today").html(newMinDate);
+    $("#date-last").html(effectiveDiff.toString() + diffString + " atrás");
 }
 
 function hideProgressBar(bar) {
@@ -261,176 +250,5 @@ function setRefreshOnResize() {
             calculateEmailPosition($(this));
         });
     });
-
-}
-
-var selectedLabel,
-    labelToAddIsSet = false;
-
-function labelDrag(ev) {
-    //ev.dataTransfer.setData("Text", ev.target.id);
-    ev.data.label.css('opacity', 0.4);
-}
-
-function setLabelsAdder() {
-    $.each($('.label'), function (index, actualLabel) {
-
-        var currentLabel = $(this);
-        if (currentLabel.hasClass("custom-label")) {
-
-            if (currentLabel.data('name') === 'others') {
-                currentLabel.mousedown(function (event) {
-                    event.preventDefault();
-                });
-                return;
-            }
-
-            currentLabel.attr("draggable", true);
-
-            currentLabel.on('dragstart', { label: currentLabel }, function (ev) {
-
-                ev.data.label.css('opacity', 0.4);
-                ev.originalEvent.dataTransfer.setData("Text", ev.target.id);
-                selectedLabel = ev.data.label.attr('data-name');
-                labelToAddIsSet = true;
-            }
-            );
-
-            currentLabel.on('dragend', { label: currentLabel }, function (ev) {
-                ev.data.label.css('opacity', 1);
-                labelToAddIsSet = false;
-            }
-            );
-
-        } else {
-            $(this).mousedown(function (downEvent) {
-                downEvent.preventDefault();
-            });
-        }
-    });
-}
-
-function canReceiveThatLabel(label, mail) {
-    return !hasLabel(mail, label);
-}
-
-function prepareToReceiveLabels(circle) {
-
-    $(circle).on('dragover', function (ev) {
-        if (selectedLabel === 'others') return;
-        if (labelToAddIsSet && canReceiveThatLabel(selectedLabel, $(this))) {
-            ev.preventDefault();
-            ev.stopPropagation();
-        }
-    }
-    );
-
-    $(circle).on('drop', function (ev) {
-        if (labelToAddIsSet) {
-            if (isClicked(this)) {
-                $('[mail-clicked|=true]').each(function () {
-                    addLabelToEmail(selectedLabel, $(this));
-                }
-                );
-            } else {
-                addLabelToEmail(selectedLabel, $(this));
-            }
-        }
-    }
-);
-}
-
-function changeMailColour(circle, label) {
-
-    var customLabels = getLabels(circle);
-    if (customLabels[0] === "") {
-        customLabels = [];
-    }
-    customLabels.push(label);
-    circle.data("custom-labels", customLabels);
-
-    calculateEmailColor(circle);
-}
-
-function addLabelToEmail(label, mail) {
-
-    // Validar que el label no sea un system label, igual tambien lo hace el server.
-
-    changeMailColour(mail, label);
-
-    $.ajax({
-        type: "POST",
-        url: "async/AddLabel",
-        dataType: 'json',
-        error: function (jqXHR, textStatus, errorThrown) {
-            alert("No se pudo agregar el label.");
-        },
-        success: function () {
-            // Hacer algo jeje
-        },
-        data: { labelName: label, mailId: mail.attr('data-id') }
-    });
-}
-
-function setEverithingRelatedToAddLabelsToAMail() {
-    setLabelsAdder();
-}
-
-function setLabelSelection() {
-    $(".custom-label").on('click', function () {
-        $(this).toggleClass('label-hidden');
-
-        $(".circle").each(function () {
-            if (toBeHidden($(this))) {
-                $(this).addClass("hidden");
-            } else {
-                $(this).removeClass("hidden");
-            }
-        });
-    });
-}
-
-function getLabels(circle) {
-
-    return circle.data("custom-labels").toString().split(",");
-}
-
-function toBeHidden(circle) {
-    return !getLabels(circle).some(isActive);
-}
-
-function isActive(label) {
-    return !$("li[data-name='" + label + "']").hasClass("label-hidden");
-}
-
-function hasLabel(circle, label) {
-    return (getLabels(circle).indexOf(label) != -1);
-}
-
-function loadLabels() {
-
-    for (var i = labels.length - 1; i >= 0; i--) {
-
-        var currentLabel = labels[i];
-        if (currentLabel.systemName === null) {
-            $(".nav-header:contains('Etiquetas')").after(
-                "<li class='custom-label label label-glimpse' data-name='" + currentLabel.showName + "'>" + currentLabel.showName + "</li>"
-            );
-        } else
-            if (unwantedSystemLabels.indexOf(currentLabel.systemName) === -1 && currentLabel.systemName != null) {
-
-                $(".nav-header:contains('Carpetas')").after(
-               "<li class='label label-glimpse label-hidden' data-name=" + currentLabel.showName +
-               " data-system=" + currentLabel.systemName + ">" + currentLabel.showName + "</li>"
-           );
-            }
-    }
-
-    $(".label-glimpse:contains('INBOX')").removeClass("label-hidden");
-
-
-    $(".nav-header:contains('Etiquetas')").after(
-                "<li class='custom-label label label-glimpse' data-name='others'>Sin etiqueta</li>"
-            );
 
 }

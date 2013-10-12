@@ -255,6 +255,7 @@
     <Compile Include="Exceptions\CommonExceptions\NotUniqueResultException.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="ViewModels\LabelViewModel.cs" />
+    <Compile Include="ViewModels\MailAccountViewModel.cs" />
     <Compile Include="ViewModels\MailSentViewModel.cs" />
     <Compile Include="ViewModels\UserViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -478,6 +479,7 @@
     <Content Include="Scripts\ckeditor\styles.js" />
     <Content Include="Scripts\glimpse-circles.js" />
     <Content Include="Scripts\glimpse-fetcher.js" />
+    <Content Include="Scripts\glimpse-labels.js" />
     <Content Include="Scripts\glimpse-mail-view.js" />
     <Content Include="Scripts\glimpse-sender.js" />
     <Content Include="Scripts\glimpse-utils.js" />

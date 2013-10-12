@@ -75,6 +75,11 @@ namespace Glimpse.Models
         {
             this.MyFetcher.Dispose();
         }
+        public void Activate(ISession session)
+        {
+            this.Entity.Active = true;
+            this.SaveOrUpdate(session);
+        }
         public void Deactivate(ISession session)
         {
             this.Entity.Active = false;
@@ -241,6 +246,10 @@ namespace Glimpse.Models
         {
             this.MyFetcher.RemoveMailTag(label, gmID);
         }
+        public void CreateLabel(String labelName)
+        {
+            this.MyFetcher.CreateLabel(labelName);
+        }
         public void RenameLabel(String oldLabelName, String newLabelName)
         {
             this.MyFetcher.RenameLabel(oldLabelName, newLabelName);
@@ -306,7 +315,7 @@ namespace Glimpse.Models
                                             .UniqueResult<MailAccountEntity>();
             return new MailAccount(entity);
         }
-        public void validateCredentials()
+        public void ValidateCredentials()
         {
             using (ISession session = NHibernateManager.OpenSession())
             {

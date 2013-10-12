@@ -32,24 +32,26 @@ hr {
     text-align: center;
     text-shadow: 0 0 1px #fff, 0 1px 2px rgba(0,0,0,1);
     cursor: pointer;
+
     /*  Color de emails sin etiqueta    */
-    color: rgb(159, 182, 205);
     background-color: rgb(159, 182, 205);
-    -webkit-box-shadow: 0 0 1px 2px;
-    box-shadow: 0 0 1px 2px;
+
+    -webkit-box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.2) inset;
+    box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.2) inset;
     /*  Habilitar aceleracion por hardware  */
     transform: translate3d(0,0,0);
     -webkit-transform: translate3d(0,0,0);
     -moz-transform: translate3d(0,0,0);
     -o-transform: translate3d(0,0,0);
     -ms-transform: translate3d(0,0,0);
-    transition: opacity 1s;
-    -webkit-transition: opacity 1s;
+
+    -webkit-transition: opacity 0.5s, box-shadow 0.5s;
+    transition: opacity 0.5s, box-shadow 0.5s;
 }
 
     .circle.transition {
-        transition: all 0.2s, left 0.5s ease-out, top 0.5s ease-out;
-        -webkit-transition: all 0.2s, left 0.5s ease-out, top 0.5s ease-out;
+        transition: left 0.5s ease-out, top 0.5s ease-out;
+        -webkit-transition: left 0.5s ease-out, top 0.5s ease-out;
     }
 
 
@@ -66,7 +68,7 @@ hr {
     width: 75px;
     font-style: normal;
     color: #fff;
-    /*font-weight: bold;*/
+    word-wrap: break-word;
     font-size: small;
     font-family: 'Open Sans', Arial, sans-serif;
     display: inline-block;
@@ -81,7 +83,6 @@ hr {
     }
 
 .circle.new {
-    /*-webkit-box-shadow: inset 0 0 0 8px rgba(255,255,255,1), 0 0 0 8px;*/
     animation-duration: 0.2s;
     animation-name: blink;
     animation-iteration-count: infinite;
@@ -93,9 +94,8 @@ hr {
 }
 
 .circle.focused {
-    -webkit-box-shadow: 0 0 4px 4px;
-    box-shadow: 0 0 4px 4px;
-    /*opacity: 1;*/
+    -webkit-box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.7) inset;
+    box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.7) inset;
 }
 
 .circle.selected {
@@ -116,9 +116,9 @@ hr {
     overflow: visible;
     z-index: +10;
     text-shadow: 0 0 1px #fff, 0 2px 4px rgba(0,0,0,1);
-    border-style: dashed;
+    /*border-style: dashed;
     border-color: black;
-    border-width: 2px;
+    border-width: 2px;*/
 }
 
 .circle.importance1 {
@@ -162,7 +162,7 @@ hr {
     text-align: center;
     font-style: normal;
     font-family: 'Open Sans', Arial, sans-serif;
-    width: 50px;
+    width: 75px;
     color: white;
     text-shadow: 0 2px 4px #000;
 }
@@ -180,10 +180,6 @@ hr {
 
 #dateTime {
     width: 125px;
-}
-
-#date-last {
-    direction: rtl;
 }
 
 /*  Para alineacion vertical de la coordenada "from"    */

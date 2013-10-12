@@ -157,7 +157,7 @@ function setAddressesDisplayer(view_modal, circle) {
 
 function setMailViewerLabels(view_modal, circle) {
 
-    var labels = getLabels(circle),
+    var labels = getCustomLabels(circle),
         labelElement;
 
     $('#mail-view-labels').html('');

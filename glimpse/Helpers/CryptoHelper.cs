@@ -25,6 +25,11 @@ namespace Glimpse.Helpers
             return EncryptStringAES(user.Password, "PasswordDefault1234");
         }
         [DebuggerNonUserCodeAttribute]
+        public static String EncryptDefaultKey(MailAccountViewModel mailAccount)
+        {
+            return EncryptStringAES(mailAccount.Password, "PasswordDefault1234");
+        }
+        [DebuggerNonUserCodeAttribute]
         public static String DecryptDefaultKey(String cipherText)
         {
             return DecryptStringAES(cipherText, "PasswordDefault1234");
