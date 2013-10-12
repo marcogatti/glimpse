@@ -199,26 +199,40 @@ function ageToDate(age) {
     return new Date(now - jsAge);
 }
 
+function getDiffString(diff, singular) {
+
+    if (diff === 1) { return " " + singular; }
+    else { return " " + singular + "s"; }
+}
+
 function setDateCoords() {
 
     var newMinDate = ageToDate(minAge),
         newMaxDate = ageToDate(maxAge),
-        diff = newMinDate - newMaxDate;
-
-    diff = Math.round(diff / 1000 / 60 / 60 / 24)
+        diff = newMinDate - newMaxDate,
+        diffString;
 
     newMinDate = newMinDate.toLocaleDateString();
     if (newMinDate === new Date().toLocaleDateString()) {
         newMinDate = "Hoy";
     }
 
-    var diffString = function () {
-        if (diff === 1) { return " día"; }
-        else { return " días"; }
-    }();
+    var effectiveDiff = Math.round(diff / 1000 / 60 / 60 / 24);
+
+    if (effectiveDiff !== 0) {
+        diffString = getDiffString(effectiveDiff, "día");
+    } else {
+        effectiveDiff = Math.round(diff / 1000 / 60 / 60);
+        if (effectiveDiff !== 0) {
+            diffString = getDiffString(effectiveDiff, "hora");
+        } else {
+            effectiveDiff = Math.round(diff / 1000 / 60);
+            diffString = getDiffString(effectiveDiff, "minuto");
+        }
+    }
 
     $("#date-today").html(newMinDate);
-    $("#date-last").html(diff.toString() + diffString + " atrás");
+    $("#date-last").html(effectiveDiff.toString() + diffString + " atrás");
 }
 
 function hideProgressBar(bar) {
