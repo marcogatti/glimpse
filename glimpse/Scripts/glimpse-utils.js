@@ -1,8 +1,7 @@
 ﻿var maxAge = 0,
     minAge = 0,
     labelColors = {},
-    editor,
-    readyToZoom = true;
+    editor;
 
 
 function preventSelectingNotUsefulThings() {
@@ -97,41 +96,34 @@ function currentPeriodShown() {
 
 function zoom(factor, zoomPoint) {
 
-    //if (readyToZoom) {
+    if (amountOfCirclesShown() < $("#max-amount").val() || (factor > 0)) {
 
-    //    readyToZoom = false;
-    //    setTimeout(function () {
-    //        readyToZoom = true;
-    //    }, 300);
+        var movement = currentPeriodShown() * factor * 0.0001;
 
-        if (amountOfCirclesShown() < $("#max-amount").val() || (factor > 0)) {
+        var offsetRight = (containerWidth() - zoomPoint) * movement;
+        var offsetLeft = zoomPoint * movement;
 
-            var movement = currentPeriodShown() * factor * 0.0001;
+        if (maxAge - offsetRight > minAge + offsetLeft) {
 
-            var offsetRight = (containerWidth() - zoomPoint) * movement;
-            var offsetLeft = zoomPoint * movement;
-
-            if (maxAge - offsetRight > minAge + offsetLeft) {
-
-                if (allowedMovementRight(-offsetRight)) {
-                    maxAge -= offsetRight;
-                }
-                if (allowedMovementLeft(offsetLeft)) {
-                    minAge += offsetLeft;
-                }
-
-                setDateCoords();
-                fetchMailsWithinActualPeriod();
-
-                surroundingCircles(0.5, function (circle) {
-                    circle.addClass("transition");
-                });
-                calculateEmailsLeft(2).done(function () {
-                    $(".circle.transition").removeClass("transition");
-                });
+            if (allowedMovementRight(-offsetRight)) {
+                maxAge -= offsetRight;
             }
+            if (allowedMovementLeft(offsetLeft)) {
+                minAge += offsetLeft;
+            }
+
+            setDateCoords();
+            fetchMailsWithinActualPeriod();
+
+            surroundingCircles(0.5, function (circle) {
+                circle.addClass("transition");
+            });
+            calculateEmailsLeft(2).done(function () {
+                $(".circle.transition").removeClass("transition");
+            });
         }
-    
+    }
+
 }
 
 function configureZoom() {
@@ -153,15 +145,10 @@ function setWheelZoom() {
     $('#email-container').on('mousewheel', function (event, delta, deltaX, deltaY) {
         event.preventDefault();
 
-        if (readyToZoom) {
+        var sign = deltaY ? deltaY < 0 ? -1 : 1 : 0;
 
-            readyToZoom = false;
-            setTimeout(function () {
-                readyToZoom = true;
-            }, 50);
+        zoom(sign, event.offsetX);
 
-            zoom(deltaY, event.offsetX);
-        }
     });
 }
 

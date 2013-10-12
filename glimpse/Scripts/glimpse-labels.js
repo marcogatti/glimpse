@@ -182,6 +182,10 @@ function setLabelSelection() {
     });
 }
 
+function setMailBoxSelection() {
+
+}
+
 function getCustomLabels(circle) {
 
     var labelsArray = circle.data("custom-labels").toString().split(",");
