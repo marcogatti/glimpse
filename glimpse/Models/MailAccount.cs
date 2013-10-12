@@ -306,7 +306,7 @@ namespace Glimpse.Models
                                             .UniqueResult<MailAccountEntity>();
             return new MailAccount(entity);
         }
-        public void validateCredentials()
+        public void ValidateCredentials()
         {
             using (ISession session = NHibernateManager.OpenSession())
             {
