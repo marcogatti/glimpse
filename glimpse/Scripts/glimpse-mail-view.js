@@ -3,9 +3,8 @@
     $('.modal-footer').mousedown(function (ev) {
         ev.preventDefault();
     });
-}
 
-function setFullDisplay(circle) {
+    setAddressesDisplayer();
 
     $('#mail-view-address-displayer').click(function (ev) {
         ev.stopPropagation();
@@ -15,6 +14,9 @@ function setFullDisplay(circle) {
     $(document).click(function () {
         $('#mail-view-address-displayer').popover('hide');
     });
+}
+
+function setFullDisplay(circle) {
 
     circle.dblclick(
 
@@ -136,11 +138,9 @@ function setMailViewerActions(view_modal, circle, body) {
     setMailTraversingArrows(view_modal, data.circle);
 
     setAddressesDisplayer(view_modal, data.circle);
-
-    setMailViewerLabels(view_modal, data.circle);
 }
 
-function setAddressesDisplayer(view_modal, circle) {
+function setAddressesDisplayer() {
 
     var options =
     {
