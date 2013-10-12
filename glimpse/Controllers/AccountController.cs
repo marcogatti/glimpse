@@ -234,7 +234,7 @@ namespace Glimpse.Controllers
             catch (GlimpseException exc)
             {
                 Log.LogException(exc);
-                return Json(new { success = false, message = exceptionMessage }, JsonRequestBehavior.AllowGet);
+                return Json(new { success = false, message = exc.Message }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception exc)
             {

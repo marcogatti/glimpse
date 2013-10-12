@@ -22,22 +22,22 @@ namespace Glimpse.ViewModels
                            @"((\.(\w){2,3})+)$", 
                            ErrorMessage= "Nombre de usuario debe ser una dirección de correo o un nombre de usuario Glimpse válido.")]
         [DataType(DataType.Text)]
-        [Display(Name = "Glimpse User or Email")]
+        [Display(Name = "Nombre de Usuario/Email")]
         public String Username { get; set; }
 
         [Required]
         //caracteres validos para un passoword de email segun RFC, entre 6 y 20 caracteres
         [RegularExpression(@"^(?!.{20})[A-Za-z0-9\!#\$%&'\*\.\+\-/=\?\^`\{|\}~_]{6,20}",
-                           ErrorMessage= "Caracteres de contraseña inválidos.")]
+                           ErrorMessage= "Contraseña inválida. Debe tener entre 6 y 20 caracteres. No debe tener caracteres inválidos.")]
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public String Password { get; set; }
 
-        [RegularExpression(@"^(\p{L}\p{M}*){2,16}$", ErrorMessage = "Caracteres de nombre inválidos.")]
+        [RegularExpression(@"^([A-Za-z]){2,16}$", ErrorMessage = "Caracteres de nombre inválidos.")]
         public String Firstname { get; set; }
 
-        [RegularExpression(@"^(\p{L}\p{M}*){2,16}$", ErrorMessage = "Caracteres de apellido inválidos.")]
+        [RegularExpression(@"^([A-Za-z]){2,16}$", ErrorMessage = "Caracteres de apellido inválidos.")]
         public String Lastname { get; set; }
 
         [RegularExpression(@"^(?!.{20})[A-Za-z0-9\!#\$%&'\*\.\+\-/=\?\^`\{|\}~_]{6,20}",
