@@ -1,10 +1,14 @@
-﻿function initializeMailViewModal() {
+﻿var currentCircle;
+
+function initializeMailViewModal() {
 
     $('.modal-footer').mousedown(function (ev) {
         ev.preventDefault();
     });
 
     setAddressesDisplayer();
+
+    setMailTraversingArrows();
 
     $('#mail-view-address-displayer').click(function (ev) {
         ev.stopPropagation();
@@ -21,6 +25,8 @@ function setFullDisplay(circle) {
     circle.dblclick(
 
         function () {
+
+            currentCircle = circle;
 
             var view_modal = $("#mail-view");
             from = circle.data("from"),
@@ -135,8 +141,6 @@ function setMailViewerActions(view_modal, circle, body) {
         displayComposeDialog();
     }
 );
-    setMailTraversingArrows(view_modal, data.circle);
-
     setMailViewerLabels(view_modal, circle);
 }
 
@@ -171,17 +175,17 @@ function setMailViewerLabels(view_modal, circle) {
 }
 
 
-function setMailTraversingArrows(view_modal, circle) {
+function setMailTraversingArrows() {
 
-    view_modal.find("#mail-goback").one("click", view_modal, function (event) {
-        event.data.find("#mail-goforw").unbind('click');
-        moveToFollowingMail(view_modal, circle, getFollowingMailBackward);
+    var view_modal = $('#mail-view');
+
+    view_modal.find("#mail-goback").on("click", function (event) {
+        moveToFollowingMail(view_modal, currentCircle, getFollowingMailBackward);
     }
     );
 
-    view_modal.find("#mail-goforw").one("click", view_modal, function (event) {
-        event.data.find("#mail-goback").unbind('click');
-        moveToFollowingMail(view_modal, circle, getFollowingMailForward);
+    view_modal.find("#mail-goforw").on("click", function (event) {
+        moveToFollowingMail(view_modal, currentCircle, getFollowingMailForward);
     }
     );
 
@@ -194,9 +198,10 @@ function moveToFollowingMail(view_modal, circle, nextMailSearcher) {
 
     if (nextCircle.data('id') === circle.data('id') &&
         nextCircle.data('mailaccount') === circle.data('mailaccount')) {
-        setMailTraversingArrows(view_modal, circle);
         return false;
     }
+
+    currentCircle = nextCircle;
 
     setMailViewModalHeadData(view_modal, nextCircle);
     setMailViewModalBodyData(view_modal, nextCircle);
