@@ -2,6 +2,8 @@
 
 function insertCircle(value) {
 
+    var spinner = "";
+
     if (ownedCircles.indexOf(value.id) === -1) {
         ownedCircles.push(value.id);
 
@@ -12,14 +14,10 @@ function insertCircle(value) {
         var date = new Date(parseInt(value.date.substr(6))).toGMTString(),
             classes = "circle";
 
-        if (!$("#transitions-check").prop("checked")) {
-            classes += " transition";
-        }
-
         classes += " importance" + value.importance;
 
         if (!value.seen) {
-            classes += " new";
+            spinner = '<div class="loading"><div class="spinner"><div class="mask"><div class="maskedCircle"></div></div></div></div>';
         }
 
         var systemLabels = [],
@@ -51,8 +49,8 @@ function insertCircle(value) {
             " data-mailaccount=", value.mailaccount
         ];
 
-        var newCircle = $("<div class='" + classes + "'" + dataAttributes.join("'") + "' title='" + value.from.address +
-                            "'><div class='centered'><p content=true>" + value.subject.substr(0, 50) + "</p></div></div>");
+        var newCircle = $("<div class='" + classes + "'" + dataAttributes.join("'") + "' title='" + value.from.address + "'>" + spinner +
+            "<div class='centered'><p content=true>" + value.subject.substr(0, 50) + "</p></div></div>");
 
         calculateEmailColor(newCircle);
         newCircle.css("opacity", 0);
@@ -131,6 +129,7 @@ function setMailClicked(circle) {
 
     $(circle).attr('mail-clicked', true);
     $(circle).addClass('previewed');
+    $(circle).find(".loading").css("visibility", "hidden");
 
     $(circle).animate({
         width: '150',
@@ -146,6 +145,7 @@ function unsetMailClicked(circle) {
 
     $(circle).attr('mail-clicked', false);
     $(circle).removeClass('previewed');
+    $(circle).find(".loading").css("visibility", "visible");
 
     $(circle).animate({
         width: '75',
@@ -202,7 +202,8 @@ function configureCircleHover(circle) {
 }
 
 function markAsRead(circle) {
-    circle.removeClass("new");
+    //circle.removeClass("new");
+    circle.find(".loading").remove();
 }
 
 function calculateEmailColor(circle) {

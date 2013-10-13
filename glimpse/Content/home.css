@@ -80,14 +80,27 @@ hr {
     }
 
 .circle.new {
-    animation-duration: 0.2s;
+    /*animation-duration: 0.2s;
     animation-name: blink;
     animation-iteration-count: infinite;
     animation-direction: alternate;
     -webkit-animation-duration: 0.2s;
     -webkit-animation-name: blink;
     -webkit-animation-iteration-count: infinite;
-    -webkit-animation-direction: alternate;
+    -webkit-animation-direction: alternate;*/
+}
+
+@-webkit-keyframes blink {
+    from {
+    }
+
+    to {
+        transform: scale(1.05);
+        -webkit-transform: scale(1.05);
+        -moz-transform: scale(1.05);
+        -o-transform: scale(1.05);
+        -ms-transform: scale(1.05);
+    }
 }
 
 .circle.focused {
@@ -102,11 +115,6 @@ hr {
 }
 
 .circle.previewed {
-    /*box-shadow: inset 0 0 0 8px rgba(255,255,255,0.4), 0 0 32px 4px;
-    -webkit-box-shadow: inset 0 0 0 8px rgba(255,255,255,0.4), 0 0 32px 4px;
-    -moz-box-shadow: inset 0 0 0 8px rgba(255,255,255,0.4), 0 0 32px 4px;
-    -o-box-shadow: inset 0 0 0 8px rgba(255,255,255,0.4), 0 0 32px 4px;
-    -ms-box-shadow: inset 0 0 0 8px rgba(255,255,255,0.4), 0 0 32px 4px;*/
     animation: none !important;
     -webkit-animation: none !important;
     opacity: 1;
@@ -139,19 +147,6 @@ hr {
 .circle.importance5 {
     -webkit-transform: scale(1.3);
     transform: scale(1.3);
-}
-
-@-webkit-keyframes blink {
-    from {
-    }
-
-    to {
-        transform: scale(1.05);
-        -webkit-transform: scale(1.05);
-        -moz-transform: scale(1.05);
-        -o-transform: scale(1.05);
-        -ms-transform: scale(1.05);
-    }
 }
 
 .coord {
@@ -354,4 +349,45 @@ blockquote {
     margin-left: 50px;
     padding-left: 15px;
     border-left: 3px solid #ccc;
+}
+
+/* Animation keyframes - you need to add prefixes */
+@-webkit-keyframes spin {
+    from { -webkit-transform: rotate(0deg); }
+    to { -webkit-transform: rotate(360deg); }
+}
+ 
+/* Loading animation container */
+.loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 84px;
+    height: 84px;
+    margin: -42px 0 0 -42px;
+}
+ 
+/* Spinning circle (inner circle) */
+.loading .maskedCircle {
+    width: 60px;
+    height: 60px;
+    border-radius: 36px;
+    border: 9px solid rgba(255, 255, 255, 0.7);
+}
+ 
+/* Spinning circle mask */
+.loading .mask {
+    width: 36px;
+    height: 36px;
+    overflow: hidden;
+}
+ 
+/* Spinner */
+.loading .spinner {
+    position: absolute;
+    left: 3px;
+    top: 3px;
+    width: 78px;
+    height: 78px;
+    -webkit-animation: spin 1s infinite linear;
 }
