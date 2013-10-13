@@ -503,7 +503,7 @@ namespace Glimpse.Controllers
                 {
                     id = mail.Id,
                     subject = mail.Subject,
-                    date = mail.Date,
+                    date = DateTimeHelper.changeToUtc(mail.Date),
                     age = currentAge,
                     from = new
                     {
@@ -522,6 +522,7 @@ namespace Glimpse.Controllers
                     importance = mail.Importance,
                     mailaccount = mail.MailAccountEntity.Id
                 };
+
                 preparedMails.Add(anEmail);
             }
             return preparedMails;
