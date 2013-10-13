@@ -169,11 +169,16 @@ function setMailViewerLabels(view_modal, circle) {
     for (var i = 0; i < labels.length && i < 5; i++) {
 
         labelElement = $('.custom-label[data-name="' + labels[i] + '"]').clone();
-        labelElement.removeAttr('draggable');
+        prepareLabelForMailView(labelElement);
         view_modal.find('#mail-view-labels').append(labelElement);
     }
 }
 
+function prepareLabelForMailView(labelElement) {
+    labelElement.addClass('mail-view-labels');
+    labelElement.removeAttr('draggable');
+    labelElement.attr('title', labelElement.data('name'));
+}
 
 function setMailTraversingArrows() {
 
