@@ -43,7 +43,7 @@ function fetchRecentMails() {
     }).done(function () {
 
         setDateCoords();
-        calculateEmailsLeft();
+        calculateEmailsLeft(1);
 
     });
 }

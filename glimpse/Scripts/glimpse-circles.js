@@ -109,8 +109,7 @@ function setPreviewDisplay(circle) {
             unsetMailClicked(innerEvent.data);
             innerEvent.data.unbind('click');
             setPreviewDisplay(innerEvent.data);
-        }
-        );
+        });
 
         $(document).one('click', circle, function (innerEvent) {
             innerEvent.stopPropagation();
@@ -119,10 +118,7 @@ function setPreviewDisplay(circle) {
             setPreviewDisplay(innerEvent.data);
         }
         );
-
-    }
-    );
-
+    });
 }
 
 function setMailClicked(circle) {
@@ -233,17 +229,15 @@ function calculateEmailColor(circle) {
 
 function calculateEmailPosition(circle) {
 
-    var margin = parseInt($(".circle").css('width'), 10);
-
     var left = (circle.attr('data-age') - minAge) / currentPeriodShown(),
         top = (circle.attr('data-from').charCodeAt(0) - "a".charCodeAt(0) + 2) / alphabetSize();
 
     circle.css('top', function () {
-        return top * (containerHeight() - margin) + 'px';
+        return top * containerHeight() + 'px';
     });
 
     circle.css('left', function () {
-        return left * (containerWidth() - margin) + 'px';
+        return left * containerWidth() + 'px';
     });
 }
 
@@ -254,7 +248,7 @@ function surroundingCircles(factor, whatToDo) {
 
     $(".circle").each(function () {
         var currentAge = $(this).attr('data-age');
-        if (currentAge < furthestAgeRight && currentAge > furthestAgeLeft) {
+        if ((currentAge < furthestAgeRight) && (currentAge > furthestAgeLeft)) {
             whatToDo($(this));
         }
     });
@@ -263,21 +257,19 @@ function surroundingCircles(factor, whatToDo) {
 function calculateEmailsLeft(containerChunk) {
 
     var r = $.Deferred();
-
-    var margin = parseInt($(".circle").css('width'), 10),
-        periodShown = currentPeriodShown();
+    periodShown = currentPeriodShown();
 
     surroundingCircles(containerChunk, function (circle) {
 
         var left = (circle.data("age") - minAge) / periodShown;
         circle.css('left', function () {
-            return left * (containerWidth() - margin) + 'px';
+            return left * containerWidth() + 'px';
         });
     });
 
     setTimeout(function () {
         r.resolve();
-    }, 600);
+    }, 300);
 
     return r;
 }

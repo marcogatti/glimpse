@@ -91,7 +91,7 @@ function amountOfCirclesShown() {
 }
 
 function currentPeriodShown() {
-    return maxAge - minAge;
+    return parseInt(maxAge - minAge);
 }
 
 function zoom(factor, zoomPoint) {
