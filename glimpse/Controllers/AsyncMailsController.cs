@@ -481,7 +481,7 @@ namespace Glimpse.Controllers
             }
         }
         #endregion
-        #region Private Helpers
+         #region Private Helpers
         private static DateTime ConvertFromJS(Int64 JSDate)
         {
             DateTime date = new DateTime(1970, 1, 1) + new TimeSpan(JSDate * 10000);

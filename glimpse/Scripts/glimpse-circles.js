@@ -139,7 +139,7 @@ function setMailClicked(circle) {
         marginTop: '-37.5',
     }, 200);
 
-    $(circle).find('[content|=true]').text($(circle).attr('data-bodypeek'));
+    $(circle).find('[content=true]').text($(circle).attr('data-bodypeek'));
 }
 
 function unsetMailClicked(circle) {
@@ -154,7 +154,7 @@ function unsetMailClicked(circle) {
         marginTop: '0'
     }, 200);
 
-    $(circle).find('[content|=true]').text($(circle).attr('data-subject'));
+    $(circle).find('[content=true]').text($(circle).attr('data-subject'));
 }
 
 function isClicked(circle) {

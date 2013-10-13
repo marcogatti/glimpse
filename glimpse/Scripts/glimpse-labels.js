@@ -95,7 +95,7 @@ function prepareToReceiveLabels(circle) {
 
     $(circle).on('drop', function (ev) {
         if (labelToAddIsSet) {
-            if (isClicked(this)) {
+            if (isClicked(this) == 'true') {
                 $('[mail-clicked|=true]').each(function () {
                     addLabelToEmail(selectedLabel, $(this));
                 }
