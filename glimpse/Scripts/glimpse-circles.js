@@ -29,9 +29,9 @@ function insertCircle(value) {
             if (value.labels[i].system_name === null) {
                 customLabels.push(value.labels[i].name);
             } else
-            if (unwantedSystemLabels.indexOf(value.labels[i].system_name) === -1) {
-                systemLabels.push(value.labels[i].name);
-            }
+                if (unwantedSystemLabels.indexOf(value.labels[i].system_name) === -1) {
+                    systemLabels.push(value.labels[i].name);
+                }
         }
 
         var dataAttributes = [
@@ -61,7 +61,7 @@ function insertCircle(value) {
         if (toBeHidden(newCircle)) {
             newCircle.addClass("hidden");
         }
-     
+
         setTimeout(function () {
             newCircle.css("opacity", 0.9);
         }, 100);
@@ -206,7 +206,7 @@ function markAsRead(circle) {
 }
 
 function calculateEmailColor(circle) {
-    
+
     var customLabels = getCustomLabels(circle);
 
     var fill = "",
@@ -223,7 +223,11 @@ function calculateEmailColor(circle) {
         fill += fill;
     }
 
-    circle.css('background', '-webkit-radial-gradient(circle' + fill + ')');
+    if (i !== 0) {
+        circle.css('background', '-webkit-radial-gradient(circle' + fill + ')');
+    } else {
+        circle.css('background', '');
+    }
 }
 
 function calculateEmailPosition(circle) {

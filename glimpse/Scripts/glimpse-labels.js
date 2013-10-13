@@ -119,16 +119,12 @@ function addCircleColor(circle, label) {
 
 function addLabelToEmail(label, circle) {
 
+    addCircleColor(circle, label);
+
     $.ajax({
         type: "POST",
         url: "async/AddLabel",
         dataType: 'json',
-        error: function (jqXHR, textStatus, errorThrown) {
-            alert("No se pudo agregar la etiqueta.");
-        },
-        success: function () {
-            addCircleColor(circle, label);
-        },
         data: { labelName: label, mailId: circle.data('id') }
     });
 }
@@ -149,9 +145,9 @@ function removeLabelFromEmail(label, circle) {
     });
 }
 
-function removeCircleColor(circle, label) {
+function removeCircleColor(circle, labelName) {
 
-    var index = getCustomLabels(circle).indexOf(label),
+    var index = getCustomLabels(circle).indexOf(labelName),
         newCustomLabels;
 
     if (index > -1) {
@@ -162,6 +158,32 @@ function removeCircleColor(circle, label) {
 
     circle.data("custom-labels", newCustomLabels);
     calculateEmailColor(circle);
+}
+
+
+//Marco dice: La funcion de arriba no esta funcando, me hice esta porque la necesito.
+function removeLabelFromCircle(circle, label) {
+
+    var circleLabels = getCustomLabels(circle),
+        indexOfLabel;
+
+    indexOfLabel = circleLabels.indexOf(label);
+
+    if (indexOfLabel > -1) {
+        circleLabels.splice(indexOfLabel, 1);
+    } else {
+        alert("El Email no contenía la etiqueta.");
+    }
+
+    circle.data("custom-labels", circleLabels);
+    calculateEmailColor(circle);
+
+    $.ajax({
+        type: "POST",
+        url: "async/RemoveLabel",
+        dataType: 'json',
+        data: { labelName: label, mailId: circle.data('id') }
+    });
 }
 
 function setEverithingRelatedToAddLabelsToAMail() {

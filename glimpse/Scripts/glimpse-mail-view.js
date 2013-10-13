@@ -175,9 +175,26 @@ function setMailViewerLabels(view_modal, circle) {
 }
 
 function prepareLabelForMailView(labelElement) {
+
+    var timeoutId;
+
     labelElement.addClass('mail-view-labels');
     labelElement.removeAttr('draggable');
     labelElement.attr('title', labelElement.data('name'));
+
+    labelElement.mousedown(function (ev) {
+        ev.preventDefault();
+        timeoutId = setTimeout(function () {
+            removeLabelFromMailView(labelElement);
+            removeLabelFromCircle(currentCircle, labelElement.data('name'));      
+        }, 1000);
+    }).bind('mouseup mouseleave', function () {
+        clearTimeout(timeoutId);
+    });
+}
+
+function removeLabelFromMailView(label) {
+    label.remove();
 }
 
 function setMailTraversingArrows() {
