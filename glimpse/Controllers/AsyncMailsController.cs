@@ -214,29 +214,25 @@ namespace Glimpse.Controllers
         public ActionResult RemoveLabel(String labelName, Int64 mailId, Int64 mailAccountId = 0)
         {
             ISession session = NHibernateManager.OpenSession();
+            ITransaction tran = session.BeginTransaction();
             try
             {
                 MailAccount currentMailAccount = this.GetMailAccount(mailAccountId);
                 Mail mail = new Mail(mailId, session);
-                Boolean success;
 
-                if (mail.Entity.MailAccountEntity.Id == currentMailAccount.Entity.Id)
-                {
-                    mail.RemoveLabel(labelName, session); //DB
-                    currentMailAccount.RemoveMailLabel(labelName, mail.Entity.Gm_mid); //IMAP
-                    success = true;
-                }
-                else
-                {
-                    success = false;
-                }
+                if (mail.Entity.MailAccountEntity.Id != currentMailAccount.Entity.Id)
+                    return Json(new { success = false, message = "El mail indicado no pertenece a la cuenta indicada." }, JsonRequestBehavior.AllowGet);
 
-                JsonResult result = Json(new { success = success }, JsonRequestBehavior.AllowGet);
-                return result;
+                mail.RemoveLabel(labelName, session); //DB
+                currentMailAccount.RemoveMailLabel(labelName, mail.Entity.Gm_mid); //IMAP
+                tran.Commit();
+
+                return Json(new { success = true }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception exc)
             {
-                Log.LogException(exc, "Parametros de la llamada: label(" + labelName + "), gmID(" + mailId.ToString() + ").");
+                tran.Rollback();
+                Log.LogException(exc, "Parametros de la llamada: labelName(" + labelName + "), gmID(" + mailId.ToString() + "), mailAccountId(" + mailAccountId + ").");
                 return Json(new { success = false, message = "Error al remover label." }, JsonRequestBehavior.AllowGet);
             }
             finally

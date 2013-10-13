@@ -50,6 +50,7 @@ namespace Glimpse.Models
         {
             LabelEntity labelToRemove = this.Entity.Labels.First<LabelEntity>(x => x.Name == label);
             this.Entity.Labels.Remove(labelToRemove);
+            this.Save(session);
         }
         public void SetImportance(UInt16 newImportance, ISession session)
         {
