@@ -12,7 +12,6 @@ namespace Glimpse.ViewModels
 {
     public class UserViewModel
     {
-        [Required]
         [RegularExpression(@"^[A-Za-z]{1}[A-Za-z0-9]{3,15}$" + //Usuario Glimpse: debe comenzar con una letra 
                                  //seguido de cualquier combinacion de letras (total entre 4 y 16 caracteres)
                            "|" + //o ser Email:
@@ -25,7 +24,6 @@ namespace Glimpse.ViewModels
         [Display(Name = "Nombre de Usuario/Email")]
         public String Username { get; set; }
 
-        [Required]
         //caracteres validos para un passoword de email segun RFC, entre 6 y 20 caracteres
         [RegularExpression(@"^(?!.{20})[A-Za-z0-9\!#\$%&'\*\.\+\-/=\?\^`\{|\}~_]{6,20}",
                            ErrorMessage= "Contraseña inválida. Debe tener entre 6 y 20 caracteres. No debe tener caracteres inválidos.")]

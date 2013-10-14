@@ -30,13 +30,13 @@
 
     <div id="registration-view" class="modal hide fade in">
         <div id="first-screen">
-            
-            @using (Ajax.BeginForm("ValidateUserFields", "Account", null, new AjaxOptions { OnSuccess = "registrationNext", OnFailure = "registrationFailure" }, new {@class="registration-modal" }))
+
+            @using (Ajax.BeginForm("ValidateUserFields", "Account", null, new AjaxOptions { OnSuccess = "registrationNext", OnFailure = "registrationFailure" }, new { @class = "registration-modal" }))
             {
                 @Html.AntiForgeryToken()
                 <h3 class="form-signin-heading" id="registration-view-title">Creá tu usuario Glimpse</h3>
 
-                @Html.ValidationSummary()
+                //@Html.ValidationSummary()
                 
                 @Html.TextBoxFor(m => m.Firstname, new { maxlenght = 16, placeholder = "Escribí tu nombre...", @class = "input-block-level" })
                 @Html.TextBoxFor(m => m.Lastname, new { maxlenght = 16, placeholder = "Escribí tu apellido...", @class = "input-block-level" })
@@ -50,20 +50,17 @@
         </div>
 
         <div id="second-screen" class="hidden">
-            <div>
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-            </div>
 
             @using (Html.BeginForm("CreateUser", "Account", FormMethod.Post, new { @class = "registration-modal" }))
             {
                 @Html.AntiForgeryToken()
 
                 <h3 class="form-signin-heading">Integrá tus cuentas de correo</h3>
-            
-                @Html.TextBoxFor(m => m.ListMailAccounts[0].Address, new { maxlenght = 16, placeholder = "Primer cuenta de correo...", @class = "input-block-level" })
-                @Html.PasswordFor(m => m.ListMailAccounts[0].Password, new { maxlenght = 20, placeholder = "Contraseña de la cuenta...", @class = "input-block-level" })
-                @Html.PasswordFor(m => m.ListMailAccounts[0].ConfirmationPassword, new { maxlenght = 20, placeholder = "Confirmá la contraseña...", @class = "input-block-level" })
-
+                <div class="controls controls-row">
+                    @Html.TextBoxFor(m => m.ListMailAccounts[0].Address, new { maxlenght = 16, placeholder = "Primer cuenta de correo...", @class = "input-block-level" })
+                    @Html.PasswordFor(m => m.ListMailAccounts[0].Password, new { maxlenght = 20, placeholder = "Contraseña de la cuenta...", @class = "input-block-level" })
+                    @Html.PasswordFor(m => m.ListMailAccounts[0].ConfirmationPassword, new { maxlenght = 20, placeholder = "Confirmá la contraseña...", @class = "input-block-level" })
+                </div>
                 @Html.TextBoxFor(m => m.ListMailAccounts[1].Address, new { maxlenght = 16, placeholder = "Segunda cuenta de correo...", @class = "input-block-level" })
                 @Html.PasswordFor(m => m.ListMailAccounts[1].Password, new { maxlenght = 20, placeholder = "Contraseña de la cuenta...", @class = "input-block-level" })
                 @Html.PasswordFor(m => m.ListMailAccounts[1].ConfirmationPassword, new { maxlenght = 20, placeholder = "Confirmá la contraseña...", @class = "input-block-level" })
@@ -72,7 +69,7 @@
                 @Html.PasswordFor(m => m.ListMailAccounts[2].Password, new { maxlenght = 20, placeholder = "Contraseña de la cuenta...", @class = "input-block-level" })
                 @Html.PasswordFor(m => m.ListMailAccounts[2].ConfirmationPassword, new { maxlenght = 20, placeholder = "Confirmá la contraseña...", @class = "input-block-level" })
             
-                <input class="btn btn-default" id="registration-back-btn" type="submit" value="Volver" />
+                <input class="btn btn-default" id="registration-back-btn" type="button" value="Volver" />
                 <input class="btn btn-primary" id="registration-register-btn" type="submit" value="Registrar usuario" />
             }
         </div>
