@@ -93,7 +93,7 @@ namespace Glimpse.Models
                                                .Add(Restrictions.Eq("MailAccountEntity", this.Entity))
                                                .Add(Restrictions.Eq("Active", true))
                                                .List<LabelEntity>();
-            this.RegisterLabel(labelsByProperty["INBOX"], session, databaseLabels, "INBOX");
+            this.RegisterLabel(labelsByProperty["INBOX"], session, databaseLabels, "Inbox");
             this.RegisterLabel(labelsByProperty["All"], session, databaseLabels, "All");
             this.RegisterLabel(labelsByProperty["Trash"], session, databaseLabels, "Trash");
             this.RegisterLabel(labelsByProperty["Junk"], session, databaseLabels, "Junk");
