@@ -33,6 +33,7 @@ function populateLabelColors() {
     });
 
     setLabelSelection();
+    setMailBoxSelection();
 }
 
 function labelDrag(ev) {
@@ -190,27 +191,48 @@ function setEverithingRelatedToAddLabelsToAMail() {
     setLabelsAdder();
 }
 
+function chooseCirclesToBeShown() {
+    $(".circle").each(function () {
+        if (toBeHidden($(this))) {
+            $(this).addClass("hidden");
+        } else {
+            $(this).removeClass("hidden");
+        }
+    });
+}
+
 function setLabelSelection() {
     $(".custom-label").on('click', function () {
         $(this).toggleClass('label-hidden');
-
-        $(".circle").each(function () {
-            if (toBeHidden($(this))) {
-                $(this).addClass("hidden");
-            } else {
-                $(this).removeClass("hidden");
-            }
-        });
+        chooseCirclesToBeShown();
     });
 }
 
 function setMailBoxSelection() {
+    $(".mailbox").on('click', function () {
 
+        var clicked = $(this);
+
+        if (clicked.hasClass("label-hidden")) {
+            $(".mailbox").addClass("label-hidden");
+            clicked.removeClass("label-hidden");
+            chooseCirclesToBeShown();
+        }
+    });
 }
 
 function getCustomLabels(circle) {
 
-    var labelsArray = circle.data("custom-labels").toString().split(",");
+    return getLabels(circle, "custom-labels");
+}
+
+function getSystemLabels(circle) {
+
+    return getLabels(circle, "system-labels");
+}
+
+function getLabels(circle, labelsString) {
+    var labelsArray = circle.data(labelsString).toString().split(",");
     if (labelsArray.length === 1 && labelsArray[0] === "") {
         labelsArray = [];
     }
@@ -218,13 +240,27 @@ function getCustomLabels(circle) {
 }
 
 function toBeHidden(circle) {
-    var circleLabels = getCustomLabels(circle);
+    //  un quilombo...
 
-    if (circleLabels.length === 0) {
+    var customLabels = getCustomLabels(circle),
+        systemLabels = getSystemLabels(circle),
+        activeMailBox = $(".mailbox:not(.label-hidden)").data("name");
+
+    if (activeMailBox !== "INBOX") {
+        if (systemLabels.indexOf(activeMailBox) === -1) {
+            return true;
+        }
+    } else {
+        if (systemLabels.length != 0 && systemLabels.indexOf(activeMailBox) === -1) {
+            return true;
+        }
+    }
+
+    if (customLabels.length === 0) {
         return !isActive("others");
     }
     else {
-        return !getCustomLabels(circle).some(isActive);
+        return !customLabels.some(isActive);
     }
 }
 
@@ -234,6 +270,10 @@ function isActive(label) {
 
 function hasLabel(circle, label) {
     return (getCustomLabels(circle).indexOf(label) != -1);
+}
+
+function validSystemLabel(label){
+    return unwantedSystemLabels.indexOf(label.systemName) === -1 && label.systemName != null;
 }
 
 function loadLabels() {
@@ -246,16 +286,16 @@ function loadLabels() {
                 "<li class='custom-label label label-glimpse' data-name='" + currentLabel.showName + "'>" + currentLabel.showName + "</li>"
             );
         } else
-            if (unwantedSystemLabels.indexOf(currentLabel.systemName) === -1 && currentLabel.systemName != null) {
+            if (validSystemLabel(currentLabel)) {
 
                 $(".nav-header:contains('Carpetas')").after(
-               "<li class='label label-glimpse label-hidden' data-name=" + currentLabel.showName +
-               " data-system=" + currentLabel.systemName + ">" + currentLabel.showName + "</li>"
+               "<li class='mailbox label label-glimpse label-hidden' data-name=" + currentLabel.systemName + ">" +
+               currentLabel.showName + "</li>"
            );
             }
     }
 
-    $(".label-glimpse:contains('INBOX')").removeClass("label-hidden");
+    $(".mailbox:contains('INBOX')").removeClass("label-hidden");
 
 
     $(".nav-header:contains('Etiquetas')").after(

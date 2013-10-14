@@ -28,7 +28,7 @@ function insertCircle(value) {
                 customLabels.push(value.labels[i].name);
             } else
                 if (unwantedSystemLabels.indexOf(value.labels[i].system_name) === -1) {
-                    systemLabels.push(value.labels[i].name);
+                    systemLabels.push(value.labels[i].system_name);
                 }
         }
 
