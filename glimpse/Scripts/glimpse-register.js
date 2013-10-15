@@ -28,3 +28,24 @@ $(document).ready(function () {
         $('#second-screen').fadeOut().addClass('hidden');
     });
 });
+
+function checkbox1Changed() {
+    if ($("check1").checkbox == true) {
+        ($("check2").checkbox = false);
+        ($("check3").checkbox = false);
+    }
+}
+
+function checkbox2Changed() {
+    if ($("check2").checkbox == true) {
+        ($("check1").checkbox = false);
+        ($("check3").checkbox = false);
+    }
+}
+
+function checkbox3Changed() {
+    if ($("check3").checkbox == true) {
+        ($("check1").checkbox = false);
+        ($("check2").checkbox = false);
+    }
+}
