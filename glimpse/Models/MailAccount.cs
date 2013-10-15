@@ -42,17 +42,8 @@ namespace Glimpse.Models
             return mailAccountClone;
         }
 
-        public void SetAsMainAccount(ISession session)
+        public void SetAsMainAccount()
         {
-            IList<MailAccountEntity> notMainMailAccounts = session.CreateCriteria<MailAccountEntity>()
-                                                                .Add(Restrictions.Eq("User", this.Entity.User))
-                                                                .Add(Restrictions.Not(Restrictions.Eq("Id", this.Entity.Id)))
-                                                                .List<MailAccountEntity>();
-            foreach (MailAccountEntity notMainAccount in notMainMailAccounts)
-            {
-                notMainAccount.Active = false;
-                new MailAccount(notMainAccount).SaveOrUpdate(session);
-            }
             this.Entity.IsMainAccount = true;
         }
         public void SetUser(User user)
@@ -290,7 +281,7 @@ namespace Glimpse.Models
         {
             MailAccount mailAccount = MailAccount.FindMainMailAccount(user.Entity.Username, session);
             if (mailAccount == null)
-                throw new Exception("Usuario: " + user.Entity.Username + " no posee mailAccount primario.");
+                throw new Exception("Usuario: " + user.Entity.Username + " no posee cuenta primaria.");
             Sender.SendResetPasswordMail(user.Entity.Username, mailAccount.Entity.Address, newPassword);
         }
         public static MailAccount FindByAddress(String emailAddress, ISession session, Boolean activeRequired = true)

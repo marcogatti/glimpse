@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
+using System.Text;
 using System.Web.Mvc;
 using System.Web.Security;
 
@@ -210,6 +211,97 @@ namespace Glimpse.Controllers
             }
         }
 
+        [HttpPost]
+        public ActionResult EditUser(UserViewModel userView)
+        {
+            String exceptionMessage = "";
+            ISession session = NHibernateManager.OpenSession();
+            ITransaction tran = session.BeginTransaction();
+            try
+            {
+                this.UpdateModel(userView); //corre todos los regex
+                this.ValidateUserGenericFields(userView, session); //usuarioGlimpse y contraseñas de usuario
+                this.ValidateUserMailAccounts(userView, session); //direcciones de correo y contraseñas
+
+                User editedUser = Glimpse.Models.User.FindByUsername(userView.Username, session);
+                if (editedUser == null)
+                    throw new GlimpseException("Usuario inexistente: " + userView.Username + ".");
+                User sessionUser = (User)Session[AccountController.USER_NAME];
+                if (sessionUser == null || editedUser.Entity.Username != sessionUser.Entity.Username)
+                    throw new GlimpseException("Usuario de la sesión es distinto del usuario realizando la operación.");
+
+                editedUser.Entity.Password = CryptoHelper.EncryptDefaultKey(userView);
+                editedUser.Entity.Firstname = userView.Firstname;
+                editedUser.Entity.Lastname = userView.Lastname;
+
+                foreach (MailAccount removedMailAccount in editedUser.mailAccounts
+                            .Where(x => !userView.ListMailAccounts.Any(c => c.Address == x.Entity.Address)))
+                {
+                    removedMailAccount.Disconnect();
+                    removedMailAccount.Deactivate(session); //saveOrUpdate adentro
+                    editedUser.mailAccounts.Remove(removedMailAccount);
+                }
+
+                foreach (MailAccountViewModel mailAccountView in userView.ListMailAccounts)
+                {
+                    if (editedUser.mailAccounts.Any(x => x.Entity.Address == mailAccountView.Address)) //si la cuenta ya existia
+                    {
+                        MailAccount editedMailAccount = editedUser.mailAccounts.Where(x => x.Entity.Address == mailAccountView.Address).Single();
+                        editedMailAccount.Entity.Password = CryptoHelper.EncryptDefaultKey(mailAccountView);
+                        editedMailAccount.SetUser(editedUser);
+                        editedMailAccount.ConnectLight();
+                        if(mailAccountView.IsMainAccount)
+                            editedMailAccount.SetAsMainAccount();
+                        editedMailAccount.Activate(session); //saveOrUpdate adentro
+                    }
+                    else //si la cuenta es nueva
+                    {
+                        MailAccount newMailAccount = new MailAccount(mailAccountView.Address, CryptoHelper.EncryptDefaultKey(mailAccountView.Password));
+                        newMailAccount.SetUser(editedUser);
+                        newMailAccount.ConnectFull();
+                        if (mailAccountView.IsMainAccount)
+                            newMailAccount.SetAsMainAccount();
+                        newMailAccount.Activate(session); //saveOrUpdate adentro
+                        editedUser.AddAccount(newMailAccount);
+                    }
+                }
+                editedUser.SaveOrUpdate(session);
+                tran.Commit();
+
+                Session[AccountController.USER_NAME] = editedUser;
+
+                return JavaScript("window.location = '" + Url.Action("Index", "Home") + "'");
+            }
+            catch (InvalidOperationException exc) //model state invalido
+            {
+                tran.Rollback();
+                foreach (ModelState wrongState in this.ModelState.Values.Where(x => x.Errors.Count > 0))
+                    foreach (ModelError error in wrongState.Errors)
+                        exceptionMessage += error.ErrorMessage;
+                if (String.IsNullOrEmpty(exceptionMessage))
+                    exceptionMessage = exc.Message;
+                return Json(new { success = false, message = exceptionMessage }, JsonRequestBehavior.AllowGet);
+            }
+            catch (GlimpseException exc)
+            {
+                tran.Rollback();
+                Log.LogException(exc);
+                return Json(new { success = false, message = exceptionMessage }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception exc)
+            {
+                tran.Rollback();
+                Log.LogException(exc, "Parametros: userName:(" + userView.Username + "), userPassowrd( " + userView.Password +
+                                      "), userConfirmPassword(" + userView.ConfirmationPassword + "), userFirstName(" + userView.Firstname +
+                                      "), userLastName(" + userView.Lastname + ").");
+                return Json(new { success = false, message = "Error modificando usuario." }, JsonRequestBehavior.AllowGet);
+            }
+            finally
+            {
+                session.Close();
+            }
+        }
+
         [AllowAnonymous]
         public ActionResult ValidateUserFields(UserViewModel userView)
         {
@@ -242,6 +334,81 @@ namespace Glimpse.Controllers
                                       "), userConfirmPassword(" + userView.ConfirmationPassword + "), userFirstName(" + userView.Firstname +
                                       "), userLastName(" + userView.Lastname + ").");
                 return Json(new { success = false, message = "Error validando usuario." }, JsonRequestBehavior.AllowGet);
+            }
+            finally
+            {
+                session.Close();
+            }
+        }
+
+        [HttpPost]
+        public ActionResult ResetPassword(String username)
+        {
+            ISession session = NHibernateManager.OpenSession();
+            ITransaction tran = session.BeginTransaction();
+            try
+            {
+                User user = Glimpse.Models.User.FindByUsername(username, session);
+                if (user == null)
+                    throw new Exception("Usuario inexistente: " + username + ".");
+                User sessionUser = (User)Session[AccountController.USER_NAME];
+                if (sessionUser == null || user.Entity.Username != sessionUser.Entity.Username)
+                    throw new GlimpseException("Usuario de la sesión es distinto del usuario realizando la operación.");
+                String newPassword = this.GenerateRandomPassword(16);
+                String newPasswordEnc = CryptoHelper.EncryptDefaultKey(newPassword);
+                user.ChangePassword(user.Entity.Password, newPasswordEnc, session);
+                MailAccount.SendResetPasswordMail(user, newPassword, session);
+                tran.Commit();
+
+                JsonResult result = Json(new { success = true, message = "La contraseña ha sido reinicializada." }, JsonRequestBehavior.AllowGet);
+                return result;
+            }
+            catch (Exception exc)
+            {
+                tran.Rollback();
+                Log.LogException(exc);
+                return Json(new { success = false, message = "Error al reiniciar la contraseña." }, JsonRequestBehavior.AllowGet);
+            }
+            finally
+            {
+                session.Close();
+            }
+        }
+
+        [HttpPost]
+        public ActionResult ChangePassword(String username, String oldPassword, String newPassword)
+        {
+            ISession session = NHibernateManager.OpenSession();
+            ITransaction tran = session.BeginTransaction();
+            try
+            {
+                if (!Glimpse.Models.User.IsPassword(newPassword))
+                    throw new GlimpseException("La nueva contraseña ingresada no posee caracteres válidos, es muy corta o muy larga.");
+                String oldPasswordEnc = CryptoHelper.EncryptDefaultKey(oldPassword);
+                String newPasswordEnc = CryptoHelper.EncryptDefaultKey(newPassword);
+                User user = Glimpse.Models.User.FindByUsername(username, session);
+                if (user == null)
+                    throw new GlimpseException("Usuario inexistente: " + username + ".");
+                User sessionUser = (User)Session[AccountController.USER_NAME];
+                if (sessionUser == null || user.Entity.Username != sessionUser.Entity.Username)
+                    throw new GlimpseException("Usuario de la sesión es distinto del usuario realizando la operación.");
+                sessionUser.ChangePassword(oldPasswordEnc, newPasswordEnc, session);
+                tran.Commit();
+
+                JsonResult result = Json(new { success = true, message = "La contraseña ha sido cambiada con éxito." }, JsonRequestBehavior.AllowGet);
+                return result;
+            }
+            catch (WrongClassException exc)
+            {
+                tran.Rollback();
+                Log.LogException(exc);
+                return Json(new { success = false, message = exc.Message }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception exc)
+            {
+                tran.Rollback();
+                Log.LogException(exc);
+                return Json(new { success = false, message = "Error al reiniciar la contraseña." }, JsonRequestBehavior.AllowGet);
             }
             finally
             {
@@ -287,6 +454,19 @@ namespace Glimpse.Controllers
                 throw new GlimpseException(exceptionMessage);
         }
         [NonAction]
+        private String GenerateRandomPassword(Int16 size)
+        {
+            StringBuilder builder = new StringBuilder();
+            Random random = new Random();
+            char ch;
+            for (Int16 i = 0; i < size; i++)
+            {
+                ch = Convert.ToChar(Convert.ToInt32(Math.Floor(26 * random.NextDouble() + 65)));
+                builder.Append(ch);
+            }
+            return CryptoHelper.EncryptDefaultKey(builder.ToString());
+        }
+        [NonAction]
         private IList<MailAccount> ValidateUserMailAccounts(UserViewModel userView, ISession session)
         {
             String exceptionMessage = "";
@@ -328,9 +508,9 @@ namespace Glimpse.Controllers
                 #endregion
                 #region Valida Unicidad en Base de datos
                 databaseMailAccount = MailAccount.FindByAddress(mailAccountView.Address, session, true);
-                if (databaseMailAccount != null)
-                    exceptionMessage += "La dirección: " + mailAccountView.Address + " ya se encuentra "+
-                                        "asociada a un usuario Glimpse.\n";
+                if (databaseMailAccount != null && databaseMailAccount.Entity.User.Username != userView.Username)
+                    exceptionMessage += "La dirección: " + mailAccountView.Address + " ya se encuentra " +
+                                        "asociada a otro usuario Glimpse.\n";
                 #endregion
             }
 

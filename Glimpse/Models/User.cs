@@ -1,8 +1,10 @@
 ﻿using Glimpse.DataAccessLayer.Entities;
 using Glimpse.Exceptions.ModelsExceptions;
+using Glimpse.Helpers;
 using NHibernate;
 using NHibernate.Criterion;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
@@ -34,7 +36,13 @@ namespace Glimpse.Models
 
         public void AddAccount(MailAccount mailAccount)
         {
-            this.mailAccounts.Add(mailAccount);
+            if (!this.mailAccounts.Any(x => x.Entity.Address == mailAccount.Entity.Address)) //si no lo tiene
+                this.mailAccounts.Add(mailAccount);
+            else //si ya lo tiene que lo actualice
+            {
+                MailAccount newMailaccount = this.mailAccounts.Where(x => x.Entity.Address == mailAccount.Entity.Address).Single();
+                newMailaccount = mailAccount;
+            }
         }
         public void UpdateAccounts(ISession session)
         {
@@ -74,7 +82,7 @@ namespace Glimpse.Models
         }
         public void ChangePassword(String oldPassword, String newPassword, ISession session)
         {
-            if (this.Entity.Password == oldPassword)
+            if (CryptoHelper.PasswordsMatch(this.Entity.Password, oldPassword))
             {
                 this.Entity.Password = newPassword;
                 this.SaveOrUpdate(session);
@@ -97,6 +105,10 @@ namespace Glimpse.Models
         public static bool IsGlimpseUser(String phrase)
         {
             return Regex.IsMatch(phrase, @"^[A-Za-z]{1}[A-Za-z0-9]{3,15}$");
+        }
+        public static bool IsPassword(String phrase)
+        {
+            return Regex.IsMatch(phrase, @"^(?!.{20})[A-Za-z0-9\!#\$%&'\*\.\+\-/=\?\^`\{|\}~_]{6,20}");
         }
         public static User FindByUsername(String username, ISession session)
         {

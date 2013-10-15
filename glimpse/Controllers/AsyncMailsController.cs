@@ -1,7 +1,6 @@
 ﻿using ActiveUp.Net.Mail;
 using Glimpse.DataAccessLayer;
 using Glimpse.DataAccessLayer.Entities;
-using Glimpse.Exceptions;
 using Glimpse.Helpers;
 using Glimpse.MailInterfaces;
 using Glimpse.Models;
@@ -11,7 +10,6 @@ using NHibernate.Criterion;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Web.Mvc;
 
 namespace Glimpse.Controllers
@@ -414,74 +412,8 @@ namespace Glimpse.Controllers
             }
         }
 
-
-        [HttpPost] //Hay que testearlo y pasarlo al AccountController
-        public ActionResult ResetPassword(String username)
-        {
-            ISession session = NHibernateManager.OpenSession();
-            ITransaction tran = session.BeginTransaction();
-            try
-            {
-                User user = Glimpse.Models.User.FindByUsername(username, session);
-                if (user == null)
-                    throw new Exception("Usuario inexistente: " + username + ".");
-                String newPassword = this.GenerateRandomPassword(16);
-                String newPasswordEnc = CryptoHelper.EncryptDefaultKey(newPassword);
-                user.ChangePassword(user.Entity.Password, newPasswordEnc, session);
-                MailAccount.SendResetPasswordMail(user, newPassword, session);
-                tran.Commit();
-
-                JsonResult result = Json(new { success = true, message = "La contraseña ha sido reinicializada." }, JsonRequestBehavior.AllowGet);
-                return result;
-            }
-            catch (Exception exc)
-            {
-                tran.Rollback();
-                Log.LogException(exc);
-                return Json(new { success = false, message = "Error al reiniciar la contraseña." }, JsonRequestBehavior.AllowGet);
-            }
-            finally
-            {
-                session.Close();
-            }
-        }
-        [HttpPost] //Hay que testearlo y pasarlo al AccountController
-        public ActionResult ChangePassword(String username, String oldPassword, String newPassword)
-        {
-            ISession session = NHibernateManager.OpenSession();
-            ITransaction tran = session.BeginTransaction();
-            try
-            {
-                String oldPasswordEnc = CryptoHelper.EncryptDefaultKey(oldPassword);
-                String newPasswordEnc = CryptoHelper.EncryptDefaultKey(newPassword);
-
-                User user = Glimpse.Models.User.FindByUsername(username, session);
-                if (user == null)
-                    throw new Exception("Usuario inexistente.");
-                user.ChangePassword(oldPasswordEnc, newPasswordEnc, session);
-
-                JsonResult result = Json(new { success = true, message = "La contraseña ha sido reinicializada." }, JsonRequestBehavior.AllowGet);
-                return result;
-            }
-            catch (WrongClassException exc)
-            {
-                tran.Rollback();
-                Log.LogException(exc);
-                return Json(new { success = false, message = exc.Message }, JsonRequestBehavior.AllowGet);
-            }
-            catch (Exception exc)
-            {
-                tran.Rollback();
-                Log.LogException(exc);
-                return Json(new { success = false, message = "Error al reiniciar la contraseña." }, JsonRequestBehavior.AllowGet);
-            }
-            finally
-            {
-                session.Close();
-            }
-        }
         #endregion
-         #region Private Helpers
+        #region Private Helpers
         private static DateTime ConvertFromJS(Int64 JSDate)
         {
             DateTime date = new DateTime(1970, 1, 1) + new TimeSpan(JSDate * 10000);
@@ -564,18 +496,6 @@ namespace Glimpse.Controllers
             IList<MailAccount> mailAccounts = user.GetAccounts();
             //return mailAccounts.Where<MailAccount>(x => x.Entity.Id == id).Single<MailAccount>();
             return mailAccounts[0]; //harcodeado para que funcione hasta que la vista mande los ids
-        }
-        private String GenerateRandomPassword(Int16 size)
-        {
-            StringBuilder builder = new StringBuilder();
-            Random random = new Random();
-            char ch;
-            for (Int16 i = 0; i < size; i++)
-            {
-                ch = Convert.ToChar(Convert.ToInt32(Math.Floor(26 * random.NextDouble() + 65)));
-                builder.Append(ch);
-            }
-            return CryptoHelper.EncryptDefaultKey(builder.ToString());
         }
         private Label GetAccountLabel(String labelName, MailAccount possibleMainAccount, ISession session)
         {
