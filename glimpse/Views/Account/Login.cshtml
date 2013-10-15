@@ -51,24 +51,31 @@
 
         <div id="second-screen" class="hidden">
 
-            @using (Html.BeginForm("CreateUser", "Account", FormMethod.Post, new { @class = "registration-modal" }))
+            @using (Html.BeginForm("CreateUser", "Account", FormMethod.Post, new { @class = "registration-modal-2" }))
             {
                 @Html.AntiForgeryToken()
 
                 <h3 class="form-signin-heading">Integrá tus cuentas de correo</h3>
-                <div class="controls controls-row">
-                    @Html.TextBoxFor(m => m.ListMailAccounts[0].Address, new { maxlenght = 16, placeholder = "Primer cuenta de correo...", @class = "input-block-level" })
-                    @Html.PasswordFor(m => m.ListMailAccounts[0].Password, new { maxlenght = 20, placeholder = "Contraseña de la cuenta...", @class = "input-block-level" })
-                    @Html.PasswordFor(m => m.ListMailAccounts[0].ConfirmationPassword, new { maxlenght = 20, placeholder = "Confirmá la contraseña...", @class = "input-block-level" })
-                </div>
-                @Html.TextBoxFor(m => m.ListMailAccounts[1].Address, new { maxlenght = 16, placeholder = "Segunda cuenta de correo...", @class = "input-block-level" })
-                @Html.PasswordFor(m => m.ListMailAccounts[1].Password, new { maxlenght = 20, placeholder = "Contraseña de la cuenta...", @class = "input-block-level" })
-                @Html.PasswordFor(m => m.ListMailAccounts[1].ConfirmationPassword, new { maxlenght = 20, placeholder = "Confirmá la contraseña...", @class = "input-block-level" })
-            
-                @Html.TextBoxFor(m => m.ListMailAccounts[2].Address, new { maxlenght = 20, placeholder = "Tercer cuenta de correo...", @class = "input-block-level" })
-                @Html.PasswordFor(m => m.ListMailAccounts[2].Password, new { maxlenght = 20, placeholder = "Contraseña de la cuenta...", @class = "input-block-level" })
-                @Html.PasswordFor(m => m.ListMailAccounts[2].ConfirmationPassword, new { maxlenght = 20, placeholder = "Confirmá la contraseña...", @class = "input-block-level" })
-            
+                <table>
+                    <tr class="mail-register-row">
+                        <td>@Html.TextBoxFor(m => m.ListMailAccounts[0].Address, new { maxlenght = 16, placeholder = "Primer cuenta de correo...", type="email", @class = "input-large" })</td>
+                        <td>@Html.PasswordFor(m => m.ListMailAccounts[0].Password, new { maxlenght = 20, placeholder = "Contraseña de la cuenta...", @class = "input-large" })</td>
+                        <td>@Html.PasswordFor(m => m.ListMailAccounts[0].ConfirmationPassword, new { maxlenght = 20, placeholder = "Confirmá la contraseña...", @class = "input-large" })</td>
+                        <td>@Html.CheckBoxFor(m => m.ListMailAccounts[0].IsMainAccount, new { id = "check1", @checked="checked", onchange="checkbox1Changed()" })</td>
+                    </tr>
+                    <tr class="mail-register-row">
+                        <td>@Html.TextBoxFor(m => m.ListMailAccounts[1].Address, new { maxlenght = 16, placeholder = "Segunda cuenta de correo...", type="email", @class = "input-large" })</td>
+                        <td>@Html.PasswordFor(m => m.ListMailAccounts[1].Password, new { maxlenght = 20, placeholder = "Contraseña de la cuenta...", @class = "input-large" })</td>
+                        <td>@Html.PasswordFor(m => m.ListMailAccounts[1].ConfirmationPassword, new { maxlenght = 20, placeholder = "Confirmá la contraseña...", @class = "input-large" })</td>
+                        <td>@Html.CheckBoxFor(m => m.ListMailAccounts[1].IsMainAccount, new { id="check2", onchange="checkbox2Changed()" })</td>
+                    </tr>
+                    <tr class="mail-register-row">
+                        <td>@Html.TextBoxFor(m => m.ListMailAccounts[2].Address, new { maxlenght = 20, placeholder = "Tercer cuenta de correo...", type="email", @class = "input-large" })</td>
+                        <td>@Html.PasswordFor(m => m.ListMailAccounts[2].Password, new { maxlenght = 20, placeholder = "Contraseña de la cuenta...", @class = "input-large" })</td>
+                        <td>@Html.PasswordFor(m => m.ListMailAccounts[2].ConfirmationPassword, new { maxlenght = 20, placeholder = "Confirmá la contraseña...", @class = "input-large" })</td>
+                        <td>@Html.CheckBoxFor(m => m.ListMailAccounts[2].IsMainAccount, new { id="check3", onchange="checkbox3Changed()" })</td>
+                    </tr>
+                </table>
                 <input class="btn btn-default" id="registration-back-btn" type="button" value="Volver" />
                 <input class="btn btn-primary" id="registration-register-btn" type="submit" value="Registrar usuario" />
             }
