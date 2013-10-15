@@ -46,5 +46,10 @@ namespace Glimpse.ViewModels
 
         public List<MailAccountViewModel> ListMailAccounts { get; set; }
 
+        public void FilterNullAccounts()
+        {
+            this.ListMailAccounts = this.ListMailAccounts.Where(x => x.Address != null && x.Password != null).ToList();
+        }
+
     }
 }

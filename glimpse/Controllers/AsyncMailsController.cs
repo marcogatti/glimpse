@@ -188,7 +188,7 @@ namespace Glimpse.Controllers
                 Mail theMail = new Mail(mailId, session);
 
                 if (theMail.Entity.MailAccountEntity.Id != theLabel.Entity.MailAccountEntity.Id) //si el mail no es del mismo MailAccount de la etiqueta
-                    this.CreateLabel(labelName, theLabel.Entity.MailAccountEntity.Id); //DB e IMAP
+                    this.CreateLabel(labelName, mailMailAccountId); //DB e IMAP
 
                 theMail.AddLabel(theLabel, session); //DB
                 mailAccount.AddLabelIMAP(theMail, theLabel); //IMAP
@@ -289,8 +289,7 @@ namespace Glimpse.Controllers
                 currentMailAccount.CreateLabel(labelName); //IMAP
                 tran.Commit();
 
-                JsonResult result = Json(new { success = true }, JsonRequestBehavior.AllowGet);
-                return result;
+                return Json(new { success = true }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception exc)
             {
@@ -494,8 +493,10 @@ namespace Glimpse.Controllers
         {
             User user = (User)Session[AccountController.USER_NAME];
             IList<MailAccount> mailAccounts = user.GetAccounts();
-            //return mailAccounts.Where<MailAccount>(x => x.Entity.Id == id).Single<MailAccount>();
-            return mailAccounts[0]; //harcodeado para que funcione hasta que la vista mande los ids
+            if(id != 0)
+                return mailAccounts.Where<MailAccount>(x => x.Entity.Id == id).Single<MailAccount>();
+            else
+                return mailAccounts[0]; //harcodeado para que funcione hasta que la vista mande los ids
         }
         private Label GetAccountLabel(String labelName, MailAccount possibleMainAccount, ISession session)
         {

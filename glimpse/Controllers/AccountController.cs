@@ -161,25 +161,29 @@ namespace Glimpse.Controllers
             {
                 this.UpdateModel(userView); //corre todos los regex
                 this.ValidateUserGenericFields(userView, session); //usuarioGlimpse y contraseñas de usuario
+                userView.FilterNullAccounts();
                 mailAccounts = this.ValidateUserMailAccounts(userView, session); //direcciones de correo y contraseñas
 
                 String cipherPassword = CryptoHelper.EncryptDefaultKey(userView);
 
                 User newUser = new User(userView.Username, cipherPassword, userView.Firstname, userView.Lastname);
+                newUser.SaveOrUpdate(session);
+
                 foreach (MailAccount mailAccount in mailAccounts)
                 {
                     mailAccount.SetUser(newUser);
                     mailAccount.SetOldestMailDate();
-                    mailAccount.UpdateLabels(session);
                     mailAccount.Activate(session); //saveOrUpdate adentro
+                    mailAccount.UpdateLabels(session);
                     newUser.AddAccount(mailAccount);
                 }
-                newUser.SaveOrUpdate(session);
+
                 tran.Commit();
-
                 Session[AccountController.USER_NAME] = newUser;
+                new CookieHelper().AddUsernameCookie(newUser.Entity.Username);
+                FormsAuthentication.SetAuthCookie(newUser.Entity.Username, true);
 
-                return JavaScript("window.location = '" + Url.Action("Index", "Home") + "'");
+                return Redirect(Url.Action("Index", "Home"));
             }
             catch (InvalidOperationException exc) //model state invalido
             {
@@ -195,7 +199,7 @@ namespace Glimpse.Controllers
             {
                 tran.Rollback();
                 Log.LogException(exc);
-                return Json(new { success = false, message = exceptionMessage }, JsonRequestBehavior.AllowGet);
+                return Json(new { success = false, message = exc.GlimpseMessage}, JsonRequestBehavior.AllowGet);
             }
             catch (Exception exc)
             {
@@ -234,6 +238,8 @@ namespace Glimpse.Controllers
                 editedUser.Entity.Firstname = userView.Firstname;
                 editedUser.Entity.Lastname = userView.Lastname;
 
+                editedUser.SaveOrUpdate(session);
+
                 foreach (MailAccount removedMailAccount in editedUser.mailAccounts
                             .Where(x => !userView.ListMailAccounts.Any(c => c.Address == x.Entity.Address)))
                 {
@@ -258,19 +264,18 @@ namespace Glimpse.Controllers
                     {
                         MailAccount newMailAccount = new MailAccount(mailAccountView.Address, CryptoHelper.EncryptDefaultKey(mailAccountView.Password));
                         newMailAccount.SetUser(editedUser);
-                        newMailAccount.ConnectFull();
                         if (mailAccountView.IsMainAccount)
                             newMailAccount.SetAsMainAccount();
                         newMailAccount.Activate(session); //saveOrUpdate adentro
+                        newMailAccount.ConnectFull();
                         editedUser.AddAccount(newMailAccount);
                     }
                 }
-                editedUser.SaveOrUpdate(session);
-                tran.Commit();
 
+                tran.Commit();
                 Session[AccountController.USER_NAME] = editedUser;
 
-                return JavaScript("window.location = '" + Url.Action("Index", "Home") + "'");
+                return Redirect(Url.Action("Index", "Home"));
             }
             catch (InvalidOperationException exc) //model state invalido
             {
@@ -325,7 +330,6 @@ namespace Glimpse.Controllers
             }
             catch (GlimpseException exc)
             {
-                Log.LogException(exc);
                 return Json(new { success = false, message = exc.Message }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception exc)
@@ -484,7 +488,9 @@ namespace Glimpse.Controllers
                     try
                     {
                         mailAccount = new MailAccount(mailAccountView.Address, CryptoHelper.EncryptDefaultKey(mailAccountView));
-                        mailAccount.ConnectLight();
+                        mailAccount.ConnectLight(); //si pasa este punto es que esta bien y va a ser devuelta
+                        if (mailAccountView.IsMainAccount)
+                            mailAccount.Entity.IsMainAccount = true;
                         connectedMailAccounts.Add(mailAccount);
                     }
                     catch (InvalidAuthenticationException)

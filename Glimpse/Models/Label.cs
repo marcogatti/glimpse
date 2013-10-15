@@ -72,9 +72,9 @@ namespace Glimpse.Models
                                           .UniqueResult<LabelEntity>();
 
             if (labelEntity == null)
-                throw new GlimpseException("No se encontro el label.");
-
-            return new Label(labelEntity);
+                return null;
+            else
+                return new Label(labelEntity);
         }
         public static List<LabelEntity> RemoveDuplicates(List<LabelEntity> dupLabels)
         {
