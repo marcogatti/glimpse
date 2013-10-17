@@ -36,13 +36,11 @@
                 @Html.AntiForgeryToken()
                 <h3 class="form-signin-heading" id="registration-view-title">Creá tu usuario Glimpse</h3>
 
-                //@Html.ValidationSummary()
-                
-                @Html.TextBoxFor(m => m.Firstname, new { maxlenght = 16, placeholder = "Escribí tu nombre...", @class = "input-block-level" })
-                @Html.TextBoxFor(m => m.Lastname, new { maxlenght = 16, placeholder = "Escribí tu apellido...", @class = "input-block-level" })
-                @Html.TextBoxFor(m => m.Username, new { maxlenght = 20, placeholder = "Elegí un nombre de usuario...", @class = "input-block-level" })
-                @Html.PasswordFor(m => m.Password, new { maxlenght = 20, placeholder = "Ingresá tu contraseña...", @class = "input-block-level" })
-                @Html.PasswordFor(m => m.ConfirmationPassword, new { maxlenght = 20, placeholder = "Confirmá tu contraseña...", @class = "input-block-level" })
+                @Html.TextBoxFor(m => m.Firstname, new { maxlenght = 16, placeholder = "Escribí tu nombre...", @class = "input-block-level", id="firstname" })
+                @Html.TextBoxFor(m => m.Lastname, new { maxlenght = 16, placeholder = "Escribí tu apellido...", @class = "input-block-level", id="lastname" })
+                @Html.TextBoxFor(m => m.Username, new { maxlenght = 20, placeholder = "Elegí un nombre de usuario...", @class = "input-block-level", id="username" })
+                @Html.PasswordFor(m => m.Password, new { maxlenght = 20, placeholder = "Ingresá tu contraseña...", @class = "input-block-level", id="password" })
+                @Html.PasswordFor(m => m.ConfirmationPassword, new { maxlenght = 20, placeholder = "Confirmá tu contraseña...", @class = "input-block-level", id="confirmation" })
             
                 <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
                 <input class="btn btn-default" id="registration-next-btn" type="submit" value="Siguiente" />
@@ -56,6 +54,16 @@
                 @Html.AntiForgeryToken()
 
                 <h3 class="form-signin-heading">Integrá tus cuentas de correo</h3>
+                <div hidden>
+                @Html.TextBoxFor(m => m.Firstname, new { maxlenght = 16, placeholder = "Escribí tu nombre...", @class = "input-block-level", id="createFirstname" })
+                @Html.TextBoxFor(m => m.Lastname, new { maxlenght = 16, placeholder = "Escribí tu apellido...", @class = "input-block-level", id="createLastname" })
+                @Html.TextBoxFor(m => m.Username, new { maxlenght = 20, placeholder = "Elegí un nombre de usuario...", @class = "input-block-level", id="createUsername" })
+                @Html.PasswordFor(m => m.Password, new { maxlenght = 20, placeholder = "Ingresá tu contraseña...", @class = "input-block-level", id="createPassword" })
+                @Html.PasswordFor(m => m.ConfirmationPassword, new { maxlenght = 20, placeholder = "Confirmá tu contraseña...", @class = "input-block-level", id="createConfirmation" })
+                </div>
+                
+                @Html.ValidationSummary();
+                
                 <table>
                     <tr class="mail-register-row">
                         <td>@Html.TextBoxFor(m => m.ListMailAccounts[0].Address, new { maxlenght = 16, placeholder = "Primer cuenta de correo...", type="email", @class = "input-large" })</td>

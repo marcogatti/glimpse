@@ -27,10 +27,20 @@
             </button>
             <a class="brand" href="#">Glimpse</a>
             <div class="nav-collapse collapse">
-                <p class="navbar-text pull-right">
+                @*<p class="navbar-text pull-right">
                     Has iniciado sesión con tu cuenta <a href="#" class="navbar-link">@ViewBag.Username</a>
                     @Html.ActionLink("Salir", "Logout", "Account", null, new { @class = "navbar-link" })
-                </p>
+                </p>*@
+                <div class="btn-group pull-right">
+                    <button class="btn">@ViewBag.Username</button>
+                    <button class="btn dropdown-toggle" data-toggle="dropdown">
+                        <span class="caret"></span>
+                    </button>
+                    <ul id="account-dropdown" class="dropdown-menu">
+                        <li> <span class="icon-wrench"></span> Configuración </li>
+                        <li> <span class="icon-arrow-right"></span> Salir </li>
+                    </ul>
+                </div>
                 <ul class="nav">
                     <li class="active"><a href="#">Inicio</a></li>
                     <li><a href="#about">Acerca de</a></li>
@@ -50,21 +60,17 @@
         <div class="span2">
             <div id="panel" class="well sidebar-nav">
                 <a href="#compose" id="compose" class="btn btn-block">Redactar</a>
-
+                <hr />
                 <ol id="labels-header" class="nav nav-list">
-
                     <li class="nav-header">Carpetas</li>
-                    <li class="nav-header">Etiquetas</li>
-
+                    <li class="nav-header">Etiquetas <span class="pull-right"><i class="icon-pencil"></i></span></li>
                 </ol>
-
+                <hr />
+                <div id="circles-progress" class="progress progress-striped active">
+                    <div class="bar" style="width: 100%;">Cargando...</div>
+                </div>
             </div>
             <!--/.well -->
-
-            <div id="circles-progress" class="progress progress-striped active">
-                <div class="bar" style="width: 100%;">Cargando...</div>
-            </div>
-
         </div>
         <!--/span-->
 
@@ -89,22 +95,16 @@
 
         </div>
 
+        <form class="form-inline pull-right">
+            <label>Cantidad máxima</label>
+            <input id="max-amount" type="number" min="1" max="100" value="30">
+        </form>
+
 
     </div>
     <!--/row-->
-    <form class="form-inline pull-left">
-        <label>Cantidad máxima</label>
-        <input id="max-amount" type="number" min="1" max="100" value="30">
-    </form>
 
-@*    <div class="row-fluid">
-        <div class="pull-right">
-            <label class="checkbox">
-                <input id="transitions-check" type="checkbox" checked value="">
-                Desactivar animaciones (para equipos menos potentes)
-            </label>
-        </div>
-    </div>*@
+    <hr />
 
     <footer>
         <p>&copy; glimpse 2013</p>

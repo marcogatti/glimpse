@@ -4,17 +4,15 @@
     background: -webkit-linear-gradient(top, rgb(154, 230, 164), rgb(65, 161, 78));
 }
 
-hr {
-    border-color: rgba(255, 255, 255, 0.3);
+#account-dropdown {
+    padding: 5px;
 }
 
 #email-container {
     height: 480px;
-    /*border: 2px inset rgba(255, 255, 255, 0.3);*/
     position: relative;
     overflow: hidden;
     padding: 0;
-    /*background: rgb(0, 0, 0);*/
 }
 
 .brand {
@@ -351,7 +349,6 @@ blockquote {
     border-left: 3px solid #ccc;
 }
 
-/* Animation keyframes - you need to add prefixes */
 @-webkit-keyframes spin {
     from { -webkit-transform: rotate(0deg); }
     to { -webkit-transform: rotate(360deg); }

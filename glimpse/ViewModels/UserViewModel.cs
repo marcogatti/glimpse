@@ -39,7 +39,7 @@ namespace Glimpse.ViewModels
         public String Lastname { get; set; }
 
         [RegularExpression(@"^(?!.{20})[A-Za-z0-9\!#\$%&'\*\.\+\-/=\?\^`\{|\}~_]{6,20}",
-                           ErrorMessage = "Caracteres de contraseña inválidos.")]
+                           ErrorMessage = "Confirmación de contraseña inválida.")]
         [DataType(DataType.Password)]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public String ConfirmationPassword { get; set; }
