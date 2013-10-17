@@ -9,15 +9,15 @@ namespace Glimpse.ViewModels
     public class MailAccountViewModel
     {
         [RegularExpression( @"^[A-Za-z0-9]([\w\.\-]*)@([A-Za-z0-9-]+)((\.(\w){2,3})+)$", 
-                                ErrorMessage= "La dirección de correo posee caracteres inválidos.")]
+                                ErrorMessage= "Dirección de correo inválida.")]
         public String Address { get; set; }
 
         [RegularExpression(@"^(?!.{20})[A-Za-z0-9\!#\$%&'\*\.\+\-/=\?\^`\{|\}~_]{6,20}",
-                                ErrorMessage = "Caracteres de contraseña inválidos.")]
+                                ErrorMessage = "Contraseña inválida.")]
         public String Password { get; set; }
 
         [RegularExpression(@"^(?!.{20})[A-Za-z0-9\!#\$%&'\*\.\+\-/=\?\^`\{|\}~_]{6,20}",
-                                ErrorMessage = "Caracteres de contraseña inválidos.")]
+                                ErrorMessage = "Confirmación de contraseña inválida.")]
         public String ConfirmationPassword { get; set; }
 
         public Boolean IsMainAccount { get; set; }

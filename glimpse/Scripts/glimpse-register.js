@@ -2,6 +2,28 @@
     $("#registration-link").click(function () {
         $("#registration-view").modal("show");
     });
+
+    $("#registration-next-btn").click(function updateModel() {
+        var fnvalue = $("#firstname").val();
+        $("#createFirstname").val(fnvalue);
+
+        var lnvalue = $("#lastname").val();
+        $("#createLastname").val(lnvalue);
+
+        var unvalue = $("#username").val();
+        $("#createUsername").val(unvalue);
+
+        var pvalue = $("#password").val();
+        $("#createPassword").val(pvalue);
+
+        var cpvalue = $("#confirmation").val();
+        $("#createConfirmation").val(cpvalue);
+    });
+
+    $("#registration-back-btn").click(function () {
+        $('#first-screen').fadeIn().removeClass('hidden');
+        $('#second-screen').fadeOut().addClass('hidden');
+    });
 });
 
 function registrationNext(data) {
@@ -22,30 +44,23 @@ function registrationFailure() {
     alert("No se pudo realizar la registración. Intentelo de nuevo más tarde.");
 }
 
-$(document).ready(function () {
-    $("#registration-back-btn").click(function () {
-        $('#first-screen').fadeIn().removeClass('hidden');
-        $('#second-screen').fadeOut().addClass('hidden');
-    });
-});
-
 function checkbox1Changed() {
-    if ($("check1").checkbox == true) {
-        ($("check2").checkbox = false);
-        ($("check3").checkbox = false);
+    if ($("#check1").is(':checked')) {
+        ($("#check2").removeAttr('checked'));
+        ($("#check3").removeAttr('checked'));
     }
 }
 
 function checkbox2Changed() {
-    if ($("check2").checkbox == true) {
-        ($("check1").checkbox = false);
-        ($("check3").checkbox = false);
+    if ($("#check2").is(':checked')) {
+        ($("#check1").removeAttr('checked'));
+        ($("#check3").removeAttr('checked'));
     }
 }
 
 function checkbox3Changed() {
-    if ($("check3").checkbox == true) {
-        ($("check1").checkbox = false);
-        ($("check2").checkbox = false);
+    if ($("#check3").is(':checked')) {
+        ($("#check1").removeAttr('checked'));
+        ($("#check2").removeAttr('checked'));
     }
 }
