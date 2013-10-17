@@ -20,6 +20,7 @@
     {
         @Html.AntiForgeryToken()
         <h2 class="form-signin-heading">Bienvenido a Glimpse</h2>
+        
         @Html.ValidationSummary()
         @Html.TextBoxFor(m => m.Username, new { placeholder = "Tu usuario o dirección de correo...", @class = "input-block-level" })
         @Html.PasswordFor(m => m.Password, new { placeholder = "Tu contraseña...", @class = "input-block-level" })
@@ -36,6 +37,10 @@
                 @Html.AntiForgeryToken()
                 <h3 class="form-signin-heading" id="registration-view-title">Creá tu usuario Glimpse</h3>
 
+                @Html.ValidationSummary()
+
+                <div id="first-validations"></div>
+                
                 @Html.TextBoxFor(m => m.Firstname, new { maxlenght = 16, placeholder = "Escribí tu nombre...", @class = "input-block-level", id="firstname" })
                 @Html.TextBoxFor(m => m.Lastname, new { maxlenght = 16, placeholder = "Escribí tu apellido...", @class = "input-block-level", id="lastname" })
                 @Html.TextBoxFor(m => m.Username, new { maxlenght = 20, placeholder = "Elegí un nombre de usuario...", @class = "input-block-level", id="username" })
@@ -61,8 +66,6 @@
                 @Html.PasswordFor(m => m.Password, new { maxlenght = 20, placeholder = "Ingresá tu contraseña...", @class = "input-block-level", id="createPassword" })
                 @Html.PasswordFor(m => m.ConfirmationPassword, new { maxlenght = 20, placeholder = "Confirmá tu contraseña...", @class = "input-block-level", id="createConfirmation" })
                 </div>
-                
-                @Html.ValidationSummary();
                 
                 <table>
                     <tr class="mail-register-row">

@@ -28,7 +28,7 @@
 
 function registrationNext(data) {
     if (!data.success) {
-        alert(data.message);
+        $('#first-validations').html(data.message);
     }
     else {
         renderMailAccountScreen();

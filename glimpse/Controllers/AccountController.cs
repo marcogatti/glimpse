@@ -330,7 +330,7 @@ namespace Glimpse.Controllers
             }
             catch (GlimpseException exc)
             {
-                return Json(new { success = false, message = exc.Message }, JsonRequestBehavior.AllowGet);
+                return Json(new { success = false, message = exc.GlimpseMessage }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception exc)
             {
