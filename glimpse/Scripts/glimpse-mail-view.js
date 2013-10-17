@@ -25,6 +25,10 @@ function initializeMailViewModal() {
     });
 
     $("#mail-view-delete").click(function () {
+        deleteCircleWithConfirmationWindow(currentCircle);
+    });
+
+    $('#deletion-confirmed').click(function () {
         deleteCircle(currentCircle);
         $("#mail-view").modal('hide');
     });
@@ -339,4 +343,20 @@ function setConversationOfMail(circle, body, subjectPrefix) {
 
     $("#email-subject").html(subject);
     setMailEditorText('<br /> <blockquote>' + body + '</blockquote>');
+}
+
+function deleteCircleWithConfirmationWindow(circle) {
+
+    var currentLabels = getSystemLabels(circle);
+
+    if (currentLabels.indexOf(label_trash) != -1) {
+        $('#deletion-confirmation').modal();
+        return;
+    }
+
+    addSystemLabel(circle, label_trash);
+
+    deleteCircleInServer(circle);
+
+    $("#mail-view").modal('hide');
 }

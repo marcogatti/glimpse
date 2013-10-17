@@ -281,14 +281,11 @@ function archiveCircle(circle) {
 
 function deleteCircle(circle) {
 
-    var currentLabels = getSystemLabels(circle);
+    circle.remove();
+    deleteCircleInServer(circle);
+}
 
-    if (currentLabels.indexOf(label_trash) != -1) {
-        circle.remove();
-    } else {
-        addSystemLabel(circle, label_trash);
-    }
-
+function deleteCircleInServer(circle){
     $.ajax({
         type: "POST",
         url: "async/TrashMail",
