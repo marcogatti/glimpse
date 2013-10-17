@@ -23,6 +23,11 @@ function initializeMailViewModal() {
         archiveCircle(currentCircle);
         $("#mail-view").modal('hide');
     });
+
+    $("#mail-view-delete").click(function () {
+        deleteCircle(currentCircle);
+        $("#mail-view").modal('hide');
+    });
 }
 
 function setFullDisplay(circle) {

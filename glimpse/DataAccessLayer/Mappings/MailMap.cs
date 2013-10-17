@@ -39,7 +39,7 @@ namespace Glimpse.DataAccessLayer.Mappings
                                                     .Cascade.All();
             HasManyToMany<LabelEntity>(x => x.Labels).ParentKeyColumn("MailId")
                                                     .ChildKeyColumn("LabelId")
-                                                    .Cascade.All()
+                                                    .Cascade.SaveUpdate()
                                                     .Not.LazyLoad()
                                                     .Table("LABELSPERMAIL");
             Table("MAIL");

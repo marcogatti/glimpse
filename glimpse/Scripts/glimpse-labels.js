@@ -2,6 +2,12 @@
     labelToAddIsSet = false;
 var unwantedSystemLabels = ["Important", "Flagged", "Drafts"];
 
+var label_trash = 'Trash',
+    label_inbox = 'Inbox',
+    label_all = 'All',
+    label_spam = 'Junk',
+    label_sent = 'Sent';
+
 function populateLabelColors() {
 
     var glimpseColors = [
@@ -116,6 +122,16 @@ function addCircleColor(circle, label) {
     circle.data("custom-labels", newCustomLabels);
 
     calculateEmailColor(circle);
+}
+
+function addSystemLabel(circle, systemLabel) {
+
+    var systemLabels = getSystemLabels(circle);
+
+    systemLabels.push(systemLabel);
+    circle.data("system-labels", systemLabels);
+
+    chooseCirclesToBeShown();
 }
 
 function addLabelToEmail(label, circle) {

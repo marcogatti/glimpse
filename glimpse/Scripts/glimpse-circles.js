@@ -275,6 +275,24 @@ function calculateEmailsLeft(containerChunk) {
 }
 
 function archiveCircle(circle) {
-    removeSystemLabelFromCircle(circle, 'Inbox');
+    removeSystemLabelFromCircle(circle, label_inbox);
     chooseCirclesToBeShown();
+}
+
+function deleteCircle(circle) {
+
+    var currentLabels = getSystemLabels(circle);
+
+    if (currentLabels.indexOf(label_trash) != -1) {
+        circle.remove();
+    } else {
+        addSystemLabel(circle, label_trash);
+    }
+
+    $.ajax({
+        type: "POST",
+        url: "async/TrashMail",
+        dataType: 'json',
+        data: { id: circle.data('id'), mailAccountId: circle.data('mailaccount') }
+    });
 }
