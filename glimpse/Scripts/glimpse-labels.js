@@ -1,6 +1,6 @@
 ﻿var selectedLabel,
     labelToAddIsSet = false;
-var unwantedSystemLabels = ["Important", "Flagged", "Drafts", "All"];
+var unwantedSystemLabels = ["Important", "Flagged", "Drafts"];
 
 function populateLabelColors() {
 
@@ -172,20 +172,31 @@ function removeLabelFromCircle(circle, label) {
 
     if (indexOfLabel > -1) {
         circleLabels.splice(indexOfLabel, 1);
-    } else {
-        alert("El Email no contenía la etiqueta.");
     }
 
     circle.data("custom-labels", circleLabels);
     calculateEmailColor(circle);
 
-    $.ajax({
-        type: "POST",
-        url: "async/RemoveLabel",
-        dataType: 'json',
-        data: { labelName: label, mailId: circle.data('id') }
-    });
+    removeLabelFromCircleInServer(label, circle.data('id'), false, circle.data('mailaccount'));
 }
+
+function removeSystemLabelFromCircle(circle, label) {
+
+    var circleLabels = getSystemLabels(circle),
+        indexOfLabel;
+
+    indexOfLabel = circleLabels.indexOf(label);
+
+    if (indexOfLabel > -1) {
+        circleLabels.splice(indexOfLabel, 1);
+    }
+
+    circle.data("system-labels", circleLabels);
+    calculateEmailColor(circle);
+
+    removeLabelFromCircleInServer(label, circle.data('id'), true, circle.data('mailaccount'));
+}
+
 
 function setEverithingRelatedToAddLabelsToAMail() {
     setLabelsAdder();
@@ -303,3 +314,13 @@ function loadLabels() {
             );
 
 }
+
+function removeLabelFromCircleInServer(label, mailId, isSystemLabel, mailAccountId) {
+    $.ajax({
+        type: "POST",
+        url: "async/RemoveLabel",
+        dataType: 'json',
+        data: { labelName: label, mailId: mailId, isSystemLabel: isSystemLabel, mailAccountId: mailAccountId }
+    });
+}
+

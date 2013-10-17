@@ -523,6 +523,7 @@
     <Content Include="Views\Account\Login.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Shared\mail_view.cshtml" />
+    <Content Include="Views\Shared\compose_panel.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

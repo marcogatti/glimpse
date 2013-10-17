@@ -209,7 +209,7 @@ namespace Glimpse.Controllers
             }
         }
         [HttpPost]
-        public ActionResult RemoveLabel(String labelName, Int64 mailId, Int64 mailAccountId = 0)
+        public ActionResult RemoveLabel(String labelName, Int64 mailId, Boolean isSystemLabel, Int64 mailAccountId = 0)
         {
             ISession session = NHibernateManager.OpenSession();
             ITransaction tran = session.BeginTransaction();
@@ -221,7 +221,7 @@ namespace Glimpse.Controllers
                 if (mail.Entity.MailAccountEntity.Id != currentMailAccount.Entity.Id)
                     return Json(new { success = false, message = "El mail indicado no pertenece a la cuenta indicada." }, JsonRequestBehavior.AllowGet);
 
-                mail.RemoveLabel(labelName, session); //DB
+                mail.RemoveLabel(labelName, isSystemLabel, session); //DB
                 currentMailAccount.RemoveMailLabel(labelName, mail.Entity.Gm_mid); //IMAP
                 tran.Commit();
 
@@ -383,7 +383,7 @@ namespace Glimpse.Controllers
             }
         }
         [HttpPost]
-        public ActionResult ArchieveMail(Int64 mailId, Int64 mailAccountId = 0)
+        public ActionResult ArchiveMail(Int64 mailId, Int64 mailAccountId = 0)
         {
             ISession session = NHibernateManager.OpenSession();
             ITransaction tran = session.BeginTransaction();
@@ -392,7 +392,7 @@ namespace Glimpse.Controllers
                 MailAccount currentMailAccount = this.GetMailAccount(mailAccountId);
                 Mail mail = new Mail(mailId, session);
                 mail.Archieve(session);
-                currentMailAccount.ArchieveMail(mail);
+                currentMailAccount.ArchiveMail(mail);
                 tran.Commit();
 
                 JsonResult result = Json(new { success = true }, JsonRequestBehavior.AllowGet);

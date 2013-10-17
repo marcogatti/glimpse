@@ -18,6 +18,11 @@ function initializeMailViewModal() {
     $(document).click(function () {
         $('#mail-view-address-displayer').popover('hide');
     });
+
+    $("#mail-view-archive").click(function () {
+        archiveCircle(currentCircle);
+        $("#mail-view").modal('hide');
+    });
 }
 
 function setFullDisplay(circle) {
@@ -186,7 +191,7 @@ function prepareLabelForMailView(labelElement) {
         ev.preventDefault();
         timeoutId = setTimeout(function () {
             removeLabelFromMailView(labelElement);
-            removeLabelFromCircle(currentCircle, labelElement.data('name'));      
+            removeLabelFromCircle(currentCircle, labelElement.data('name'));
         }, 1000);
     }).bind('mouseup mouseleave', function () {
         clearTimeout(timeoutId);

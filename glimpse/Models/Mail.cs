@@ -46,9 +46,15 @@ namespace Glimpse.Models
                 this.Save(session);
             }
         }
-        public void RemoveLabel(String label, ISession session)
+        public void RemoveLabel(String label, Boolean isSystemLabel, ISession session)
         {
-            LabelEntity labelToRemove = this.Entity.Labels.First<LabelEntity>(x => x.Name == label);
+            LabelEntity labelToRemove;
+
+            if (isSystemLabel)
+                labelToRemove = this.Entity.Labels.First<LabelEntity>(x => x.SystemName == label);
+            else
+                labelToRemove = this.Entity.Labels.First<LabelEntity>(x => x.Name == label);
+
             this.Entity.Labels.Remove(labelToRemove);
             this.Save(session);
         }

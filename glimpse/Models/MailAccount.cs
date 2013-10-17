@@ -249,7 +249,7 @@ namespace Glimpse.Models
         {
             this.MyFetcher.DeleteLabel(labelName);
         }
-        public void ArchieveMail(Mail mail)
+        public void ArchiveMail(Mail mail)
         {
             this.MyFetcher.ArchiveMail(mail.Entity.Gm_mid);
         }

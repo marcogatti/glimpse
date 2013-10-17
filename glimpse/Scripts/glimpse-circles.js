@@ -273,3 +273,8 @@ function calculateEmailsLeft(containerChunk) {
 
     return r;
 }
+
+function archiveCircle(circle) {
+    removeSystemLabelFromCircle(circle, 'Inbox');
+    chooseCirclesToBeShown();
+}
