@@ -1,5 +1,6 @@
 ﻿using ActiveUp.Net.Mail;
 using Glimpse.DataAccessLayer.Entities;
+using Glimpse.Exceptions;
 using Glimpse.Exceptions.MailInterfacesExceptions;
 using Glimpse.Models;
 using System;
@@ -66,7 +67,12 @@ namespace Glimpse.MailInterfaces
         public Int32 GetMailUID(String mailbox, UInt64 gmMailID)
         {
             this.GetMailbox(mailbox); //Se asegura que se encuentra seleccionado el mailbox en IMAP
-            return Int32.Parse(this.CleanIMAPResponse(this.Receiver.Command("UID SEARCH X-GM-MSGID " + gmMailID.ToString()), "SEARCH", false));
+            String uidString = this.CleanIMAPResponse(this.Receiver.Command("UID SEARCH X-GM-MSGID " + gmMailID.ToString()), "SEARCH", false);
+            Int32 uid;
+            if (Int32.TryParse(uidString, out uid))
+                return uid;
+            else
+                throw new GlimpseException("El email con gmID: " + gmMailID + " no se encuentra en la carpeta " + mailbox + ".");
         }
         public DateTime GetOldestMailDate(Int32 oldestMessageCount)
         {

@@ -43,9 +43,7 @@ namespace Glimpse.Models
         }
         public static Label FindBySystemName(MailAccount account, String systemName, ISession session)
         {
-
             LabelEntity labelEntity;
-
             try
             {
                 labelEntity = session.CreateCriteria<LabelEntity>()

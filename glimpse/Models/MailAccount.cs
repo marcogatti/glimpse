@@ -253,12 +253,27 @@ namespace Glimpse.Models
         {
             this.MyFetcher.ArchiveMail(mail.Entity.Gm_mid);
         }
-        public void TrashMail(Mail mail, String systemFolderName)
+        public void TrashMail(Mail mail, ISession session)
         {
-            if (systemFolderName == "Trash")
-                this.MyFetcher.DeleteFromTrash(mail.Entity.Gm_mid);
+            if (mail.GetSystemFolderName() == "Trash")
+            {
+                this.MyFetcher.DeleteFromTrash(mail.Entity.Gm_mid); //IMAP
+                mail.Delete(session); //DB
+            }
             else
+            {
                 this.MyFetcher.MoveToTrash(mail.GetImapFolderName(), mail.Entity.Gm_mid);
+                Label trashLabel = Label.FindBySystemName(this, "Trash", session);
+                this.UpdateTrashUid(mail, trashLabel.Entity.Name);
+                mail.AddLabel(trashLabel, session); //SaveOrUpdate adentro
+            }
+        }
+        public void UpdateTrashUid(Mail deletedMail, String imapTrashFolderName)
+        {
+            Int32 trashUID = this.MyFetcher.GetMailUID(imapTrashFolderName, deletedMail.Entity.Gm_mid);
+            deletedMail.Entity.UidAll = 0;
+            deletedMail.Entity.UidSpam = 0;
+            deletedMail.Entity.UidTrash = trashUID;
         }
         public Int32 GetUIDExternalFrom(String mailbox, Boolean max)
         {

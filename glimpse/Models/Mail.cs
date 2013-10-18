@@ -1,4 +1,5 @@
 ﻿using Glimpse.DataAccessLayer.Entities;
+using Glimpse.Exceptions;
 using NHibernate;
 using NHibernate.Criterion;
 using System;
@@ -40,7 +41,7 @@ namespace Glimpse.Models
         }
         public void AddLabel(Label theLabel, ISession session)
         {
-            if (!this.HasLabel(theLabel))
+            if (!this.HasLabel(theLabel) && !this.Entity.Labels.Any(x => x.SystemName == "Trash"))
             {
                 this.Entity.Labels.Add(theLabel.Entity);
                 this.Save(session);
@@ -135,6 +136,13 @@ namespace Glimpse.Models
             this.Entity.CC = from.CC;
             this.Entity.BCC = from.BCC;
             this.Entity.Body = from.Body;
+        }
+        private void MoveToTrash(ISession session)
+        {
+            Label trashLabel = Label.FindBySystemName(new MailAccount(this.Entity.MailAccountEntity), "Trash", session);
+            this.AddLabel(trashLabel, session);
+
+
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using ActiveUp.Net.Mail;
 using Glimpse.DataAccessLayer;
 using Glimpse.DataAccessLayer.Entities;
+using Glimpse.Exceptions;
 using Glimpse.Helpers;
 using Glimpse.MailInterfaces;
 using Glimpse.Models;
@@ -127,16 +128,20 @@ namespace Glimpse.Controllers
                 MailAccount mailAccount = this.GetMailAccount(mailAccountId);
                 Mail mail = new Mail(id, session);
                 if (mail == null)
-                    throw new Exception("Mail inexistente: " + id.ToString() + ".");
-                String systemFolder = mail.GetSystemFolderName();
-                mail.Delete(session); //DB
-                mailAccount.TrashMail(mail, systemFolder); //IMAP
-                if(systemFolder != "Trash")
-                    MailsTasksHandler.SynchronizeTrash(mailAccount.Entity.Address);
+                    throw new GlimpseException("Mail inexistente: " + id.ToString() + ".");
+                mailAccount.TrashMail(mail, session); //IMAP y BD
+                //if(systemFolder != "Trash")
+                //    MailsTasksHandler.SynchronizeTrash(mailAccount.Entity.Address);
                 tran.Commit();
 
                 JsonResult result = Json(new { success = true }, JsonRequestBehavior.AllowGet);
                 return result;
+            }
+            catch (GlimpseException exc)
+            {
+                tran.Rollback();
+                Log.LogException(exc, "Parametros de la llamada: mailID(" + id.ToString() + ").");
+                return Json(new { success = false, message = exc.GlimpseMessage }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception exc)
             {
@@ -150,7 +155,7 @@ namespace Glimpse.Controllers
             }
         }
         [HttpPost]
-        public ActionResult sendEmail(MailSentViewModel sendInfo, Int64 mailAccountId = 0)
+        public ActionResult SendEmail(MailSentViewModel sendInfo, Int64 mailAccountId = 0)
         {
             try
             {
