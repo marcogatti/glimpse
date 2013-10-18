@@ -121,11 +121,36 @@ function setPreviewDisplay(circle) {
     });
 }
 
+function rotation(deg) {
+    return "-webkit-transform: rotate(" + deg + "deg);";
+}
+
 function setMailClicked(circle) {
 
     $(circle).attr('mail-clicked', true);
     $(circle).addClass('previewed');
     $(circle).find(".loading").css("visibility", "hidden");
+
+    var buttons = $(
+        "<div class='radial-button icon-plus-sign' style='" + rotation(30) + "'></div>" +
+        "<div class='radial-button icon-minus-sign' style='" + rotation(15) + "'></div>" +
+        "<div class='radial-button icon-trash' style='" + rotation(-15) + "'></div>" +
+        "<div class='radial-button icon-comment' style='" + rotation(-30) + "'></div>"
+        );
+
+    $(circle).prepend(buttons);
+
+    var customLabels = getCustomLabels($(circle)),
+        labelsBalls = "";
+
+    var deg = 135;
+    for (var i = 0; i < customLabels.length; i++) {
+        labelsBalls += "<div class='radial-button label-ball' style='" + rotation(deg) +
+            " background-color: " + labelColors[customLabels[i]] + ";'></div>";
+        deg += 15;
+    }
+
+    $(circle).prepend($(labelsBalls));
 
     $(circle).animate({
         width: '150',
@@ -142,6 +167,7 @@ function unsetMailClicked(circle) {
     $(circle).attr('mail-clicked', false);
     $(circle).removeClass('previewed');
     $(circle).find(".loading").css("visibility", "visible");
+    $(circle).find(".radial-button").remove();
 
     $(circle).animate({
         width: '75',

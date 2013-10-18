@@ -1,12 +1,18 @@
 ﻿var selectedLabel,
     labelToAddIsSet = false;
-var unwantedSystemLabels = ["Important", "Flagged", "Drafts"];
 
 var label_trash = 'Trash',
     label_inbox = 'Inbox',
     label_all = 'All',
     label_spam = 'Junk',
-    label_sent = 'Sent';
+    label_sent = 'Sent',
+    label_important = 'Important',
+    label_flagged = 'Flagged',
+    label_draft = 'Drafts';
+
+var unwantedSystemLabels = [label_important, label_flagged, label_draft],
+    exclusive_labels = [label_trash, label_spam];
+
 
 function populateLabelColors() {
 
@@ -85,8 +91,14 @@ function setLabelsAdder() {
     });
 }
 
-function canReceiveThatLabel(label, mail) {
-    return !hasLabel(mail, label);
+function canReceiveThatLabel(label, circle) {
+
+    var systemLabels = getSystemLabels(circle);
+
+    if (hasExclusiveLabel(systemLabels))
+        return false;
+    else
+        return !hasLabel(circle, label);
 }
 
 function prepareToReceiveLabels(circle) {
@@ -273,6 +285,11 @@ function toBeHidden(circle) {
         systemLabels = getSystemLabels(circle),
         activeMailBox = $(".mailbox:not(.label-hidden)").data("name");
 
+
+    if (hasExclusiveLabel(systemLabels) && !isExclusive(activeMailBox)) {
+        return true;
+    }
+
     if (activeMailBox !== "INBOX") {
         if (systemLabels.indexOf(activeMailBox) === -1) {
             return true;
@@ -291,6 +308,21 @@ function toBeHidden(circle) {
     }
 }
 
+function isExclusive(systemLabel) {
+    return exclusive_labels.indexOf(systemLabel) != -1 ? true : false;
+}
+
+function hasExclusiveLabel(labels) {
+
+    for (var i = 0; i < labels.length; i++) {
+
+        if (isExclusive(labels[i]))
+            return true;
+    }
+
+    return false;
+}
+
 function isActive(label) {
     return !$("li[data-name='" + label + "']").hasClass("label-hidden");
 }
@@ -299,7 +331,7 @@ function hasLabel(circle, label) {
     return (getCustomLabels(circle).indexOf(label) != -1);
 }
 
-function validSystemLabel(label){
+function validSystemLabel(label) {
     return unwantedSystemLabels.indexOf(label.systemName) === -1 && label.systemName != null;
 }
 

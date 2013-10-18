@@ -211,8 +211,13 @@ namespace Glimpse.Models
         }
         public void Disconnect()
         {
-            if (this.MyFetcher != null)
-                this.MyFetcher.CloseClient();
+            try
+            {
+                if (this.MyFetcher != null)
+                    this.MyFetcher.CloseClient();
+            }
+            catch (ActiveUp.Net.Mail.Imap4Exception e) { Log.LogException(e, "Error al cerrar mailAccount"); }
+            catch (System.Net.Sockets.SocketException e) { Log.LogException(e, "Error al cerrar mailAccount"); }
         }
         public void FetchAndSaveMails(Label label, Int64 fromUid, Int64 toUid, ref Int32 amountOfMails)
         {

@@ -188,6 +188,7 @@ function setDragging() {
         $(window).unbind("mousemove");
         if (wasDragging) {
             setDateCoords();
+            calculateEmailsLeft(15);       //Emparchau
             fetchMailsWithinActualPeriod();
             wasDragging = false;
         }

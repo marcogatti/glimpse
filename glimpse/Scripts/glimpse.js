@@ -15,5 +15,6 @@ $(document).ready(function () {
     setEverithingRelatedToAddLabelsToAMail();
     initializeMailEditor();
     initializeMailViewModal();
+    initializeMainDropdownMenuActions();
 })
 

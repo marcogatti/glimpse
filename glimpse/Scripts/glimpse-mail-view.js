@@ -1,4 +1,5 @@
-﻿var currentCircle;
+﻿var currentCircle,
+    currentBody;
 
 function initializeMailViewModal() {
 
@@ -9,6 +10,8 @@ function initializeMailViewModal() {
     setAddressesDisplayer();
 
     setMailTraversingArrows();
+
+    setMailViewerActions();
 
     $('#mail-view-address-displayer').click(function (ev) {
         ev.stopPropagation();
@@ -62,6 +65,8 @@ function setFullDisplay(circle) {
             view_modal.find("#mail-view-subject").html(subject);
             view_modal.find("#mail-view-date").html(date.toLocaleString());
 
+            setMailViewerLabels(view_modal, circle);
+
             showProgressBar("#body-progress");
 
             view_modal.modal("show");
@@ -72,7 +77,6 @@ function setFullDisplay(circle) {
                     setViewMailBody(view_modal, data.mail.body);
                     setViewMailAttachments(view_modal, data.mail.extras)
                     markAsRead(circle);
-                    setMailViewerActions(view_modal, circle, data.mail.body);
 
                 } else alert(data.message);
             });
@@ -113,49 +117,52 @@ function setViewMailAttachments(view_modal, attachments) {
 }
 
 function setViewMailBody(view_modal, body) {
+
+    currentBody = body;
+
     view_modal.find("#mail-view-body").html(body);
 }
 
-function setMailViewerActions(view_modal, circle, body) {
+function setMailViewerActions() {
 
-    var data = { circle: circle, body: body }
+    var view_modal = $("#mail-view");
 
-    view_modal.find(".mail-reply").one("click", data, function (event) {
 
-        var circle = event.data.circle;
+    view_modal.find(".mail-reply").click(function (event) {
+
+        var circle = currentCircle;
 
         $("#email-to").html(circle.data('from'));
 
-        setConversationOfMail(circle, event.data.body, 'RE: ');
+        setConversationOfMail(circle, currentBody, 'RE: ');
 
         displayComposeDialog();
     }
     );
 
-    view_modal.find(".mail-replyall").one("click", data, function (event) {
+    view_modal.find(".mail-replyall").click(function (event) {
 
-        var circle = event.data.circle;
+        var circle = currentCircle;
 
         $("#email-to").html(circle.data('from') + ', ' + circle.data('to') + ', ' + circle.data('cc'));
 
-        setConversationOfMail(circle, event.data.body, 'RE: ');
+        setConversationOfMail(circle, currentBody, 'RE: ');
 
         displayComposeDialog();
     }
 );
 
-    view_modal.find(".mail-forward").one("click", data, function (event) {
+    view_modal.find(".mail-forward").click(function (event) {
 
-        var circle = event.data.circle;
+        var circle = currentCircle;
 
         $("#email-to").html('');
 
-        setConversationOfMail(circle, event.data.body, 'FW: ');
+        setConversationOfMail(circle, currentBody, 'FW: ');
 
         displayComposeDialog();
     }
 );
-    setMailViewerLabels(view_modal, circle);
 }
 
 function setAddressesDisplayer() {
