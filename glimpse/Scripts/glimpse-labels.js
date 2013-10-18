@@ -91,8 +91,14 @@ function setLabelsAdder() {
     });
 }
 
-function canReceiveThatLabel(label, mail) {
-    return !hasLabel(mail, label);
+function canReceiveThatLabel(label, circle) {
+
+    var systemLabels = getSystemLabels(circle);
+
+    if (hasExclusiveLabel(systemLabels))
+        return false;
+    else
+        return !hasLabel(circle, label);
 }
 
 function prepareToReceiveLabels(circle) {
@@ -310,7 +316,7 @@ function hasExclusiveLabel(labels) {
 
     for (var i = 0; i < labels.length; i++) {
 
-        if(isExclusive(labels[i]))
+        if (isExclusive(labels[i]))
             return true;
     }
 
