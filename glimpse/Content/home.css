@@ -147,6 +147,19 @@
     transform: scale(1.3);
 }
 
+.radial-button {
+    position: absolute;
+    top: 0;
+    left: 0;
+    -webkit-transform-origin: 75px 75px;
+}
+.label-ball {
+    border-radius: 50%;
+    height: 15px;
+    width: 15px;
+    box-shadow: 0 0 2px 2px white;
+}
+
 .coord {
     position: absolute;
     text-align: center;
