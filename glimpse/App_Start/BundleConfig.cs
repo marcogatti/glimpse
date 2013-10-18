@@ -28,6 +28,7 @@ namespace Glimpse
                         "~/Scripts/glimpse-circles.js",
                         "~/Scripts/glimpse-mail-view.js",
                         "~/Scripts/glimpse-labels.js",
+                        "~/Scripts/glimpse-config.js",
                         "~/Scripts/glimpse.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/jquerymousewheel").Include(
