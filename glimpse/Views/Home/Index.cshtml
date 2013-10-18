@@ -27,20 +27,7 @@
             </button>
             <a class="brand" href="#">Glimpse</a>
             <div class="nav-collapse collapse">
-                @*<p class="navbar-text pull-right">
-                    Has iniciado sesión con tu cuenta <a href="#" class="navbar-link">@ViewBag.Username</a>
-                    @Html.ActionLink("Salir", "Logout", "Account", null, new { @class = "navbar-link" })
-                </p>*@
-                <div class="btn-group pull-right">
-                    <button class="btn">@ViewBag.Username</button>
-                    <button class="btn dropdown-toggle" data-toggle="dropdown">
-                        <span class="caret"></span>
-                    </button>
-                    <ul id="account-dropdown" class="dropdown-menu">
-                        <li> <span class="icon-wrench"></span> Configuración </li>
-                        <li> <span class="icon-arrow-right"></span> Salir </li>
-                    </ul>
-                </div>
+                @{Html.RenderPartial("config_dropdown");}
                 <ul class="nav">
                     <li class="active"><a href="#">Inicio</a></li>
                     <li><a href="#about">Acerca de</a></li>

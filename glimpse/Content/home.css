@@ -350,10 +350,15 @@ blockquote {
 }
 
 @-webkit-keyframes spin {
-    from { -webkit-transform: rotate(0deg); }
-    to { -webkit-transform: rotate(360deg); }
+    from {
+        -webkit-transform: rotate(0deg);
+    }
+
+    to {
+        -webkit-transform: rotate(360deg);
+    }
 }
- 
+
 /* Loading animation container */
 .loading {
     position: absolute;
@@ -363,28 +368,37 @@ blockquote {
     height: 84px;
     margin: -42px 0 0 -42px;
 }
- 
-/* Spinning circle (inner circle) */
-.loading .maskedCircle {
-    width: 60px;
-    height: 60px;
-    border-radius: 36px;
-    border: 9px solid rgba(255, 255, 255, 0.7);
-}
- 
-/* Spinning circle mask */
-.loading .mask {
-    width: 36px;
-    height: 36px;
-    overflow: hidden;
-}
- 
-/* Spinner */
-.loading .spinner {
-    position: absolute;
-    left: 3px;
-    top: 3px;
-    width: 78px;
-    height: 78px;
-    -webkit-animation: spin 1s infinite linear;
+
+    /* Spinning circle (inner circle) */
+    .loading .maskedCircle {
+        width: 60px;
+        height: 60px;
+        border-radius: 36px;
+        border: 9px solid rgba(255, 255, 255, 0.7);
+    }
+
+    /* Spinning circle mask */
+    .loading .mask {
+        width: 36px;
+        height: 36px;
+        overflow: hidden;
+    }
+
+    /* Spinner */
+    .loading .spinner {
+        position: absolute;
+        left: 3px;
+        top: 3px;
+        width: 78px;
+        height: 78px;
+        -webkit-animation: spin 1s infinite linear;
+    }
+
+.unselectable {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }

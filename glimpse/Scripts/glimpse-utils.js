@@ -11,6 +11,13 @@ function preventSelectingNotUsefulThings() {
     //);
 }
 
+function initializeMainDropdownMenuActions() {
+    $('#btn-config').click(function () {
+
+    }
+    );
+}
+
 function containerHeight() {
     return $("#email-container").height();
 }
