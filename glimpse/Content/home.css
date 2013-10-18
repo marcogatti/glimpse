@@ -158,6 +158,7 @@
     height: 15px;
     width: 15px;
     box-shadow: 0 0 2px 2px white;
+    -webkit-transition: all 0.5s ease;
 }
 
 .coord {

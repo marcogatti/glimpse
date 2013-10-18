@@ -174,23 +174,6 @@ function removeLabelFromEmail(label, circle) {
     });
 }
 
-function removeCircleColor(circle, labelName) {
-
-    var index = getCustomLabels(circle).indexOf(labelName),
-        newCustomLabels;
-
-    if (index > -1) {
-        newCustomLabels = getCustomLabels(circle).splice(index, 1);
-    } else {
-        alert("El Email no contenía la etiqueta.");
-    }
-
-    circle.data("custom-labels", newCustomLabels);
-    calculateEmailColor(circle);
-}
-
-
-//Marco dice: La funcion de arriba no esta funcando, me hice esta porque la necesito.
 function removeLabelFromCircle(circle, label) {
 
     var circleLabels = getCustomLabels(circle),
@@ -279,7 +262,6 @@ function getLabels(circle, labelsString) {
 }
 
 function toBeHidden(circle) {
-    //  un quilombo...
 
     var customLabels = getCustomLabels(circle),
         systemLabels = getSystemLabels(circle),
