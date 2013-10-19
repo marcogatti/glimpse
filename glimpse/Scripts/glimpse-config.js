@@ -27,10 +27,11 @@ function initializeMainDropdownMenuActions() {
 
     $('#config-password-form, #config-mailaccount-form, #config-personaldata-form').submit(function (event) {
 
-        var sendData, url, isValid;
+        var sendData, url, isValid, form;
 
         event.preventDefault();
 
+        form = $(this);
         sendData = getFormData($(this));
         url = formActions[$(this).data('action')]['url'];
         isValid = formActions[$(this).data('action')]['validation'];
@@ -44,7 +45,7 @@ function initializeMainDropdownMenuActions() {
             dataType: 'json',
             data: sendData,
             success: function (data, textStatus, jqXHR) {
-                serverPostActions(sendData, data)
+                serverPostActions(form, sendData, data)
             }
         });
     });
@@ -88,15 +89,19 @@ function hasEmptyValues(array) {
     return false;
 }
 
-function serverPostActions(sentData, receivedData) {
+function serverPostActions(form, sentData, receivedData) {
 
     if (!receivedData.success) {
-        alert(receivedData.message);
+        showConfigErrors(receivedData.message);
         return;
     }
 
+    $('#config-errors-cont').addClass('hidden');
+    alert("Datos actualizados correctamente.");
+
     closeConfigModal();
 
+    cleanFormData(form);
 }
 
 function closeConfigModal() {
@@ -105,4 +110,25 @@ function closeConfigModal() {
 
 function openConfigModal() {
     $('#config-view').modal();
+}
+
+function showConfigErrors(message) {
+
+    var errorList = $('#config-errors-list');
+
+    $('#config-errors-cont').removeClass('hidden');
+    $("<li />").html(message).appendTo(errorList);
+}
+
+function cleanFormData(form) {
+    setFormData(form, null);
+}
+
+function setFormData(form, data) {
+
+    if (data == null) {
+        form.find('input').each(function () {
+            $(this).val('');
+        });
+    }
 }
