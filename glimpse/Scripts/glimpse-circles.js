@@ -129,25 +129,11 @@ function removeImportance(circle) {
 function setImportance(circle) {
     circle.addClass("importance" + circle.data("importance"));
 }
-    
-function setMailClicked(circle) {
 
-    removeImportance(circle);
-    circle.attr('mail-clicked', true);
-    circle.addClass('previewed');
-    circle.find(".loading").css("visibility", "hidden");
+function putLabelBalls(circle) {
 
-    var buttons = $(
-        "<div class='radial-button icon-plus-sign' style='" + rotation(30) + "'></div>" +
-        "<div class='radial-button icon-minus-sign' style='" + rotation(15) + "'></div>" +
-        "<div class='radial-button icon-trash' style='" + rotation(-15) + "'></div>" +
-        "<div class='radial-button icon-comment' style='" + rotation(-30) + "'></div>"
-        );
-
-    circle.prepend(buttons);
-
-    var customLabels = getCustomLabels($(circle)),
-        labelsBalls = "";
+    var customLabels = getCustomLabels(circle),
+    labelsBalls = "";
 
     var deg = 135;
     for (var i = 0; i < customLabels.length; i++) {
@@ -157,6 +143,62 @@ function setMailClicked(circle) {
     }
 
     circle.prepend($(labelsBalls));
+}
+
+function putButtons(circle) {
+
+    var buttons = $(
+    "<div class='radial-button icon-plus-sign' style='" + rotation(30) + "'></div>" +
+    "<div class='radial-button icon-minus-sign' style='" + rotation(15) + "'></div>" +
+    "<div class='radial-button icon-trash' style='" + rotation(-15) + "'></div>" +
+    "<div class='radial-button icon-comment' style='" + rotation(-30) + "'></div>"
+    );
+
+    circle.prepend(buttons);
+
+    $(".circle > .icon-plus-sign").on('click', function (e) {
+        e.stopPropagation();
+        changeImportance($(this).parent(), true)
+    });
+    $(".circle > .icon-minus-sign").on('click', function (e) {
+        e.stopPropagation();
+        changeImportance($(this).parent(), false)
+    });
+}
+    
+function changeSize(circle, step) {
+    var currentImportance = circle.data("importance");
+    var intVal = step ? 1 : -1;
+    var newImportance = Math.min(Math.max(currentImportance + intVal, 1), 5);
+    
+    removeImportance(circle);
+    circle.data("importance", newImportance);
+    setImportance(circle);
+}
+
+function changeImportance(circle, step) {
+
+    changeSize(circle, step);
+    //unsetMailClicked(circle);
+    //setMailClicked(circle);
+
+    $.ajax({
+        type: "POST",
+        url: "async/ChangeImportance",
+        dataType: 'json',
+        data: { mailId: circle.data('id'), isIncrease: step, mailAccountId: circle.data("mailaccount") }
+    });
+}
+
+function setMailClicked(circle) {
+
+    //removeImportance(circle);
+    circle.attr('mail-clicked', true);
+    circle.addClass('previewed');
+    circle.find(".loading").css("visibility", "hidden");
+
+    putLabelBalls(circle);
+    putButtons(circle);
 
     circle.animate({
         width: '150',
@@ -174,7 +216,7 @@ function unsetMailClicked(circle) {
     circle.removeClass('previewed');
     circle.find(".loading").css("visibility", "visible");
     circle.find(".radial-button").remove();
-    setImportance(circle);
+    //setImportance(circle);
 
     circle.animate({
         width: '75',

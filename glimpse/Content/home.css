@@ -5,14 +5,14 @@
 }
 
 #account-dropdown {
-    padding: 5px;
+    padding: 2px;
 }
 
 #email-container {
     height: 480px;
     position: relative;
     overflow: hidden;
-    padding: 0;
+    padding: 5px;
 }
 
 .brand {
@@ -125,39 +125,43 @@
 }
 
 .circle.importance1 {
-    -webkit-transform: scale(0.7);
-    transform: scale(0.7);
+    -webkit-transform: scale(0.75);
+    transform: scale(0.75);
 }
 
 .circle.importance2 {
-    -webkit-transform: scale(0.85);
-    transform: scale(0.85);
+    -webkit-transform: scale(0.9);
+    transform: scale(0.9);
 }
 
 .circle.importance3 {
 }
 
 .circle.importance4 {
-    -webkit-transform: scale(1.15);
-    transform: scale(1.15);
+    -webkit-transform: scale(1.1);
+    transform: scale(1.1);
 }
 
 .circle.importance5 {
-    -webkit-transform: scale(1.3);
-    transform: scale(1.3);
+    -webkit-transform: scale(1.25);
+    transform: scale(1.25);
 }
 
 .radial-button {
     position: absolute;
     top: 0;
     left: 0;
+    cursor: pointer;
     -webkit-transform-origin: 75px 75px;
-}
-.label-ball {
+    transform-origin: 75px 75px;
+    
     border-radius: 50%;
     height: 15px;
     width: 15px;
-    box-shadow: 0 0 2px 2px white;
+    box-shadow: 0 0 4px 4px white;
+}
+
+.label-ball {
     -webkit-transition: all 0.5s ease;
 }
 
@@ -165,10 +169,13 @@
     position: absolute;
     text-align: center;
     font-style: normal;
+    font-weight: bolder;
+    font-size: large;
     font-family: 'Open Sans', Arial, sans-serif;
     width: 125px;
     color: white;
-    text-shadow: 0 2px 4px #000;
+    margin: 5px;
+    text-shadow: 0 0 8px #000;
 }
 
     .coord.hidable {
