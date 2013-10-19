@@ -10,10 +10,18 @@ function initializeMainDropdownMenuActions() {
         openConfigModal();
     });
 
+    $('#config-view').on('hidden', function () {
+        cleanConfigErrors();
+        cleanAllFormsData($(this));
+    })
+
     $('#config-password, #config-mailaccount, #config-personaldata').click(function () {
 
         var modalBody = $('#config-view').find('.modal-body'),
             bodyId = $(this).data('body-id');
+
+        cleanConfigErrors();
+        cleanAllFormsData(modalBody);
 
         modalBody.find('.nav-tabs').find('li').each(function () {
             $(this).removeClass('active')
@@ -64,8 +72,10 @@ function getFormData(form) {
 
 function formChangePasswordValidation(data) {
 
+    cleanConfigErrors();
+
     if (hasEmptyValues(data)) {
-        alert("Todos los campos son obligatorios.");
+        showConfigErrors("Todos los campos son obligatorios.");
         return false;
     }
     return true;
@@ -91,6 +101,8 @@ function hasEmptyValues(array) {
 
 function serverPostActions(form, sentData, receivedData) {
 
+    cleanConfigErrors();
+
     if (!receivedData.success) {
         showConfigErrors(receivedData.message);
         return;
@@ -109,6 +121,7 @@ function closeConfigModal() {
 }
 
 function openConfigModal() {
+    cleanConfigErrors();
     $('#config-view').modal();
 }
 
@@ -120,8 +133,19 @@ function showConfigErrors(message) {
     $("<li />").html(message).appendTo(errorList);
 }
 
+function cleanConfigErrors() {
+    $('#config-errors-list').html('');
+}
+
 function cleanFormData(form) {
     setFormData(form, null);
+}
+
+function cleanAllFormsData(modalBody) {
+
+    modalBody.find('form').each(function () {
+        cleanFormData($(this));
+    });
 }
 
 function setFormData(form, data) {
