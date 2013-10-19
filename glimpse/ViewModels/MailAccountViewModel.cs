@@ -12,11 +12,11 @@ namespace Glimpse.ViewModels
                                 ErrorMessage= "Dirección de correo inválida.")]
         public String Address { get; set; }
 
-        [RegularExpression(@"^(?!.{20})[A-Za-z0-9\!#\$%&'\*\.\+\-/=\?\^`\{|\}~_]{6,20}",
+        [RegularExpression(@"^(?!.{20})[A-Za-z0-9\!#\$%&'\*\.\+\-/=\?\^`\{|\}~_]{4,20}",
                                 ErrorMessage = "Contraseña inválida.")]
         public String Password { get; set; }
 
-        [RegularExpression(@"^(?!.{20})[A-Za-z0-9\!#\$%&'\*\.\+\-/=\?\^`\{|\}~_]{6,20}",
+        [RegularExpression(@"^(?!.{20})[A-Za-z0-9\!#\$%&'\*\.\+\-/=\?\^`\{|\}~_]{4,20}",
                                 ErrorMessage = "Confirmación de contraseña inválida.")]
         public String ConfirmationPassword { get; set; }
 

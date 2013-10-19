@@ -1,4 +1,5 @@
 ﻿using ActiveUp.Net.Mail;
+using Glimpse.Attributes;
 using Glimpse.DataAccessLayer;
 using Glimpse.DataAccessLayer.Entities;
 using Glimpse.Exceptions;
@@ -15,6 +16,7 @@ using System.Web.Mvc;
 
 namespace Glimpse.Controllers
 {
+    [AjaxOnly]
     [Authorize]
     public class AsyncMailsController : Controller
     {
