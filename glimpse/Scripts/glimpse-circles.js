@@ -11,10 +11,7 @@ function insertCircle(value) {
             maxAge = value.age;
         }
 
-        var date = new Date(parseInt(value.date.substr(6))).toGMTString(),
-            classes = "circle";
-
-        classes += " importance" + value.importance;
+        var date = new Date(parseInt(value.date.substr(6))).toGMTString();
 
         if (!value.seen) {
             spinner = '<div class="loading"><div class="spinner"><div class="mask"><div class="maskedCircle"></div></div></div></div>';
@@ -49,7 +46,7 @@ function insertCircle(value) {
             " data-mailaccount=", value.mailaccount
         ];
 
-        var newCircle = $("<div class='" + classes + "'" + dataAttributes.join("'") + "' title='" + value.from.address + "'>" + spinner +
+        var newCircle = $("<div class='circle'" + dataAttributes.join("'") + "' title='" + value.from.address + "'>" + spinner +
             "<div class='centered'><p content=true>" + value.subject.substr(0, 50) + "</p></div></div>");
 
         calculateEmailColor(newCircle);
@@ -64,6 +61,7 @@ function insertCircle(value) {
             newCircle.css("opacity", 0.9);
         }, 100);
 
+        setImportance(newCircle);
         calculateEmailPosition(newCircle);
         prepareToReceiveLabels(newCircle);
         setPreviewDisplay(newCircle);
@@ -96,15 +94,15 @@ function getCircleData(circle) {
 
 function setPreviewDisplay(circle) {
 
-    $(circle).click(function (event) {
+    circle.click(function (event) {
         event.preventDefault();
         event.stopPropagation();
 
-        setMailClicked(this);
+        setMailClicked($(this));
 
-        $(circle).unbind('click');
+        circle.unbind('click');
 
-        $(circle).one('click', circle, function (innerEvent) {
+        circle.one('click', circle, function (innerEvent) {
             innerEvent.stopPropagation();
             unsetMailClicked(innerEvent.data);
             innerEvent.data.unbind('click');
@@ -122,26 +120,20 @@ function setPreviewDisplay(circle) {
 }
 
 function rotation(deg) {
-    return "-webkit-transform: rotate(" + deg + "deg);";
+    return "-webkit-transform: rotate(" + deg + "deg); transform: rotate(" + deg + "deg);";
 }
 
-function setMailClicked(circle) {
+function removeImportance(circle) {
+    circle.removeClass("importance1 importance2 importance3 importance4 importance5");
+}
+function setImportance(circle) {
+    circle.addClass("importance" + circle.data("importance"));
+}
 
-    $(circle).attr('mail-clicked', true);
-    $(circle).addClass('previewed');
-    $(circle).find(".loading").css("visibility", "hidden");
+function putLabelBalls(circle) {
 
-    var buttons = $(
-        "<div class='radial-button icon-plus-sign' style='" + rotation(30) + "'></div>" +
-        "<div class='radial-button icon-minus-sign' style='" + rotation(15) + "'></div>" +
-        "<div class='radial-button icon-trash' style='" + rotation(-15) + "'></div>" +
-        "<div class='radial-button icon-comment' style='" + rotation(-30) + "'></div>"
-        );
-
-    $(circle).prepend(buttons);
-
-    var customLabels = getCustomLabels($(circle)),
-        labelsBalls = "";
+    var customLabels = getCustomLabels(circle),
+    labelsBalls = "";
 
     var deg = 135;
     for (var i = 0; i < customLabels.length; i++) {
@@ -150,33 +142,90 @@ function setMailClicked(circle) {
         deg += 15;
     }
 
-    $(circle).prepend($(labelsBalls));
+    circle.prepend($(labelsBalls));
+}
 
-    $(circle).animate({
+function putButtons(circle) {
+
+    var buttons = $(
+    "<div class='radial-button icon-plus-sign' style='" + rotation(30) + "'></div>" +
+    "<div class='radial-button icon-minus-sign' style='" + rotation(15) + "'></div>" +
+    "<div class='radial-button icon-trash' style='" + rotation(-15) + "'></div>" +
+    "<div class='radial-button icon-comment' style='" + rotation(-30) + "'></div>"
+    );
+
+    circle.prepend(buttons);
+
+    $(".circle > .icon-plus-sign").on('click', function (e) {
+        e.stopPropagation();
+        changeImportance($(this).parent(), true)
+    });
+    $(".circle > .icon-minus-sign").on('click', function (e) {
+        e.stopPropagation();
+        changeImportance($(this).parent(), false)
+    });
+}
+    
+function changeSize(circle, step) {
+    var currentImportance = circle.data("importance");
+    var intVal = step ? 1 : -1;
+    var newImportance = Math.min(Math.max(currentImportance + intVal, 1), 5);
+    
+    removeImportance(circle);
+    circle.data("importance", newImportance);
+    setImportance(circle);
+}
+
+function changeImportance(circle, step) {
+
+    changeSize(circle, step);
+    //unsetMailClicked(circle);
+    //setMailClicked(circle);
+
+    $.ajax({
+        type: "POST",
+        url: "async/ChangeImportance",
+        dataType: 'json',
+        data: { mailId: circle.data('id'), isIncrease: step, mailAccountId: circle.data("mailaccount") }
+    });
+}
+
+function setMailClicked(circle) {
+
+    //removeImportance(circle);
+    circle.attr('mail-clicked', true);
+    circle.addClass('previewed');
+    circle.find(".loading").css("visibility", "hidden");
+
+    putLabelBalls(circle);
+    putButtons(circle);
+
+    circle.animate({
         width: '150',
         height: '150',
         marginLeft: '-37.5',
         marginTop: '-37.5',
     }, 200);
 
-    $(circle).find('[content=true]').text($(circle).attr('data-bodypeek'));
+    circle.find('[content=true]').text(circle.attr('data-bodypeek'));
 }
 
 function unsetMailClicked(circle) {
 
-    $(circle).attr('mail-clicked', false);
-    $(circle).removeClass('previewed');
-    $(circle).find(".loading").css("visibility", "visible");
-    $(circle).find(".radial-button").remove();
+    circle.attr('mail-clicked', false);
+    circle.removeClass('previewed');
+    circle.find(".loading").css("visibility", "visible");
+    circle.find(".radial-button").remove();
+    //setImportance(circle);
 
-    $(circle).animate({
+    circle.animate({
         width: '75',
         height: '75',
         marginLeft: '0',
         marginTop: '0'
     }, 200);
 
-    $(circle).find('[content=true]').text($(circle).attr('data-subject'));
+    circle.find('[content=true]').text($(circle).attr('data-subject'));
 }
 
 function isClicked(circle) {

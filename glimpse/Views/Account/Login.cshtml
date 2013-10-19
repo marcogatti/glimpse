@@ -71,19 +71,16 @@
                     <tr class="mail-register-row">
                         <td>@Html.TextBoxFor(m => m.ListMailAccounts[0].Address, new { maxlenght = 16, placeholder = "Primer cuenta de correo...", type="email", @class = "input-large" })</td>
                         <td>@Html.PasswordFor(m => m.ListMailAccounts[0].Password, new { maxlenght = 20, placeholder = "Contraseña de la cuenta...", @class = "input-large" })</td>
-                        <td>@Html.PasswordFor(m => m.ListMailAccounts[0].ConfirmationPassword, new { maxlenght = 20, placeholder = "Confirmá la contraseña...", @class = "input-large" })</td>
                         <td>@Html.CheckBoxFor(m => m.ListMailAccounts[0].IsMainAccount, new { id = "check1", @checked="checked", onchange="checkbox1Changed()" })</td>
                     </tr>
                     <tr class="mail-register-row">
                         <td>@Html.TextBoxFor(m => m.ListMailAccounts[1].Address, new { maxlenght = 16, placeholder = "Segunda cuenta de correo...", type="email", @class = "input-large" })</td>
                         <td>@Html.PasswordFor(m => m.ListMailAccounts[1].Password, new { maxlenght = 20, placeholder = "Contraseña de la cuenta...", @class = "input-large" })</td>
-                        <td>@Html.PasswordFor(m => m.ListMailAccounts[1].ConfirmationPassword, new { maxlenght = 20, placeholder = "Confirmá la contraseña...", @class = "input-large" })</td>
                         <td>@Html.CheckBoxFor(m => m.ListMailAccounts[1].IsMainAccount, new { id="check2", onchange="checkbox2Changed()" })</td>
                     </tr>
                     <tr class="mail-register-row">
                         <td>@Html.TextBoxFor(m => m.ListMailAccounts[2].Address, new { maxlenght = 20, placeholder = "Tercer cuenta de correo...", type="email", @class = "input-large" })</td>
                         <td>@Html.PasswordFor(m => m.ListMailAccounts[2].Password, new { maxlenght = 20, placeholder = "Contraseña de la cuenta...", @class = "input-large" })</td>
-                        <td>@Html.PasswordFor(m => m.ListMailAccounts[2].ConfirmationPassword, new { maxlenght = 20, placeholder = "Confirmá la contraseña...", @class = "input-large" })</td>
                         <td>@Html.CheckBoxFor(m => m.ListMailAccounts[2].IsMainAccount, new { id="check3", onchange="checkbox3Changed()" })</td>
                     </tr>
                 </table>
