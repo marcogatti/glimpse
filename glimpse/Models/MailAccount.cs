@@ -42,9 +42,9 @@ namespace Glimpse.Models
             return mailAccountClone;
         }
 
-        public void SetAsMainAccount()
+        public void SetAsMainAccount(Boolean isMain)
         {
-            this.Entity.IsMainAccount = true;
+            this.Entity.IsMainAccount = isMain;
         }
         public void SetUser(User user)
         {
@@ -205,7 +205,7 @@ namespace Glimpse.Models
             this.ConnectLight();
             using (ISession session = NHibernateManager.OpenSession())
             {
-                this.SetFetcherLabels(session);
+                this.UpdateLabels(session);
                 session.Close();
             }
         }
@@ -293,6 +293,8 @@ namespace Glimpse.Models
             {
                 oldAccount.Entity.Address = this.Entity.Address;
                 oldAccount.Entity.Password = this.Entity.Password;
+                oldAccount.Entity.IsMainAccount = this.Entity.IsMainAccount;
+                oldAccount.Entity.Active = this.Entity.Active;
                 this.Entity = oldAccount.Entity;
             }
             session.SaveOrUpdate(this.Entity);
@@ -319,8 +321,12 @@ namespace Glimpse.Models
         }
         public static MailAccount FindMainMailAccount(String username, ISession session)
         {
+            UserEntity userEntity = session.CreateCriteria<UserEntity>()
+                                            .Add(Restrictions.Eq("Username", username))
+                                            .UniqueResult<UserEntity>();
+
             MailAccountEntity entity = session.CreateCriteria<MailAccountEntity>()
-                                            .Add(Restrictions.Eq("User.Username", username))
+                                            .Add(Restrictions.Eq("User", userEntity))
                                             .Add(Restrictions.Eq("IsMainAccount", true))
                                             .Add(Restrictions.Eq("Active", true))
                                             .UniqueResult<MailAccountEntity>();

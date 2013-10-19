@@ -48,7 +48,7 @@ namespace Glimpse.ViewModels
 
         public void FilterNullAccounts()
         {
-            this.ListMailAccounts = this.ListMailAccounts.Where(x => x.Address != null && x.Password != null).ToList();
+            this.ListMailAccounts = this.ListMailAccounts.Where(x => !String.IsNullOrEmpty(x.Address) && !String.IsNullOrEmpty(x.Password)).ToList();
         }
     }
 }
