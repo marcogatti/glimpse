@@ -74,6 +74,13 @@ namespace Glimpse.Controllers
                 ViewBag.Username = sessionUser.Entity.Username;
                 ViewBag.Labels = viewLabels;
                 ViewBag.OldestAge = DateTime.Now.Ticks - oldestMailDate.Ticks;
+                ViewBag.Firstname = sessionUser.Entity.Firstname ?? "";
+                ViewBag.Lastname = sessionUser.Entity.Lastname ?? "";
+                ViewBag.Country = sessionUser.Entity.Country ?? "";
+                ViewBag.City = sessionUser.Entity.City ?? "";
+                ViewBag.Telephone = sessionUser.Entity.Telephone ?? "";
+                ViewBag.MailAccounts = sessionUser.GetAccounts().Select(x => new { address = x.Entity.Address, mainAccount = x.Entity.IsMainAccount });
+                ViewBag.IsGlimpseUser = Glimpse.Models.User.IsGlimpseUser(sessionUser.Entity.Username);
 
                 return View();
             }

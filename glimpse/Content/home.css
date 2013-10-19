@@ -446,3 +446,7 @@ blockquote {
     -ms-user-select: none;
     user-select: none;
 }
+a.disabled {
+    color: #333333;
+    cursor: default;
+}

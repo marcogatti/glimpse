@@ -330,7 +330,7 @@ namespace Glimpse.Controllers
                 userView.ListMailAccounts = mailAccountsView;
                 userView.FilterNullAccounts();
                 #endregion
-                
+
                 this.ValidateUserMailAccounts(userView, session); //direcciones de correo y contraseñas
 
                 User sessionUser = (User)Session[AccountController.USER_NAME];
@@ -372,7 +372,7 @@ namespace Glimpse.Controllers
                 tran.Commit();
                 Session[AccountController.USER_NAME] = sessionUser;
 
-                return Redirect(Url.Action("Index", "Home"));
+                return Json(new { success = true, url = Url.Action("Index", "Home") }, JsonRequestBehavior.AllowGet);
             }
             catch (GlimpseException exc)
             {
@@ -458,7 +458,7 @@ namespace Glimpse.Controllers
                 sessionUser.SaveOrUpdate(session);
                 session.Flush();
 
-                return Redirect(Url.Action("Index", "Home"));
+                return Json(new { success = true }, JsonRequestBehavior.AllowGet);
             }
             catch (GlimpseException exc)
             {

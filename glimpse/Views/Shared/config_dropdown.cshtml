@@ -4,7 +4,10 @@
         <span class="caret"></span>
     </button>
     <ul id="account-dropdown" class="dropdown-menu">
-        <li><a id="btn-config" href="#configure" class="unselectable"><span class="icon-wrench"></span> Configuración</a> </li>
-        <li><a id="btn-logout" href="/account/logout" class="unselectable"><span class="icon-arrow-right"></span> Salir</a></li>
+        @if(ViewBag.IsGlimpseUser)
+        {
+            <li><a id="btn-config" href="#configure" class="unselectable"><span class="icon-wrench"></span>Configuración</a> </li>
+        }
+        <li><a id="btn-logout" href="/account/logout" class="unselectable"><span class="icon-arrow-right"></span>Salir</a></li>
     </ul>
 </div>

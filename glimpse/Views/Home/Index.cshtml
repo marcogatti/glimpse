@@ -102,4 +102,23 @@
 </div>
 
 @{Html.RenderPartial("compose_panel");}
+
+<script>
+    var user_firstname = @Html.Raw(Json.Encode(ViewBag.Firstname));
+    var user_lastname = @Html.Raw(Json.Encode(ViewBag.Lastname)); 
+    var user_country = @Html.Raw(Json.Encode(ViewBag.Country));
+    var user_city = @Html.Raw(Json.Encode(ViewBag.City));
+    var user_telephone = @Html.Raw(Json.Encode(ViewBag.Telephone));
+    var mailAccounts = @Html.Raw(Json.Encode(ViewBag.MailAccounts));
+    var user_isGlimpseUser = @Html.Raw(Json.Encode(ViewBag.IsGlimpseUser));
+
+    var user_personal_data = {
+                                firstName: user_firstname,
+                                lastName: user_lastname,
+                                country:user_country,
+                                city: user_city,
+                                tel:user_telephone
+                             };
+</script>
+
 @{Html.RenderPartial("config_view");}
