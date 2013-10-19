@@ -153,11 +153,11 @@ namespace Glimpse.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        public ActionResult CreateUser(String viewAccountName1, String viewAccountPass1, Boolean viewAccountCheck1,
-                                       String viewAccountName2, String viewAccountPass2, Boolean viewAccountCheck2,
-                                       String viewAccountName3, String viewAccountPass3, Boolean viewAccountCheck3,
+        public ActionResult CreateUser(String mailAccount1, String password1, Boolean isMainAccount1,
+                                       String mailAccount2, String password2, Boolean isMainAccount2,
+                                       String mailAccount3, String password3, Boolean isMainAccount3,
                                        String username, String userPassword, String userConfirmationPassword,
-                                       String firstName, String Lastname)
+                                       String firstname, String lastname)
         {
             IList<MailAccount> mailAccounts;
             String exceptionMessage = "";
@@ -172,17 +172,17 @@ namespace Glimpse.Controllers
                 List<MailAccountViewModel> mailAccountsView = new List<MailAccountViewModel>();
                 UserViewModel userView = new UserViewModel();
 
-                mailAccountView1.Address = viewAccountName1;
-                mailAccountView1.Password = viewAccountPass1;
-                mailAccountView1.IsMainAccount = viewAccountCheck1;
+                mailAccountView1.Address = mailAccount1;
+                mailAccountView1.Password = password1;
+                mailAccountView1.IsMainAccount = isMainAccount1;
 
-                mailAccountView2.Address = viewAccountName2;
-                mailAccountView2.Password = viewAccountPass2;
-                mailAccountView2.IsMainAccount = viewAccountCheck2;
+                mailAccountView2.Address = mailAccount2;
+                mailAccountView2.Password = password2;
+                mailAccountView2.IsMainAccount = isMainAccount2;
 
-                mailAccountView3.Address = viewAccountName3;
-                mailAccountView3.Password = viewAccountPass3;
-                mailAccountView3.IsMainAccount = viewAccountCheck3;
+                mailAccountView3.Address = mailAccount3;
+                mailAccountView3.Password = password3;
+                mailAccountView3.IsMainAccount = isMainAccount3;
 
                 mailAccountsView.Add(mailAccountView1);
                 mailAccountsView.Add(mailAccountView2);
@@ -191,8 +191,8 @@ namespace Glimpse.Controllers
                 userView.Username = username;
                 userView.Password = userPassword;
                 userView.ConfirmationPassword = userConfirmationPassword;
-                userView.Firstname = firstName;
-                userView.Lastname = Lastname;
+                userView.Firstname = firstname;
+                userView.Lastname = lastname;
                 userView.ListMailAccounts = mailAccountsView;
                 userView.FilterNullAccounts();
                 #endregion
@@ -220,9 +220,13 @@ namespace Glimpse.Controllers
                 new CookieHelper().AddUsernameCookie(newUser.Entity.Username);
                 FormsAuthentication.SetAuthCookie(newUser.Entity.Username, true);
 
-                Sender.SendGreetingsPassword(newUser.Entity.Username, newUser.mailAccounts.Where(x => x.Entity.IsMainAccount).Single().Entity.Address);
+                try
+                {
+                    Sender.SendGreetingsPassword(newUser, newUser.mailAccounts.Where(x => x.Entity.IsMainAccount).Single().Entity.Address);
+                }
+                catch (Exception exc) { Log.LogException(exc); } //que no corte la ejecucion
 
-                return Redirect(Url.Action("Index", "Home"));
+                return Json(new { success = true, url = Url.Action("Index", "Home") }, JsonRequestBehavior.AllowGet);
             }
             catch (InvalidOperationException exc) //model state invalido
             {
@@ -237,7 +241,6 @@ namespace Glimpse.Controllers
             catch (GlimpseException exc)
             {
                 tran.Rollback();
-                Log.LogException(exc);
                 return Json(new { success = false, message = exc.GlimpseMessage }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception exc)
@@ -255,20 +258,21 @@ namespace Glimpse.Controllers
         [HttpPost]
         [AllowAnonymous]
         [AjaxOnly]
-        public ActionResult ValidateUserFields(String firstname, String lastname, String username, String password, String confirmationPassword)
+        public ActionResult ValidateUserFields(String firstname, String lastname, String username, String userPassword, String userConfirmationPassword)
         {
             String exceptionMessage = "";
             ISession session = NHibernateManager.OpenSession();
             
             try
             {
+                #region Initialize UserView
                 UserViewModel userView = new UserViewModel();
-
                 userView.Firstname = firstname;
                 userView.Lastname = lastname;
                 userView.Username = username;
-                userView.Password = password;
-                userView.ConfirmationPassword = confirmationPassword;
+                userView.Password = userPassword;
+                userView.ConfirmationPassword = userConfirmationPassword;
+                #endregion
 
                 this.UpdateModel(userView); //corre todos los regex
                 this.ValidateUserGenericFields(userView, session); //nombre, apellido, usuarioGlimpse, contraseñas
@@ -279,7 +283,10 @@ namespace Glimpse.Controllers
             {
                 foreach (ModelState wrongState in this.ModelState.Values.Where(x => x.Errors.Count > 0))
                     foreach (ModelError error in wrongState.Errors)
-                        exceptionMessage += error.ErrorMessage;
+                        if (error.ErrorMessage.Contains("usuario Glimpse válido")) //regex dice que un email puede ser valido
+                            exceptionMessage += "El nombre de usuario elegido no posee caracteres válidos.";
+                        else
+                            exceptionMessage += error.ErrorMessage;
                 if (String.IsNullOrEmpty(exceptionMessage))
                     exceptionMessage = exc.Message;
                 return Json(new { success = false, message = exceptionMessage }, JsonRequestBehavior.AllowGet);
@@ -290,8 +297,8 @@ namespace Glimpse.Controllers
             }
             catch (Exception exc)
             {
-                Log.LogException(exc, "Parametros: userName:(" + username + "), password( " + password +
-                                      "), confirmationPassword(" + confirmationPassword + "), firstname(" + firstname +
+                Log.LogException(exc, "Parametros: userName:(" + username + "), password( " + userPassword +
+                                      "), confirmationPassword(" + userConfirmationPassword + "), firstname(" + firstname +
                                       "), lastname(" + lastname + ").");
                 return Json(new { success = false, message = "Error validando usuario." }, JsonRequestBehavior.AllowGet);
             }
@@ -517,7 +524,6 @@ namespace Glimpse.Controllers
             }
             catch (GlimpseException exc)
             {
-                Log.LogException(exc);
                 return Json(new { success = false, message = exc.GlimpseMessage }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception exc)

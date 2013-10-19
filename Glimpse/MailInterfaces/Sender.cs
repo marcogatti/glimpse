@@ -1,7 +1,9 @@
 ﻿using ActiveUp.Net.Mail;
 using Glimpse.Exceptions.MailInterfacesExceptions;
 using Glimpse.Helpers;
+using Glimpse.Models;
 using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace Glimpse.MailInterfaces
@@ -60,7 +62,7 @@ namespace Glimpse.MailInterfaces
             SmtpMessage resetMail = new SmtpMessage();
             AddressCollection to = new AddressCollection();
 
-            resetMail.From = new Address("GlimpseInnovationSystems@gmail.com");
+            resetMail.From = new ActiveUp.Net.Mail.Address("GlimpseInnovationSystems@gmail.com");
             resetMail.BodyText.Text = "Usted ha olvidado la contraseña de su usuario Glimpse: " + username +
                                       ".\nLa nueva contraseña autogenerada es: \"" + newPassword + "\"." + 
                                       "\nDeberá ingresar con ésta clave la próxima vez que ingrese a Glimpse.";
@@ -74,17 +76,34 @@ namespace Glimpse.MailInterfaces
             encodedSubject += "?=";
             resetMail.Subject = encodedSubject;
 
-            to.Add(new Address(mailAddress));
+            to.Add(new ActiveUp.Net.Mail.Address(mailAddress));
             resetMail.To = to;
             resetMail.SendSsl("smtp.gmail.com", 465, "glimpseinnovationsystems@gmail.com", "poiewq123890", SaslMechanism.Login);
         }
-        public static void SendGreetingsPassword(String username, String mailAddress)
+        public static void SendGreetingsPassword(User newUser, String mailAddress)
         {
             SmtpMessage greetingsMail = new SmtpMessage();
             AddressCollection to = new AddressCollection();
+            IList<MailAccount> userMailAccounts = newUser.GetAccounts();
 
-            greetingsMail.From = new Address("GlimpseInnovationSystems@gmail.com");
-            greetingsMail.BodyText.Text = "¡Bienvenido a Glimpse" + username + "!.\n";
+            #region Build Mail Body
+            String mailBody = "";
+            mailBody += "¡Bienvenido a Glimpse!\nSu nuevo usuario es: " + newUser.Entity.Username + " (" +
+                        newUser.Entity.Firstname + " " + newUser.Entity.Lastname + ").\n" +
+                        "Las cuentas asociadas al mismo son:\n\n";
+            foreach (MailAccount userMailAccount in userMailAccounts)
+            {
+                mailBody += "\t- " + userMailAccount.Entity.Address;
+                if (userMailAccount.Entity.IsMainAccount)
+                    mailBody += " (cuenta principal)";
+                mailBody += ".\n";
+            }
+            mailBody += "\nPara editar la información de su usuario, ingrese a Glimpse y vaya al panel de Configuración.\n\n" +
+                        "Si no se ha registrado en Glimpse, por favor ignore este mensaje o responda al mismo indicando el inconveniente originado.";
+            #endregion
+
+            greetingsMail.From = new ActiveUp.Net.Mail.Address("GlimpseInnovationSystems@gmail.com");
+            greetingsMail.BodyText.Text = mailBody;
             greetingsMail.BodyText.ContentTransferEncoding = ContentTransferEncoding.QuotedPrintable;
             greetingsMail.BodyText.Charset = "ISO-8859-1";
             greetingsMail.BodyText.Format = BodyFormat.Text;
@@ -95,7 +114,7 @@ namespace Glimpse.MailInterfaces
             encodedSubject += "?=";
             greetingsMail.Subject = encodedSubject;
 
-            to.Add(new Address(mailAddress));
+            to.Add(new ActiveUp.Net.Mail.Address(mailAddress));
             greetingsMail.To = to;
             greetingsMail.SendSsl("smtp.gmail.com", 465, "glimpseinnovationsystems@gmail.com", "poiewq123890", SaslMechanism.Login);
         }
@@ -142,9 +161,9 @@ namespace Glimpse.MailInterfaces
         private void SetMailSender(SmtpMessage newMail)
         {
             if (this.senderName != null)
-                newMail.From = new Address(this.senderAddress, this.senderName);
+                newMail.From = new ActiveUp.Net.Mail.Address(this.senderAddress, this.senderName);
             else
-                newMail.From = new Address(this.senderAddress);
+                newMail.From = new ActiveUp.Net.Mail.Address(this.senderAddress);
         }
         private void CheckRecipients(AddressCollection recipients)
         {

@@ -1,4 +1,6 @@
-﻿$(document).ready(function () {
+﻿var user_personal_fields
+
+$(document).ready(function () {
     $("#registration-link").click(function () {
         $("#register-view").modal("show");
     });
@@ -7,13 +9,7 @@
 
         e.preventDefault();
 
-        var dataToSend = {
-            firstname: $('#register-name').val(),
-            lastname: $('#register-lastname').val(),
-            username: $('#register-username').val(),
-            password: $('#register-pass').val(),
-            confirmationPassword: $('#register-confpass').val(),
-        }
+        var dataToSend = getFormData($(this));
 
         $.ajax({
             type: "POST",
@@ -22,26 +18,53 @@
             data: dataToSend,
             success: function (data, textStatus, jqXHR) {
                 if (data.success) {
+                    user_personal_fields = dataToSend;
+                    switchForm($("#register-user"),
+                               $("#register-user-div"),
+                               $("#register-mailaccounts"),
+                               $("#register-mails-div"),
+                               "Integrá tus cuentas");
+                } else {
+                    showError(data.message);
+                }
+            }
+        });
+    });
+
+    $("#register-mails-form").submit(function (e) {
+
+        e.preventDefault();
+
+        var dataToSend = getFormData($(this)); //mailaccounts
+        dataToSend.firstname = user_personal_fields.firstname;
+        dataToSend.lastname = user_personal_fields.lastname;
+        dataToSend.username = user_personal_fields.username;
+        dataToSend.userpassword = user_personal_fields.userpassword;
+        dataToSend.userconfirmationpassword = user_personal_fields.userconfirmationpassword;
+
+        $.ajax({
+            type: "POST",
+            url: "createuser",
+            dataType: 'json',
+            data: dataToSend,
+            success: function (data, textStatus, jqXHR) {
+                if (data.success) {
                     $('#config-errors-cont').addClass('hidden');
                     $('#config-errors-list').html("");
-                    switchformforward();
+                    window.location.assign(data.url);
                 } else {
-                    $('#config-errors-cont').removeClass('hidden');
-                    var errorList = $('#config-errors-list')
-                    errorList.html("");
-                    $("<li />").html(data.message).appendTo(errorList);
+                    showError(data.message);
                 }
             }
         });
     });
 
     $("#config_mailaccount-goback").click(function () {
-        switchformbackward();
-    });
-
-    $("#registration-back-btn").click(function () {
-        $('#first-screen').fadeIn().removeClass('hidden');
-        $('#second-screen').fadeOut().addClass('hidden');
+        switchForm($("#register-mailaccounts"),
+                   $("#register-mails-div"),
+                   $("#register-user"),
+                   $("#register-user-div"),
+                   "Ingresá tus datos");
     });
 
     $("#forgot-password").click(function (e) {
@@ -59,63 +82,52 @@
             }
         });
     });
-
 });
 
-function switchformforward() {
+function switchForm(oldForm, oldContent, newForm, newContent, titleMessage) {
 
-    $("#register-mailaccounts").addClass("active");
-    $("#register-user").removeClass("active");
-    
-    $('#registration-title').val("Integrá tus cuentas de correo");
-    $("#register-user-div").addClass("hidden");
-    $("#register-mails-div").removeClass("hidden");
+    $('#registration-title').val(titleMessage);
+    $('#config-errors-cont').addClass('hidden');
+    $('#config-errors-list').html("");
+
+    oldForm.removeClass("active");
+    oldContent.addClass("hidden");
+    newForm.addClass("active");
+    newContent.removeClass("hidden");
 }
 
-function switchformbackward() {
-    $("#register-mailaccounts").removeClass("active");
-    $("#register-user").addClass("active");
-
-    $('#registration-title').val("Ingresá tus datos");
-    $("#register-user-div").removeClass("hidden");
-    $("#register-mails-div").addClass("hidden");
+function showError(errorMessage) {
+    $('#config-errors-cont').removeClass('hidden');
+    var errorList = $('#config-errors-list')
+    errorList.html("");
+    $("<li />").html(errorMessage).appendTo(errorList);
 }
 
-function registrationNext(data) {
-    if (!data.success) {
-        $('#first-validations').html(data.message);
-    }
-    else {
-        renderMailAccountScreen();
-    }
-}
+function getFormData(form) {
 
-function renderMailAccountScreen() {
-    $('#first-screen').fadeOut().addClass('hidden');
-    $('#second-screen').fadeIn().removeClass('hidden');
-}
+    var formField,
+        data = {};
 
-function registrationFailure() {
-    alert("No se pudo realizar la registración. Intentelo de nuevo más tarde.");
+    form.find('input').each(function () {
+
+        formField = $(this);
+
+        if (formField.attr('type') == 'checkbox') {
+            if (formField.prop('checked') == 'checked' || formField.prop('checked') == true)
+                data[formField.data('name')] = true;
+            else
+                data[formField.data('name')] = false;
+        } else {
+            data[formField.data('name')] = formField.val();
+        }
+    });
+
+    return data;
 }
 
 function checkbox1Changed() {
     if ($("#check1").is(':checked')) {
         ($("#check2").removeAttr('checked'));
         ($("#check3").removeAttr('checked'));
-    }
-}
-
-function checkbox2Changed() {
-    if ($("#check2").is(':checked')) {
-        ($("#check1").removeAttr('checked'));
-        ($("#check3").removeAttr('checked'));
-    }
-}
-
-function checkbox3Changed() {
-    if ($("#check3").is(':checked')) {
-        ($("#check1").removeAttr('checked'));
-        ($("#check2").removeAttr('checked'));
     }
 }

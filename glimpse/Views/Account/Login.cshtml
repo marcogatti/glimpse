@@ -24,8 +24,8 @@
         <h2 class="form-signin-heading">Bienvenido a Glimpse</h2>
         
         @Html.ValidationSummary()
-        @Html.TextBoxFor(m => m.Username, new { placeholder = "Tu usuario o dirección de correo...", @class = "input-block-level", id="username" })
-        @Html.PasswordFor(m => m.Password, new { placeholder = "Tu contraseña...", @class = "input-block-level" })
+        @Html.TextBoxFor(m => m.Username, new { placeholder = "Tu usuario o dirección de correo", @class = "input-block-level", id="username", autofocus="autofocus" })
+        @Html.PasswordFor(m => m.Password, new { placeholder = "Tu contraseña", @class = "input-block-level" })
         
         <input class="btn btn-primary btn-success" type="submit" value="Entrar" />
         <a class="btn btn-default" id="registration-link">Crear nueva cuenta Glimpse</a>

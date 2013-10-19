@@ -21,6 +21,26 @@ namespace Glimpse.Controllers
     public class AsyncMailsController : Controller
     {
         #region Action Methods
+        public FileResult GetFile(Int64 id, Int64 mailAccountId = 0)
+        {
+            ISession session = NHibernateManager.OpenSession();
+            try
+            {
+                this.GetMailAccount(mailAccountId); //valida que el mailAccoun pertenezca al User
+                Extra extra = Extra.FindByID(id, session);
+                return File(extra.Entity.Data, extra.Entity.FileType, extra.Entity.Name);
+            }
+            catch (Exception exc)
+            {
+                Log.LogException(exc, "Parametros de la llamada: idExtra(" + id.ToString() + ").");
+                return null;
+            }
+            finally
+            {
+                session.Close();
+            }
+        }
+        [AjaxOnly]
         public ActionResult GetMailBody(Int64 id = 0, Int64 mailAccountId = 0)
         {
             ISession session = NHibernateManager.OpenSession();
@@ -49,25 +69,7 @@ namespace Glimpse.Controllers
                 session.Close();
             }
         }
-        public FileResult GetFile(Int64 id, Int64 mailAccountId = 0)
-        {
-            ISession session = NHibernateManager.OpenSession();
-            try
-            {
-                this.GetMailAccount(mailAccountId); //valida que el mailAccoun pertenezca al User
-                Extra extra = Extra.FindByID(id, session);
-                return File(extra.Entity.Data, extra.Entity.FileType, extra.Entity.Name);
-            }
-            catch (Exception exc)
-            {
-                Log.LogException(exc, "Parametros de la llamada: idExtra(" + id.ToString() + ").");
-                return null;
-            }
-            finally
-            {
-                session.Close();
-            }
-        }
+        [AjaxOnly]
         public ActionResult GetMailsByDate(Int64 initial, Int64 final, Int64 mailAccountId = 0)
         {
             DateTime initialDate = AsyncMailsController.ConvertFromJS(initial);
@@ -95,6 +97,7 @@ namespace Glimpse.Controllers
                 session.Close();
             }
         }
+        [AjaxOnly]
         public ActionResult GetMailsByAmount(Int32 amountOfMails, Int64 mailAccountId = 0)
         {
             ISession session = NHibernateManager.OpenSession();
@@ -120,7 +123,9 @@ namespace Glimpse.Controllers
             }
         }
 
+        #region HttpPost
         [HttpPost]
+        [AjaxOnly]
         public ActionResult TrashMail(Int64 id, Int64 mailAccountId = 0)
         {
             ISession session = NHibernateManager.OpenSession();
@@ -157,6 +162,7 @@ namespace Glimpse.Controllers
             }
         }
         [HttpPost]
+        [AjaxOnly]
         public ActionResult SendEmail(MailSentViewModel sendInfo, Int64 mailAccountId = 0)
         {
             try
@@ -182,6 +188,7 @@ namespace Glimpse.Controllers
             }
         }
         [HttpPost]
+        [AjaxOnly]
         public ActionResult AddLabel(String labelName, Int64 mailId, Int64 mailMailAccountId = 0)
         {
             ISession session = NHibernateManager.OpenSession();
@@ -216,6 +223,7 @@ namespace Glimpse.Controllers
             }
         }
         [HttpPost]
+        [AjaxOnly]
         public ActionResult RemoveLabel(String labelName, Int64 mailId, Boolean isSystemLabel, Int64 mailAccountId = 0)
         {
             ISession session = NHibernateManager.OpenSession();
@@ -246,6 +254,7 @@ namespace Glimpse.Controllers
             }
         }
         [HttpPost]
+        [AjaxOnly]
         public ActionResult RenameLabel(String oldLabelName, String newLabelName, Int64 mailAccountId = 0)
         {
             ISession session = NHibernateManager.OpenSession();
@@ -278,6 +287,7 @@ namespace Glimpse.Controllers
             }
         }
         [HttpPost]
+        [AjaxOnly]
         public ActionResult CreateLabel(String labelName, Int64 mailAccountId = 0)
         {
             ISession session = NHibernateManager.OpenSession();
@@ -310,6 +320,7 @@ namespace Glimpse.Controllers
             }
         }
         [HttpPost]
+        [AjaxOnly]
         public ActionResult DeleteLabel(String labelName, Int64 mailAccountId = 0)
         {
             ISession session = NHibernateManager.OpenSession();
@@ -337,6 +348,7 @@ namespace Glimpse.Controllers
             }
         }
         [HttpPost]
+        [AjaxOnly]
         public ActionResult ChangeImportance(Int64 mailId, Boolean isIncrease, Int64 mailAccountId = 0)
         {
             ISession session = NHibernateManager.OpenSession();
@@ -366,6 +378,7 @@ namespace Glimpse.Controllers
             }
         }
         [HttpPost]
+        [AjaxOnly]
         public ActionResult SetReadFlag(Int64 mailId, Boolean seenFlag, Int64 mailAccountId = 0)
         {
             ISession session = NHibernateManager.OpenSession();
@@ -390,6 +403,7 @@ namespace Glimpse.Controllers
             }
         }
         [HttpPost]
+        [AjaxOnly]
         public ActionResult ArchiveMail(Int64 mailId, Int64 mailAccountId = 0)
         {
             ISession session = NHibernateManager.OpenSession();
@@ -417,6 +431,7 @@ namespace Glimpse.Controllers
                 session.Close();
             }
         }
+        #endregion
 
         #endregion
         #region Private Helpers

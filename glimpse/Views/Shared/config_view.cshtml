@@ -1,19 +1,19 @@
 ﻿<div id="config-view" class="modal hide fade in" style="display: none;" data-backdrop="static">
     <div class="modal-header">
-        <a href="#" class="close" data-dismiss="modal">×</a>
+        <a class="close" data-dismiss="modal">×</a>
         <h4>Configura tu cuenta Glimpse</h4>
     </div>
 
     <div class="modal-body" style="max-height: 500px;">
         <ul class="nav nav-tabs">
             <li id="config-personaldata" data-body-id="config-personaldata-cont" class="active">
-                <a href="#personal-data">Datos Personales</a>
+                <a>Datos Personales</a>
             </li>
             <li id="config-mailaccount" data-body-id="config-mailaccount-cont">
-                <a href="#mail-accounts">Cuentas de Email</a>
+                <a>Cuentas de Email</a>
             </li>
             <li id="config-password" data-body-id="config-password-cont">
-                <a href="#password">Contraseña</a>
+                <a>Contraseña</a>
             </li>
         </ul>
 
@@ -27,20 +27,20 @@
                 <div class="control-group">
                     <label class="control-label" for="config-inp-oldpass">Contraseña Actual</label>
                     <div class="controls">
-                        <input type="password" id="config-inp-oldpass" data-name="oldPassword">
+                        <input type="password" id="config-inp-oldpass" data-name="oldPassword" required>
                     </div>
                 </div>
                 <br />
                 <div class="control-group">
                     <label class="control-label" for="config-inp-newpass1">Contraseña nueva</label>
                     <div class="controls">
-                        <input type="password" id="config-inp-newpass1" data-name="newPassword">
+                        <input type="password" id="config-inp-newpass1" data-name="newPassword" required>
                     </div>
                 </div>
                 <div class="control-group">
                     <label class="control-label" for="config-inp-newpass2">Confirma Contraseña nueva</label>
                     <div class="controls">
-                        <input type="password" id="config-inp-newpass2" data-name="newPasswordConfirmation">
+                        <input type="password" id="config-inp-newpass2" data-name="newPasswordConfirmation" required>
                     </div>
                 </div>
                 <button id="config-password-submit" type="submit" class="btn btn-primary" style="margin-left: 25%">Guardar</button>
@@ -57,13 +57,13 @@
                         </div>
                     </div>
                     <div class="control-group">
-                        <label class="control-label" for="config-inp-password1">Password #1</label>
+                        <label class="control-label" for="config-inp-password1">Contraseña #1</label>
                         <div class="controls">
                             <input type="password" id="config-inp-password1" data-name="password1">
                         </div>
                     </div>
                     <div class="control-group">
-                        <label class="control-label" for="config-inp-main1">Cuenta principal?</label>
+                        <label class="control-label" for="config-inp-main1">¿Cuenta principal?</label>
                         <div class="controls">
                             <input type="checkbox" id="config-inp-main1" data-name="isMainAccount1">
                         </div>
@@ -77,13 +77,13 @@
                         </div>
                     </div>
                     <div class="control-group">
-                        <label class="control-label" for="config-inp-password2">Password #2</label>
+                        <label class="control-label" for="config-inp-password2">Contraseña #2</label>
                         <div class="controls">
                             <input type="password" id="config-inp-password2" data-name="password2">
                         </div>
                     </div>
                     <div class="control-group">
-                        <label class="control-label" for="config-inp-main2">Cuenta principal?</label>
+                        <label class="control-label" for="config-inp-main2">¿Cuenta principal?</label>
                         <div class="controls">
                             <input type="checkbox" id="config-inp-main2" data-name="isMainAccount2">
                         </div>
@@ -97,13 +97,13 @@
                         </div>
                     </div>
                     <div class="control-group">
-                        <label class="control-label" for="config-inp-password3">Password #3</label>
+                        <label class="control-label" for="config-inp-password3">Contraseña #3</label>
                         <div class="controls">
                             <input type="password" id="config-inp-password3" data-name="password3">
                         </div>
                     </div>
                     <div class="control-group">
-                        <label class="control-label" for="config-inp-main3">Cuenta principal?</label>
+                        <label class="control-label" for="config-inp-main3">¿Cuenta principal?</label>
                         <div class="controls">
                             <input type="checkbox" id="config-inp-main3" data-name="isMainAccount3">
                         </div>
