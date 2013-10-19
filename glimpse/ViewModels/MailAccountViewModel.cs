@@ -16,10 +16,6 @@ namespace Glimpse.ViewModels
                                 ErrorMessage = "Contraseña inválida.")]
         public String Password { get; set; }
 
-        [RegularExpression(@"^(?!.{20})[A-Za-z0-9\!#\$%&'\*\.\+\-/=\?\^`\{|\}~_]{4,20}",
-                                ErrorMessage = "Confirmación de contraseña inválida.")]
-        public String ConfirmationPassword { get; set; }
-
         public Boolean IsMainAccount { get; set; }
     }
 }

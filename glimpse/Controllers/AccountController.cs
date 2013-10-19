@@ -152,7 +152,6 @@ namespace Glimpse.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        [AjaxOnly]
         public ActionResult CreateUser(UserViewModel userView)
         {
             IList<MailAccount> mailAccounts;
@@ -294,99 +293,108 @@ namespace Glimpse.Controllers
         }
         #endregion
         #region Authorized Methods
-        //[HttpPost]
-        //[AjaxOnly]
-        //[Authorize]
-        //public ActionResult EditUserAccounts(String viewAccountName1, String viewAccountPass1, Boolean viewAccountCheck1,
-        //                                     String viewAccountName2, String viewAccountPass2, Boolean viewAccountCheck2,
-        //                                     String viewAccountName3, String viewAccountPass3, Boolean viewAccountCheck3)
-        //{
-        //    String exceptionMessage = "";
-        //    ISession session = NHibernateManager.OpenSession();
-        //    ITransaction tran = session.BeginTransaction();
-        //    try
-        //    {
-        //        this.ValidateUserMailAccounts(userView, session); //direcciones de correo y contraseñas
+        [HttpPost]
+        [AjaxOnly]
+        [Authorize]
+        public ActionResult EditUserAccounts(String viewAccountName1, String viewAccountPass1, Boolean viewAccountCheck1,
+                                             String viewAccountName2, String viewAccountPass2, Boolean viewAccountCheck2,
+                                             String viewAccountName3, String viewAccountPass3, Boolean viewAccountCheck3)
+        {
+            ISession session = NHibernateManager.OpenSession();
+            ITransaction tran = session.BeginTransaction();
+            try
+            {
+                #region Initialize UserView
+                MailAccountViewModel mailAccountView1 = new MailAccountViewModel();
+                MailAccountViewModel mailAccountView2 = new MailAccountViewModel();
+                MailAccountViewModel mailAccountView3 = new MailAccountViewModel();
+                UserViewModel userView = new UserViewModel();
+                List<MailAccountViewModel> mailAccountsView = new List<MailAccountViewModel>();
 
-        //        User editedUser = Glimpse.Models.User.FindByUsername(userView.Username, session);
-        //        if (editedUser == null)
-        //            throw new GlimpseException("Usuario inexistente: " + userView.Username + ".");
-        //        User sessionUser = (User)Session[AccountController.USER_NAME];
-        //        if (sessionUser == null || editedUser.Entity.Username != sessionUser.Entity.Username)
-        //            throw new GlimpseException("Usuario de la sesión es distinto del usuario realizando la operación.");
+                mailAccountView1.Address = viewAccountName1;
+                mailAccountView1.Password = viewAccountPass1;
+                mailAccountView1.IsMainAccount = viewAccountCheck1;
 
-        //        editedUser.Entity.Password = CryptoHelper.EncryptDefaultKey(userView);
-        //        editedUser.Entity.Firstname = userView.Firstname;
-        //        editedUser.Entity.Lastname = userView.Lastname;
+                mailAccountView2.Address = viewAccountName2;
+                mailAccountView2.Password = viewAccountPass2;
+                mailAccountView2.IsMainAccount = viewAccountCheck2;
 
-        //        editedUser.SaveOrUpdate(session);
+                mailAccountView3.Address = viewAccountName3;
+                mailAccountView3.Password = viewAccountPass3;
+                mailAccountView3.IsMainAccount = viewAccountCheck3;
 
-        //        foreach (MailAccount removedMailAccount in editedUser.mailAccounts
-        //                    .Where(x => !userView.ListMailAccounts.Any(c => c.Address == x.Entity.Address)))
-        //        {
-        //            removedMailAccount.Disconnect();
-        //            removedMailAccount.Deactivate(session); //saveOrUpdate adentro
-        //            editedUser.mailAccounts.Remove(removedMailAccount);
-        //        }
+                mailAccountsView.Add(mailAccountView1);
+                mailAccountsView.Add(mailAccountView2);
+                mailAccountsView.Add(mailAccountView3);
 
-        //        foreach (MailAccountViewModel mailAccountView in userView.ListMailAccounts)
-        //        {
-        //            if (editedUser.mailAccounts.Any(x => x.Entity.Address == mailAccountView.Address)) //si la cuenta ya existia
-        //            {
-        //                MailAccount editedMailAccount = editedUser.mailAccounts.Where(x => x.Entity.Address == mailAccountView.Address).Single();
-        //                editedMailAccount.Entity.Password = CryptoHelper.EncryptDefaultKey(mailAccountView);
-        //                editedMailAccount.SetUser(editedUser);
-        //                editedMailAccount.ConnectLight();
-        //                if (mailAccountView.IsMainAccount)
-        //                    editedMailAccount.SetAsMainAccount();
-        //                editedMailAccount.Activate(session); //saveOrUpdate adentro
-        //            }
-        //            else //si la cuenta es nueva
-        //            {
-        //                MailAccount newMailAccount = new MailAccount(mailAccountView.Address, CryptoHelper.EncryptDefaultKey(mailAccountView.Password));
-        //                newMailAccount.SetUser(editedUser);
-        //                if (mailAccountView.IsMainAccount)
-        //                    newMailAccount.SetAsMainAccount();
-        //                newMailAccount.Activate(session); //saveOrUpdate adentro
-        //                newMailAccount.ConnectFull();
-        //                editedUser.AddAccount(newMailAccount);
-        //            }
-        //        }
+                userView.ListMailAccounts = mailAccountsView;
+                userView.FilterNullAccounts();
+                #endregion
+                
+                this.ValidateUserMailAccounts(userView, session); //direcciones de correo y contraseñas
 
-        //        tran.Commit();
-        //        Session[AccountController.USER_NAME] = editedUser;
+                User sessionUser = (User)Session[AccountController.USER_NAME];
+                if (sessionUser == null)
+                    throw new GlimpseException("No se encontró el usuario.");
 
-        //        return Redirect(Url.Action("Index", "Home"));
-        //    }
-        //    catch (InvalidOperationException exc) //model state invalido
-        //    {
-        //        tran.Rollback();
-        //        foreach (ModelState wrongState in this.ModelState.Values.Where(x => x.Errors.Count > 0))
-        //            foreach (ModelError error in wrongState.Errors)
-        //                exceptionMessage += error.ErrorMessage;
-        //        if (String.IsNullOrEmpty(exceptionMessage))
-        //            exceptionMessage = exc.Message;
-        //        return Json(new { success = false, message = exceptionMessage }, JsonRequestBehavior.AllowGet);
-        //    }
-        //    catch (GlimpseException exc)
-        //    {
-        //        tran.Rollback();
-        //        Log.LogException(exc);
-        //        return Json(new { success = false, message = exceptionMessage }, JsonRequestBehavior.AllowGet);
-        //    }
-        //    catch (Exception exc)
-        //    {
-        //        tran.Rollback();
-        //        Log.LogException(exc, "Parametros: userName:(" + userView.Username + "), userPassowrd( " + userView.Password +
-        //                              "), userConfirmPassword(" + userView.ConfirmationPassword + "), userFirstName(" + userView.Firstname +
-        //                              "), userLastName(" + userView.Lastname + ").");
-        //        return Json(new { success = false, message = "Error modificando usuario." }, JsonRequestBehavior.AllowGet);
-        //    }
-        //    finally
-        //    {
-        //        session.Close();
-        //    }
-        //}
+                foreach (MailAccount removedMailAccount in sessionUser.mailAccounts
+                            .Where(x => !userView.ListMailAccounts.Any(c => c.Address == x.Entity.Address)))
+                {
+                    removedMailAccount.Disconnect();
+                    removedMailAccount.Deactivate(session); //saveOrUpdate adentro
+                    sessionUser.mailAccounts.Remove(removedMailAccount);
+                }
+
+                foreach (MailAccountViewModel mailAccountView in userView.ListMailAccounts)
+                {
+                    if (sessionUser.mailAccounts.Any(x => x.Entity.Address == mailAccountView.Address)) //si la cuenta ya existia
+                    {
+                        MailAccount editedMailAccount = sessionUser.mailAccounts.Where(x => x.Entity.Address == mailAccountView.Address).Single();
+                        editedMailAccount.Entity.Password = CryptoHelper.EncryptDefaultKey(mailAccountView);
+                        editedMailAccount.SetUser(sessionUser);
+                        editedMailAccount.ConnectLight();
+                        if (mailAccountView.IsMainAccount)
+                            editedMailAccount.SetAsMainAccount();
+                        editedMailAccount.Activate(session); //saveOrUpdate adentro
+                    }
+                    else //si la cuenta es nueva
+                    {
+                        MailAccount newMailAccount = new MailAccount(mailAccountView.Address, CryptoHelper.EncryptDefaultKey(mailAccountView.Password));
+                        newMailAccount.SetUser(sessionUser);
+                        if (mailAccountView.IsMainAccount)
+                            newMailAccount.SetAsMainAccount();
+                        newMailAccount.Activate(session); //saveOrUpdate adentro
+                        newMailAccount.ConnectFull();
+                        sessionUser.AddAccount(newMailAccount);
+                    }
+                }
+
+                tran.Commit();
+                Session[AccountController.USER_NAME] = sessionUser;
+
+                return Redirect(Url.Action("Index", "Home"));
+            }
+            catch (GlimpseException exc)
+            {
+                tran.Rollback();
+                Log.LogException(exc);
+                return Json(new { success = false, message = exc.GlimpseMessage }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception exc)
+            {
+                tran.Rollback();
+                Log.LogException(exc, "Parametros: viewAccountName1:(" + viewAccountName1 + "), viewAccountPass1( " + viewAccountPass1 +
+                                      "), viewAccountCheck1(" + viewAccountCheck1 + "), viewAccountName2(" + viewAccountName2 +
+                                      "), viewAccountPass1(" + viewAccountPass1 + "), viewAccountCheck2(" + viewAccountCheck2 +
+                                      "),  viewAccountName3:(" + viewAccountName3 + "), viewAccountPass3( " + viewAccountPass3 +
+                                      "), viewAccountCheck3(" + viewAccountCheck3 + ").");
+                return Json(new { success = false, message = "Error modificando usuario." }, JsonRequestBehavior.AllowGet);
+            }
+            finally
+            {
+                session.Close();
+            }
+        }
 
         [HttpPost]
         [AjaxOnly]
@@ -406,7 +414,7 @@ namespace Glimpse.Controllers
                 if (newPassword != newPasswordConfirmation)
                     exceptionMessage += "Las contraseñas ingresadas deben coincidir.";
 
-                if (exceptionMessage == "")
+                if (exceptionMessage != "")
                     throw new GlimpseException(exceptionMessage);
 
                 sessionUser.ChangePassword(CryptoHelper.EncryptDefaultKey(oldPassword), CryptoHelper.EncryptDefaultKey(newPassword), session);
@@ -532,25 +540,19 @@ namespace Glimpse.Controllers
             foreach (MailAccountViewModel mailAccountView in userView.ListMailAccounts)
             {
                 #region Valida Credenciales
-                if (mailAccountView.Password == mailAccountView.ConfirmationPassword)
+                try
                 {
-                    try
-                    {
-                        mailAccount = new MailAccount(mailAccountView.Address, CryptoHelper.EncryptDefaultKey(mailAccountView));
-                        mailAccount.ConnectLight(); //si pasa este punto es que esta bien y va a ser devuelta
-                        if (mailAccountView.IsMainAccount)
-                            mailAccount.Entity.IsMainAccount = true;
-                        connectedMailAccounts.Add(mailAccount);
-                    }
-                    catch (InvalidAuthenticationException)
-                    {
-                        exceptionMessage += "La dirección de correo (" + mailAccountView.Address +
-                                            ") o la contraseña no son válidos.\n";
-                    }
+                    mailAccount = new MailAccount(mailAccountView.Address, CryptoHelper.EncryptDefaultKey(mailAccountView));
+                    mailAccount.ConnectLight(); //si pasa este punto es que esta bien y va a ser devuelta
+                    if (mailAccountView.IsMainAccount)
+                        mailAccount.Entity.IsMainAccount = true;
+                    connectedMailAccounts.Add(mailAccount);
                 }
-                else
-                    exceptionMessage += "Las contraseñas de la dirección: " + mailAccountView.Address + 
-                                        " no son iguales.\n";
+                catch (InvalidAuthenticationException)
+                {
+                    exceptionMessage += "La dirección de correo (" + mailAccountView.Address +
+                                        ") o la contraseña no son válidos.\n";
+                }
                 #endregion
                 #region Valida Cuentas Principales
                 if (hasMainAccount && mailAccountView.IsMainAccount && checkMainAccounts)
