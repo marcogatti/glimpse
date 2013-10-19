@@ -296,54 +296,59 @@ namespace Glimpse.Controllers
         [HttpPost]
         [AjaxOnly]
         [Authorize]
-        public ActionResult EditUserAccounts(String viewAccountName1, String viewAccountPass1, Boolean viewAccountCheck1,
-                                             String viewAccountName2, String viewAccountPass2, Boolean viewAccountCheck2,
-                                             String viewAccountName3, String viewAccountPass3, Boolean viewAccountCheck3)
+        public ActionResult EditUserAccounts(String mailAccount1, String password1, Boolean isMainAccount1,
+                                             String mailAccount2, String password2, Boolean isMainAccount2,
+                                             String mailAccount3, String password3, Boolean isMainAccount3)
         {
             ISession session = NHibernateManager.OpenSession();
             ITransaction tran = session.BeginTransaction();
             try
             {
+                User sessionUser = (User)Session[AccountController.USER_NAME];
+                if (sessionUser == null)
+                    throw new GlimpseException("No se encontró el usuario.");
+
                 #region Initialize UserView
                 MailAccountViewModel mailAccountView1 = new MailAccountViewModel();
                 MailAccountViewModel mailAccountView2 = new MailAccountViewModel();
                 MailAccountViewModel mailAccountView3 = new MailAccountViewModel();
                 UserViewModel userView = new UserViewModel();
                 List<MailAccountViewModel> mailAccountsView = new List<MailAccountViewModel>();
+                List<MailAccount> removedMailAccounts = new List<MailAccount>();
 
-                mailAccountView1.Address = viewAccountName1;
-                mailAccountView1.Password = viewAccountPass1;
-                mailAccountView1.IsMainAccount = viewAccountCheck1;
+                mailAccountView1.Address = mailAccount1;
+                mailAccountView1.Password = password1;
+                mailAccountView1.IsMainAccount = isMainAccount1;
 
-                mailAccountView2.Address = viewAccountName2;
-                mailAccountView2.Password = viewAccountPass2;
-                mailAccountView2.IsMainAccount = viewAccountCheck2;
+                mailAccountView2.Address = mailAccount2;
+                mailAccountView2.Password = password2;
+                mailAccountView2.IsMainAccount = isMainAccount2;
 
-                mailAccountView3.Address = viewAccountName3;
-                mailAccountView3.Password = viewAccountPass3;
-                mailAccountView3.IsMainAccount = viewAccountCheck3;
+                mailAccountView3.Address = mailAccount3;
+                mailAccountView3.Password = password3;
+                mailAccountView3.IsMainAccount = isMainAccount3;
 
                 mailAccountsView.Add(mailAccountView1);
                 mailAccountsView.Add(mailAccountView2);
                 mailAccountsView.Add(mailAccountView3);
 
+                userView.Username = sessionUser.Entity.Username;
                 userView.ListMailAccounts = mailAccountsView;
                 userView.FilterNullAccounts();
                 #endregion
 
                 this.ValidateUserMailAccounts(userView, session); //direcciones de correo y contraseñas
 
-                User sessionUser = (User)Session[AccountController.USER_NAME];
-                if (sessionUser == null)
-                    throw new GlimpseException("No se encontró el usuario.");
-
                 foreach (MailAccount removedMailAccount in sessionUser.mailAccounts
                             .Where(x => !userView.ListMailAccounts.Any(c => c.Address == x.Entity.Address)))
                 {
                     removedMailAccount.Disconnect();
                     removedMailAccount.Deactivate(session); //saveOrUpdate adentro
-                    sessionUser.mailAccounts.Remove(removedMailAccount);
+                    removedMailAccounts.Add(removedMailAccount);
                 }
+
+                foreach (MailAccount removedMailAccount in removedMailAccounts)
+                    sessionUser.mailAccounts.Remove(removedMailAccount);
 
                 foreach (MailAccountViewModel mailAccountView in userView.ListMailAccounts)
                 {
@@ -354,7 +359,9 @@ namespace Glimpse.Controllers
                         editedMailAccount.SetUser(sessionUser);
                         editedMailAccount.ConnectLight();
                         if (mailAccountView.IsMainAccount)
-                            editedMailAccount.SetAsMainAccount();
+                            editedMailAccount.SetAsMainAccount(true);
+                        else
+                            editedMailAccount.SetAsMainAccount(false);
                         editedMailAccount.Activate(session); //saveOrUpdate adentro
                     }
                     else //si la cuenta es nueva
@@ -362,7 +369,9 @@ namespace Glimpse.Controllers
                         MailAccount newMailAccount = new MailAccount(mailAccountView.Address, CryptoHelper.EncryptDefaultKey(mailAccountView.Password));
                         newMailAccount.SetUser(sessionUser);
                         if (mailAccountView.IsMainAccount)
-                            newMailAccount.SetAsMainAccount();
+                            newMailAccount.SetAsMainAccount(true);
+                        else
+                            newMailAccount.SetAsMainAccount(false);
                         newMailAccount.Activate(session); //saveOrUpdate adentro
                         newMailAccount.ConnectFull();
                         sessionUser.AddAccount(newMailAccount);
@@ -377,17 +386,16 @@ namespace Glimpse.Controllers
             catch (GlimpseException exc)
             {
                 tran.Rollback();
-                Log.LogException(exc);
                 return Json(new { success = false, message = exc.GlimpseMessage }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception exc)
             {
                 tran.Rollback();
-                Log.LogException(exc, "Parametros: viewAccountName1:(" + viewAccountName1 + "), viewAccountPass1( " + viewAccountPass1 +
-                                      "), viewAccountCheck1(" + viewAccountCheck1 + "), viewAccountName2(" + viewAccountName2 +
-                                      "), viewAccountPass1(" + viewAccountPass1 + "), viewAccountCheck2(" + viewAccountCheck2 +
-                                      "),  viewAccountName3:(" + viewAccountName3 + "), viewAccountPass3( " + viewAccountPass3 +
-                                      "), viewAccountCheck3(" + viewAccountCheck3 + ").");
+                Log.LogException(exc, "Parametros: viewAccountName1:(" + mailAccount1 + "), viewAccountPass1( " + password1 +
+                                      "), viewAccountCheck1(" + isMainAccount1 + "), viewAccountName2(" + mailAccount2 +
+                                      "), viewAccountPass1(" + password1 + "), viewAccountCheck2(" + isMainAccount2 +
+                                      "),  viewAccountName3:(" + mailAccount3 + "), viewAccountPass3( " + password3 +
+                                      "), viewAccountCheck3(" + isMainAccount3 + ").");
                 return Json(new { success = false, message = "Error modificando usuario." }, JsonRequestBehavior.AllowGet);
             }
             finally
@@ -547,6 +555,11 @@ namespace Glimpse.Controllers
                     if (mailAccountView.IsMainAccount)
                         mailAccount.Entity.IsMainAccount = true;
                     connectedMailAccounts.Add(mailAccount);
+                }
+                catch (ArgumentNullException)
+                {
+                    exceptionMessage += "La dirección de correo (" + mailAccountView.Address +
+                                        ") no posee contraseña.\n";
                 }
                 catch (InvalidAuthenticationException)
                 {

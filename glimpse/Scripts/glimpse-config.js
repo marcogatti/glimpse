@@ -7,7 +7,7 @@
     },
     manageMailAccounts: {
         validation: formManageMailAccountsValidation,
-        url: 'edituseraccount',
+        url: 'edituseraccounts',
         cleanup: formManageMailAccountsCleanup,
         preload: preloadMailAccountsForm
     },
@@ -134,10 +134,21 @@ function cleanAllFormsData(modalBody) {
 
 function getFormData(form) {
 
-    var data = {};
+    var formField,
+        data = {};
 
     form.find('input').each(function () {
-        data[$(this).data('name')] = $(this).val();
+
+        formField = $(this);
+
+        if (formField.attr('type') == 'checkbox') {
+            if (formField.prop('checked') == 'checked' || formField.prop('checked') == true)
+                data[formField.data('name')] = true;
+            else
+                data[formField.data('name')] = false;
+        } else {
+            data[formField.data('name')] = formField.val();
+        }
     });
 
     return data;
@@ -145,13 +156,29 @@ function getFormData(form) {
 
 function setFormData(form, data) {
 
+    var formField;
+
     if (data == null) {
         form.find('input').each(function () {
             $(this).val('');
         });
     } else {
         for (var index in data) {
-            form.find('[data-name="' + index + '"]').val(data[index]);
+
+            formField = form.find('[data-name="' + index + '"]');
+
+            if (formField.attr('type') == 'checkbox') {
+
+                if (data[index] == true) {
+                    formField.attr('checked', true);
+                    formField.prop('checked', true);
+                } else {
+                    formField.attr('checked', false);
+                    formField.prop('checked', false);
+                }
+            } else {
+                formField.val(data[index]);
+            }
         }
     }
 }
@@ -177,6 +204,18 @@ function hasEmptyValues(array) {
 
 function preloadMailAccountsForm(form) {
 
+    var loopPass = 1,
+        formData = {};
+
+    for (var index in user_mailAccounts) {
+
+        formData['mailAccount' + loopPass] = user_mailAccounts[index].address;
+        formData['isMainAccount' + loopPass] = user_mailAccounts[index].mainAccount;
+
+        loopPass++;
+    }
+
+    setFormData(form, formData);
 }
 
 function preloadPersonalDataForm(form) {
@@ -201,7 +240,7 @@ function formEditPersonalDataCleanup(form, serverData) {
 }
 
 function formManageMailAccountsCleanup(form, serverData) {
-    return;
+    window.location.assign(serverData.url);
 }
 
 

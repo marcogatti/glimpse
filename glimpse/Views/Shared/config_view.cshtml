@@ -4,7 +4,7 @@
         <h4>Configura tu cuenta Glimpse</h4>
     </div>
 
-    <div class="modal-body">
+    <div class="modal-body" style="max-height: 500px;">
         <ul class="nav nav-tabs">
             <li id="config-personaldata" data-body-id="config-personaldata-cont" class="active">
                 <a href="#personal-data">Datos Personales</a>
@@ -49,24 +49,67 @@
 
         <div id="config-mailaccount-cont" class="hidden nav-body">
             <form class="form-horizontal" id="config-mailaccount-form" data-action="manageMailAccounts">
-                <div class="control-group">
-                    <label class="control-label" for="config-inp-account1">Cuenta de Email #1</label>
-                    <div class="controls">
-                        <input type="email" id="config-inp-account1">
+                <div style="max-height: 320px; overflow-y: auto;">
+                    <div class="control-group">
+                        <label class="control-label" for="config-inp-account1">Cuenta de Email #1</label>
+                        <div class="controls">
+                            <input type="email" id="config-inp-account1" data-name="mailAccount1">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="config-inp-password1">Password #1</label>
+                        <div class="controls">
+                            <input type="password" id="config-inp-password1" data-name="password1">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="config-inp-main1">Cuenta principal?</label>
+                        <div class="controls">
+                            <input type="checkbox" id="config-inp-main1" data-name="isMainAccount1">
+                        </div>
+                    </div>
+                    <br />
+
+                    <div class="control-group">
+                        <label class="control-label" for="config-inp-account2">Cuenta de Email #2</label>
+                        <div class="controls">
+                            <input type="email" id="config-inp-account2" data-name="mailAccount2">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="config-inp-password2">Password #2</label>
+                        <div class="controls">
+                            <input type="password" id="config-inp-password2" data-name="password2">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="config-inp-main2">Cuenta principal?</label>
+                        <div class="controls">
+                            <input type="checkbox" id="config-inp-main2" data-name="isMainAccount2">
+                        </div>
+                    </div>
+                    <br />
+
+                    <div class="control-group">
+                        <label class="control-label" for="config-inp-account3">Cuenta de Email #3</label>
+                        <div class="controls">
+                            <input type="email" id="config-inp-account3" data-name="mailAccount3">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="config-inp-password3">Password #3</label>
+                        <div class="controls">
+                            <input type="password" id="config-inp-password3" data-name="password3">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="config-inp-main3">Cuenta principal?</label>
+                        <div class="controls">
+                            <input type="checkbox" id="config-inp-main3" data-name="isMainAccount3">
+                        </div>
                     </div>
                 </div>
-                <div class="control-group">
-                    <label class="control-label" for="config-inp-account2">Cuenta de Email #2</label>
-                    <div class="controls">
-                        <input type="email" id="config-inp-account2">
-                    </div>
-                </div>
-                <div class="control-group">
-                    <label class="control-label" for="config-inp-account3">Cuenta de Email #3</label>
-                    <div class="controls">
-                        <input type="email" id="config-inp-account3">
-                    </div>
-                </div>
+                <hr />
                 <button id="config-mailaccount-submit" type="submit" class="btn btn-primary" style="margin-left: 25%">Guardar</button>
             </form>
         </div>
@@ -106,7 +149,5 @@
                 <button id="config-personaldata-submit" type="submit" class="btn btn-primary" style="margin-left: 25%">Guardar</button>
             </form>
         </div>
-    </div>
-    <div class="modal-footer">
     </div>
 </div>
