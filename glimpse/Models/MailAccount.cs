@@ -321,8 +321,12 @@ namespace Glimpse.Models
         }
         public static MailAccount FindMainMailAccount(String username, ISession session)
         {
+            UserEntity userEntity = session.CreateCriteria<UserEntity>()
+                                            .Add(Restrictions.Eq("Username", username))
+                                            .UniqueResult<UserEntity>();
+
             MailAccountEntity entity = session.CreateCriteria<MailAccountEntity>()
-                                            .Add(Restrictions.Eq("User.Username", username))
+                                            .Add(Restrictions.Eq("User", userEntity))
                                             .Add(Restrictions.Eq("IsMainAccount", true))
                                             .Add(Restrictions.Eq("Active", true))
                                             .UniqueResult<MailAccountEntity>();
