@@ -219,12 +219,21 @@ namespace Glimpse.Controllers
         [HttpPost]
         [AllowAnonymous]
         [AjaxOnly]
-        public ActionResult ValidateUserFields(UserViewModel userView)
+        public ActionResult ValidateUserFields(String firstname, String lastname, String username, String password, String confirmationPassword)
         {
             String exceptionMessage = "";
             ISession session = NHibernateManager.OpenSession();
+            
             try
             {
+                UserViewModel userView = new UserViewModel();
+
+                userView.Firstname = firstname;
+                userView.Lastname = lastname;
+                userView.Username = username;
+                userView.Password = password;
+                userView.ConfirmationPassword = confirmationPassword;
+
                 this.UpdateModel(userView); //corre todos los regex
                 this.ValidateUserGenericFields(userView, session); //nombre, apellido, usuarioGlimpse, contraseñas
 
@@ -245,9 +254,9 @@ namespace Glimpse.Controllers
             }
             catch (Exception exc)
             {
-                Log.LogException(exc, "Parametros: userName:(" + userView.Username + "), userPassowrd( " + userView.Password +
-                                      "), userConfirmPassword(" + userView.ConfirmationPassword + "), userFirstName(" + userView.Firstname +
-                                      "), userLastName(" + userView.Lastname + ").");
+                Log.LogException(exc, "Parametros: userName:(" + username + "), password( " + password +
+                                      "), confirmationPassword(" + confirmationPassword + "), firstname(" + firstname +
+                                      "), lastname(" + lastname + ").");
                 return Json(new { success = false, message = "Error validando usuario." }, JsonRequestBehavior.AllowGet);
             }
             finally
@@ -267,7 +276,7 @@ namespace Glimpse.Controllers
             {
                 User user = Glimpse.Models.User.FindByUsername(username, session);
                 if (user == null)
-                    throw new Exception("Usuario inexistente: " + username + ".");
+                    throw new GlimpseException("Usuario inexistente: " + username + ".");
                 User sessionUser = (User)Session[AccountController.USER_NAME];
                 if (sessionUser == null || user.Entity.Username != sessionUser.Entity.Username)
                     throw new GlimpseException("Usuario de la sesión es distinto del usuario realizando la operación.");
@@ -279,6 +288,11 @@ namespace Glimpse.Controllers
 
                 JsonResult result = Json(new { success = true, message = "La contraseña ha sido reinicializada." }, JsonRequestBehavior.AllowGet);
                 return result;
+            }
+            catch (GlimpseException exc)
+            {
+                tran.Rollback();
+                return Json(new { success = false, message = exc.GlimpseMessage }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception exc)
             {

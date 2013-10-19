@@ -1,0 +1,114 @@
+﻿<div id="register-view" class="modal hide fade in" style="display: none;" data-backdrop="static">
+        <a href="#" class="close" data-dismiss="modal">×</a>
+
+        <h3 style="margin-left:5%; margin-top:3%" id="registration-title">Creá tu usuario Glimpse</h3>
+
+    <div class="modal-body">
+        <ul class="nav nav-tabs">
+            <li id="register-user" data-body-id="config-password-cont" class="active">
+                <a href="#password"><i class="icon-user"></i> Datos de Usuario</a>
+            </li>
+            <li id="register-mailaccounts" data-body-id="config-mailaccount-cont">
+                <a href="#mail-accounts"><i class="icon-envelope"></i> Cuentas de Email</a>
+            </li>
+        </ul>
+        
+        <div class="alert alert-error" hidden></div>
+
+        <div id="register-user-div" class="nav-body">
+            <form class="form-horizontal" id="register-user-form" data-action="changePassword">
+                <div class="control-group">
+                    <label class="control-label" for="register-name">Nombre</label>
+                    <div class="controls">
+                        <input type="text" id="register-name" required>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="register-lastname">Apellido</label>
+                    <div class="controls">
+                        <input type="text" id="register-lastname" required>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="register-username">Nombre de Usuario</label>
+                    <div class="controls">
+                        <input type="text" id="register-username" required>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="register-pass">Contraseña</label>
+                    <div class="controls">
+                        <input type="password" id="register-pass" required>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="register-confpass">Confirmación de Contraseña</label>
+                    <div class="controls">
+                        <input type="password" id="register-confpass" required>
+                    </div>
+                </div>
+                <button id="registration-next-btn" type="submit" class="btn btn-primary" style="margin-left: 42%">Siguiente</button>
+            </form>
+        </div>
+
+        <div id="register-mails-div" class="hidden nav-body">
+            <form class="form-horizontal" id="register-mails-form" data-action="manageMailAccounts">
+                <div class="control-group">
+                    <label class="control-label" for="config-inp-account1">Cuenta de Email #1</label>
+                    <div class="controls">
+                        <input type="email" id="config-inp-account1">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="config-inp-account2">Cuenta de Email #2</label>
+                    <div class="controls">
+                        <input type="email" id="config-inp-account2">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="config-inp-account3">Cuenta de Email #3</label>
+                    <div class="controls">
+                        <input type="email" id="config-inp-account3">
+                    </div>
+                </div>
+                <button id="config-mailaccount-submit" type="submit" class="btn btn-primary" style="margin-left: 25%">Guardar</button>
+            </form>
+        </div>
+
+        <div id="config-personaldata-cont" class="hidden nav-body">
+            <form class="form-horizontal" id="config-personaldata-form" data-action="editPersonalData">
+                <div class="control-group">
+                    <label class="control-label" for="config-inp-name">Nombre</label>
+                    <div class="controls">
+                        <input type="text" id="config-inp-name">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="config-inp-surname">Apellido</label>
+                    <div class="controls">
+                        <input type="text" id="config-inp-surname">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="config-inp-country">País</label>
+                    <div class="controls">
+                        <input type="text" id="config-inp-country">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="config-inp-city">Ciudad</label>
+                    <div class="controls">
+                        <input type="text" id="config-inp-city">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="config-inp-phone">Teléfono</label>
+                    <div class="controls">
+                        <input type="tel" id="config-inp-phone">
+                    </div>
+                </div>
+                <button id="config-personaldata-submit" type="submit" class="btn btn-primary" style="margin-left: 25%">Guardar</button>
+            </form>
+        </div>
+    </div>
+</div>
