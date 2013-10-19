@@ -232,6 +232,7 @@ function chooseCirclesToBeShown() {
             $(this).addClass("hidden");
         } else {
             $(this).removeClass("hidden");
+            calculateEmailColor($(this));
         }
     });
 }

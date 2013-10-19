@@ -109,7 +109,7 @@ function setPreviewDisplay(circle) {
             setPreviewDisplay(innerEvent.data);
         });
 
-        $(document).one('click', circle, function (innerEvent) {
+        $("#email-container").one('click', circle, function (innerEvent) {
             innerEvent.stopPropagation();
             unsetMailClicked(innerEvent.data);
             innerEvent.data.unbind('click');
@@ -279,15 +279,24 @@ function markAsRead(circle) {
 
 function calculateEmailColor(circle) {
 
-    var customLabels = getCustomLabels(circle);
+    var customLabels = getCustomLabels(circle),
+        filteredLabels = [];
+
+    for (var i = 0; i < customLabels.length; i++) {
+        if (isActive(customLabels[i])){
+            filteredLabels.push(customLabels[i]);
+        }
+    }    
 
     var fill = "",
         i;
 
-    for (i = 0; i < customLabels.length; i++) {
+    for (i = 0; i < filteredLabels.length; i++) {
 
-        fill += ", ";
-        fill += labelColors[customLabels[i]];
+        if (isActive(filteredLabels[i])) {
+            fill += ", ";
+            fill += labelColors[filteredLabels[i]];
+        }
     }
 
     //  hack para que se muestren bien los mails con un solo label
