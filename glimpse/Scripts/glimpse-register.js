@@ -7,7 +7,7 @@
 
         e.preventDefault();
 
-        var data = {
+        var dataToSend = {
             firstname: $('#register-name').val(),
             lastname: $('#register-lastname').val(),
             username: $('#register-username').val(),
@@ -19,15 +19,24 @@
             type: "POST",
             url: "validateuserfields",
             dataType: 'json',
-            data: data,
+            data: dataToSend,
             success: function (data, textStatus, jqXHR) {
                 if (data.success) {
-                    switchform();
+                    $('#config-errors-cont').addClass('hidden');
+                    $('#config-errors-list').html("");
+                    switchformforward();
                 } else {
-                    alert(data.message);
+                    $('#config-errors-cont').removeClass('hidden');
+                    var errorList = $('#config-errors-list')
+                    errorList.html("");
+                    $("<li />").html(data.message).appendTo(errorList);
                 }
             }
         });
+    });
+
+    $("#config_mailaccount-goback").click(function () {
+        switchformbackward();
     });
 
     $("#registration-back-btn").click(function () {
@@ -53,7 +62,7 @@
 
 });
 
-function switchform() {
+function switchformforward() {
 
     $("#register-mailaccounts").addClass("active");
     $("#register-user").removeClass("active");
@@ -61,6 +70,15 @@ function switchform() {
     $('#registration-title').val("Integrá tus cuentas de correo");
     $("#register-user-div").addClass("hidden");
     $("#register-mails-div").removeClass("hidden");
+}
+
+function switchformbackward() {
+    $("#register-mailaccounts").removeClass("active");
+    $("#register-user").addClass("active");
+
+    $('#registration-title').val("Ingresá tus datos");
+    $("#register-user-div").removeClass("hidden");
+    $("#register-mails-div").addClass("hidden");
 }
 
 function registrationNext(data) {

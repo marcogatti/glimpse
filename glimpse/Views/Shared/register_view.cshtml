@@ -13,7 +13,10 @@
             </li>
         </ul>
         
-        <div class="alert alert-error" hidden></div>
+        <div id="config-errors-cont" class="validation-summary-errors hidden">
+            <ul id="config-errors-list"></ul>
+            <hr />
+        </div>
 
         <div id="register-user-div" class="nav-body">
             <form class="form-horizontal" id="register-user-form" data-action="changePassword">
@@ -71,6 +74,7 @@
                         <input type="email" id="config-inp-account3">
                     </div>
                 </div>
+                <a id="config_mailaccount-goback" class="btn btn-primary" style="margin-left: 25%">Volver</a>
                 <button id="config-mailaccount-submit" type="submit" class="btn btn-primary" style="margin-left: 25%">Guardar</button>
             </form>
         </div>

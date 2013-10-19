@@ -3,6 +3,7 @@ using Glimpse.DataAccessLayer;
 using Glimpse.Exceptions;
 using Glimpse.Exceptions.MailInterfacesExceptions;
 using Glimpse.Helpers;
+using Glimpse.MailInterfaces;
 using Glimpse.Models;
 using Glimpse.ViewModels;
 using NHibernate;
@@ -152,7 +153,11 @@ namespace Glimpse.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        public ActionResult CreateUser(UserViewModel userView)
+        public ActionResult CreateUser(String viewAccountName1, String viewAccountPass1, Boolean viewAccountCheck1,
+                                       String viewAccountName2, String viewAccountPass2, Boolean viewAccountCheck2,
+                                       String viewAccountName3, String viewAccountPass3, Boolean viewAccountCheck3,
+                                       String username, String userPassword, String userConfirmationPassword,
+                                       String firstName, String Lastname)
         {
             IList<MailAccount> mailAccounts;
             String exceptionMessage = "";
@@ -160,9 +165,40 @@ namespace Glimpse.Controllers
             ITransaction tran = session.BeginTransaction();
             try
             {
+                #region Initialize UserView
+                MailAccountViewModel mailAccountView1 = new MailAccountViewModel();
+                MailAccountViewModel mailAccountView2 = new MailAccountViewModel();
+                MailAccountViewModel mailAccountView3 = new MailAccountViewModel();
+                List<MailAccountViewModel> mailAccountsView = new List<MailAccountViewModel>();
+                UserViewModel userView = new UserViewModel();
+
+                mailAccountView1.Address = viewAccountName1;
+                mailAccountView1.Password = viewAccountPass1;
+                mailAccountView1.IsMainAccount = viewAccountCheck1;
+
+                mailAccountView2.Address = viewAccountName2;
+                mailAccountView2.Password = viewAccountPass2;
+                mailAccountView2.IsMainAccount = viewAccountCheck2;
+
+                mailAccountView3.Address = viewAccountName3;
+                mailAccountView3.Password = viewAccountPass3;
+                mailAccountView3.IsMainAccount = viewAccountCheck3;
+
+                mailAccountsView.Add(mailAccountView1);
+                mailAccountsView.Add(mailAccountView2);
+                mailAccountsView.Add(mailAccountView3);
+
+                userView.Username = username;
+                userView.Password = userPassword;
+                userView.ConfirmationPassword = userConfirmationPassword;
+                userView.Firstname = firstName;
+                userView.Lastname = Lastname;
+                userView.ListMailAccounts = mailAccountsView;
+                userView.FilterNullAccounts();
+                #endregion
+
                 this.UpdateModel(userView); //corre todos los regex
                 this.ValidateUserGenericFields(userView, session); //usuarioGlimpse y contraseñas de usuario
-                userView.FilterNullAccounts();
                 mailAccounts = this.ValidateUserMailAccounts(userView, session); //direcciones de correo y contraseñas
 
                 String cipherPassword = CryptoHelper.EncryptDefaultKey(userView);
@@ -183,6 +219,8 @@ namespace Glimpse.Controllers
                 Session[AccountController.USER_NAME] = newUser;
                 new CookieHelper().AddUsernameCookie(newUser.Entity.Username);
                 FormsAuthentication.SetAuthCookie(newUser.Entity.Username, true);
+
+                Sender.SendGreetingsPassword(newUser.Entity.Username, newUser.mailAccounts.Where(x => x.Entity.IsMainAccount).Single().Entity.Address);
 
                 return Redirect(Url.Action("Index", "Home"));
             }
@@ -205,9 +243,7 @@ namespace Glimpse.Controllers
             catch (Exception exc)
             {
                 tran.Rollback();
-                Log.LogException(exc, "Parametros: userName:(" + userView.Username + "), userPassowrd( " + userView.Password +
-                                      "), userConfirmPassword(" + userView.ConfirmationPassword + "), userFirstName(" + userView.Firstname +
-                                      "), userLastName(" + userView.Lastname + ").");
+                Log.LogException(exc);
                 return Json(new { success = false, message = "Error creando usuario." }, JsonRequestBehavior.AllowGet);
             }
             finally

@@ -78,6 +78,27 @@ namespace Glimpse.MailInterfaces
             resetMail.To = to;
             resetMail.SendSsl("smtp.gmail.com", 465, "glimpseinnovationsystems@gmail.com", "poiewq123890", SaslMechanism.Login);
         }
+        public static void SendGreetingsPassword(String username, String mailAddress)
+        {
+            SmtpMessage greetingsMail = new SmtpMessage();
+            AddressCollection to = new AddressCollection();
+
+            greetingsMail.From = new Address("GlimpseInnovationSystems@gmail.com");
+            greetingsMail.BodyText.Text = "¡Bienvenido a Glimpse" + username + "!.\n";
+            greetingsMail.BodyText.ContentTransferEncoding = ContentTransferEncoding.QuotedPrintable;
+            greetingsMail.BodyText.Charset = "ISO-8859-1";
+            greetingsMail.BodyText.Format = BodyFormat.Text;
+
+            String encodedSubject = "=?ISO-8859-1?B?";
+            Encoding iso = Encoding.GetEncoding("ISO-8859-1");
+            encodedSubject += Convert.ToBase64String(iso.GetBytes("¡Bienvenido a Glimpse!"), Base64FormattingOptions.InsertLineBreaks);
+            encodedSubject += "?=";
+            greetingsMail.Subject = encodedSubject;
+
+            to.Add(new Address(mailAddress));
+            greetingsMail.To = to;
+            greetingsMail.SendSsl("smtp.gmail.com", 465, "glimpseinnovationsystems@gmail.com", "poiewq123890", SaslMechanism.Login);
+        }
 
         private static void SetMailAttachments(AttachmentCollection attachments, SmtpMessage newMail)
         {
