@@ -1,14 +1,31 @@
 ﻿var formActions = {
-    changePassword: { validation: formChangePasswordValidation, url: 'edituserpassword' },
-    manageMailAccounts: { validation: formManageMailAccountsValidation, url: 'edituseraccount' },
-    editPersonalData: { validation: formAEditPersonalDataValidation, url: 'edituserpersonaldata' }
+    changePassword: {
+        validation: formChangePasswordValidation,
+        url: 'edituserpassword',
+        cleanup: formChangePasswordCleanup,
+        preload: preloadPasswordForm
+    },
+    manageMailAccounts: {
+        validation: formManageMailAccountsValidation,
+        url: 'edituseraccount',
+        cleanup: formManageMailAccountsCleanup,
+        preload: preloadMailAccountsForm
+    },
+    editPersonalData: {
+        validation: formEditPersonalDataValidation,
+        url: 'edituserpersonaldata',
+        cleanup: formEditPersonalDataCleanup,
+        preload: preloadPersonalDataForm
+    }
 };
 
 function initializeMainDropdownMenuActions() {
 
-    $('#btn-config').click(function () {
-        openConfigModal();
-    });
+    if (user_isGlimpseUser) {
+        $('#btn-config').click(function () {
+            openConfigModal();
+        });
+    }
 
     $('#config-view').on('hidden', function () {
         cleanConfigErrors();
@@ -18,10 +35,12 @@ function initializeMainDropdownMenuActions() {
     $('#config-password, #config-mailaccount, #config-personaldata').click(function () {
 
         var modalBody = $('#config-view').find('.modal-body'),
-            bodyId = $(this).data('body-id');
+            bodyId = $(this).data('body-id'),
+            form = $('#' + $(this).data('body-id')).find('form'),
+            preloadFormAction = formActions[form.data('action')]['preload'];
 
         cleanConfigErrors();
-        cleanAllFormsData(modalBody);
+        preloadFormAction(form);
 
         modalBody.find('.nav-tabs').find('li').each(function () {
             $(this).removeClass('active')
@@ -59,6 +78,60 @@ function initializeMainDropdownMenuActions() {
     });
 }
 
+function serverPostActions(form, sentData, receivedData) {
+
+    var cleanupFormAction;
+
+    cleanConfigErrors();
+
+    if (!receivedData.success) {
+        showConfigErrors(receivedData.message);
+        return;
+    }
+
+    $('#config-errors-cont').addClass('hidden');
+    alert("Datos actualizados correctamente.");
+
+    closeConfigModal();
+
+    cleanupFormAction = formActions[form.data('action')]['cleanup'];
+    cleanupFormAction(form, receivedData);
+}
+
+function closeConfigModal() {
+    $('#config-view').modal('hide');
+}
+
+function openConfigModal() {
+
+    preloadMailAccountsForm($('#config-mailaccount-form'));
+    preloadPersonalDataForm($('#config-personaldata-form'));
+    preloadPasswordForm($('#config-password-form'));
+
+    cleanConfigErrors();
+
+    $('#config-view').modal();
+}
+
+function showConfigErrors(message) {
+
+    var errorList = $('#config-errors-list');
+
+    $('#config-errors-cont').removeClass('hidden');
+    $("<li />").html(message).appendTo(errorList);
+}
+
+function cleanConfigErrors() {
+    $('#config-errors-list').html('');
+}
+
+function cleanAllFormsData(modalBody) {
+
+    modalBody.find('form').each(function () {
+        cleanFormData($(this));
+    });
+}
+
 function getFormData(form) {
 
     var data = {};
@@ -69,6 +142,72 @@ function getFormData(form) {
 
     return data;
 }
+
+function setFormData(form, data) {
+
+    if (data == null) {
+        form.find('input').each(function () {
+            $(this).val('');
+        });
+    } else {
+        for (var index in data) {
+            form.find('[data-name="' + index + '"]').val(data[index]);
+        }
+    }
+}
+
+function cleanFormData(form) {
+    setFormData(form, null);
+}
+
+function hasEmptyValues(array) {
+
+    for (var index in array) {
+        if (array[index] === "") {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+////////////////////////////////////////
+//          PreloadActions            //
+////////////////////////////////////////
+
+function preloadMailAccountsForm(form) {
+
+}
+
+function preloadPersonalDataForm(form) {
+    setFormData(form, user_personal_data);
+}
+
+function preloadPasswordForm(form) {
+    cleanFormData(form);
+}
+
+
+////////////////////////////////////////
+//          CleanupActions            //
+////////////////////////////////////////
+
+function formChangePasswordCleanup(form, serverData) {
+    cleanFormData(form);
+}
+
+function formEditPersonalDataCleanup(form, serverData) {
+    user_personal_data = getFormData(form);
+}
+
+function formManageMailAccountsCleanup(form, serverData) {
+    return;
+}
+
+
+////////////////////////////////////////
+//        ValidationActions           //
+////////////////////////////////////////
 
 function formChangePasswordValidation(data) {
 
@@ -85,74 +224,12 @@ function formManageMailAccountsValidation(data) {
     return true;
 }
 
-function formAEditPersonalDataValidation(data) {
+function formEditPersonalDataValidation(data) {
+
+    if (hasEmptyValues({ firstname: data.firstName, lastname: data.lastName })) {
+        showConfigErrors("Los campos Nombre y Apellido son obligatorios.");
+        return false;
+    }
+
     return true;
-}
-
-function hasEmptyValues(array) {
-
-    for (var index in array) {
-        if (array[index] === "") {
-            return true;
-        }
-    }
-    return false;
-}
-
-function serverPostActions(form, sentData, receivedData) {
-
-    cleanConfigErrors();
-
-    if (!receivedData.success) {
-        showConfigErrors(receivedData.message);
-        return;
-    }
-
-    $('#config-errors-cont').addClass('hidden');
-    alert("Datos actualizados correctamente.");
-
-    closeConfigModal();
-
-    cleanFormData(form);
-}
-
-function closeConfigModal() {
-    $('#config-view').modal('hide');
-}
-
-function openConfigModal() {
-    cleanConfigErrors();
-    $('#config-view').modal();
-}
-
-function showConfigErrors(message) {
-
-    var errorList = $('#config-errors-list');
-
-    $('#config-errors-cont').removeClass('hidden');
-    $("<li />").html(message).appendTo(errorList);
-}
-
-function cleanConfigErrors() {
-    $('#config-errors-list').html('');
-}
-
-function cleanFormData(form) {
-    setFormData(form, null);
-}
-
-function cleanAllFormsData(modalBody) {
-
-    modalBody.find('form').each(function () {
-        cleanFormData($(this));
-    });
-}
-
-function setFormData(form, data) {
-
-    if (data == null) {
-        form.find('input').each(function () {
-            $(this).val('');
-        });
-    }
 }
