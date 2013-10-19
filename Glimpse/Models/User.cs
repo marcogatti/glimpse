@@ -109,6 +109,9 @@ namespace Glimpse.Models
         }
         public static bool IsPassword(String phrase)
         {
+            if (phrase == null)
+                return false;
+
             return Regex.IsMatch(phrase, @"^(?!.{20})[A-Za-z0-9\!#\$%&'\*\.\+\-/=\?\^`\{|\}~_]{6,20}");
         }
         public static User FindByUsername(String username, ISession session)

@@ -414,7 +414,7 @@ namespace Glimpse.Controllers
                 if (newPassword != newPasswordConfirmation)
                     exceptionMessage += "Las contraseñas ingresadas deben coincidir.";
 
-                if (exceptionMessage == "")
+                if (exceptionMessage != "")
                     throw new GlimpseException(exceptionMessage);
 
                 sessionUser.ChangePassword(CryptoHelper.EncryptDefaultKey(oldPassword), CryptoHelper.EncryptDefaultKey(newPassword), session);

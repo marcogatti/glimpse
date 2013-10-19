@@ -7,7 +7,7 @@
 function initializeMainDropdownMenuActions() {
 
     $('#btn-config').click(function () {
-        $('#config-view').modal();
+        openConfigModal();
     });
 
     $('#config-password, #config-mailaccount, #config-personaldata').click(function () {
@@ -40,7 +40,7 @@ function initializeMainDropdownMenuActions() {
 
         $.ajax({
             type: "POST",
-            url: "async/" + url,
+            url: "account/" + url,
             dataType: 'json',
             data: sendData,
             success: function (data, textStatus, jqXHR) {
@@ -52,7 +52,7 @@ function initializeMainDropdownMenuActions() {
 
 function getFormData(form) {
 
-    var data = [];
+    var data = {};
 
     form.find('input').each(function () {
         data[$(this).data('name')] = $(this).val();
@@ -90,7 +90,19 @@ function hasEmptyValues(array) {
 
 function serverPostActions(sentData, receivedData) {
 
-    if (receivedData.success != true) {
+    if (!receivedData.success) {
         alert(receivedData.message);
+        return;
     }
+
+    closeConfigModal();
+
+}
+
+function closeConfigModal() {
+    $('#config-view').modal('hide');
+}
+
+function openConfigModal() {
+    $('#config-view').modal();
 }
