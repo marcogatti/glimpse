@@ -64,6 +64,10 @@ hr {
     opacity: 0.3;
 }
 
+div.field-group {
+    margin-right: 30%;
+}
+
 #main-left-panel {
     height: 560px;
 }

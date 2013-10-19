@@ -1,4 +1,10 @@
-﻿function initializeMainDropdownMenuActions() {
+﻿var formActions = {
+    changePassword: { validation: formChangePasswordValidation, url: 'edituserpassword' },
+    manageMailAccounts: { validation: formManageMailAccountsValidation, url: 'edituseraccount' },
+    editPersonalData: { validation: formAEditPersonalDataValidation, url: 'edituserpersonaldata' }
+};
+
+function initializeMainDropdownMenuActions() {
 
     $('#btn-config').click(function () {
         $('#config-view').modal();
@@ -20,9 +26,71 @@
     });
 
     $('#config-password-form, #config-mailaccount-form, #config-personaldata-form').submit(function (event) {
+
+        var sendData, url, isValid;
+
         event.preventDefault();
-        alert("No implementado jeje");
+
+        sendData = getFormData($(this));
+        url = formActions[$(this).data('action')]['url'];
+        isValid = formActions[$(this).data('action')]['validation'];
+
+        if (!isValid(sendData))
+            return;
+
+        $.ajax({
+            type: "POST",
+            url: "async/" + url,
+            dataType: 'json',
+            data: sendData,
+            success: function (data, textStatus, jqXHR) {
+                serverPostActions(sendData, data)
+            }
+        });
+    });
+}
+
+function getFormData(form) {
+
+    var data = [];
+
+    form.find('input').each(function () {
+        data[$(this).data('name')] = $(this).val();
     });
 
+    return data;
+}
 
+function formChangePasswordValidation(data) {
+
+    if (hasEmptyValues(data)) {
+        alert("Todos los campos son obligatorios.");
+        return false;
+    }
+    return true;
+}
+
+function formManageMailAccountsValidation(data) {
+    return true;
+}
+
+function formAEditPersonalDataValidation(data) {
+    return true;
+}
+
+function hasEmptyValues(array) {
+
+    for (var index in array) {
+        if (array[index] === "") {
+            return true;
+        }
+    }
+    return false;
+}
+
+function serverPostActions(sentData, receivedData) {
+
+    if (receivedData.success != true) {
+        alert(receivedData.message);
+    }
 }

@@ -17,25 +17,27 @@
             </li>
         </ul>
 
+        <div class="validation-summary-errors"></div>
+
         <div id="config-password-cont" class="nav-body">
-            <form class="form-horizontal" id="config-password-form">
+            <form class="form-horizontal" id="config-password-form" data-action="changePassword">
                 <div class="control-group">
                     <label class="control-label" for="config-inp-oldpass">Contraseña Actual</label>
                     <div class="controls">
-                        <input type="password" id="config-inp-oldpass">
+                        <input type="password" id="config-inp-oldpass" data-name="oldPassword">
                     </div>
                 </div>
                 <br />
                 <div class="control-group">
                     <label class="control-label" for="config-inp-newpass1">Contraseña nueva</label>
                     <div class="controls">
-                        <input type="password" id="config-inp-newpass1">
+                        <input type="password" id="config-inp-newpass1" data-name="newPassword">
                     </div>
                 </div>
                 <div class="control-group">
                     <label class="control-label" for="config-inp-newpass2">Confirma Contraseña nueva</label>
                     <div class="controls">
-                        <input type="password" id="config-inp-newpass2">
+                        <input type="password" id="config-inp-newpass2" data-name="newPasswordConfirmation">
                     </div>
                 </div>
                 <button id="config-password-submit" type="submit" class="btn btn-primary" style="margin-left: 25%">Guardar</button>
@@ -43,7 +45,7 @@
         </div>
 
         <div id="config-mailaccount-cont" class="hidden nav-body">
-            <form class="form-horizontal" id="config-mailaccount-form">
+            <form class="form-horizontal" id="config-mailaccount-form" data-action="manageMailAccounts">
                 <div class="control-group">
                     <label class="control-label" for="config-inp-account1">Cuenta de Email #1</label>
                     <div class="controls">
@@ -67,7 +69,7 @@
         </div>
 
         <div id="config-personaldata-cont" class="hidden nav-body">
-            <form class="form-horizontal" id="config-personaldata-form">
+            <form class="form-horizontal" id="config-personaldata-form" data-action="editPersonalData">
                 <div class="control-group">
                     <label class="control-label" for="config-inp-name">Nombre</label>
                     <div class="controls">
