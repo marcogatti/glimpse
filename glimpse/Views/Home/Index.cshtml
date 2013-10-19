@@ -44,14 +44,16 @@
 <div class="container-fluid">
 
     <div class="row-fluid">
-        <div class="span2">
+        <div class="span2" id="main-left-panel">
             <div id="panel" class="well sidebar-nav">
                 <a href="#compose" id="compose" class="btn btn-block">Redactar</a>
                 <hr />
-                <ol id="labels-header" class="nav nav-list">
-                    <li class="nav-header">Carpetas</li>
-                    <li class="nav-header">Etiquetas <span class="pull-right"><i class="icon-pencil"></i></span></li>
-                </ol>
+                <div id="main-labels-cont" class="scrollable">
+                    <ol id="labels-header" class="nav nav-list">
+                        <li class="nav-header">Carpetas</li>
+                        <li class="nav-header">Etiquetas <span class="pull-right"><i class="icon-pencil"></i></span></li>
+                    </ol>
+                </div>
                 <hr />
                 <div id="circles-progress" class="progress progress-striped active">
                     <div class="bar" style="width: 100%;">Cargando...</div>
@@ -82,7 +84,7 @@
 
         </div>
 
-        <form class="form-inline pull-right">
+        <form class="form-inline pull-right hidden">
             <label>Cantidad máxima</label>
             <input id="max-amount" type="number" min="1" max="100" value="30">
         </form>

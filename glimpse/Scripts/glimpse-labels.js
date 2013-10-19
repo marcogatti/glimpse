@@ -28,8 +28,21 @@ function populateLabelColors() {
     "LimeGreen",
     "LightSeaGreen",
     "Crimson",
-    "Indigo"
-    ];
+    "Indigo",
+    'aqua',
+    'blue',
+    'fuchsia',
+    'green',
+    'gray',
+    'lime',
+    'maroon',
+    'navy',
+    'olive',
+    'purple',
+    'red',
+    'silver',
+    'teal',
+    'yellow'];
 
     var i = 0;
     $(".custom-label:not(.custom-label[data-name^='others'])").each(function () {
