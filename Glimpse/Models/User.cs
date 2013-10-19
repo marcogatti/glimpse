@@ -7,6 +7,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using Glimpse.Exceptions;
 
 namespace Glimpse.Models
 {
@@ -89,7 +90,7 @@ namespace Glimpse.Models
             }
             else
             {
-                throw new WrongPasswordException("La contraseña ingresada es incorrecta.");
+                throw new GlimpseException("La contraseña de usuario ingresada es incorrecta.");
             }
         }
         public void Disconnect()

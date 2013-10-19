@@ -9,7 +9,7 @@
 }
 
 #email-container {
-    height: 480px;
+    height: 560px;
     position: relative;
     overflow: hidden;
     padding: 5px;
@@ -58,6 +58,24 @@
         vertical-align: middle;
         margin-right: -0.25em; /* Adjusts for spacing */
     }
+
+hr {
+    border-color: grey;
+    opacity: 0.3;
+}
+
+#main-left-panel {
+    height: 560px;
+}
+
+.scrollable {
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+#main-labels-cont {
+    height: 366px;
+}
 
 .centered {
     width: 75px;
@@ -152,17 +170,18 @@
     top: 0;
     left: 0;
     cursor: pointer;
-    -webkit-transform-origin: 75px 75px;
-    transform-origin: 75px 75px;
-    
     border-radius: 50%;
     height: 15px;
     width: 15px;
     box-shadow: 0 0 4px 4px white;
+    
+    -webkit-transform-origin: 75px 75px;
+    transform-origin: 75px 75px;
 }
 
 .label-ball {
     -webkit-transition: all 0.5s ease;
+    transition: all 0.5s ease;
 }
 
 .coord {
