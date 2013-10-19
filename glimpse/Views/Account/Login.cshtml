@@ -3,10 +3,12 @@
 
 @section css {
     @Styles.Render("~/Login/css")
+    @Styles.Render("~/Content/ui-lightness/jquery-ui-1.10.3.custom.css")
 }
 
 @section scripts{
     @Scripts.Render("~/bundles/registration")
+    @Scripts.Render("~/bundles/glimpse")
     @Scripts.Render("~/bundles/jqueryval")
 }
 
@@ -22,15 +24,18 @@
         <h2 class="form-signin-heading">Bienvenido a Glimpse</h2>
         
         @Html.ValidationSummary()
-        @Html.TextBoxFor(m => m.Username, new { placeholder = "Tu usuario o dirección de correo...", @class = "input-block-level" })
+        @Html.TextBoxFor(m => m.Username, new { placeholder = "Tu usuario o dirección de correo...", @class = "input-block-level", id="username" })
         @Html.PasswordFor(m => m.Password, new { placeholder = "Tu contraseña...", @class = "input-block-level" })
         
-        <input class="btn btn-large btn-primary" type="submit" value="Entrar" />
-        <a class="btn btn-link" id="registration-link">Crear nueva cuenta Glimpse</a>
+        <input class="btn btn-primary btn-success" type="submit" value="Entrar" />
+        <a class="btn btn-default" id="registration-link">Crear nueva cuenta Glimpse</a>
+        <a class="btn btn-link" id="forgot-password" style="margin-left:-4%">Olvidé mi contraseña...</a>
     }
 
-    <div id="registration-view" class="modal hide fade in">
-        <div id="first-screen">
+    @*<div id="registration-view" class="modal hide fade in">*@
+
+        @{Html.RenderPartial("register_view");}
+    @*    <div id="first-screen">
 
             @using (Ajax.BeginForm("ValidateUserFields", "Account", null, new AjaxOptions { OnSuccess = "registrationNext", OnFailure = "registrationFailure" }, new { @class = "registration-modal" }))
             {
@@ -88,7 +93,9 @@
                 <input class="btn btn-primary" id="registration-register-btn" type="submit" value="Registrar usuario" />
             }
         </div>
-    </div>
+    </div>*@
+
+    
 
 </div>
 

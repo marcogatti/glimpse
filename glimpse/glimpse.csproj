@@ -528,6 +528,7 @@
     <Content Include="Views\Shared\compose_panel.cshtml" />
     <Content Include="Views\Shared\config_dropdown.cshtml" />
     <Content Include="Views\Shared\config_view.cshtml" />
+    <Content Include="Views\Shared\register_view.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

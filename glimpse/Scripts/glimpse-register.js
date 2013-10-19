@@ -1,30 +1,67 @@
 ﻿$(document).ready(function () {
     $("#registration-link").click(function () {
-        $("#registration-view").modal("show");
+        $("#register-view").modal("show");
     });
 
-    $("#registration-next-btn").click(function updateModel() {
-        var fnvalue = $("#firstname").val();
-        $("#createFirstname").val(fnvalue);
+    $("#register-user-form").submit(function (e) {
 
-        var lnvalue = $("#lastname").val();
-        $("#createLastname").val(lnvalue);
+        e.preventDefault();
 
-        var unvalue = $("#username").val();
-        $("#createUsername").val(unvalue);
+        var data = {
+            firstname: $('#register-name').val(),
+            lastname: $('#register-lastname').val(),
+            username: $('#register-username').val(),
+            password: $('#register-pass').val(),
+            confirmationPassword: $('#register-confpass').val(),
+        }
 
-        var pvalue = $("#password").val();
-        $("#createPassword").val(pvalue);
-
-        var cpvalue = $("#confirmation").val();
-        $("#createConfirmation").val(cpvalue);
+        $.ajax({
+            type: "POST",
+            url: "validateuserfields",
+            dataType: 'json',
+            data: data,
+            success: function (data, textStatus, jqXHR) {
+                if (data.success) {
+                    switchform();
+                } else {
+                    alert(data.message);
+                }
+            }
+        });
     });
 
     $("#registration-back-btn").click(function () {
         $('#first-screen').fadeIn().removeClass('hidden');
         $('#second-screen').fadeOut().addClass('hidden');
     });
+
+    $("#forgot-password").click(function (e) {
+        $.ajax({
+            type: "POST",
+            url: "resetpassword",
+            dataType: 'json',
+            data: {username:$('#username').val()},
+            success: function (data, textStatus, jqXHR) {
+                if (data.success) {
+                    alert("Se ha enviado un email con la nueva contraseña a su cuenta principal de mail.");
+                } else {
+                    alert(data.message);
+                }
+            }
+        });
+    });
+
 });
+
+function switchform() {
+
+    $("#register-mailaccounts").addClass("active");
+    $("#register-user").removeClass("active");
+    
+    $('#registration-title').val("Integrá tus cuentas de correo");
+    $("#register-user-div").addClass("hidden");
+    $("#register-mails-div").removeClass("hidden");
+}
 
 function registrationNext(data) {
     if (!data.success) {
