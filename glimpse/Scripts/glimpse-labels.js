@@ -67,7 +67,7 @@ function labelDrag(ev) {
 }
 
 function setLabelsAdder() {
-    $.each($(".custom-label"), function (index, actualLabel) {
+    $.each($(".label-glimpse"), function (index, actualLabel) {
 
         var currentLabel = $(this);
         if (currentLabel.hasClass("custom-label")) {
@@ -147,6 +147,9 @@ function addCircleColor(circle, label) {
     circle.data("custom-labels", newCustomLabels);
 
     calculateEmailColor(circle);
+    if (circle.hasClass("previewed")) {
+        putLabelBalls(circle);
+    }
 }
 
 function addSystemLabel(circle, systemLabel) {
@@ -171,19 +174,12 @@ function addLabelToEmail(label, circle) {
     });
 }
 
-function removeLabelFromEmail(label, circle) {
+function setQuickLabelRemoval() {
+    $(".label-ball").on('click', function () {
 
-    $.ajax({
-        type: "POST",
-        url: "async/RemoveLabel",
-        dataType: 'json',
-        error: function (jqXHR, textStatus, errorThrown) {
-            alert("No se pudo quitar la etiqueta.");
-        },
-        success: function () {
-            removeCircleColor(circle, label);
-        },
-        data: { labelName: label, mailId: circle.data('id') }
+        var circle = $(this).parent();
+        removeLabelFromCircle(circle, $(this).data("label-name"));
+        putLabelBalls(circle);
     });
 }
 
@@ -232,6 +228,7 @@ function chooseCirclesToBeShown() {
             $(this).addClass("hidden");
         } else {
             $(this).removeClass("hidden");
+            calculateEmailColor($(this));
         }
     });
 }

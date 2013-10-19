@@ -147,26 +147,26 @@ div.field-group {
 }
 
 .circle.importance1 {
-    -webkit-transform: scale(0.75);
-    transform: scale(0.75);
+    -webkit-transform: scale(0.6);
+    transform: scale(0.6);
 }
 
 .circle.importance2 {
-    -webkit-transform: scale(0.9);
-    transform: scale(0.9);
+    -webkit-transform: scale(0.8);
+    transform: scale(0.8);
 }
 
 .circle.importance3 {
 }
 
 .circle.importance4 {
-    -webkit-transform: scale(1.1);
-    transform: scale(1.1);
+    -webkit-transform: scale(1.2);
+    transform: scale(1.2);
 }
 
 .circle.importance5 {
-    -webkit-transform: scale(1.25);
-    transform: scale(1.25);
+    -webkit-transform: scale(1.4);
+    transform: scale(1.4);
 }
 
 .radial-button {
