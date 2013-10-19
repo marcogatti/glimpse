@@ -135,14 +135,22 @@ function putLabelBalls(circle) {
     var customLabels = getCustomLabels(circle),
     labelsBalls = "";
 
+    circle.find(".label-ball").remove();
+
     var deg = 135;
     for (var i = 0; i < customLabels.length; i++) {
-        labelsBalls += "<div class='radial-button label-ball' style='" + rotation(deg) +
+        labelsBalls += "<div class='radial-button label-ball' data-label-name='" + customLabels[i] + "' style='" + rotation(deg) +
             " background-color: " + labelColors[customLabels[i]] + ";'></div>";
         deg += 15;
     }
 
     circle.prepend($(labelsBalls));
+
+    circle.find(".radial-button").on('click', function (e) {
+        e.stopPropagation();
+    });
+
+    setQuickLabelRemoval();
 }
 
 function putButtons(circle) {
@@ -156,12 +164,10 @@ function putButtons(circle) {
 
     circle.prepend(buttons);
 
-    $(".circle > .icon-plus-sign").on('click', function (e) {
-        e.stopPropagation();
+    $(".circle > .icon-plus-sign").on('click', function () {
         changeImportance($(this).parent(), true)
     });
-    $(".circle > .icon-minus-sign").on('click', function (e) {
-        e.stopPropagation();
+    $(".circle > .icon-minus-sign").on('click', function () {
         changeImportance($(this).parent(), false)
     });
 }
@@ -197,8 +203,8 @@ function setMailClicked(circle) {
     circle.addClass('previewed');
     circle.find(".loading").css("visibility", "hidden");
 
-    putLabelBalls(circle);
     putButtons(circle);
+    putLabelBalls(circle);
 
     circle.animate({
         width: '150',
@@ -273,7 +279,6 @@ function configureCircleHover(circle) {
 }
 
 function markAsRead(circle) {
-    //circle.removeClass("new");
     circle.find(".loading").remove();
 }
 
