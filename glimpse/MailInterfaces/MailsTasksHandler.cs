@@ -12,6 +12,7 @@ namespace Glimpse.MailInterfaces
 {
     public class MailsTasksHandler
     {
+        private static Boolean forceContinueOnError = false;
         private static Dictionary<string, MailsTask> TasksList = new Dictionary<string, MailsTask>();
         private static Mutex TasksListLock = new Mutex(false);
 
@@ -194,7 +195,13 @@ namespace Glimpse.MailInterfaces
                                              task.HasFinishedBackward.ToString() + " nextUidBackward:" +
                                              task.NextUidBackward.ToString() + " labelName:" + 
                                              task.Label.Entity.Name);
-                throw exc;
+                if (MailsTasksHandler.forceContinueOnError)
+                {
+                    task.SkipCicle();
+                    MailsTasksHandler.StartMailsTask(task);
+                }
+                else
+                    throw exc;
             }
         }
         private static void SynchronizeBackward(MailsTask task)
@@ -229,14 +236,14 @@ namespace Glimpse.MailInterfaces
             task.MailAccount.Disconnect();
         }
 
-        private static Int64 GetFollowingNextUid(Int64 fromUid)
+        internal static Int64 GetFollowingNextUid(Int64 fromUid)
         {
             if (fromUid - 1 <= 0)
-                return -1;  // Task finished
+                return -1;  // tarea terminada
             else
                 return fromUid - 1; //muevo el puntero una posicion atras de que recien me traje
         }
-        private static Int64 GetFromUid(Int64 toUid, Int64 UidLimit)
+        internal static Int64 GetFromUid(Int64 toUid, Int64 UidLimit)
         {
             Int64 fromUid;
 
@@ -328,6 +335,19 @@ namespace Glimpse.MailInterfaces
         public void SetMailAccount(MailAccount mailAccount)
         {
             this.MailAccount = mailAccount;
+        }
+        public void SkipCicle()
+        {
+            if (!this.HasFinishedBackward)
+            {
+                Int64 fromUid = MailsTasksHandler.GetFromUid(this.NextUidBackward, this.LowestUidExternal - 1);
+                this.NextUidBackward = MailsTasksHandler.GetFollowingNextUid(fromUid);
+            }
+            if (!this.HasFinishedForward)
+            {
+                Int64 fromUid = MailsTasksHandler.GetFromUid(this.NextUidForward, this.HighestUidLocal);
+                this.NextUidForward = MailsTasksHandler.GetFollowingNextUid(fromUid);
+            }
         }
         public bool IsWorking
         {

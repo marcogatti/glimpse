@@ -1,11 +1,8 @@
-﻿using Glimpse.DataAccessLayer.Entities;
+﻿using ActiveUp.Net.Mail;
+using Glimpse.DataAccessLayer.Entities;
 using NHibernate;
 using NHibernate.Criterion;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using ActiveUp.Net.Mail;
 
 namespace Glimpse.Models
 {
@@ -18,6 +15,26 @@ namespace Glimpse.Models
             this.Entity = entity;
         }
 
+        public void SaveOrUpdate(ISession session)
+        {
+            Address databaseAddress = FindByAddress(this.Entity.MailAddress, session);
+
+            if (databaseAddress.Entity != null)
+            {
+                databaseAddress.Entity.Name = this.Entity.Name;
+                this.Entity = databaseAddress.Entity;
+            }
+
+            session.SaveOrUpdate(this.Entity);
+        }
+
+        public static void RemoveByAddress(String mailAddress, ISession session)
+        {
+            Address foundAddress = FindByAddress(mailAddress, session);
+
+            if (foundAddress != null)
+                session.Delete(foundAddress);
+        }
         public static Address FindByAddress(String address, ISession session)
         {
             var entity = session.CreateCriteria<AddressEntity>()
@@ -28,21 +45,6 @@ namespace Glimpse.Models
 
             return foundAddress;
         }
-
-        public static void RemoveByAddress(String mailAddress, ISession session)
-        {
-            Address foundAddress = FindByAddress(mailAddress, session);
-
-            if (foundAddress != null)
-            {
-                ITransaction tran = session.BeginTransaction();
-
-                session.Delete(foundAddress);
-
-                tran.Commit();
-            }
-        }
-
         public static AddressCollection ParseAddresses(String toAddresses)
         {
             /*test.imap.performance@gmail.com, "Simpson Marge" <test.imap.performance@gmail.com>,
@@ -83,35 +85,6 @@ namespace Glimpse.Models
                 }
             }
             return addresses;
-        }
-
-        public void Save(ISession currentSession)
-        {
-            AddressEntity persistAddress;
-
-            ITransaction tran = currentSession.BeginTransaction();
-
-            Address oldAddress = FindByAddress(this.Entity.MailAddress, currentSession);
-
-            if (oldAddress.Entity == null)
-            {
-                persistAddress = this.Entity;
-            }
-            else
-            {
-                oldAddress.Clone(this.Entity);
-                persistAddress = oldAddress.Entity;
-            }
-
-            currentSession.SaveOrUpdate(persistAddress);
-
-            tran.Commit();
-        }        
-
-        private void Clone(AddressEntity from)
-        {
-            this.Entity.MailAddress = from.MailAddress;
-            this.Entity.Name = from.Name;
         }
     }
 }

@@ -125,9 +125,9 @@ function getFormData(form) {
     return data;
 }
 
-function checkbox1Changed() {
-    if ($("#check1").is(':checked')) {
-        ($("#check2").removeAttr('checked'));
-        ($("#check3").removeAttr('checked'));
-    }
-}
+//function checkbox1Changed() {
+//    if ($("#check1").is(':checked')) {
+//        ($("#check2").removeAttr('checked'));
+//        ($("#check3").removeAttr('checked'));
+//    }
+//}

@@ -223,9 +223,7 @@ namespace Glimpse.Models
         {
             List<Mail> mails = this.MyFetcher.GetMailsBetweenUID(label.Entity.Name, (int)fromUid, (int)toUid);
             foreach (Mail mail in mails)
-            {
                 mail.Entity.MailAccountEntity = this.Entity;
-            }
             MailAccount.Save(mails);
             amountOfMails = mails.Count;
         }
@@ -377,17 +375,9 @@ namespace Glimpse.Models
 
             foreach (Mail mailToSave in mails)
             {
-                Address foundAddress = Address.FindByAddress(mailToSave.Entity.From.MailAddress, session);
-
-                if (foundAddress.Entity == null)
-                {
-                    session.SaveOrUpdate(mailToSave.Entity.From);
-                }
-                else
-                {
-                    mailToSave.SetFrom(foundAddress.Entity);
-                }
-
+                Address newAddress = new Address(mailToSave.Entity.From);
+                newAddress.SaveOrUpdate(session); //si fija si ya existe adentro
+                mailToSave.SetFrom(newAddress.Entity);
                 session.SaveOrUpdate(mailToSave.Entity);
             }
             tran.Commit();
