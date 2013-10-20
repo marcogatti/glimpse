@@ -67,21 +67,29 @@
             var labels = @Html.Raw(Json.Encode(ViewBag.Labels));
             var oldestAge = @ViewBag.OldestAge;
         </script>
-
-        <div id="email-container" class="span10 well">
-
-            <div class="icons">
-                <i id="zoom-in" class="icon icon-zoom-in"></i>
-                <i id="zoom-out" class="icon icon-zoom-out"></i>
-                <i id="refresh" class="icon icon-refresh"></i>
+        <div class="span10" style="height: 560px">
+            <div id="mailaccounts-container" class="well well-small">
+                <ul class="nav nav-pills">
+                    <li class="active"><a href="#">Account 1</a></li>
+                    <li><a href="#">Account 2</a></li>
+                    <li><a href="#">Account 3</a></li>
+                </ul>
             </div>
+            <div id="email-container" class="well">
+
+                <div class="icons">
+                    <i id="zoom-in" class="icon icon-zoom-in"></i>
+                    <i id="zoom-out" class="icon icon-zoom-out"></i>
+                    <i id="refresh" class="icon icon-refresh"></i>
+                </div>
 
 
-            <div id="date-today" class="coord date-coord"></div>
-            <div id="date-last" class="coord date-coord"></div>
-            <div id="dateTime" class="coord date-coord hidable hidden"></div>
-            <div id="from" class="coord hidable hidden"></div>
+                <div id="date-today" class="coord date-coord"></div>
+                <div id="date-last" class="coord date-coord"></div>
+                <div id="dateTime" class="coord date-coord hidable hidden"></div>
+                <div id="from" class="coord hidable hidden"></div>
 
+            </div>
         </div>
 
         <form class="form-inline pull-right hidden">
@@ -113,11 +121,11 @@
     var user_telephone = @Html.Raw(Json.Encode(ViewBag.Telephone));
     
     var user_personal_data = {
-                                firstName: user_firstname,
-                                lastName: user_lastname,
-                                country:user_country,
-                                city: user_city,
-                                tel:user_telephone
+        firstName: user_firstname,
+        lastName: user_lastname,
+        country:user_country,
+        city: user_city,
+        tel:user_telephone
     };
 
     var user_mailAccounts = @Html.Raw(Json.Encode(ViewBag.MailAccounts));
