@@ -9,6 +9,7 @@ using NHibernate.Criterion;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Web;
 
 namespace Glimpse.Models
 {
@@ -163,7 +164,6 @@ namespace Glimpse.Models
         }
         public MailCollection GetMailsByDate(DateTime initialDate, DateTime finalDate, ISession session)
         {
-            //TODO: Ver el tema de las fechas para diferenciar mails de las 3 carpetas
             IList<MailEntity> databaseMails = session.CreateCriteria<MailEntity>()
                                                   .Add(Restrictions.Eq("MailAccountEntity", this.Entity))
                                                   .Add(Restrictions.Between("Date", initialDate, finalDate))
@@ -188,9 +188,7 @@ namespace Glimpse.Models
                                  .UniqueResult<MailEntity>();
             Mail mail = new Mail(mailEntity);
             if (mailEntity.Seen == false)
-            {
                 this.SetReadFlag(mail, true, session);
-            }
             return mail.Entity.Body;
         }
 
@@ -227,10 +225,10 @@ namespace Glimpse.Models
             MailAccount.Save(mails);
             amountOfMails = mails.Count;
         }
-        public void SendMail(String toAddresses, String body, String subject)
+        public void SendMail(String toAddresses, String body, String subject, List<HttpPostedFile> uploadedFiles)
         {
             AddressCollection recipients = Glimpse.Models.Address.ParseAddresses(toAddresses);
-            this.MySender.sendMail(recipients, body, subject);
+            this.MySender.sendMail(recipients, body, subject, null, null, uploadedFiles);
         }
         public void AddLabelIMAP(Mail theMail, Label theLabel)
         {
