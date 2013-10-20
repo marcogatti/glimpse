@@ -275,8 +275,12 @@ function toBeHidden(circle) {
 
     var customLabels = getCustomLabels(circle),
         systemLabels = getSystemLabels(circle),
-        activeMailBox = $(".mailbox:not(.label-hidden)").data("name");
+        activeMailBox = $(".mailbox:not(.label-hidden)").data("name"),
+        circleMailAccountIsActive = activeMailAccounts[circle.data('mailaccount')];
 
+
+    if (!circleMailAccountIsActive)
+        return true;
 
     if (hasExclusiveLabel(systemLabels) && !isExclusive(activeMailBox)) {
         return true;
