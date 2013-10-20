@@ -9,10 +9,14 @@
 }
 
 #email-container {
-    height: 560px;
+    height: 475px;
     position: relative;
     overflow: hidden;
     padding: 5px;
+}
+
+#mailaccounts-container {
+    height: 34px;
 }
 
 .brand {
@@ -180,9 +184,9 @@ div.field-group {
     width: 15px;
     box-shadow: 0 0 4px 4px white;
     transition: all 0.1s;
-    
     -webkit-transform-origin: 75px -75px;
     transform-origin: 75px -75px;
+
 }
 
         .radial-button:active {
@@ -452,6 +456,7 @@ blockquote {
     -ms-user-select: none;
     user-select: none;
 }
+
 a.disabled {
     color: #333333;
     cursor: default;
