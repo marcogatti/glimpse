@@ -170,18 +170,24 @@ div.field-group {
 }
 
 .radial-button {
+    padding: 0;
     position: absolute;
-    top: 0;
+    top: 150px;
     left: 0;
     cursor: pointer;
     border-radius: 50%;
     height: 15px;
     width: 15px;
     box-shadow: 0 0 4px 4px white;
+    transition: all 0.1s;
     
-    -webkit-transform-origin: 75px 75px;
-    transform-origin: 75px 75px;
+    -webkit-transform-origin: 75px -75px;
+    transform-origin: 75px -75px;
 }
+
+        .radial-button:active {
+            box-shadow: 0 0 4px 4px limegreen;
+        }
 
 .label-ball {
     -webkit-transition: all 0.5s ease;
