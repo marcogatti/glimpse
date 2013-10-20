@@ -606,7 +606,9 @@ namespace Glimpse.Controllers
                     mailAccount = new MailAccount(mailAccountView.Address, CryptoHelper.EncryptDefaultKey(mailAccountView));
                     mailAccount.ConnectLight(); //si pasa este punto es que esta bien y va a ser devuelta
                     if (mailAccountView.IsMainAccount)
-                        mailAccount.Entity.IsMainAccount = true;
+                        mailAccount.SetAsMainAccount(true);
+                    else
+                        mailAccount.SetAsMainAccount(false);
                     connectedMailAccounts.Add(mailAccount);
                 }
                 catch (ArgumentNullException)
