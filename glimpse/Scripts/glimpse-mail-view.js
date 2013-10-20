@@ -39,48 +39,17 @@ function initializeMailViewModal() {
 
 function setFullDisplay(circle) {
 
-    circle.dblclick(
+    circle.dblclick(function () {
 
-        function () {
+        var circle = $(this),
+            view_modal = $("#mail-view");
 
-            currentCircle = circle;
+        setMailViewModalHeadData(view_modal, circle)
 
-            var view_modal = $("#mail-view");
-            from = circle.data("from"),
-            subject = circle.data("subject"),
-            cc = circle.data("cc"),
-            to = circle.data("to"),
-            date = new Date(circle.data('date')),
-            ccContainer = $("#mail-view-cc-container");
+        view_modal.modal("show");
 
-            setViewMailBody(view_modal, '');
-            view_modal.find("#mail-view-from").html(from);
-            $("#mail-view-to").html(to);
-            if (cc == "" || cc === null) {
-                ccContainer.addClass('hidden');
-            } else {
-                ccContainer.removeClass('hidden');
-                $("#mail-view-cc").html(cc);
-            }
-            view_modal.find("#mail-view-subject").html(subject);
-            view_modal.find("#mail-view-date").html(date.toLocaleString());
-
-            setMailViewerLabels(view_modal, circle);
-
-            showProgressBar("#body-progress");
-
-            view_modal.modal("show");
-
-            $.getJSON("async/GetMailBody/" + circle.data("id"), function (data) {
-                hideProgressBar("#body-progress");
-                if (data.success == true) {
-                    setViewMailBody(view_modal, data.mail.body);
-                    setViewMailAttachments(view_modal, data.mail.extras)
-                    markAsRead(circle);
-
-                } else alert(data.message);
-            });
-        });
+        setMailViewModalBodyData(view_modal, circle);
+    });
 }
 
 function setViewMailAttachments(view_modal, attachments) {
@@ -328,7 +297,7 @@ function setMailViewModalBodyData(view_modal, circle) {
 
     showProgressBar("#body-progress");
 
-    $.getJSON("async/GetMailBody/" + circle.data('id'), function (data) {
+    $.getJSON("async/GetMailBody", { id: circle.data('id'), mailAccountId: circle.data('mailaccount') }, function (data) {
         hideProgressBar("#body-progress");
         if (data.success == true) {
             setViewMailBody(view_modal, data.mail.body);
