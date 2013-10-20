@@ -54,7 +54,7 @@ function initializeMainDropdownMenuActions() {
 
     $('#config-password-form, #config-mailaccount-form, #config-personaldata-form').submit(function (event) {
 
-        var sendData, url, isValid, form;
+        var sendData, url, isValid, form, modal;
 
         event.preventDefault();
 
@@ -66,6 +66,10 @@ function initializeMainDropdownMenuActions() {
         if (!isValid(sendData))
             return;
 
+        modal = $('#config-view');
+
+        startWorkingWidget(modal);
+
         $.ajax({
             type: "POST",
             url: "account/" + url,
@@ -73,6 +77,9 @@ function initializeMainDropdownMenuActions() {
             data: sendData,
             success: function (data, textStatus, jqXHR) {
                 serverPostActions(form, sendData, data)
+            },
+            complete: function () {
+                stopWorkingWidget(modal);
             }
         });
     });

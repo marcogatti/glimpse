@@ -267,6 +267,7 @@
     <Content Include="App_Readme\Elmah.MySql.sql" />
     <Content Include="App_Readme\Elmah.MySql.txt" />
     <Content Include="App_Readme\Elmah.txt" />
+    <Content Include="Content\ajax-loader.gif" />
     <Content Include="Content\bootstrap-responsive.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\Home.css" />
@@ -529,6 +530,7 @@
     <Content Include="Views\Shared\config_dropdown.cshtml" />
     <Content Include="Views\Shared\config_view.cshtml" />
     <Content Include="Views\Shared\register_view.cshtml" />
+    <Content Include="Views\Shared\loading_widjet.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

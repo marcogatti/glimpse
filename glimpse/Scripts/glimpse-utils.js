@@ -267,3 +267,11 @@ function setRefreshOnResize() {
     });
 
 }
+
+function stopWorkingWidget(container) {
+    container.find('.progress-circular').addClass('hidden');
+}
+
+function startWorkingWidget(container) {
+    container.find('.progress-circular').removeClass('hidden');
+}
