@@ -16,5 +16,6 @@ $(document).ready(function () {
     initializeMailEditor();
     initializeMailViewModal();
     initializeMainDropdownMenuActions();
+    initializeMailAccountToggles();
 })
 

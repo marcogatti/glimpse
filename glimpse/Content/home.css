@@ -17,6 +17,8 @@
 
 #mailaccounts-container {
     height: 34px;
+    overflow-x: auto;
+    overflow-y: hidden;
 }
 
 .brand {
