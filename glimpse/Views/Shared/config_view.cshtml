@@ -1,7 +1,12 @@
 ﻿<div id="config-view" class="modal hide fade in" style="display: none;" data-backdrop="static">
-    <div class="modal-header">
+    <div class="modal-header" style="height: 50px;">
         <a href="#" class="close" data-dismiss="modal">×</a>
-        <h4>Configura tu cuenta Glimpse</h4>
+        <div class="pull-left">
+            <h4>Configura tu cuenta Glimpse</h4>
+        </div>
+        <div class="pull-left progress-circular hidden" style="margin-top: 8px; margin-left: 20px;">
+            @{Html.RenderPartial("loading_widjet");}
+        </div>
     </div>
 
     <div class="modal-body" style="max-height: 500px;">
