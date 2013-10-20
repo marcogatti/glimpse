@@ -47,7 +47,7 @@ function insertCircle(value) {
         ];
 
         var newCircle = $("<div class='circle'" + dataAttributes.join("'") + "' title='" + value.from.address + "'>" + spinner +
-            "<div class='centered'><p content=true>" + value.subject.substr(0, 50) + "</p></div></div>");
+            "<div class='centered'><p content=true>" + value.subject.substr(0, 30) + "</p></div></div>");
 
         calculateEmailColor(newCircle);
         newCircle.css("opacity", 0);
@@ -137,7 +137,7 @@ function putLabelBalls(circle) {
 
     circle.find(".label-ball").remove();
 
-    var deg = 135;
+    var deg = 195;
     for (var i = 0; i < customLabels.length; i++) {
         labelsBalls += "<div class='radial-button label-ball' data-label-name='" + customLabels[i] + "' style='" + rotation(deg) +
             " background-color: " + labelColors[customLabels[i]] + ";'></div>";
@@ -146,7 +146,7 @@ function putLabelBalls(circle) {
 
     circle.prepend($(labelsBalls));
 
-    circle.find(".radial-button").on('click', function (e) {
+    circle.find(".radial-button").on('click dblclick', function (e) {
         e.stopPropagation();
     });
 
@@ -172,21 +172,31 @@ function putButtons(circle) {
     });
 }
     
+function checkIconHide(currentImportance, limit, iconToHide) {
+    if (currentImportance === limit) {
+        iconToHide.addClass("hidden");
+    } else {
+        iconToHide.removeClass("hidden");
+    }
+}
+
+function checkImportanceIconsVisibility(circle) {
+    var currentImportance = circle.data("importance");
+    checkIconHide(currentImportance, 1, circle.find(".icon-minus-sign"));
+    checkIconHide(currentImportance, 5, circle.find(".icon-plus-sign"));
+}
+
 function changeSize(circle, step) {
     var currentImportance = circle.data("importance");
     var intVal = step ? 1 : -1;
     var newImportance = Math.min(Math.max(currentImportance + intVal, 1), 5);
-    
-    removeImportance(circle);
     circle.data("importance", newImportance);
-    setImportance(circle);
+    checkImportanceIconsVisibility(circle);
 }
 
 function changeImportance(circle, step) {
 
     changeSize(circle, step);
-    //unsetMailClicked(circle);
-    //setMailClicked(circle);
 
     $.ajax({
         type: "POST",
@@ -198,13 +208,14 @@ function changeImportance(circle, step) {
 
 function setMailClicked(circle) {
 
-    //removeImportance(circle);
+    removeImportance(circle);
     circle.attr('mail-clicked', true);
     circle.addClass('previewed');
     circle.find(".loading").css("visibility", "hidden");
 
     putButtons(circle);
     putLabelBalls(circle);
+    checkImportanceIconsVisibility(circle);
 
     circle.animate({
         width: '150',
@@ -222,7 +233,7 @@ function unsetMailClicked(circle) {
     circle.removeClass('previewed');
     circle.find(".loading").css("visibility", "visible");
     circle.find(".radial-button").remove();
-    //setImportance(circle);
+    setImportance(circle);
 
     circle.animate({
         width: '75',
@@ -381,4 +392,11 @@ function deleteCircleInServer(circle){
         dataType: 'json',
         data: { id: circle.data('id'), mailAccountId: circle.data('mailaccount') }
     });
+}
+
+function showMailAccount(mailAccountId) {
+
+}
+function hideMailAccount(mailAccountId) {
+
 }

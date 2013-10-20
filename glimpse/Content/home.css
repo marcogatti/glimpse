@@ -9,10 +9,16 @@
 }
 
 #email-container {
-    height: 560px;
+    height: 475px;
     position: relative;
     overflow: hidden;
     padding: 5px;
+}
+
+#mailaccounts-container {
+    height: 34px;
+    overflow-x: auto;
+    overflow-y: hidden;
 }
 
 .brand {
@@ -170,18 +176,24 @@ div.field-group {
 }
 
 .radial-button {
+    padding: 0;
     position: absolute;
-    top: 0;
+    top: 150px;
     left: 0;
     cursor: pointer;
     border-radius: 50%;
     height: 15px;
     width: 15px;
     box-shadow: 0 0 4px 4px white;
-    
-    -webkit-transform-origin: 75px 75px;
-    transform-origin: 75px 75px;
+    transition: all 0.1s;
+    -webkit-transform-origin: 75px -75px;
+    transform-origin: 75px -75px;
+
 }
+
+        .radial-button:active {
+            box-shadow: 0 0 4px 4px limegreen;
+        }
 
 .label-ball {
     -webkit-transition: all 0.5s ease;
@@ -446,6 +458,7 @@ blockquote {
     -ms-user-select: none;
     user-select: none;
 }
+
 a.disabled {
     color: #333333;
     cursor: default;
