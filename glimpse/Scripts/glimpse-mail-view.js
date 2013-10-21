@@ -103,6 +103,7 @@ function setMailViewerActions() {
 
         var circle = currentCircle;
 
+        $("#email-from").html(circle.data('mailaccount'));
         $("#email-to").html(circle.data('from'));
 
         setConversationOfMail(circle, currentBody, 'RE: ');
@@ -115,6 +116,7 @@ function setMailViewerActions() {
 
         var circle = currentCircle;
 
+        $("#email-from").html(circle.data('mailaccount'));
         $("#email-to").html(circle.data('from') + ', ' + circle.data('to') + ', ' + circle.data('cc'));
 
         setConversationOfMail(circle, currentBody, 'RE: ');
@@ -127,6 +129,7 @@ function setMailViewerActions() {
 
         var circle = currentCircle;
 
+        $("#email-from").html(circle.data('mailaccount'));
         $("#email-to").html('');
 
         setConversationOfMail(circle, currentBody, 'FW: ');
