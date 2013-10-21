@@ -259,6 +259,10 @@ div.icons {
     left: 10px;
 }
 
+.label-color-picker {
+    width: 20px;
+}
+
 .label-glimpse {
     margin-top: 2px;
     display: block;

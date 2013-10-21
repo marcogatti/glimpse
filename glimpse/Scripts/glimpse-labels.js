@@ -399,7 +399,7 @@ function appendCustomLabel(name) {
         title: 'Color',
         trigger: 'click',
         html: true,
-        content: "<input type='color' value='#ff0000' onchange=''>"
+        content: "<input type='color' class='label-color-picker' id='"+ name + "-picker' onchange='changeLabelColor(this);'>"
     });
 
     labelToAppend.hover(function () {
@@ -411,6 +411,18 @@ function appendCustomLabel(name) {
     setLabelSelection(labelToAppend);
 
     $(".custom-label:last-of-type").after(labelToAppend);
+}
+
+function changeLabelColor(colorPicker) {
+    var targetLabelName = colorPicker.id.split("-")[0];
+    var targetLabel = $(".custom-label[data-name='" + targetLabelName + "']");
+    paintLabel(targetLabel, colorPicker.value);
+
+    $(".circle").each(function () {
+        if (hasLabel($(this), targetLabelName)) {
+            calculateEmailColor($(this));
+        }
+    });
 }
 
 function exists(label) {
