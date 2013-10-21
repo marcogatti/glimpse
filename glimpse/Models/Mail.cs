@@ -141,8 +141,6 @@ namespace Glimpse.Models
         {
             Label trashLabel = Label.FindBySystemName(new MailAccount(this.Entity.MailAccountEntity), "Trash", session);
             this.AddLabel(trashLabel, session);
-
-
         }
     }
 }

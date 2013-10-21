@@ -9,6 +9,7 @@ using NHibernate.Criterion;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Linq;
 using System.Web;
 
 namespace Glimpse.Models
@@ -21,10 +22,9 @@ namespace Glimpse.Models
 
         #region Public Methods
         public MailAccount(String address, String password) : this(new MailAccountEntity(address, password)) { }
-        public MailAccount(MailAccountEntity accountEntity, Boolean isActive = true)
+        public MailAccount(MailAccountEntity accountEntity)
         {
             this.Entity = accountEntity;
-            this.Entity.Active = isActive;
             this.MySender = new Sender(this.Entity.Address, this.Entity.Password);
         }
         public MailAccount Clone()
@@ -37,7 +37,7 @@ namespace Glimpse.Models
                 mailAccountClone = new MailAccount(entity);
 
                 if (this.IsConnected())
-                    mailAccountClone.ConnectFull();
+                    mailAccountClone.ConnectFull(session);
                 session.Close();
             }
             return mailAccountClone;
@@ -99,9 +99,7 @@ namespace Glimpse.Models
             {
                 String[] labelsName = tagsNames.Split(new String[] { "," }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (String label in labelsName)
-                {
                     this.RegisterLabel(label, session, databaseLabels);
-                }
             }
             this.SetFetcherLabels(session);
         }
@@ -198,14 +196,10 @@ namespace Glimpse.Models
             if (this.MyFetcher == null || !this.MyFetcher.IsConnected())
                 this.MyFetcher = new Fetcher(this.Entity.Address, this.Entity.Password);
         }
-        public void ConnectFull()
+        public void ConnectFull(ISession session)
         {
             this.ConnectLight();
-            using (ISession session = NHibernateManager.OpenSession())
-            {
-                this.UpdateLabels(session);
-                session.Close();
-            }
+            this.UpdateLabels(session);
         }
         public void Disconnect()
         {
@@ -287,6 +281,7 @@ namespace Glimpse.Models
             MailAccount oldAccount = MailAccount.FindByAddress(this.Entity.Address, session, false);
             if (oldAccount != null)
             {
+                oldAccount.Entity.User = this.Entity.User;
                 oldAccount.Entity.Address = this.Entity.Address;
                 oldAccount.Entity.Password = this.Entity.Password;
                 oldAccount.Entity.IsMainAccount = this.Entity.IsMainAccount;
@@ -313,7 +308,7 @@ namespace Glimpse.Models
             if (account == null)
                 return null;
             else
-                return new MailAccount(account, false);
+                return new MailAccount(account);
         }
         public static MailAccount FindMainMailAccount(String username, ISession session)
         {
@@ -347,22 +342,15 @@ namespace Glimpse.Models
         }
         private void RegisterLabel(String labelName, ISession session, IList<LabelEntity> databaseLabels, String systemName = null)
         {
-            if (labelName == null)
+            if (labelName == null || databaseLabels.Any(x => x.Name == labelName))
                 return;
+            
             LabelEntity labelEntity = new LabelEntity();
-
-            foreach (LabelEntity databaseLabel in databaseLabels)
-            {
-                if (databaseLabel.Name == labelName)
-                {
-                    return;
-                }
-            }
-
             labelEntity.Name = labelName;
             labelEntity.MailAccountEntity = this.Entity;
             labelEntity.SystemName = systemName;
             labelEntity.Active = true;
+
             Label label = new Label(labelEntity);
             label.SaveOrUpdate(session);
         }

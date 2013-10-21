@@ -36,7 +36,7 @@ namespace Glimpse.MailInterfaces
                 mailAccountAll = MailAccount.FindByAddress(mailAddress, session, false);
                 try
                 {
-                    mailAccountAll.ConnectFull();
+                    mailAccountAll.ConnectFull(session);
                 }
                 catch (NullReferenceException exc)
                 {
@@ -120,7 +120,7 @@ namespace Glimpse.MailInterfaces
                 mailAccountTrash = MailAccount.FindByAddress(mailAddress, session, false);
                 try
                 {
-                    mailAccountTrash.ConnectFull();
+                    mailAccountTrash.ConnectFull(session);
                 }
                 catch (NullReferenceException exc)
                 {

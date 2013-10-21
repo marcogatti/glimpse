@@ -19,10 +19,10 @@ function mailSendingConnectionFailed(jqXHR, textStatus, errorThrown) {
     alert("Falló el envío del mail, por favor intentelo nuevamente más tarde.");
 }
 
-function sendEmailAsync(toAddres, subject, body) {
+function sendEmailAsync(toAddress, subject, body) {
 
     var sendInfo = {
-        ToAddress: toAddres,
+        ToAddress: toAddress,
         Subject: subject,
         Body: body
     };
@@ -64,7 +64,9 @@ function prepareComposeDialog() {
         {
             text: "Enviar",
             click: function () {
-                sendEmailAsync($("#email-to").val(), $("#email-subject").val(), editor.getData());
+                sendEmailAsync($("#email-to").val(),
+                               $("#email-subject").val(),
+                               editor.getData());
             }
         }
         ]
