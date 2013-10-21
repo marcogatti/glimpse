@@ -55,7 +55,6 @@ function populateLabelColors() {
         }
     });
 
-    setLabelSelection();
     setMailBoxSelection();
 }
 
@@ -267,8 +266,8 @@ function chooseCirclesToBeShown() {
     });
 }
 
-function setLabelSelection() {
-    $(".custom-label").on('click', function () {
+function setLabelSelection(label) {
+    label.on('click', function () {
         $(this).toggleClass('label-hidden');
         chooseCirclesToBeShown();
     });
@@ -367,9 +366,9 @@ function validSystemLabel(label) {
 
 function loadLabels() {
 
-    $(".nav-header:contains('Etiquetas')").after(
-            "<li class='custom-label label label-glimpse' data-name='others'>Sin Etiqueta</li>"
-        );
+    var others = $("<li class='custom-label label label-glimpse' data-name='others'>Sin Etiqueta</li>");
+    setLabelSelection(others);
+    $(".nav-header:contains('Etiquetas')").after(others);
 
     for (var i = labels.length - 1; i >= 0; i--) {
 
@@ -392,24 +391,55 @@ function loadLabels() {
 }
 
 function appendCustomLabel(name) {
-    $(".custom-label:last-of-type").after(
-                "<li class='custom-label label label-glimpse' data-name='" + name + "'>" + name + "</li>"
-            );
+
+    var labelToAppend = $("<li class='custom-label label label-glimpse' data-name='" + name + "'>" + name +
+        '<span class="pull-right hidden" title="Editar"><i class="icon-edit icon-white"></i><i class="icon-remove icon-white"></i></span></li>');
+
+    labelToAppend.find(".icon-edit").popover({
+        title: 'Color',
+        trigger: 'click',
+        html: true,
+        content: "<input type='color' value='#ff0000' onchange=''>"
+    });
+
+    labelToAppend.hover(function () {
+        labelToAppend.find("span").toggleClass("hidden");
+    });
+    labelToAppend.find("span").on('click', function (e) {
+        e.stopPropagation();
+    });
+    setLabelSelection(labelToAppend);
+
+    $(".custom-label:last-of-type").after(labelToAppend);
+}
+
+function exists(label) {
+
+    for(var i = 0; i<labels.length; i++){
+        if (labels[i].showName === label) {
+            return true;
+        }
+    }
+    return false;
 }
 
 function createCustomLabel(labelName) {
 
-    appendCustomLabel(labelName);
+    if (!exists(labelName)) {
+        appendCustomLabel(labelName);
 
-    $.ajax({
-        type: "POST",
-        url: "async/CreateLabel",
-        dataType: 'json',
-        data: { labelName: labelName }
+        $.ajax({
+            type: "POST",
+            url: "async/CreateLabel",
+            dataType: 'json',
+            data: { labelName: labelName }
 
-    }).fail(function(){
-        alert("No fue posible crear la etiqueta");
-    });
+        }).fail(function () {
+            alert("No fue posible crear la etiqueta");
+        });
+    } else {
+        alert("Ya hay una etiqueta del mismo nombre");
+    }
 }
 
 function removeLabelFromCircleInServer(labelName, mailId, isSystemLabel, mailAccountId) {

@@ -82,6 +82,9 @@ div.field-group {
     overflow-y: auto;
     overflow-x: hidden;
 }
+#labels-header {
+    padding: 2px;
+}
 
 #main-labels-cont {
     height: 366px;
@@ -104,17 +107,6 @@ div.field-group {
     .centered .pre {
         font-size: xx-small;
     }
-
-.circle.new {
-    /*animation-duration: 0.2s;
-    animation-name: blink;
-    animation-iteration-count: infinite;
-    animation-direction: alternate;
-    -webkit-animation-duration: 0.2s;
-    -webkit-animation-name: blink;
-    -webkit-animation-iteration-count: infinite;
-    -webkit-animation-direction: alternate;*/
-}
 
 @-webkit-keyframes blink {
     from {
@@ -272,6 +264,7 @@ div.icons {
     display: block;
     cursor: pointer;
     overflow: hidden;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
 }
 
     .label-glimpse:hover {
@@ -284,6 +277,10 @@ div.icons {
     -moz-box-shadow: inset 0 0 8px 8px rgba(0,0,0,0.7);
     -o-box-shadow: inset 0 0 8px 8px rgba(0,0,0,0.7);
     -ms-box-shadow: inset 0 0 8px 8px rgba(0,0,0,0.7);
+}
+
+.custom-label [class^='icon']:hover {
+    background-color: rgba(0, 0, 0, 0.5);
 }
 
 #labels-header {
