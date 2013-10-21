@@ -49,16 +49,19 @@ function populateLabelColors() {
 
         var currentColor = glimpseColors[i];
 
-        if (!$(this).data("system") && $(this).data("name") !== "others") {
-
-            $(this).css("background-color", currentColor);
-            labelColors[$(this).data("name")] = currentColor;
+        if ($(this).data("name") !== "others") {
+            paintLabel($(this), currentColor);
             i++;
         }
     });
 
     setLabelSelection();
     setMailBoxSelection();
+}
+
+function paintLabel(labelElement, color) {
+    labelElement.css("background-color", color);
+    labelColors[labelElement.data("name")] = color;;
 }
 
 function labelDrag(ev) {
@@ -220,6 +223,37 @@ function removeSystemLabelFromCircle(circle, label) {
 
 function setEverithingRelatedToAddLabelsToAMail() {
     setLabelsAdder();
+    setLabelPencil();
+}
+
+function setLabelPencil() {
+    $("#create-label").popover({
+        html: true,
+        content: "<div class='form-inline'><input type='text' id='create-label-textbox' class='input-small'>" +
+            "<div id='create-label-submit' class='btn'>Crear</div></div>"
+    });
+
+    $("#create-label").on('click', function () {
+        setLabelCreationForm();
+    });
+
+}
+
+function setLabelCreationForm() {
+
+    $("#create-label-textbox").on('keyup', function (e) {
+        e.preventDefault();
+        if (e.keyCode === 13) {
+            $('#create-label-submit').click();
+        }
+    });
+
+    $('#create-label-submit').on('click', function () {
+        var newLabel = $("#create-label-textbox").val();
+        createCustomLabel(newLabel);
+        $("#create-label").popover('hide');
+        setLabelsAdder();
+    });
 }
 
 function chooseCirclesToBeShown() {
@@ -329,13 +363,16 @@ function validSystemLabel(label) {
 
 function loadLabels() {
 
+    $(".nav-header:contains('Etiquetas')").after(
+            "<li class='custom-label label label-glimpse' data-name='others'>Sin Etiqueta</li>"
+        );
+
     for (var i = labels.length - 1; i >= 0; i--) {
 
         var currentLabel = labels[i];
         if (currentLabel.systemName === null) {
-            $(".nav-header:contains('Etiquetas')").after(
-                "<li class='custom-label label label-glimpse' data-name='" + currentLabel.showName + "'>" + currentLabel.showName + "</li>"
-            );
+            appendCustomLabel(currentLabel.showName);
+            
         } else
             if (validSystemLabel(currentLabel)) {
 
@@ -348,19 +385,35 @@ function loadLabels() {
 
     $(".mailbox:contains('INBOX')").removeClass("label-hidden");
 
-
-    $(".nav-header:contains('Etiquetas')").after(
-                "<li class='custom-label label label-glimpse' data-name='others'>Sin etiqueta</li>"
-            );
-
 }
 
-function removeLabelFromCircleInServer(label, mailId, isSystemLabel, mailAccountId) {
+function appendCustomLabel(name) {
+    $(".custom-label:last-of-type").after(
+                "<li class='custom-label label label-glimpse' data-name='" + name + "'>" + name + "</li>"
+            );
+}
+
+function createCustomLabel(labelName) {
+
+    appendCustomLabel(labelName);
+
+    $.ajax({
+        type: "POST",
+        url: "async/CreateLabel",
+        dataType: 'json',
+        data: { labelName: labelName }
+
+    }).fail(function(){
+        alert("No fue posible crear la etiqueta");
+    });
+}
+
+function removeLabelFromCircleInServer(labelName, mailId, isSystemLabel, mailAccountId) {
     $.ajax({
         type: "POST",
         url: "async/RemoveLabel",
         dataType: 'json',
-        data: { labelName: label, mailId: mailId, isSystemLabel: isSystemLabel, mailAccountId: mailAccountId }
+        data: { labelName: labelName, mailId: mailId, isSystemLabel: isSystemLabel, mailAccountId: mailAccountId }
     });
 }
 

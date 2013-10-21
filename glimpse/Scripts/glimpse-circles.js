@@ -165,10 +165,10 @@ function putButtons(circle) {
     circle.prepend(buttons);
 
     $(".circle > .icon-plus-sign").on('click', function () {
-        changeImportance($(this).parent(), true)
+        changeImportance($(this).parent(), true);
     });
     $(".circle > .icon-minus-sign").on('click', function () {
-        changeImportance($(this).parent(), false)
+        changeImportance($(this).parent(), false);
     });
 }
     

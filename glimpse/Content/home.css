@@ -269,6 +269,7 @@ div.icons {
     margin-top: 2px;
     display: block;
     cursor: pointer;
+    overflow: hidden;
 }
 
     .label-glimpse:hover {
@@ -285,6 +286,10 @@ div.icons {
 
 #labels-header {
     margin-top: 10px;
+}
+
+#create-label {
+    cursor: pointer;
 }
 
 .compose-text {
