@@ -76,7 +76,7 @@ function prepareComposeDialog() {
 
         compose_panel.find('#email-from').html(mainMailAccountId);
 
-        compose_panel.dialog("open");
+        displayComposeDialog();
 
     });
 }
