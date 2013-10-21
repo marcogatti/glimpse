@@ -48,7 +48,7 @@ namespace Glimpse.Controllers
                     try
                     {
                         if (!mailAccount.IsFullyConnected())
-                            mailAccount.ConnectFull();
+                            mailAccount.ConnectFull(session);
                         Task.Factory.StartNew(() => MailsTasksHandler.StartSynchronization(mailAccount.Entity.Address));     
                     }
                     catch (InvalidAuthenticationException exc)

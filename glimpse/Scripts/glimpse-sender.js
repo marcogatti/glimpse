@@ -19,10 +19,10 @@ function mailSendingConnectionFailed(jqXHR, textStatus, errorThrown) {
     alert("Falló el envío del mail, por favor intentelo nuevamente más tarde.");
 }
 
-function sendEmailAsync(fromAccountId, toAddres, subject, body) {
+function sendEmailAsync(fromAccountId, toAddress, subject, body) {
 
     var sendInfo = {
-        ToAddress: toAddres,
+        ToAddress: toAddress,
         Subject: subject,
         Body: body,
         mailAccountId: fromAccountId
