@@ -1,8 +1,11 @@
-﻿function initializeMailAccountToggles() {
+﻿var activeMailAccounts = {};
+
+function initializeMailAccountToggles() {
 
     var mailAccountsContainer = $('#mailaccounts-container');
 
     prepareMailAccountToggles(mailAccountsContainer);
+    initializeMailAccountActivenessVector(mailAccountsContainer);
     setTogglesAction(mailAccountsContainer);
 
 }
@@ -31,11 +34,13 @@ function setTogglesAction(mailAccountsContainer) {
 
             if (mailAccountToggle.hasClass('active')) {
                 mailAccountToggle.removeClass('active');
-                hideMailAccount(mailAccountId);
             } else {
                 mailAccountToggle.addClass('active');
-                showMailAccount(mailAccountId);
             }
+
+            activeMailAccounts[mailAccountToggle.data('mailaccount-id')] = mailAccountToggle.hasClass('active');
+
+            chooseCirclesToBeShown();
         });
     });
 
@@ -65,6 +70,16 @@ function mailAccountToggleAdd(container, mailAccount, isMainAccount) {
 
     accountToggle.append(mailAccount.address);
     accountItem.append(accountToggle);
-    accountItem.data('mailaccount-id', mailAccount.mailAccountId);
+    accountItem.attr("data-mailaccount-id", mailAccount.mailAccountId);
     container.find('ul').append(accountItem);
+}
+
+function initializeMailAccountActivenessVector(container) {
+
+    container.find('li').each(function () {
+
+        var accountItem = $(this);
+
+        activeMailAccounts[accountItem.data('mailaccount-id')] = accountItem.hasClass('active');
+    });
 }

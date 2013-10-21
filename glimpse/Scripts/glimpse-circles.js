@@ -393,10 +393,3 @@ function deleteCircleInServer(circle){
         data: { id: circle.data('id'), mailAccountId: circle.data('mailaccount') }
     });
 }
-
-function showMailAccount(mailAccountId) {
-
-}
-function hideMailAccount(mailAccountId) {
-
-}
