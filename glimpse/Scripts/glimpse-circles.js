@@ -2,8 +2,6 @@
 
 function insertCircle(value) {
 
-    var spinner = "";
-
     if (ownedCircles.indexOf(value.id) === -1) {
         ownedCircles.push(value.id);
 
@@ -12,10 +10,6 @@ function insertCircle(value) {
         }
 
         var date = new Date(parseInt(value.date.substr(6))).toGMTString();
-
-        if (!value.seen) {
-            spinner = '<div class="loading"><div class="spinner"><div class="mask"><div class="maskedCircle"></div></div></div></div>';
-        }
 
         var systemLabels = [],
             customLabels = [];
@@ -43,12 +37,14 @@ function insertCircle(value) {
             " data-importance=", value.importance,
             " data-custom-labels=", customLabels,
             " data-system-labels=", systemLabels,
-            " data-mailaccount=", value.mailaccount
+            " data-mailaccount=", value.mailaccount,
+            " data-seen=", value.seen
         ];
 
-        var newCircle = $("<div class='circle'" + dataAttributes.join("'") + "' title='" + value.from.address + "'>" + spinner +
+        var newCircle = $("<div class='circle'" + dataAttributes.join("'") + "' title='" + value.from.address + "'>" +
             "<div class='centered'><p content=true>" + value.subject.substr(0, 30) + "</p></div></div>");
 
+        setSeenStatus(newCircle);
         calculateEmailColor(newCircle);
         newCircle.css("opacity", 0);
         $("#email-container").append(newCircle);
@@ -156,13 +152,20 @@ function putLabelBalls(circle) {
 function putButtons(circle) {
 
     var buttons = $(
-    "<div class='radial-button icon-plus-sign' style='" + rotation(30) + "'></div>" +
+    "<div class='radial-button icon-plus-sign' title='Sumar importacia' style='" + rotation(30) + "'></div>" +
     "<div class='radial-button icon-minus-sign' style='" + rotation(15) + "'></div>" +
     "<div class='radial-button icon-trash' style='" + rotation(-15) + "'></div>" +
-    "<div class='radial-button icon-comment' style='" + rotation(-30) + "'></div>"
+    "<div class='radial-button icon-comment' style='" + rotation(-30) + "'></div>" +
+    "<div class='radial-button icon-eye-close' title='Marcar como no leído' style='" + rotation(0) + "'></div>"
     );
 
     circle.prepend(buttons);
+
+    if (!circle.data("seen")) {
+        var eye = circle.find(".icon-eye-close");
+        toggleEye(eye);
+        eye.attr("title", "Marcar como leído");
+    }
 
     $(".circle > .icon-plus-sign").on('click', function () {
         changeImportance($(this).parent(), true);
@@ -170,6 +173,25 @@ function putButtons(circle) {
     $(".circle > .icon-minus-sign").on('click', function () {
         changeImportance($(this).parent(), false);
     });
+    $(".circle > .icon-eye-open").on('click', function () {
+        markAsRead(circle, true);
+        $(this).attr("title", "Marcar como no leído");
+        $.getJSON("async/GetMailBody", { id: circle.data('id'), mailAccountId: circle.data('mailaccount') });
+        toggleEye($(this));
+    });
+    $(".circle > .icon-eye-close").on('click', function () {
+        markAsRead(circle, false);
+        $(this).attr("title", "Marcar como leído");
+        toggleEye($(this));
+    });
+    $(".circle > .icon-trash").on('click', function () {
+    });
+    $(".circle > .icon-comment").on('click', function () {
+    });
+}
+
+function toggleEye(eyeIcon) {
+    eyeIcon.toggleClass("icon-eye-close icon-eye-open");
 }
     
 function checkIconHide(currentImportance, limit, iconToHide) {
@@ -289,8 +311,18 @@ function configureCircleHover(circle) {
         })
 }
 
-function markAsRead(circle) {
-    circle.find(".loading").remove();
+function markAsRead(circle, seen) {
+    circle.data("seen", seen);
+    setSeenStatus(circle);
+}
+
+function setSeenStatus(circle) {
+    if (!circle.data("seen")) {
+        var spinner = '<div class="loading"><div class="spinner"><div class="mask"><div class="maskedCircle"></div></div></div></div>';
+        circle.prepend(spinner);
+    } else {
+        circle.find(".loading").remove();
+    }
 }
 
 function calculateEmailColor(circle) {
