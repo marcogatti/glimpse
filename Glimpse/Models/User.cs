@@ -53,9 +53,7 @@ namespace Glimpse.Models
                                                                   .Add(Restrictions.Eq("Active", true))
                                                                   .List<MailAccountEntity>();
             foreach (MailAccountEntity entity in mailAccountEntities)
-            {
                 databaseMailAccounts.Add(new MailAccount(entity));
-            }
             this.mailAccounts = databaseMailAccounts;
         }
         public void UpdateLabels(ISession session)

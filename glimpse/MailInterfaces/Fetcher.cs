@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -289,7 +290,14 @@ namespace Glimpse.MailInterfaces
 
         public void CloseClient()
         {
-            this.Receiver.Disconnect();
+            try
+            {
+                this.Receiver.Disconnect();
+            }
+            catch (IOException exc) //imap cerro la conexion por algun motivo
+            {
+                Log.LogException(exc);
+            }
         }
         public void Dispose()
         {
@@ -524,9 +532,8 @@ namespace Glimpse.MailInterfaces
         private void ReplaceLabelName(String oldLabel, String newLabel)
         {
             this.AccountMailboxesBySpecialProperty["Tags"] = this.AccountMailboxesBySpecialProperty["Tags"].Replace(oldLabel, newLabel);
-            if (this.AccountLabels != null)
-                this.AccountLabels.Where(x => x.Name == oldLabel).Single().Name = newLabel;
-            
+            foreach (LabelEntity accountLabel in this.AccountLabels.Where(x => x.Name.Contains(oldLabel)))
+                accountLabel.Name = accountLabel.Name.Replace(oldLabel, newLabel);
         }
         private void RemoveLabel(String labelName)
         {

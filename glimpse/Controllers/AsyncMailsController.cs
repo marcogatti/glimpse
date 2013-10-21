@@ -12,6 +12,7 @@ using NHibernate.Criterion;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web;
 using System.Web.Mvc;
 
 namespace Glimpse.Controllers
@@ -77,11 +78,14 @@ namespace Glimpse.Controllers
             ISession session = NHibernateManager.OpenSession();
             try
             {
-                MailCollection mails;
+                MailCollection accountMails;
                 List<Object> mailsToReturn = new List<object>();
-                MailAccount currentMailAccount = this.GetMailAccount(mailAccountId);
-                mails = new MailCollection(currentMailAccount.GetMailsByDate(initialDate, finalDate, session));
-                mailsToReturn = this.PrepareHomeMails(mails);
+                User currentUser = (User)Session[AccountController.USER_NAME];
+                foreach (MailAccount mailAccount in currentUser.GetAccounts())
+                {
+                    accountMails = new MailCollection(mailAccount.GetMailsByDate(initialDate, finalDate, session));
+                    mailsToReturn.AddRange(this.PrepareHomeMails(accountMails));
+                }
 
                 JsonResult result = Json(new { success = true, mails = mailsToReturn }, JsonRequestBehavior.AllowGet);
                 return result;
@@ -167,18 +171,30 @@ namespace Glimpse.Controllers
             try
             {
                 MailAccount mailAccount = this.GetMailAccount(mailAccountId);
-                mailAccount.SendMail(sendInfo.ToAddress, sendInfo.Body, sendInfo.Subject);
+                List<HttpPostedFile> uploadedFiles = new List<HttpPostedFile>();
+                foreach (HttpPostedFile file in this.Request.Files)
+                {
+                    if (file.ContentType == "application/octet-stream" || file.ContentType == "application/exe")
+                        throw new GlimpseException("No se pueden enviar archivos adjuntos del tipo ejecutable.");
+                    else if (file.ContentLength > 0)
+                        uploadedFiles.Add(file);
+                }
+
+                mailAccount.SendMail(sendInfo.ToAddress, sendInfo.Body, sendInfo.Subject, uploadedFiles);
                 return Json(new { success = true, address = sendInfo.ToAddress }, JsonRequestBehavior.AllowGet);
             }
             catch (InvalidRecipientsException exc)
             {
-                Log.LogException(exc, "Parametros del mail a enviar: subjectMail(" + sendInfo.Subject + "), addressMail(" + sendInfo.ToAddress + ").");
                 return Json(new { success = false, address = sendInfo.ToAddress }, JsonRequestBehavior.AllowGet);
             }
             catch (SmtpException exc)
             {
                 Log.LogException(exc, "Parametros del mail a enviar: subjectMail(" + sendInfo.Subject + "), addressMail(" + sendInfo.ToAddress + ").");
                 return Json(new { success = false, address = sendInfo.ToAddress }, JsonRequestBehavior.AllowGet);
+            }
+            catch (GlimpseException exc)
+            {
+                return Json(new { success = false, address = exc.GlimpseMessage }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception exc)
             {
@@ -264,9 +280,7 @@ namespace Glimpse.Controllers
                 IList<LabelEntity> labels = Label.FindByAccount(currentMailAccount.Entity, session);
                 labels = labels.Where(x => x.Name.Contains(oldLabelName) && x.SystemName == null).ToList();
                 foreach (LabelEntity label in labels)
-                {
                     new Label(label).Rename(oldLabelName, newLabelName, session); //BD
-                }
                 currentMailAccount.RenameLabel(oldLabelName, newLabelName); //IMAP
                 tran.Commit();
 
@@ -293,8 +307,14 @@ namespace Glimpse.Controllers
             ITransaction tran = session.BeginTransaction();
             try
             {
-                MailAccount currentMailAccount = this.GetMailAccount(mailAccountId);
-                Label existingLabel = Label.FindByName(currentMailAccount, labelName, session);
+                MailAccount labelAccount;
+                
+                if (mailAccountId != 0)
+                    labelAccount = this.GetMailAccount(mailAccountId);
+                else
+                    labelAccount = this.GetMainMailAccount();
+
+                Label existingLabel = Label.FindByName(labelAccount, labelName, session);
                 if (existingLabel != null)
                     return Json(new { success = false, message = "Ya existe una etiqueta con ese nombre." }, JsonRequestBehavior.AllowGet);
                 Label newLabel = new Label(new LabelEntity());
@@ -302,7 +322,7 @@ namespace Glimpse.Controllers
                 newLabel.Entity.Name = labelName;
                 newLabel.Entity.Active = true;
                 newLabel.SaveOrUpdate(session); //BD
-                currentMailAccount.CreateLabel(labelName); //IMAP
+                labelAccount.CreateLabel(labelName); //IMAP
                 tran.Commit();
 
                 return Json(new { success = true }, JsonRequestBehavior.AllowGet);
@@ -328,12 +348,13 @@ namespace Glimpse.Controllers
             {
                 MailAccount currentMailAccount = this.GetMailAccount(mailAccountId);
                 Label labelToDelete = Label.FindByName(currentMailAccount, labelName, session);
+                if(labelToDelete == null)
+                    return Json(new { success = true, message = "No se encontro la etiqueta." }, JsonRequestBehavior.AllowGet);
                 labelToDelete.Delete(session); //BD
                 currentMailAccount.DeleteLabel(labelName); //IMAP
                 tran.Commit();
 
-                JsonResult result = Json(new { success = true }, JsonRequestBehavior.AllowGet);
-                return result;
+                return Json(new { success = true }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception exc)
             {
@@ -518,6 +539,15 @@ namespace Glimpse.Controllers
                 return mailAccounts.Where<MailAccount>(x => x.Entity.Id == id).Single<MailAccount>();
             else
                 return mailAccounts[0]; //harcodeado para que funcione hasta que la vista mande los ids
+        }
+        private MailAccount GetMainMailAccount()
+        {
+            User currentUser = (User)Session[AccountController.USER_NAME];
+            IList<MailAccount> currentMailAccounts = currentUser.GetAccounts();
+            if (currentMailAccounts.Count == 1)
+                return currentMailAccounts[0];
+            else
+                return currentMailAccounts.First(x => x.Entity.IsMainAccount == true);
         }
         private Label GetAccountLabel(String labelName, MailAccount possibleMainAccount, ISession session)
         {

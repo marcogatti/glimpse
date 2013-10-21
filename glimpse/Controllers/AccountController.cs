@@ -74,7 +74,7 @@ namespace Glimpse.Controllers
                         user = new User(userView.Username, cipherPassword);
                         user.SaveOrUpdate(session);
                     }
-                    else if (user.Entity.Password != cipherPassword)
+                    else if (!CryptoHelper.PasswordsMatch(user.Entity.Password, cipherPassword))
                     {
                         user.Entity.Password = cipherPassword;
                         user.SaveOrUpdate(session);
@@ -194,12 +194,12 @@ namespace Glimpse.Controllers
                 userView.Firstname = firstname;
                 userView.Lastname = lastname;
                 userView.ListMailAccounts = mailAccountsView;
-                userView.FilterNullAccounts();
+                userView.FilterInvalidAccounts();
                 #endregion
 
                 this.UpdateModel(userView); //corre todos los regex
                 this.ValidateUserGenericFields(userView, session); //usuarioGlimpse y contraseñas de usuario
-                mailAccounts = this.ValidateUserMailAccounts(userView, session); //direcciones de correo y contraseñas
+                mailAccounts = this.ValidateUserMailAccounts(userView, null, session); //direcciones de correo y contraseñas
 
                 String cipherPassword = CryptoHelper.EncryptDefaultKey(userView);
 
@@ -388,10 +388,10 @@ namespace Glimpse.Controllers
 
                 userView.Username = sessionUser.Entity.Username;
                 userView.ListMailAccounts = mailAccountsView;
-                userView.FilterNullAccounts();
+                userView.FilterInvalidAccounts();
                 #endregion
 
-                this.ValidateUserMailAccounts(userView, session); //direcciones de correo y contraseñas
+                this.ValidateUserMailAccounts(userView, sessionUser, session); //direcciones de correo y contraseñas
 
                 foreach (MailAccount removedMailAccount in sessionUser.mailAccounts
                             .Where(x => !userView.ListMailAccounts.Any(c => c.Address == x.Entity.Address)))
@@ -409,7 +409,8 @@ namespace Glimpse.Controllers
                     if (sessionUser.mailAccounts.Any(x => x.Entity.Address == mailAccountView.Address)) //si la cuenta ya existia
                     {
                         MailAccount editedMailAccount = sessionUser.mailAccounts.Where(x => x.Entity.Address == mailAccountView.Address).Single();
-                        editedMailAccount.Entity.Password = CryptoHelper.EncryptDefaultKey(mailAccountView);
+                        if(!String.IsNullOrEmpty(mailAccountView.Password))
+                            editedMailAccount.Entity.Password = CryptoHelper.EncryptDefaultKey(mailAccountView);
                         editedMailAccount.SetUser(sessionUser);
                         editedMailAccount.ConnectLight();
                         if (mailAccountView.IsMainAccount)
@@ -426,8 +427,9 @@ namespace Glimpse.Controllers
                             newMailAccount.SetAsMainAccount(true);
                         else
                             newMailAccount.SetAsMainAccount(false);
+                        newMailAccount.SetOldestMailDate();
                         newMailAccount.Activate(session); //saveOrUpdate adentro
-                        newMailAccount.ConnectFull();
+                        newMailAccount.ConnectFull(session);
                         sessionUser.AddAccount(newMailAccount);
                     }
                 }
@@ -589,7 +591,7 @@ namespace Glimpse.Controllers
             return builder.ToString();
         }
         [NonAction]
-        private IList<MailAccount> ValidateUserMailAccounts(UserViewModel userView, ISession session)
+        private IList<MailAccount> ValidateUserMailAccounts(UserViewModel userView, User actualUser, ISession session)
         {
             String exceptionMessage = "";
             Boolean hasMainAccount = false;
@@ -603,7 +605,13 @@ namespace Glimpse.Controllers
                 #region Valida Credenciales
                 try
                 {
-                    mailAccount = new MailAccount(mailAccountView.Address, CryptoHelper.EncryptDefaultKey(mailAccountView));
+
+                    if (actualUser != null && String.IsNullOrEmpty(mailAccountView.Password) &&
+                         actualUser.GetAccounts().Any(x => x.Entity.Address == mailAccountView.Address)) //si el usuario ya tiene la cuenta y el password esta vacio
+                        mailAccount = new MailAccount(mailAccountView.Address, actualUser.GetAccounts().Where(x => x.Entity.Address == mailAccountView.Address).Single().Entity.Password);
+                    else
+                        mailAccount = new MailAccount(mailAccountView.Address, CryptoHelper.EncryptDefaultKey(mailAccountView));
+                        
                     mailAccount.ConnectLight(); //si pasa este punto es que esta bien y va a ser devuelta
                     if (mailAccountView.IsMainAccount)
                         mailAccount.SetAsMainAccount(true);

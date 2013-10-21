@@ -48,7 +48,7 @@ namespace Glimpse.Controllers
                     try
                     {
                         if (!mailAccount.IsFullyConnected())
-                            mailAccount.ConnectFull();
+                            mailAccount.ConnectFull(session);
                         Task.Factory.StartNew(() => MailsTasksHandler.StartSynchronization(mailAccount.Entity.Address));     
                     }
                     catch (InvalidAuthenticationException exc)
@@ -79,7 +79,9 @@ namespace Glimpse.Controllers
                 ViewBag.Country = sessionUser.Entity.Country ?? "";
                 ViewBag.City = sessionUser.Entity.City ?? "";
                 ViewBag.Telephone = sessionUser.Entity.Telephone ?? "";
-                ViewBag.MailAccounts = sessionUser.GetAccounts().Select(x => new { address = x.Entity.Address, mainAccount = x.Entity.IsMainAccount });
+                ViewBag.MailAccounts = sessionUser.GetAccounts().Select(x => new { address = x.Entity.Address, 
+                                                                                   mainAccount = x.Entity.IsMainAccount, 
+                                                                                   mailAccountId = x.Entity.Id });
                 ViewBag.IsGlimpseUser = Glimpse.Models.User.IsGlimpseUser(sessionUser.Entity.Username);
 
                 return View();

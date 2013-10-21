@@ -19,12 +19,13 @@ function mailSendingConnectionFailed(jqXHR, textStatus, errorThrown) {
     alert("Falló el envío del mail, por favor intentelo nuevamente más tarde.");
 }
 
-function sendEmailAsync(toAddres, subject, body) {
+function sendEmailAsync(fromAccountId, toAddress, subject, body) {
 
     var sendInfo = {
-        ToAddress: toAddres,
+        ToAddress: toAddress,
         Subject: subject,
-        Body: body
+        Body: body,
+        mailAccountId: fromAccountId
     };
 
     $.ajax({
@@ -64,13 +65,19 @@ function prepareComposeDialog() {
         {
             text: "Enviar",
             click: function () {
-                sendEmailAsync($("#email-to").val(), $("#email-subject").val(), editor.getData());
+                sendEmailAsync($('#email-from').html(), $("#email-to").val(), $("#email-subject").val(), editor.getData());
             }
         }
         ]
     });
     $("#compose").on("click", function () {
-        $("#compose_pannel").dialog("open");      
+        var compose_panel = $("#compose_pannel"),
+            mainMailAccountId = getMainAccount(user_mailAccounts);
+
+        compose_panel.find('#email-from').html(mainMailAccountId);
+
+        compose_panel.dialog("open");
+
     });
 }
 
