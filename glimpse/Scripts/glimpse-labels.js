@@ -172,7 +172,7 @@ function addLabelToEmail(label, circle) {
         type: "POST",
         url: "async/AddLabel",
         dataType: 'json',
-        data: { labelName: label, mailId: circle.data('id') }
+        data: { labelName: label, mailId: circle.data('id'), mailAccountId: circle.data('mailaccount') }
     });
 }
 

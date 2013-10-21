@@ -204,20 +204,20 @@ namespace Glimpse.Controllers
         }
         [HttpPost]
         [AjaxOnly]
-        public ActionResult AddLabel(String labelName, Int64 mailId, Int64 mailMailAccountId = 0)
+        public ActionResult AddLabel(String labelName, Int64 mailId, Int64 mailAccountId = 0)
         {
             ISession session = NHibernateManager.OpenSession();
             ITransaction tran = session.BeginTransaction();
             try
             {
-                MailAccount mailAccount = this.GetMailAccount(mailMailAccountId);
+                MailAccount mailAccount = this.GetMailAccount(mailAccountId);
                 Label theLabel = this.GetAccountLabel(labelName, mailAccount, session);
                 if(theLabel == null)
                     return Json(new { success = false, message = "No se ha podido encontrar la etiqueta con el nombre:" + labelName + "." }, JsonRequestBehavior.AllowGet);
                 Mail theMail = new Mail(mailId, session);
 
                 if (theMail.Entity.MailAccountEntity.Id != theLabel.Entity.MailAccountEntity.Id) //si el mail no es del mismo MailAccount de la etiqueta
-                    this.CreateLabel(labelName, mailMailAccountId); //DB e IMAP
+                    this.CreateLabel(labelName, mailAccountId); //DB e IMAP
 
                 theMail.AddLabel(theLabel, session); //DB
                 mailAccount.AddLabelIMAP(theMail, theLabel); //IMAP
@@ -229,7 +229,7 @@ namespace Glimpse.Controllers
             {
                 tran.Rollback();
                 Log.LogException(exc, "Parametros de la llamada: label(" + labelName + "), mailId(" +
-                                       mailId.ToString() + "), mailAccountId(" + mailMailAccountId + ").");
+                                       mailId.ToString() + "), mailAccountId(" + mailAccountId + ").");
                 return Json(new { success = false }, JsonRequestBehavior.AllowGet);
             }
             finally

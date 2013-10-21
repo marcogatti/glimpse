@@ -294,6 +294,8 @@ function setMailViewModalHeadData(view_modal, circle) {
     }
     view_modal.find("#mail-view-subject").html(data.subject);
     view_modal.find("#mail-view-date").html(date.toLocaleString());
+
+    setMailViewerLabels(view_modal, circle);
 }
 
 function setMailViewModalBodyData(view_modal, circle) {
