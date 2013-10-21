@@ -44,6 +44,8 @@ function setFullDisplay(circle) {
         var circle = $(this),
             view_modal = $("#mail-view");
 
+        currentCircle = circle;
+
         setMailViewModalHeadData(view_modal, circle)
 
         view_modal.modal("show");
