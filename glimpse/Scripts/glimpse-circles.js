@@ -167,18 +167,17 @@ function putButtons(circle) {
         eye.attr("title", "Marcar como leído");
     }
 
-    $(".circle > .icon-plus-sign").on('click', function () {
+    circle.find(".icon-plus-sign").on('click', function () {
         changeImportance($(this).parent(), true);
     });
-    $(".circle > .icon-minus-sign").on('click', function () {
+    circle.find(".icon-minus-sign").on('click', function () {
         changeImportance($(this).parent(), false);
     });
-    $(".circle > .icon-eye-open").on('click', function () {
+   circle.find(".icon-eye-open").on('click', function () {
         markAsRead(circle, true);
         $(this).attr("title", "Marcar como no leído");
-        $.getJSON("async/GetMailBody", { id: circle.data('id'), mailAccountId: circle.data('mailaccount') });
         toggleEye($(this));
-    });
+   });
     $(".circle > .icon-eye-close").on('click', function () {
         markAsRead(circle, false);
         $(this).attr("title", "Marcar como leído");
@@ -311,9 +310,14 @@ function configureCircleHover(circle) {
         })
 }
 
-function markAsRead(circle, seen) {
-    circle.data("seen", seen);
+function markAsRead(circle, seenFlag) {
+    circle.data("seen", seenFlag);
     setSeenStatus(circle);
+    $.ajax({
+        type: "POST",
+        url: "async/SetReadFlag",
+        data: { mailId: circle.data('id'), seenFlag: seenFlag, mailAccountId: circle.data("mailaccount") }
+    });
 }
 
 function setSeenStatus(circle) {
