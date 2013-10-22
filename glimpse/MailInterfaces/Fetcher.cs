@@ -360,34 +360,37 @@ namespace Glimpse.MailInterfaces
             AddressEntity fromAddress = new AddressEntity();
             fromAddress.MailAddress = retrievedMessage.From.Email;
             fromAddress.Name = retrievedMessage.From.Name;
+            retrievedMail.From = fromAddress;
 
             retrievedMail.Subject = retrievedMessage.Subject ?? "";
             retrievedMail.Date = retrievedMessage.Date;
+
+            String bodyPeek;
             if (retrievedMessage.BodyHtml.Text != "")
                 retrievedMail.Body = retrievedMessage.BodyHtml.Text;
             else
                 retrievedMail.Body = retrievedMessage.BodyText.Text;
 
-            string shortBody = retrievedMessage.BodyHtml.TextStripped;
-            shortBody = Regex.Replace(shortBody, @"\s+", " ");
-
-            if (shortBody.Length > 80)
-                retrievedMail.BodyPeek = shortBody.Substring(0, 80);
+            if (retrievedMessage.BodyText.Text != "")
+                bodyPeek = retrievedMessage.BodyText.TextStripped;
             else
-                retrievedMail.BodyPeek = shortBody;
+                bodyPeek = retrievedMessage.BodyHtml.TextStripped;
 
-            retrievedMail.From = fromAddress;
+            bodyPeek = Regex.Replace(bodyPeek, @"\s+", " ");
+
+            if (bodyPeek.Length > 80)
+                retrievedMail.BodyPeek = bodyPeek.Substring(0, 80);
+            else
+                retrievedMail.BodyPeek = bodyPeek;
 
             Boolean unknownPartsHaveAttachments = false;
             //check if UnknownDispositionMimeParts has real attachments
             foreach (MimePart unknownPart in retrievedMessage.UnknownDispositionMimeParts)
-            {
                 if (unknownPart.Filename != "" && unknownPart.IsBinary)
                 {
                     unknownPartsHaveAttachments = true;
                     break;
                 }
-            }
             retrievedMail.HasExtras = (retrievedMessage.Attachments.Count != 0
                                          || retrievedMessage.EmbeddedObjects.Count != 0
                                          || unknownPartsHaveAttachments);

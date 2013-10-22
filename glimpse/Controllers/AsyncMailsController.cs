@@ -217,12 +217,12 @@ namespace Glimpse.Controllers
                 Mail theMail = new Mail(mailId, session);
 
                 if (theMail.Entity.MailAccountEntity.Id != theLabel.Entity.MailAccountEntity.Id) //si el mail no es del mismo MailAccount de la etiqueta
-                    this.CreateLabel(labelName, mailAccountId); //DB e IMAP
+                    this.CreateLabel(labelName, theMail.Entity.MailAccountEntity.Id); //DB e IMAP
 
                 theMail.AddLabel(theLabel, session); //DB
-                mailAccount.AddLabelIMAP(theMail, theLabel); //IMAP
-
+                mailAccount.AddLabelFolder(theMail, theLabel); //IMAP
                 tran.Commit();
+
                 return Json(new { success = true }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception exc)
@@ -321,6 +321,7 @@ namespace Glimpse.Controllers
                 newLabel.Entity.SystemName = null;
                 newLabel.Entity.Name = labelName;
                 newLabel.Entity.Active = true;
+                newLabel.Entity.MailAccountEntity = labelAccount.Entity;
                 newLabel.SaveOrUpdate(session); //BD
                 labelAccount.CreateLabel(labelName); //IMAP
                 tran.Commit();
@@ -549,18 +550,18 @@ namespace Glimpse.Controllers
             else
                 return currentMailAccounts.First(x => x.Entity.IsMainAccount == true);
         }
-        private Label GetAccountLabel(String labelName, MailAccount possibleMainAccount, ISession session)
+        private Label GetAccountLabel(String labelName, MailAccount possibleLabelAccount, ISession session)
         {
             User user = (User)Session[AccountController.USER_NAME];
             IList<MailAccount> mailAccounts = user.GetAccounts();
 
             //busco en el mailAccount del mismo mail primero
-            IList<LabelEntity> accountLabels = Label.FindByAccount(possibleMainAccount.Entity, session);
+            IList<LabelEntity> accountLabels = Label.FindByAccount(possibleLabelAccount.Entity, session);
             if (accountLabels.Any(x => x.Name == labelName))
                 return new Label(accountLabels.Where(x => x.Name == labelName).Single());
 
             //si no esta, busco en el resto
-            foreach (MailAccount mailAccount in mailAccounts.Where(x => x.Entity != possibleMainAccount.Entity))
+            foreach (MailAccount mailAccount in mailAccounts.Where(x => x.Entity != possibleLabelAccount.Entity))
             {
                 accountLabels = Label.FindByAccount(mailAccount.Entity, session);
                 if (accountLabels.Any(x => x.Name == labelName))
