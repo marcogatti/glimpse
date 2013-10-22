@@ -1,6 +1,9 @@
 ﻿var user_personal_fields
 
 $(document).ready(function () {
+
+    var registrationModal = $('#register-view');
+
     $("#registration-link").click(function () {
         $("#register-view").modal("show");
     });
@@ -10,6 +13,8 @@ $(document).ready(function () {
         e.preventDefault();
 
         var dataToSend = getFormData($(this));
+
+        startWorkingWidget(registrationModal);
 
         $.ajax({
             type: "POST",
@@ -27,7 +32,8 @@ $(document).ready(function () {
                 } else {
                     showError(data.message);
                 }
-            }
+            },
+            complete: function () { stopWorkingWidget(registrationModal); }
         });
     });
 
@@ -42,6 +48,8 @@ $(document).ready(function () {
         dataToSend.userpassword = user_personal_fields.userpassword;
         dataToSend.userconfirmationpassword = user_personal_fields.userconfirmationpassword;
 
+        startWorkingWidget(registrationModal);
+
         $.ajax({
             type: "POST",
             url: "createuser",
@@ -55,7 +63,8 @@ $(document).ready(function () {
                 } else {
                     showError(data.message);
                 }
-            }
+            },
+            complete: function () { stopWorkingWidget(registrationModal); }
         });
     });
 
@@ -72,7 +81,7 @@ $(document).ready(function () {
             type: "POST",
             url: "resetpassword",
             dataType: 'json',
-            data: {username:$('#username').val()},
+            data: { username: $('#username').val() },
             success: function (data, textStatus, jqXHR) {
                 if (data.success) {
                     alert("Se ha enviado un email con la nueva contraseña a su cuenta principal de mail.");
