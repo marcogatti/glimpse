@@ -262,7 +262,7 @@ namespace Glimpse.Controllers
         {
             String exceptionMessage = "";
             ISession session = NHibernateManager.OpenSession();
-            
+
             try
             {
                 #region Initialize UserView
@@ -368,7 +368,6 @@ namespace Glimpse.Controllers
                 MailAccountViewModel mailAccountView3 = new MailAccountViewModel();
                 UserViewModel userView = new UserViewModel();
                 List<MailAccountViewModel> mailAccountsView = new List<MailAccountViewModel>();
-                List<MailAccount> removedMailAccounts = new List<MailAccount>();
 
                 mailAccountView1.Address = mailAccount1;
                 mailAccountView1.Password = password1;
@@ -393,6 +392,7 @@ namespace Glimpse.Controllers
 
                 this.ValidateUserMailAccounts(userView, sessionUser, session); //direcciones de correo y contraseñas
 
+                List<MailAccount> removedMailAccounts = new List<MailAccount>();
                 foreach (MailAccount removedMailAccount in sessionUser.mailAccounts
                             .Where(x => !userView.ListMailAccounts.Any(c => c.Address == x.Entity.Address)))
                 {
@@ -409,7 +409,7 @@ namespace Glimpse.Controllers
                     if (sessionUser.mailAccounts.Any(x => x.Entity.Address == mailAccountView.Address)) //si la cuenta ya existia
                     {
                         MailAccount editedMailAccount = sessionUser.mailAccounts.Where(x => x.Entity.Address == mailAccountView.Address).Single();
-                        if(!String.IsNullOrEmpty(mailAccountView.Password))
+                        if (!String.IsNullOrEmpty(mailAccountView.Password))
                             editedMailAccount.Entity.Password = CryptoHelper.EncryptDefaultKey(mailAccountView);
                         editedMailAccount.SetUser(sessionUser);
                         editedMailAccount.ConnectLight();
@@ -611,7 +611,7 @@ namespace Glimpse.Controllers
                         mailAccount = new MailAccount(mailAccountView.Address, actualUser.GetAccounts().Where(x => x.Entity.Address == mailAccountView.Address).Single().Entity.Password);
                     else
                         mailAccount = new MailAccount(mailAccountView.Address, CryptoHelper.EncryptDefaultKey(mailAccountView));
-                        
+
                     mailAccount.ConnectLight(); //si pasa este punto es que esta bien y va a ser devuelta
                     if (mailAccountView.IsMainAccount)
                         mailAccount.SetAsMainAccount(true);
@@ -652,6 +652,11 @@ namespace Glimpse.Controllers
                 exceptionMessage += "Una dirección de correo debe ser indicada como principal.\n";
             if (userView.ListMailAccounts.Count == 0)
                 exceptionMessage += "El usuario Glimpse debe tener al menos una dirección de correo.\n";
+            #endregion
+            #region Valida Unicidad en el Usuario
+            var repeatedAccounts = userView.ListMailAccounts.GroupBy(x => x.Address).Where(gr => gr.Count() > 1);
+            foreach (var repeatedAccount in repeatedAccounts)
+                exceptionMessage += "Se ha ingresado más de una vez la cuenta: " + repeatedAccount.Key + ", ingrese la misma una sola vez.";
             #endregion
 
             if (exceptionMessage != "")
