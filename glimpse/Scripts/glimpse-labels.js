@@ -222,6 +222,13 @@ function removeSystemLabelFromCircle(circle, label) {
 function setEverithingRelatedToAddLabelsToAMail() {
     //setLabelsAdder();
     setLabelPencil();
+    preventSelectingSystemLabels();
+}
+
+function preventSelectingSystemLabels() {
+
+    $('#panel').find('.label.mailbox').mousedown(function (e) { e.preventDefault(); });
+    $('#panel').find('.nav-header').addClass('unselectable');
 }
 
 function setLabelPencil() {
