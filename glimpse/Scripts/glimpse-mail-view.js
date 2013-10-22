@@ -41,17 +41,21 @@ function setFullDisplay(circle) {
 
     circle.dblclick(function () {
 
-        var circle = $(this),
-            view_modal = $("#mail-view");
-
-        currentCircle = circle;
-
-        setMailViewModalHeadData(view_modal, circle)
-
-        view_modal.modal("show");
-
-        setMailViewModalBodyData(view_modal, circle);
+        viewEmail($(this));
     });
+}
+
+function viewEmail(circle) {
+
+    var view_modal = $("#mail-view");
+
+    currentCircle = circle;
+
+    setMailViewModalHeadData(view_modal, circle)
+
+    view_modal.modal("show");
+
+    setMailViewModalBodyData(view_modal, circle);
 }
 
 function setViewMailAttachments(view_modal, attachments) {
@@ -311,6 +315,22 @@ function setMailViewModalBodyData(view_modal, circle) {
             setViewMailAttachments(view_modal, data.mail.extras)
             markAsRead(circle, true);
             setMailViewerActions(view_modal, circle, data.mail.body);
+
+        } else alert(data.message);
+    });
+}
+
+function replyMail(circle) {
+    $.getJSON("async/GetMailBody", { id: circle.data('id'), mailAccountId: circle.data('mailaccount') }, function (data) {
+        if (data.success == true) {
+
+            markAsRead(circle, true);
+            $("#email-from").html(circle.data('mailaccount'));
+            $("#email-to").html(circle.data('from'));
+
+            setConversationOfMail(circle, data.mail.body, 'RE: ');
+
+            displayComposeDialog();
 
         } else alert(data.message);
     });

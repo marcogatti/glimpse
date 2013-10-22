@@ -185,21 +185,26 @@ namespace Glimpse.Controllers
             }
             catch (InvalidRecipientsException exc)
             {
-                return Json(new { success = false, address = sendInfo.ToAddress }, JsonRequestBehavior.AllowGet);
+                return Json(new
+                {
+                    success = false,
+                    message = "No se pudo enviar el email porque alguna de las direcciones de los destinatarios es inexistente. Por favor corríjalos e intentelo de nuevo.",
+                    address = sendInfo.ToAddress
+                }, JsonRequestBehavior.AllowGet);
             }
             catch (SmtpException exc)
             {
                 Log.LogException(exc, "Parametros del mail a enviar: subjectMail(" + sendInfo.Subject + "), addressMail(" + sendInfo.ToAddress + ").");
-                return Json(new { success = false, address = sendInfo.ToAddress }, JsonRequestBehavior.AllowGet);
+                return Json(new { success = false, message = "Actualmente tenemos problemas para enviar el email, por favor intételo de nuevo más tarde", address = sendInfo.ToAddress }, JsonRequestBehavior.AllowGet);
             }
             catch (GlimpseException exc)
             {
-                return Json(new { success = false, address = exc.GlimpseMessage }, JsonRequestBehavior.AllowGet);
+                return Json(new { success = false, message = exc.GlimpseMessage, address = exc.GlimpseMessage }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception exc)
             {
                 Log.LogException(exc, "Parametros de la llamada: subjectMail(" + sendInfo.Subject + "), addressMail(" + sendInfo.ToAddress + ").");
-                return Json(new { success = false, address = sendInfo.ToAddress }, JsonRequestBehavior.AllowGet);
+                return Json(new { success = false, message = "Actualmente tenemos problemas para enviar el email, por favor inténtelo de nuevo más tarde", address = sendInfo.ToAddress }, JsonRequestBehavior.AllowGet);
             }
         }
         [HttpPost]
@@ -212,7 +217,7 @@ namespace Glimpse.Controllers
             {
                 MailAccount mailAccount = this.GetMailAccount(mailAccountId);
                 Label theLabel = this.GetAccountLabel(labelName, mailAccount, session);
-                if(theLabel == null)
+                if (theLabel == null)
                     return Json(new { success = false, message = "No se ha podido encontrar la etiqueta con el nombre:" + labelName + "." }, JsonRequestBehavior.AllowGet);
                 Mail theMail = new Mail(mailId, session);
 
@@ -308,7 +313,7 @@ namespace Glimpse.Controllers
             try
             {
                 MailAccount labelAccount;
-                
+
                 if (mailAccountId != 0)
                     labelAccount = this.GetMailAccount(mailAccountId);
                 else
@@ -349,7 +354,7 @@ namespace Glimpse.Controllers
             {
                 MailAccount currentMailAccount = this.GetMailAccount(mailAccountId);
                 Label labelToDelete = Label.FindByName(currentMailAccount, labelName, session);
-                if(labelToDelete == null)
+                if (labelToDelete == null)
                     return Json(new { success = true, message = "No se encontro la etiqueta." }, JsonRequestBehavior.AllowGet);
                 labelToDelete.Delete(session); //BD
                 currentMailAccount.DeleteLabel(labelName); //IMAP
@@ -377,8 +382,8 @@ namespace Glimpse.Controllers
             try
             {
                 MailAccount currentMailAccount = this.GetMailAccount(mailAccountId);
-                Mail theMail = new Mail(mailId, session);;
-                if(isIncrease)
+                Mail theMail = new Mail(mailId, session); ;
+                if (isIncrease)
                     theMail.SetImportance((UInt16)(theMail.Entity.Importance + 1), session);
                 else
                     theMail.SetImportance((UInt16)(theMail.Entity.Importance - 1), session);
@@ -525,7 +530,7 @@ namespace Glimpse.Controllers
                 };
                 extrasMetadata.Add(anExtra);
             }
-            Object returnInfo = new 
+            Object returnInfo = new
             {
                 body = body,
                 extras = extrasMetadata
@@ -536,7 +541,7 @@ namespace Glimpse.Controllers
         {
             User user = (User)Session[AccountController.USER_NAME];
             IList<MailAccount> mailAccounts = user.GetAccounts();
-            if(id != 0)
+            if (id != 0)
                 return mailAccounts.Where<MailAccount>(x => x.Entity.Id == id).Single<MailAccount>();
             else
                 return mailAccounts[0]; //harcodeado para que funcione hasta que la vista mande los ids
@@ -582,7 +587,7 @@ namespace Glimpse.Controllers
                                                   .List<ExtraEntity>();
             foreach (ExtraEntity embeddedExtra in embeddedExtras)
             {
-                body = body.Replace("cid:" +  embeddedExtra.EmbObjectContentId, Url.Action("GetFile", "AsyncMails", new { id = embeddedExtra.Id }, this.Request.Url.Scheme));
+                body = body.Replace("cid:" + embeddedExtra.EmbObjectContentId, Url.Action("GetFile", "AsyncMails", new { id = embeddedExtra.Id }, this.Request.Url.Scheme));
             }
         }
         #endregion

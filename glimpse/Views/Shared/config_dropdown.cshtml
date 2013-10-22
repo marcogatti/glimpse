@@ -1,10 +1,21 @@
 ﻿<div class="btn-group pull-right">
-    <button class="btn">@ViewBag.Username</button>
+    <button class="btn" title="Mi usuario: @ViewBag.Username">
+        @{String fullname = ViewBag.Firstname + ' ' + ViewBag.Lastname;
+          if (fullname.Length <= 45)
+          {
+            @fullname
+          }
+          else
+          {
+            @ViewBag.Firstname
+          }
+        }
+    </button>
     <button class="btn dropdown-toggle" data-toggle="dropdown">
         <span class="caret"></span>
     </button>
     <ul id="account-dropdown" class="dropdown-menu">
-        @if(ViewBag.IsGlimpseUser)
+        @if (ViewBag.IsGlimpseUser)
         {
             <li><a id="btn-config" href="#configure" class="unselectable"><span class="icon-wrench"></span>Configuración</a> </li>
         }

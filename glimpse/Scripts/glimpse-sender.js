@@ -11,15 +11,15 @@ function mailSendingConnectionOK(data, textStatus, jqXHR) {
         alert('Mail enviado correctamente a ' + data.address + '.');
         resetComposeDialog();
     } else {
-        alert('Falló el envío del mail a "' + data.address + '". Verifica la dirección de correo.');
+        alert(data.message);
     }
 }
 
 function mailSendingConnectionFailed(jqXHR, textStatus, errorThrown) {
-    alert("Falló el envío del mail, por favor intentelo nuevamente más tarde.");
+    alert("Actualmente tenemos problemas para enviar el email, por favor inténtelo de nuevo más tarde");
 }
 
-function sendEmailAsync(fromAccountId, toAddress, subject, body) {
+function sendEmailAsync(fromAccountId, toAddress, subject, body, circularProgress) {
 
     var sendInfo = {
         ToAddress: toAddress,
@@ -38,13 +38,20 @@ function sendEmailAsync(fromAccountId, toAddress, subject, body) {
         error: function (jqXHR, textStatus, errorThrown) {
             mailSendingConnectionFailed(jqXHR, textStatus, errorThrown)
         },
+        complete: function () {
+            stopWorkingWidget(circularProgress);
+        },
         data: sendInfo
     });
 }
 
 function prepareComposeDialog() {
 
-    $("#compose_pannel").dialog({
+    var compose_panel = $("#compose_pannel"),
+        circularProgress = compose_panel.find('.progress-circular'),
+        composePanelTitle;;
+
+    compose_panel.dialog({
         autoOpen: false,
         closeOnEscape: true,
         draggable: true,
@@ -65,11 +72,17 @@ function prepareComposeDialog() {
         {
             text: "Enviar",
             click: function () {
-                sendEmailAsync($('#email-from').html(), $("#email-to").val(), $("#email-subject").val(), editor.getData());
+                startWorkingWidget(circularProgress);
+                sendEmailAsync($('#email-from').html(), $("#email-to").val(), $("#email-subject").val(), editor.getData(), circularProgress);
             }
         }
         ]
     });
+
+    composePanelTitle = $('.ui-dialog[aria-describedby="compose_pannel"]').find('.ui-dialog-title');
+    circularProgress.remove();
+    composePanelTitle.append(circularProgress);
+
     $("#compose").on("click", function () {
         var compose_panel = $("#compose_pannel"),
             mainMailAccountId = getMainAccount(user_mailAccounts);

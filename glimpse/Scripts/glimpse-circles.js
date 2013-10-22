@@ -188,10 +188,12 @@ function putButtons(circle) {
     });
 
     $(".circle > .icon-trash").on('click', function () {
-        archiveCircle(circle);
+        currentCircle = circle;
+        deleteCircleWithConfirmationWindow(circle);
     });
 
     $(".circle > .icon-comment").on('click', function () {
+        replyMail(circle);
     });
 }
 
