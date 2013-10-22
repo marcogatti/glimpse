@@ -68,10 +68,8 @@ function labelDrag(ev) {
     ev.data.label.css('opacity', 0.4);
 }
 
-function setLabelsAdder() {
-    $.each($(".label-glimpse"), function (index, actualLabel) {
+function setLabelsAdder(currentLabel) {
 
-        var currentLabel = $(this);
         if (currentLabel.hasClass("custom-label")) {
 
             if (currentLabel.data('name') === 'others') {
@@ -103,7 +101,6 @@ function setLabelsAdder() {
                 downEvent.preventDefault();
             });
         }
-    });
 }
 
 function canReceiveThatLabel(label, circle) {
@@ -173,6 +170,8 @@ function addLabelToEmail(label, circle) {
         url: "async/AddLabel",
         dataType: 'json',
         data: { labelName: label, mailId: circle.data('id'), mailAccountId: circle.data('mailaccount') }
+    }).fail(function () {
+        alert("No fue posible etiquetar el email");
     });
 }
 
@@ -221,7 +220,7 @@ function removeSystemLabelFromCircle(circle, label) {
 
 
 function setEverithingRelatedToAddLabelsToAMail() {
-    setLabelsAdder();
+    //setLabelsAdder();
     setLabelPencil();
 }
 
@@ -251,7 +250,6 @@ function setLabelCreationForm() {
         var newLabel = $("#create-label-textbox").val();
         createCustomLabel(newLabel);
         $("#create-label").popover('hide');
-        setLabelsAdder();
     });
 }
 
@@ -412,7 +410,9 @@ function appendCustomLabel(name) {
         $.ajax({
             type: "POST",
             url: "async/DeleteLabel",
-            data: { labelName: currentLabel.text() }
+            data: { labelName: currentLabel.data("name") }
+        }).fail(function () {
+            alert("No fue posible eliminar la etiqueta");
         });
 
         $(".circle").each(function () {
@@ -426,8 +426,8 @@ function appendCustomLabel(name) {
     });
 
     setLabelSelection(labelToAppend);
-
     $(".custom-label:last-of-type").after(labelToAppend);
+    setLabelsAdder(labelToAppend);
 }
 
 function changeLabelColor(colorPicker) {

@@ -152,10 +152,10 @@ function putLabelBalls(circle) {
 function putButtons(circle) {
 
     var buttons = $(
-    "<div class='radial-button icon-plus-sign' title='Sumar importacia' style='" + rotation(30) + "'></div>" +
-    "<div class='radial-button icon-minus-sign' style='" + rotation(15) + "'></div>" +
-    "<div class='radial-button icon-trash' style='" + rotation(-15) + "'></div>" +
-    "<div class='radial-button icon-comment' style='" + rotation(-30) + "'></div>" +
+    "<div class='radial-button icon-plus-sign' title='Dar importacia' style='" + rotation(30) + "'></div>" +
+    "<div class='radial-button icon-minus-sign' title='Quitar importancia' style='" + rotation(15) + "'></div>" +
+    "<div class='radial-button icon-trash' title='Eliminar' style='" + rotation(-15) + "'></div>" +
+    "<div class='radial-button icon-comment' title='Responder' style='" + rotation(-30) + "'></div>" +
     "<div class='radial-button icon-eye-close' title='Marcar como no leído' style='" + rotation(0) + "'></div>"
     );
 
