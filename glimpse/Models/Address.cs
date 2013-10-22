@@ -17,33 +17,30 @@ namespace Glimpse.Models
 
         public void SaveOrUpdate(ISession session)
         {
-            Address databaseAddress = FindByAddress(this.Entity.MailAddress, session);
+            Address databaseAddress = Address.FindByAddress(this.Entity.MailAddress, session);
 
-            if (databaseAddress.Entity != null)
-            {
-                databaseAddress.Entity.Name = this.Entity.Name;
+            if (databaseAddress == null) // si no existe
+                session.SaveOrUpdate(this.Entity);
+            else
                 this.Entity = databaseAddress.Entity;
-            }
-
-            session.SaveOrUpdate(this.Entity);
         }
 
         public static void RemoveByAddress(String mailAddress, ISession session)
         {
-            Address foundAddress = FindByAddress(mailAddress, session);
+            Address foundAddress = Address.FindByAddress(mailAddress, session);
 
             if (foundAddress != null)
                 session.Delete(foundAddress);
         }
         public static Address FindByAddress(String address, ISession session)
         {
-            var entity = session.CreateCriteria<AddressEntity>()
-                    .Add(Restrictions.Eq("MailAddress", address))
-                    .UniqueResult<AddressEntity>();
-
-            Address foundAddress = new Address(entity);
-
-            return foundAddress;
+            AddressEntity entity = session.CreateCriteria<AddressEntity>()
+                                          .Add(Restrictions.Eq("MailAddress", address))
+                                          .UniqueResult<AddressEntity>();
+            if (entity == null)
+                return null;
+            else
+                return new Address(entity);
         }
         public static AddressCollection ParseAddresses(String toAddresses)
         {

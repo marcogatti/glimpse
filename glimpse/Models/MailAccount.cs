@@ -224,7 +224,7 @@ namespace Glimpse.Models
             AddressCollection recipients = Glimpse.Models.Address.ParseAddresses(toAddresses);
             this.MySender.sendMail(recipients, body, subject, null, null, uploadedFiles);
         }
-        public void AddLabelIMAP(Mail theMail, Label theLabel)
+        public void AddLabelFolder(Mail theMail, Label theLabel)
         {
             this.MyFetcher.AddMailTag(theMail.GetImapFolderName(), theLabel.Entity.Name, theMail.Entity.Gm_mid);
         }
