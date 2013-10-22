@@ -393,21 +393,38 @@ function loadLabels() {
 function appendCustomLabel(name) {
 
     var labelToAppend = $("<li class='custom-label label label-glimpse' data-name='" + name + "'>" + name +
-        '<span class="pull-right hidden" title="Editar"><i class="icon-edit icon-white"></i><i class="icon-remove icon-white"></i></span></li>');
+        '<span class="pull-right hidden" title="Editar">' +
+        '<i class="icon-edit icon-white"></i><i class="icon-remove icon-white"></i></span></li>');
+
+    labelToAppend.find("span").on('click', function (e) {
+        e.stopPropagation();
+    });
 
     labelToAppend.find(".icon-edit").popover({
         title: 'Color',
         trigger: 'click',
         html: true,
-        content: "<input type='color' class='label-color-picker' id='"+ name + "-picker' onchange='changeLabelColor(this);'>"
+        content: "<input type='color' class='label-color-picker' value='#808080' id='" + name + "-picker' onchange='changeLabelColor(this);'>"
+    });
+
+    labelToAppend.find(".icon-remove").on('click', function () {
+        var currentLabel = $(this).parent().parent();
+        $.ajax({
+            type: "POST",
+            url: "async/DeleteLabel",
+            data: { labelName: currentLabel.text() }
+        });
+
+        $(".circle").each(function () {
+            removeLabelFromCircle($(this), currentLabel.text());
+        });
+        currentLabel.remove();
     });
 
     labelToAppend.hover(function () {
         labelToAppend.find("span").toggleClass("hidden");
     });
-    labelToAppend.find("span").on('click', function (e) {
-        e.stopPropagation();
-    });
+
     setLabelSelection(labelToAppend);
 
     $(".custom-label:last-of-type").after(labelToAppend);

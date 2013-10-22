@@ -170,21 +170,27 @@ function putButtons(circle) {
     circle.find(".icon-plus-sign").on('click', function () {
         changeImportance($(this).parent(), true);
     });
+
     circle.find(".icon-minus-sign").on('click', function () {
         changeImportance($(this).parent(), false);
     });
+
    circle.find(".icon-eye-open").on('click', function () {
         markAsRead(circle, true);
         $(this).attr("title", "Marcar como no leído");
         toggleEye($(this));
    });
+
     $(".circle > .icon-eye-close").on('click', function () {
         markAsRead(circle, false);
         $(this).attr("title", "Marcar como leído");
         toggleEye($(this));
     });
+
     $(".circle > .icon-trash").on('click', function () {
+        archiveCircle(circle);
     });
+
     $(".circle > .icon-comment").on('click', function () {
     });
 }
@@ -321,6 +327,7 @@ function markAsRead(circle, seenFlag) {
 }
 
 function setSeenStatus(circle) {
+    unsetMailClicked(circle);
     if (!circle.data("seen")) {
         var spinner = '<div class="loading"><div class="spinner"><div class="mask"><div class="maskedCircle"></div></div></div></div>';
         circle.prepend(spinner);
