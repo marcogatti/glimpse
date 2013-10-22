@@ -309,7 +309,7 @@ function setMailViewModalBodyData(view_modal, circle) {
         if (data.success == true) {
             setViewMailBody(view_modal, data.mail.body);
             setViewMailAttachments(view_modal, data.mail.extras)
-            markAsRead(circle);
+            markAsRead(circle, true);
             setMailViewerActions(view_modal, circle, data.mail.body);
 
         } else alert(data.message);

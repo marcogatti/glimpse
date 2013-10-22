@@ -68,10 +68,8 @@ function labelDrag(ev) {
     ev.data.label.css('opacity', 0.4);
 }
 
-function setLabelsAdder() {
-    $.each($(".label-glimpse"), function (index, actualLabel) {
+function setLabelsAdder(currentLabel) {
 
-        var currentLabel = $(this);
         if (currentLabel.hasClass("custom-label")) {
 
             if (currentLabel.data('name') === 'others') {
@@ -103,7 +101,6 @@ function setLabelsAdder() {
                 downEvent.preventDefault();
             });
         }
-    });
 }
 
 function canReceiveThatLabel(label, circle) {
@@ -173,6 +170,8 @@ function addLabelToEmail(label, circle) {
         url: "async/AddLabel",
         dataType: 'json',
         data: { labelName: label, mailId: circle.data('id'), mailAccountId: circle.data('mailaccount') }
+    }).fail(function () {
+        alert("No fue posible etiquetar el email");
     });
 }
 
@@ -221,7 +220,7 @@ function removeSystemLabelFromCircle(circle, label) {
 
 
 function setEverithingRelatedToAddLabelsToAMail() {
-    setLabelsAdder();
+    //setLabelsAdder();
     setLabelPencil();
 }
 
@@ -251,7 +250,6 @@ function setLabelCreationForm() {
         var newLabel = $("#create-label-textbox").val();
         createCustomLabel(newLabel);
         $("#create-label").popover('hide');
-        setLabelsAdder();
     });
 }
 
@@ -393,24 +391,43 @@ function loadLabels() {
 function appendCustomLabel(name) {
 
     var labelToAppend = $("<li class='custom-label label label-glimpse' data-name='" + name + "'>" + name +
-        '<span class="pull-right hidden" title="Editar"><i class="icon-edit icon-white"></i><i class="icon-remove icon-white"></i></span></li>');
+        '<span class="pull-right hidden" title="Editar">' +
+        '<i class="icon-edit icon-white"></i><i class="icon-remove icon-white"></i></span></li>');
+
+    labelToAppend.find("span").on('click', function (e) {
+        e.stopPropagation();
+    });
 
     labelToAppend.find(".icon-edit").popover({
         title: 'Color',
         trigger: 'click',
         html: true,
-        content: "<input type='color' class='label-color-picker' id='"+ name + "-picker' onchange='changeLabelColor(this);'>"
+        content: "<input type='color' class='label-color-picker' value='#808080' id='" + name + "-picker' onchange='changeLabelColor(this);'>"
+    });
+
+    labelToAppend.find(".icon-remove").on('click', function () {
+        var currentLabel = $(this).parent().parent();
+        $.ajax({
+            type: "POST",
+            url: "async/DeleteLabel",
+            data: { labelName: currentLabel.data("name") }
+        }).fail(function () {
+            alert("No fue posible eliminar la etiqueta");
+        });
+
+        $(".circle").each(function () {
+            removeLabelFromCircle($(this), currentLabel.text());
+        });
+        currentLabel.remove();
     });
 
     labelToAppend.hover(function () {
         labelToAppend.find("span").toggleClass("hidden");
     });
-    labelToAppend.find("span").on('click', function (e) {
-        e.stopPropagation();
-    });
-    setLabelSelection(labelToAppend);
 
+    setLabelSelection(labelToAppend);
     $(".custom-label:last-of-type").after(labelToAppend);
+    setLabelsAdder(labelToAppend);
 }
 
 function changeLabelColor(colorPicker) {
