@@ -289,8 +289,7 @@ namespace Glimpse.Controllers
                 currentMailAccount.RenameLabel(oldLabelName, newLabelName); //IMAP
                 tran.Commit();
 
-                JsonResult result = Json(new { success = true }, JsonRequestBehavior.AllowGet);
-                return result;
+                return Json(new { success = true }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception exc)
             {
@@ -298,6 +297,46 @@ namespace Glimpse.Controllers
                 Log.LogException(exc, "Parametros del metodo: oldLabelName(" + oldLabelName +
                                       "), newLabelName(" + newLabelName + "), mailAccountId(" + mailAccountId.ToString() + ").");
                 return Json(new { success = false, message = "Error al renombrar label." }, JsonRequestBehavior.AllowGet);
+            }
+            finally
+            {
+                session.Close();
+            }
+        }
+        [HttpPost]
+        [AjaxOnly]
+        public ActionResult RecolorLabel(String labelName, UInt16 codeRed, UInt16 codeGreen, UInt16 codeBlue)
+        {
+            ISession session = NHibernateManager.OpenSession();
+            ITransaction tran = session.BeginTransaction();
+            try
+            {
+                User sessionUser = (User)Session[AccountController.USER_NAME];
+                if (sessionUser == null)
+                    throw new GlimpseException("No se encontró el usuario.");
+
+                foreach (MailAccount currentMailAccount in sessionUser.GetAccounts())
+                {
+                    IList<LabelEntity> labels = Label.FindByAccount(currentMailAccount.Entity, session);
+                    if (labels.Any(x => x.Name == labelName))
+                    {
+                        LabelEntity labelToRecolor = labels.Single(x => x.Name == labelName);
+                        labelToRecolor.ColorR = codeRed;
+                        labelToRecolor.ColorG = codeGreen;
+                        labelToRecolor.ColorB = codeBlue;
+                        session.SaveOrUpdate(labelToRecolor);
+                    }
+                }
+                tran.Commit();
+
+                return Json(new { success = true }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception exc)
+            {
+                tran.Rollback();
+                Log.LogException(exc, "Parametros del metodo: labelName(" + labelName + "), codeRed(" + codeRed +
+                                      "), codeGreen(" + codeGreen + "), codeBlue(" + codeBlue + ").");
+                return Json(new { success = false, message = "Error al cambiar color." }, JsonRequestBehavior.AllowGet);
             }
             finally
             {
@@ -563,14 +602,14 @@ namespace Glimpse.Controllers
             //busco en el mailAccount del mismo mail primero
             IList<LabelEntity> accountLabels = Label.FindByAccount(possibleLabelAccount.Entity, session);
             if (accountLabels.Any(x => x.Name == labelName))
-                return new Label(accountLabels.Where(x => x.Name == labelName).Single());
+                return new Label(accountLabels.Single(x => x.Name == labelName));
 
             //si no esta, busco en el resto
             foreach (MailAccount mailAccount in mailAccounts.Where(x => x.Entity != possibleLabelAccount.Entity))
             {
                 accountLabels = Label.FindByAccount(mailAccount.Entity, session);
                 if (accountLabels.Any(x => x.Name == labelName))
-                    return new Label(accountLabels.Where(x => x.Name == labelName).Single());
+                    return new Label(accountLabels.Single(x => x.Name == labelName));
             }
             return null;
         }

@@ -41,7 +41,7 @@ namespace Glimpse.Models
                 this.mailAccounts.Add(mailAccount);
             else //si ya lo tiene que lo actualice
             {
-                MailAccount newMailaccount = this.mailAccounts.Where(x => x.Entity.Address == mailAccount.Entity.Address).Single();
+                MailAccount newMailaccount = this.mailAccounts.Single(x => x.Entity.Address == mailAccount.Entity.Address);
                 newMailaccount = mailAccount;
             }
         }

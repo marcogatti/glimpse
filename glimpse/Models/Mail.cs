@@ -75,7 +75,7 @@ namespace Glimpse.Models
         {
             if (this.Entity.Labels.Any(x => x.SystemName == "INBOX"))
             {
-                this.Entity.Labels.Remove(this.Entity.Labels.Where(x => x.SystemName == "INBOX").Single());
+                this.Entity.Labels.Remove(this.Entity.Labels.Single(x => x.SystemName == "INBOX"));
                 this.Save(session);
             }
         }

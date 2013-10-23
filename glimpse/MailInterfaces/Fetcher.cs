@@ -560,7 +560,7 @@ namespace Glimpse.MailInterfaces
             }
 
             if (this.AccountLabels != null)
-                this.AccountLabels.Remove(this.AccountLabels.Where(x => x.Name == labelName).Single());
+                this.AccountLabels.Remove(this.AccountLabels.Single(x => x.Name == labelName));
         }
         private void AddUIDToMail(String mailbox, Int64 UID, MailEntity mail)
         {

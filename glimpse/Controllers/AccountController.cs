@@ -222,7 +222,7 @@ namespace Glimpse.Controllers
 
                 try
                 {
-                    Sender.SendGreetingsPassword(newUser, newUser.mailAccounts.Where(x => x.Entity.IsMainAccount).Single().Entity.Address);
+                    Sender.SendGreetingsPassword(newUser, newUser.mailAccounts.Single(x => x.Entity.IsMainAccount).Entity.Address);
                 }
                 catch (Exception exc) { Log.LogException(exc); } //que no corte la ejecucion
 
@@ -408,7 +408,7 @@ namespace Glimpse.Controllers
                 {
                     if (sessionUser.mailAccounts.Any(x => x.Entity.Address == mailAccountView.Address)) //si la cuenta ya existia
                     {
-                        MailAccount editedMailAccount = sessionUser.mailAccounts.Where(x => x.Entity.Address == mailAccountView.Address).Single();
+                        MailAccount editedMailAccount = sessionUser.mailAccounts.Single(x => x.Entity.Address == mailAccountView.Address);
                         if (!String.IsNullOrEmpty(mailAccountView.Password))
                             editedMailAccount.Entity.Password = CryptoHelper.EncryptDefaultKey(mailAccountView);
                         editedMailAccount.SetUser(sessionUser);
@@ -608,7 +608,7 @@ namespace Glimpse.Controllers
 
                     if (actualUser != null && String.IsNullOrEmpty(mailAccountView.Password) &&
                          actualUser.GetAccounts().Any(x => x.Entity.Address == mailAccountView.Address)) //si el usuario ya tiene la cuenta y el password esta vacio
-                        mailAccount = new MailAccount(mailAccountView.Address, actualUser.GetAccounts().Where(x => x.Entity.Address == mailAccountView.Address).Single().Entity.Password);
+                        mailAccount = new MailAccount(mailAccountView.Address, actualUser.GetAccounts().Single(x => x.Entity.Address == mailAccountView.Address).Entity.Password);
                     else
                         mailAccount = new MailAccount(mailAccountView.Address, CryptoHelper.EncryptDefaultKey(mailAccountView));
 
