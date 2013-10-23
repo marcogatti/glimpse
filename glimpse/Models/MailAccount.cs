@@ -97,9 +97,21 @@ namespace Glimpse.Models
             tagsNames = labelsByProperty["Tags"];
             if (tagsNames != null)
             {
-                String[] labelsName = tagsNames.Split(new String[] { "," }, StringSplitOptions.RemoveEmptyEntries);
-                foreach (String label in labelsName)
-                    this.RegisterLabel(label, session, databaseLabels);
+                IList<String> labelsName = tagsNames.Split(new String[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+
+                labelsName = labelsName.Where(x => !x.Contains("[Gmail]/")).ToList(); //filtrar otros labels de Gmail
+
+                foreach (String existingLabel in labelsName)
+                    this.RegisterLabel(existingLabel, session, databaseLabels);
+
+                //eliminar labels que no esten en Gmail
+                var namesLookUp = labelsName.ToLookup(x => x);
+                var removedLabels = databaseLabels.Where(x => x.SystemName == null &&!namesLookUp.Contains(x.Name));
+                foreach (LabelEntity removedLabel in removedLabels)
+                {
+                    Label label = new Label(removedLabel);
+                    label.Delete(session);
+                }
             }
             this.SetFetcherLabels(session);
         }
