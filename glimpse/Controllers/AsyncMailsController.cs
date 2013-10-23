@@ -393,12 +393,19 @@ namespace Glimpse.Controllers
             ITransaction tran = session.BeginTransaction();
             try
             {
-                MailAccount currentMailAccount = this.GetMailAccount(mailAccountId);
-                Label labelToDelete = Label.FindByName(currentMailAccount, labelName, session);
-                if (labelToDelete == null)
-                    return Json(new { success = true, message = "No se encontro la etiqueta." }, JsonRequestBehavior.AllowGet);
-                labelToDelete.Delete(session); //BD
-                currentMailAccount.DeleteLabel(labelName); //IMAP
+                User sessionUser = (User)Session[AccountController.USER_NAME];
+                if (sessionUser == null)
+                    throw new GlimpseException("No se encontró el usuario.");
+
+                foreach (MailAccount currentMailAccount in sessionUser.GetAccounts())
+                {
+                    Label labelToDelete = Label.FindByName(currentMailAccount, labelName, session);
+                    if (labelToDelete != null)
+                    {
+                        labelToDelete.Delete(session); //BD
+                        currentMailAccount.DeleteLabel(labelName); //IMAP
+                    }
+                }
                 tran.Commit();
 
                 return Json(new { success = true }, JsonRequestBehavior.AllowGet);
