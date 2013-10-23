@@ -361,6 +361,7 @@ namespace Glimpse.Models
             labelEntity.Name = labelName;
             labelEntity.MailAccountEntity = this.Entity;
             labelEntity.SystemName = systemName;
+            labelEntity.Color = (systemName == null) ? Label.GetNextColor(this.Entity, session) : null;
             labelEntity.Active = true;
 
             Label label = new Label(labelEntity);

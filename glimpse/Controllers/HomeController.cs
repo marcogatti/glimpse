@@ -69,7 +69,8 @@ namespace Glimpse.Controllers
                                                       .Single();
 
                 foreach (LabelEntity label in accountLabels)
-                    viewLabels.Add(new LabelViewModel(label.Name, label.SystemName));
+                    //viewLabels.Add(new LabelViewModel(label.Name, label.SystemName));
+                    viewLabels.Add(new LabelViewModel(label.Name, label.SystemName, label.Color));
 
                 ViewBag.Username = sessionUser.Entity.Username;
                 ViewBag.Labels = viewLabels;

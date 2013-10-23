@@ -12,6 +12,14 @@ namespace Glimpse.Models
     public class Label
     {
         public LabelEntity Entity { get; private set; }
+        private static String DefaultColor = "defaultColor";
+        private static IList<String> LabelColors =
+             new String[] 
+                {"color1",
+                 "color2",
+                 "color3",
+                }
+            ;
 
         public Label(LabelEntity labelEntity)
         {
@@ -33,6 +41,46 @@ namespace Glimpse.Models
             session.SaveOrUpdate(this.Entity);
         }
 
+        public static void ColorInitialLabels(IList<LabelEntity> labelsToColor)
+        {
+            Int16 index;
+            for (index = 0; index < labelsToColor.Count && index < Label.LabelColors.Count; index++)
+                labelsToColor[index].Color = Label.LabelColors[index];
+
+            //si me quedo sin colores
+            if (labelsToColor.Count > LabelColors.Count)
+                for (index = index; index < labelsToColor.Count; index++)
+                    labelsToColor[index].Color = Label.DefaultColor;
+
+        }
+        public static void ColorLabel(LabelEntity labelToColor, MailAccount labelAccount, User currentUser, ISession session)
+        {
+            if (currentUser != null)
+            {
+                IList<MailAccount> currentMailAccounts = currentUser.GetAccounts();
+                List<LabelEntity> availableLabels = new List<LabelEntity>();
+
+                foreach (MailAccount mailAccount in currentMailAccounts)
+                    availableLabels.AddRange(Label.FindByAccount(mailAccount.Entity, session));
+
+                //si alguna de las cuentas ya tiene un label con el mismo nombre
+                if (availableLabels.Any(x => x.SystemName == null && x.Name == labelToColor.Name))
+                {
+                    labelToColor.Color = availableLabels.Where(x => x.SystemName == null && x.Name == labelToColor.Name).ToList()[0].Color;
+                    return;
+                }
+            }
+
+            labelToColor.Color = Label.GetNextColor(labelAccount.Entity, session);
+        }
+        public static String GetNextColor(MailAccountEntity labelAccount, ISession session)
+        {
+            IList<LabelEntity> accountLabels = Label.FindByAccount(labelAccount, session);
+            for (Int16 currentColor = 0; currentColor < Label.LabelColors.Count; currentColor++)
+                if (!accountLabels.Any(x => x.Color == Label.LabelColors[currentColor]))
+                    return Label.LabelColors[currentColor];
+            return Label.DefaultColor;
+        }
         public static IList<LabelEntity> FindByAccount(MailAccountEntity account, ISession session)
         {
             IList<LabelEntity> labels = session.CreateCriteria<LabelEntity>()
@@ -79,6 +127,7 @@ namespace Glimpse.Models
             List<LabelEntity> uniqueLabels = new List<LabelEntity>();
             foreach (LabelEntity label in dupLabels)
             {
+                //TODO limpiar la segunda condicion y probar
                 if (uniqueLabels.Any(x => x.Name == label.Name || 
                     (x.SystemName == label.SystemName && x.Name == label.Name)))
                     continue;

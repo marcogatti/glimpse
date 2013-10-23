@@ -305,7 +305,7 @@ namespace Glimpse.Controllers
         }
         [HttpPost]
         [AjaxOnly]
-        public ActionResult RecolorLabel(String labelName, UInt16 codeRed, UInt16 codeGreen, UInt16 codeBlue)
+        public ActionResult RecolorLabel(String labelName, String color)
         {
             ISession session = NHibernateManager.OpenSession();
             ITransaction tran = session.BeginTransaction();
@@ -321,9 +321,7 @@ namespace Glimpse.Controllers
                     if (labels.Any(x => x.Name == labelName))
                     {
                         LabelEntity labelToRecolor = labels.Single(x => x.Name == labelName);
-                        labelToRecolor.ColorR = codeRed;
-                        labelToRecolor.ColorG = codeGreen;
-                        labelToRecolor.ColorB = codeBlue;
+                        labelToRecolor.Color = color;
                         session.SaveOrUpdate(labelToRecolor);
                     }
                 }
@@ -334,8 +332,7 @@ namespace Glimpse.Controllers
             catch (Exception exc)
             {
                 tran.Rollback();
-                Log.LogException(exc, "Parametros del metodo: labelName(" + labelName + "), codeRed(" + codeRed +
-                                      "), codeGreen(" + codeGreen + "), codeBlue(" + codeBlue + ").");
+                Log.LogException(exc, "Parametros del metodo: labelName(" + labelName + "), color(" + color + ").");
                 return Json(new { success = false, message = "Error al cambiar color." }, JsonRequestBehavior.AllowGet);
             }
             finally
@@ -351,6 +348,10 @@ namespace Glimpse.Controllers
             ITransaction tran = session.BeginTransaction();
             try
             {
+                User sessionUser = (User)Session[AccountController.USER_NAME];
+                if (sessionUser == null)
+                    throw new GlimpseException("No se encontró el usuario.");
+
                 MailAccount labelAccount;
 
                 if (mailAccountId != 0)
@@ -366,6 +367,7 @@ namespace Glimpse.Controllers
                 newLabel.Entity.Name = labelName;
                 newLabel.Entity.Active = true;
                 newLabel.Entity.MailAccountEntity = labelAccount.Entity;
+                Label.ColorLabel(newLabel.Entity, labelAccount, sessionUser, session);
                 newLabel.SaveOrUpdate(session); //BD
                 labelAccount.CreateLabel(labelName); //IMAP
                 tran.Commit();
