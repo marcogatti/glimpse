@@ -1,13 +1,20 @@
 ﻿<div class="btn-group pull-right">
     <button class="btn" title="Mi usuario: @ViewBag.Username">
         @{String fullname = ViewBag.Firstname + ' ' + ViewBag.Lastname;
-          if (fullname.Length <= 45)
+          if (ViewBag.IsGlimpseUser)
           {
-            @fullname
+              if (fullname.Length <= 45)
+              {
+                @fullname
+              }
+              else
+              {
+                @ViewBag.Firstname
+              }
           }
           else
           {
-            @ViewBag.Firstname
+            @ViewBag.Username
           }
         }
     </button>
