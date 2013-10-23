@@ -135,7 +135,8 @@ function putLabelBalls(circle) {
 
     var deg = 195;
     for (var i = 0; i < customLabels.length; i++) {
-        labelsBalls += "<div class='radial-button label-ball' data-label-name='" + customLabels[i] + "' style='" + rotation(deg) +
+        labelsBalls += "<div class='radial-button label-ball' title='" + customLabels[i] +
+            "' data-label-name='" + customLabels[i] + "' style='" + rotation(deg) +
             " background-color: " + labelColors[customLabels[i]] + ";'></div>";
         deg += 15;
     }
