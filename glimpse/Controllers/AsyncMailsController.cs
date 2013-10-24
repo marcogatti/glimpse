@@ -372,7 +372,7 @@ namespace Glimpse.Controllers
                 labelAccount.CreateLabel(labelName); //IMAP
                 tran.Commit();
 
-                return Json(new { success = true }, JsonRequestBehavior.AllowGet);
+                return Json(new { success = true, color = newLabel.Entity.Color }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception exc)
             {
