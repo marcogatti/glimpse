@@ -158,7 +158,8 @@ function putButtons(circle) {
     "<div class='radial-button icon-minus-sign' title='Quitar importancia' style='" + rotation(20) + "'></div>" +
     "<div class='radial-button icon-trash' title='Eliminar' style='" + rotation(-20) + "'></div>" +
     "<div class='radial-button icon-comment' title='Responder' style='" + rotation(-40) + "'></div>" +
-    "<div class='radial-button icon-eye-close' title='Marcar como no leído' style='" + rotation(0) + "'></div>"
+    "<div class='radial-button icon-eye-close' title='Marcar como no leído' style='" + rotation(0) + "'></div>" +
+    "<div class='radial-button icon-gift hidden' title='Este email tiene archivos adjuntos' style='" + rotation(60) + "'></div>"
     );
 
     circle.prepend(buttons);
@@ -167,6 +168,10 @@ function putButtons(circle) {
         var eye = circle.find(".icon-eye-close");
         toggleEye(eye);
         eye.attr("title", "Marcar como leído");
+    }
+
+    if (circle.data("has-attachments")) {
+        circle.find(".icon-gift").removeClass("hidden");
     }
 
     circle.find(".icon-plus-sign").on('click', function () {

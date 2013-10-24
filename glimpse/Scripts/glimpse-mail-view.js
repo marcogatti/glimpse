@@ -1,6 +1,6 @@
 ﻿var currentCircle,
     currentBody,
-    attachmentIcon = $('<i class="icon-folder-close" title="Este email tiene archivos adjuntos"></i>');
+    attachmentIcon = $('<i class="icon-gift" title="Este email tiene archivos adjuntos"></i>');
 
 function initializeMailViewModal() {
 
