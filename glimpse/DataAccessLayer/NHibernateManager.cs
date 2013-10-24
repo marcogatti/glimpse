@@ -15,10 +15,10 @@ namespace Glimpse.DataAccessLayer
             {
                 if (_sessionFactory == null)
                 {
-                    string strConnectionString = ConfigurationManager.AppSettings["ConnectionString"];
+                    string connectionString = ConfigurationManager.AppSettings["ConnectionString"];
 
                     FluentConfiguration cfg = Fluently.Configure()
-                        .Database(MySQLConfiguration.Standard.ConnectionString(strConnectionString))
+                        .Database(MySQLConfiguration.Standard.ConnectionString(connectionString))
                         .Mappings(m => m.FluentMappings.AddFromAssemblyOf<MailEntity>());
 
                     _sessionFactory = cfg.BuildSessionFactory();

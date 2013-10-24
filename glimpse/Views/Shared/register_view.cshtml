@@ -1,9 +1,15 @@
 ﻿<div id="register-view" class="modal hide fade in" style="display: none;" data-backdrop="static">
+    <div class="modal-header" style="height: 50px;">
         <a class="close" data-dismiss="modal">×</a>
-
-        <h3 style="margin-left:5%; margin-top:3%" id="registration-title">Creá tu usuario Glimpse  <span class="hidden progress-circular">@{Html.RenderPartial("loading_widjet");}</span></h3>
+        <div class="pull-left">
+            <h3 id="registration-title">Creá tu usuario Glimpse</h3>
+        </div>
+        <div class="pull-left progress-circular hidden" style="margin-top: 8px; margin-left: 20px;">
+            @{Html.RenderPartial("loading_widjet");}
+        </div>
+    </div>
         
-    <div class="modal-body">
+    <div class="modal-body" style="max-height: 500px;">
         <ul class="nav nav-tabs">
             <li id="register-user" data-body-id="config-password-cont" class="active">
                 <a><i class="icon-user"></i> Datos de Usuario</a>
@@ -56,7 +62,7 @@
 
         <div id="register-mails-div" class="hidden nav-body">
             <form class="form-horizontal" id="register-mails-form" data-action="manageMailAccounts">
-                <div style="max-height: 320px; overflow-y: auto;">
+                <div style="max-height: 320px; overflow-y:auto">
                     <div class="control-group">
                         <label class="control-label" for="config-inp-account1">Cuenta de Email #1</label>
                         <div class="controls">
@@ -116,7 +122,7 @@
                         </div>
                     </div>
                 </div>
-                <hr />
+                
                 <a id="config_mailaccount-goback" class="btn btn-primary" style="margin-left: 25%">Volver</a>
                 <button id="config-mailaccount-submit" type="submit" class="btn btn-primary" style="margin-left: 25%">Guardar</button>
             </form>
