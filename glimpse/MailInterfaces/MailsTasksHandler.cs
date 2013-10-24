@@ -201,7 +201,11 @@ namespace Glimpse.MailInterfaces
                     MailsTasksHandler.StartMailsTask(task);
                 }
                 else
+                {
+                    task.Working = false;
+                    task.MailAccount.Disconnect();
                     throw;
+                }
             }
         }
         private static void SynchronizeBackward(MailsTask task)
