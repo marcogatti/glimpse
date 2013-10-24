@@ -371,8 +371,12 @@ function appendCustomLabel(label) {
     var name = label.showName;
     var color = label.Color;
     var labelToAppend = $("<li class='custom-label label label-glimpse' data-name='" + name + "'>" + name +
-        '<span class="pull-right hidden" title="Editar">' +
-        '<i class="icon-edit icon-white"></i><i class="icon-remove icon-white"></i></span></li>');
+        '<span class="pull-right hidden">' +
+        '<i class="icon-pencil icon-white" title="Renombrar"></i>'+
+        '<i class="icon-edit icon-white" title="Cambiar color"></i>'+
+        '<i class="icon-remove icon-white" title="Eliminar"></i>'+
+        '</span></li>'
+        );
 
     labelToAppend.find("span").on('click', function (e) {
         e.stopPropagation();
@@ -445,11 +449,6 @@ function createCustomLabel(labelName) {
 
     if (!exists(labelName)) {
 
-        //  parche temporal
-        var newLabel = {};
-        newLabel.showName = labelName;
-        newLabel.Color = "#91BCD5";
-
         $.ajax({
             type: "POST",
             url: "async/CreateLabel",
@@ -458,6 +457,9 @@ function createCustomLabel(labelName) {
 
         }).done(function (data) {
             if (data.success === true) {
+                var newLabel = {};
+                newLabel.showName = labelName;
+                newLabel.Color = data.color;
                 appendCustomLabel(newLabel);
             } else {
                 alert(data.message);

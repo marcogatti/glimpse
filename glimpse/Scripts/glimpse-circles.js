@@ -133,12 +133,12 @@ function putLabelBalls(circle) {
 
     circle.find(".label-ball").remove();
 
-    var deg = 195;
+    var deg = 135;
     for (var i = 0; i < customLabels.length; i++) {
         labelsBalls += "<div class='radial-button label-ball' title='" + customLabels[i] +
             "' data-label-name='" + customLabels[i] + "' style='" + rotation(deg) +
             " background-color: " + labelColors[customLabels[i]] + ";'></div>";
-        deg += 15;
+        deg += 20;
     }
 
     circle.prepend($(labelsBalls));
@@ -153,10 +153,10 @@ function putLabelBalls(circle) {
 function putButtons(circle) {
 
     var buttons = $(
-    "<div class='radial-button icon-plus-sign' title='Dar importacia' style='" + rotation(30) + "'></div>" +
-    "<div class='radial-button icon-minus-sign' title='Quitar importancia' style='" + rotation(15) + "'></div>" +
-    "<div class='radial-button icon-trash' title='Eliminar' style='" + rotation(-15) + "'></div>" +
-    "<div class='radial-button icon-comment' title='Responder' style='" + rotation(-30) + "'></div>" +
+    "<div class='radial-button icon-plus-sign' title='Dar importacia' style='" + rotation(40) + "'></div>" +
+    "<div class='radial-button icon-minus-sign' title='Quitar importancia' style='" + rotation(20) + "'></div>" +
+    "<div class='radial-button icon-trash' title='Eliminar' style='" + rotation(-20) + "'></div>" +
+    "<div class='radial-button icon-comment' title='Responder' style='" + rotation(-40) + "'></div>" +
     "<div class='radial-button icon-eye-close' title='Marcar como no leído' style='" + rotation(0) + "'></div>"
     );
 
