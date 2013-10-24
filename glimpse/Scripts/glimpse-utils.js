@@ -1,7 +1,9 @@
 ﻿var maxAge = 0,
     minAge = 0,
     labelColors = {},
-    editor;
+    editor,
+    wrapperVerticalPadding = parseInt($("#container-wrapper").css("padding-top")),
+    wrapperLeftPadding = parseInt($("#container-wrapper").css("padding-left"));
 
 
 function preventSelectingNotUsefulThings() {
@@ -196,16 +198,16 @@ function setDragging() {
 }
 
 function setDateCoordsPosition() {
+    var 
+        coordLineHeight = parseInt($(".date-coord").css("line-height"), 10),
+        dateLastWidth = parseInt($("#date-last").css("width"));
+
     $(".date-coord").css("top", function () {
-        return parseInt(containerHeight(), 10) - parseInt($(".date-coord").css("line-height"), 10) + 'px';
+        return containerHeight() + (2 * wrapperVerticalPadding) + coordLineHeight + 'px';
     });
     $("#date-last").css("left", function () {
-        return parseInt(containerWidth(), 10) - parseInt($("#date-last").css("width")) + 'px';
+        return containerWidth() - wrapperLeftPadding + 'px';
     });
-}
-
-function setRefreshButtonBehaviour() {
-    $('#refresh').click(function () { fetchMailsWithinActualPeriod() });
 }
 
 function ageToDate(age) {
