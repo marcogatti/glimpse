@@ -43,7 +43,7 @@ function insertCircle(value) {
         ];
 
         var newCircle = $("<div class='circle'" + dataAttributes.join("'") + "' title='" + value.from.address + "'>" +
-            "<div class='centered'><p content=true>" + value.subject.substr(0, 30) + "</p></div></div>");
+            "<div class='centered'><p content=true></p></div></div>");
 
         setSeenStatus(newCircle);
         calculateEmailColor(newCircle);
@@ -278,7 +278,7 @@ function unsetMailClicked(circle) {
         marginTop: '0'
     }, 200);
 
-    circle.find('[content=true]').text($(circle).attr('data-subject'));
+    circle.find('[content=true]').text($(circle).attr('data-subject').substr(0, 30));
 }
 
 function isClicked(circle) {

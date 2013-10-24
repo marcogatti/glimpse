@@ -13,6 +13,7 @@
     position: relative;
     margin: 0;
     border-width: 0;
+    border-bottom-width: 1px;
 }
 
 #mailaccounts-container {

@@ -393,12 +393,7 @@ function appendCustomLabel(label) {
 
     paintLabel(labelToAppend, color);
 
-    labelToAppend.find(".icon-edit").popover({
-        trigger: 'click',
-        placement: 'bottom',
-        html: true,
-        content: "<input type='color' class='label-color-picker' value='" + color + "' id='" + name + "-picker' onchange='changeLabelColor(this);'>"
-    });
+    setColorPopover(labelToAppend, color);
 
     labelToAppend.find(".icon-remove").on('click', function () {
         var currentLabel = $(this).parent().parent();
@@ -423,9 +418,14 @@ function appendCustomLabel(label) {
         content: "<input type='text' value='" + name + "' id='" + name + "-rename' onchange='renameLabel(this);'>"
     });
 
-    labelToAppend.hover(function () {
-        labelToAppend.find("span").toggleClass("hidden");
-    });
+    labelToAppend.hover(
+        function () {
+            labelToAppend.find("span").removeClass("hidden");
+        },
+        function () {
+            labelToAppend.find("span").addClass("hidden");
+        }
+    );
 
     setLabelSelection(labelToAppend);
     $(".custom-label:last-of-type").after(labelToAppend);
@@ -456,11 +456,23 @@ function renameLabel(input) {
     });
 }
 
+function setColorPopover(labelElement, currentColor) {
+    labelElement.find(".icon-edit").popover("destroy");
+    labelElement.find(".icon-edit").popover({
+        trigger: 'click',
+        placement: 'bottom',
+        html: true,
+        content: "<input type='color' class='label-color-picker' value='" + currentColor +
+            "' id='" + labelElement.attr("data-name") + "-picker' onchange='changeLabelColor(this);'>"
+    });
+}
+
 function changeLabelColor(colorPicker) {
     var targetLabelName = colorPicker.id.split("-")[0],
         newColor = colorPicker.value;
     var targetLabel = $(".custom-label[data-name='" + targetLabelName + "']");
     paintLabel(targetLabel, newColor);
+    setColorPopover(targetLabel, newColor);
 
     $.ajax({
         type: "POST",
