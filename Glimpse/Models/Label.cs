@@ -18,18 +18,17 @@ namespace Glimpse.Models
                 {
                     "#FFA500",
                     "#0059FF",
-                     "#FF8040",
-                     "#40BFFF",
-                     "#40FF80",
-                     "#FF40BF",
-                     "#7F40FF",
-                     "#BFFF40",
-                     "#FF3300",
-                     "#00CC00",
-                     "#6666FF",
-                     "#E7E01F",
-                }
-            ;
+                    "#FF8040",
+                    "#40BFFF",
+                    "#40FF80",
+                    "#FF40BF",
+                    "#7F40FF",
+                    "#BFFF40",
+                    "#FF3300",
+                    "#00CC00",
+                    "#6666FF",
+                    "#E7E01F",
+                };
 
         public Label(LabelEntity labelEntity)
         {
@@ -38,7 +37,19 @@ namespace Glimpse.Models
 
         public void Rename(String oldName, String newName, ISession session)
         {
-            this.Entity.Name = this.Entity.Name.Replace(oldName, newName);
+            if (this.Entity.Name == oldName)
+                this.Entity.Name = newName;
+            else
+            {
+                List<String> labelHierarchy = oldName.Split( new String[] {"/"}, StringSplitOptions.RemoveEmptyEntries).ToList();
+                String newHierarchy = "";
+                foreach (String label in labelHierarchy)
+                    if (label == oldName)
+                        newHierarchy += newName + "/";
+                    else
+                        newHierarchy += label + "/";
+                this.Entity.Name = newHierarchy.Trim('/');
+            }
             this.SaveOrUpdate(session);
         }
         public void Delete(ISession session)
