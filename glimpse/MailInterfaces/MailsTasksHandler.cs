@@ -18,7 +18,7 @@ namespace Glimpse.MailInterfaces
 
         private static int MAILS_AMOUNT_PER_ROUND = 4;
 
-        public static void StartSynchronization(String mailAddress)
+        public static void StartSynchronization(String mailAddress, Boolean forwardOnly = true)
         {
             MailAccount mailAccountAll;
             MailsTask newAllTask;
@@ -81,7 +81,7 @@ namespace Glimpse.MailInterfaces
             {
                 if (newAllTask.HighestUidLocal != 0) //si no es la primera vez, que sincronice hacia adelante sin limites
                     newAllTask.SetUnlimitedForwarding(true);
-                newAllTask.SetForwardOnly(true); //TODO: ver criterio cuando no deberia ser solo para adelante
+                newAllTask.SetForwardOnly(forwardOnly);
                 MailsTasksHandler.LockTasksList();
                 MailsTasksHandler.TasksList[mailAddressAll] = newAllTask;
                 MailsTasksHandler.UnlockTasksList();

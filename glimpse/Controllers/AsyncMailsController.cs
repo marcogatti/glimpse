@@ -526,7 +526,7 @@ namespace Glimpse.Controllers
                 if (sessionUser == null)
                     throw new GlimpseException("No se encontró el usuario.");
                 foreach (MailAccount userMailAccount in sessionUser.GetAccounts())
-                    Task.Factory.StartNew(() => MailsTasksHandler.StartSynchronization(userMailAccount.Entity.Address));
+                    Task.Factory.StartNew(() => MailsTasksHandler.StartSynchronization(userMailAccount.Entity.Address, false));
             }
             catch (Exception exc)
             {
@@ -538,23 +538,32 @@ namespace Glimpse.Controllers
         {
             if (Extra.IsValidFile(file))
             {
-                String filePath = Extra.SaveToFS(file); //el contenido va a disco
+                if (Session[AsyncMailsController.FILES] == null)
+                    Session[AsyncMailsController.FILES] = new List<ExtraFile>();
 
-                ExtraFile attachment = new ExtraFile(); //el resto no
+                if (((List<ExtraFile>)Session[AsyncMailsController.FILES]).Any(x => x.Size == file.ContentLength && x.Name == file.FileName))
+                    return;
+
+                ExtraFile attachment = new ExtraFile();
                 attachment.Name = file.FileName;
                 attachment.Size = file.ContentLength;
                 attachment.Type = file.ContentType;
-                attachment.Path = filePath;
+                attachment.Path = Extra.SaveToFS(file); //el contenido va a disco
                 attachment.Content = new byte[file.ContentLength];
-                //using(BinaryReader reader = new BinaryReader(file.InputStream))
-                //    attachment.fileContent = reader.ReadBytes(file.ContentLength);
-
-                if (Session[AsyncMailsController.FILES] == null)
-                    Session[AsyncMailsController.FILES] = new List<ExtraFile>();
                 ((List<ExtraFile>)Session[AsyncMailsController.FILES]).Add(attachment);
             }
             else
                 throw new GlimpseException("El archivo seleccionado es mayor a 5mb o es potencialmente danino.");
+        }
+        [HttpPost]
+        [AjaxOnly]
+        public void ClearFiles()
+        {
+            if (Session[AsyncMailsController.FILES] == null)
+                return;
+            foreach (ExtraFile file in (List<ExtraFile>)Session[AsyncMailsController.FILES])
+                System.IO.File.Delete(file.Path);
+            ((List<ExtraFile>)Session[AsyncMailsController.FILES]).Clear();
         }
         #endregion
 
