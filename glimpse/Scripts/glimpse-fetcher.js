@@ -23,7 +23,7 @@ function fetchRecentMails() {
 
     showProgressBar("#circles-progress");
 
-    $.getJSON("async/GetMailsByAmount?amountOfMails=15", function (data) {
+    $.getJSON("async/GetMailsByAmount?amountOfMails=10", function (data) {
 
         hideProgressBar("#circles-progress");
 
@@ -53,5 +53,5 @@ function fetchMailsWithinActualPeriod() {
 }
 
 function setAutomaticFetching() {
-    setInterval(function () { fetchMailsWithinActualPeriod(); }, 3000);
+    setInterval(function () { fetchMailsWithinActualPeriod(); }, 10000);
 }
