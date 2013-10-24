@@ -29,6 +29,7 @@ namespace Glimpse.MailInterfaces
             //mail.SendSsl crea la conexión, manda los 3 parámetros de SMPT (MAIL, RCPT y DATA) y cierra la conexión
             newMail.SendSsl("smtp.gmail.com", 465, this.senderAddress, CryptoHelper.DecryptDefaultKey(this.password), SaslMechanism.Login);
         }
+
         public void sendMail(AddressCollection recipients, String bodyHTML, String subject = "",
                              AddressCollection CC = null, AddressCollection BCC = null,
                              List<HttpPostedFile> attachments = null)
@@ -51,7 +52,7 @@ namespace Glimpse.MailInterfaces
                     throw new InvalidRecipientsException("La direccion " + this.ParseWrongReceipt(exc.Message) +
                                                          " no es valida.", exc);
                 else
-                    throw exc;
+                    throw;
             }
         }
 
@@ -62,11 +63,10 @@ namespace Glimpse.MailInterfaces
 
             resetMail.From = new ActiveUp.Net.Mail.Address("GlimpseInnovationSystems@gmail.com");
             resetMail.BodyText.Text = "Usted ha olvidado la contraseña de su usuario Glimpse: " + username +
-                                      ".\nLa nueva contraseña autogenerada es: \"" + newPassword + "\"." + 
+                                      ".\nLa nueva contraseña autogenerada es: \"" + newPassword + "\"." +
                                       "\nDeberá ingresar con ésta clave la próxima vez que ingrese a Glimpse.";
-            resetMail.BodyText.ContentTransferEncoding = ContentTransferEncoding.QuotedPrintable;
-            resetMail.BodyText.Charset = "ISO-8859-1";
-            resetMail.BodyText.Format = BodyFormat.Text;
+
+            SetMailBodyEncoding(resetMail.BodyText, BodyFormat.Text);
 
             String encodedSubject = "=?ISO-8859-1?B?";
             Encoding iso = Encoding.GetEncoding("ISO-8859-1");
@@ -78,6 +78,7 @@ namespace Glimpse.MailInterfaces
             resetMail.To = to;
             resetMail.SendSsl("smtp.gmail.com", 465, "glimpseinnovationsystems@gmail.com", "poiewq123890", SaslMechanism.Login);
         }
+
         public static void SendGreetingsPassword(User newUser, String mailAddress)
         {
             SmtpMessage greetingsMail = new SmtpMessage();
@@ -102,9 +103,8 @@ namespace Glimpse.MailInterfaces
 
             greetingsMail.From = new ActiveUp.Net.Mail.Address("GlimpseInnovationSystems@gmail.com");
             greetingsMail.BodyText.Text = mailBody;
-            greetingsMail.BodyText.ContentTransferEncoding = ContentTransferEncoding.QuotedPrintable;
-            greetingsMail.BodyText.Charset = "ISO-8859-1";
-            greetingsMail.BodyText.Format = BodyFormat.Text;
+
+            SetMailBodyEncoding(greetingsMail.BodyText, BodyFormat.Text);
 
             String encodedSubject = "=?ISO-8859-1?B?";
             Encoding iso = Encoding.GetEncoding("ISO-8859-1");
@@ -119,18 +119,20 @@ namespace Glimpse.MailInterfaces
 
         private static void SetMailAttachments(List<HttpPostedFile> attachments, SmtpMessage newMail)
         {
-            if (attachments != null)
-                foreach (HttpPostedFile file in attachments)
-                {
-                    Attachment attachment = new Attachment();
-                    using (BinaryReader reader = new BinaryReader(file.InputStream))
-                        attachment.BinaryContent = reader.ReadBytes(file.ContentLength);
-                    attachment.Filename = file.FileName;
-                    attachment.ContentType.Type = file.ContentType;
-                    attachment.ParentMessage = newMail;
-                    newMail.Attachments.Add(attachment);
-                }
+            if (attachments == null) return;
+
+            foreach (HttpPostedFile file in attachments)
+            {
+                Attachment attachment = new Attachment();
+                using (BinaryReader reader = new BinaryReader(file.InputStream))
+                    attachment.BinaryContent = reader.ReadBytes(file.ContentLength);
+                attachment.Filename = file.FileName;
+                attachment.ContentType.Type = file.ContentType;
+                attachment.ParentMessage = newMail;
+                newMail.Attachments.Add(attachment);
+            }
         }
+
         private static void SetMailRecipients(AddressCollection recipients, String subject, AddressCollection CC, AddressCollection BCC, SmtpMessage newMail)
         {
             //=?ISO-8859-1?B?0fHR8dHx0fG0tLS0b/PztLRv8w==?=
@@ -143,6 +145,7 @@ namespace Glimpse.MailInterfaces
             newMail.Cc = CC ?? new AddressCollection();
             newMail.Bcc = BCC ?? new AddressCollection();
         }
+
         private static void SetMailBody(String bodyHTML, SmtpMessage newMail)
         {
             if (bodyHTML != null)
@@ -155,15 +158,17 @@ namespace Glimpse.MailInterfaces
                 newMail.BodyHtml.Text = newMail.BodyText.Text = " ";
             }
 
-            newMail.BodyHtml.ContentTransferEncoding = ContentTransferEncoding.QuotedPrintable;
-            newMail.BodyHtml.Charset = "ISO-8859-1";
-            newMail.BodyHtml.Format = BodyFormat.Html;
-
-            newMail.BodyText.ContentTransferEncoding = ContentTransferEncoding.QuotedPrintable;
-            newMail.BodyText.Charset = "ISO-8859-1";
-            newMail.BodyText.Format = BodyFormat.Text;
+            SetMailBodyEncoding(newMail.BodyHtml, BodyFormat.Html);
+            SetMailBodyEncoding(newMail.BodyText, BodyFormat.Text);
         }
-        
+
+        private static void SetMailBodyEncoding(MimeBody body, BodyFormat format)
+        {
+            body.ContentTransferEncoding = ContentTransferEncoding.QuotedPrintable;
+            body.Charset = "ISO-8859-1";
+            body.Format = format;
+        }
+
         private void SetMailSender(SmtpMessage newMail)
         {
             if (this.senderName != null)
@@ -171,16 +176,18 @@ namespace Glimpse.MailInterfaces
             else
                 newMail.From = new ActiveUp.Net.Mail.Address(this.senderAddress);
         }
+
         private void CheckRecipients(AddressCollection recipients)
         {
             if (recipients.Count == 0)
                 throw new NoRecipientsException("Debe existir por lo menos un destinatario.");
         }
+
         private String ParseWrongReceipt(String smtpResponse)
         {
             //respuesta del tipo: "Command "rcpt to: <qweqwe>" failed : 553-5.1.2 We weren't able to find the recipient domain. Please check for any"
             smtpResponse = smtpResponse.Remove(smtpResponse.IndexOf(" failed") - 2);
-            smtpResponse = smtpResponse.Remove(0, smtpResponse.IndexOf("<")+ 1);
+            smtpResponse = smtpResponse.Remove(0, smtpResponse.IndexOf("<") + 1);
             return smtpResponse;
         }
     }

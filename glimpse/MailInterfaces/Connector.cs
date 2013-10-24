@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using ActiveUp.Net.Mail;
-using ActiveUp.Net.Imap4;
 using Glimpse.Exceptions.MailInterfacesExceptions;
 using Glimpse.Helpers;
 
