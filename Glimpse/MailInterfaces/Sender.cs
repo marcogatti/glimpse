@@ -32,7 +32,7 @@ namespace Glimpse.MailInterfaces
 
         public void sendMail(AddressCollection recipients, String bodyHTML, String subject = "",
                              AddressCollection CC = null, AddressCollection BCC = null,
-                             List<HttpPostedFile> attachments = null)
+                             List<HttpPostedFileBase> attachments = null)
         {
             this.CheckRecipients(recipients);
             SmtpMessage newMail = new SmtpMessage();
@@ -117,19 +117,26 @@ namespace Glimpse.MailInterfaces
             greetingsMail.SendSsl("smtp.gmail.com", 465, "glimpseinnovationsystems@gmail.com", "poiewq123890", SaslMechanism.Login);
         }
 
-        private static void SetMailAttachments(List<HttpPostedFile> attachments, SmtpMessage newMail)
+        private static void SetMailAttachments(List<HttpPostedFileBase> attachments, SmtpMessage newMail)
         {
             if (attachments == null) return;
 
-            foreach (HttpPostedFile file in attachments)
+            foreach (HttpPostedFileBase file in attachments)
             {
                 Attachment attachment = new Attachment();
                 using (BinaryReader reader = new BinaryReader(file.InputStream))
+                {
+                    //attachment.TextContent = Convert.ToBase64String(reader.ReadBytes(file.ContentLength));
                     attachment.BinaryContent = reader.ReadBytes(file.ContentLength);
+                }
                 attachment.Filename = file.FileName;
                 attachment.ContentType.Type = file.ContentType;
-                attachment.ParentMessage = newMail;
+                attachment.ContentDisposition.Disposition = "attachment";
+                //attachment.ParentMessage = newMail;
                 newMail.Attachments.Add(attachment);
+                newMail.ContentDisposition.Disposition = "multipart/mixed";
+                attachment.StoreToFile("D:\\UTN\\Proyecto Final\\adjunto");
+                attachment.ContentTransferEncoding = ContentTransferEncoding.Base64;
             }
         }
 

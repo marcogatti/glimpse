@@ -231,7 +231,7 @@ namespace Glimpse.Models
             MailAccount.Save(mails);
             amountOfMails = mails.Count;
         }
-        public void SendMail(String toAddresses, String body, String subject, List<HttpPostedFile> uploadedFiles)
+        public void SendMail(String toAddresses, String body, String subject, List<HttpPostedFileBase> uploadedFiles)
         {
             AddressCollection recipients = Glimpse.Models.Address.ParseAddresses(toAddresses);
             this.MySender.sendMail(recipients, body, subject, null, null, uploadedFiles);

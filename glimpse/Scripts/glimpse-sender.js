@@ -45,11 +45,36 @@ function sendEmailAsync(fromAccountId, toAddress, subject, body, circularProgres
     });
 }
 
+function prepareToUploadAttachedFiles(compose_panel) {
+
+    compose_panel.find('.upload-file').click(function () {
+        var formData = new FormData($('#upload-file-form')[0]);
+        $.ajax({
+            url: 'Async/UploadFile',  //Server script to process data
+            type: 'POST',
+            xhr: function () {  // Custom XMLHttpRequest
+                var myXhr = $.ajaxSettings.xhr();
+                return myXhr;
+            },
+            success: function () { alert("salio todo bien") },
+            error: function () { alert("salio todo mal") },
+            // Form data
+            data: formData,
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+    });
+
+}
+
 function prepareComposeDialog() {
 
     var compose_panel = $("#compose_pannel"),
         circularProgress = compose_panel.find('.progress-circular'),
         composePanelTitle;;
+
+    prepareToUploadAttachedFiles(compose_panel);
 
     compose_panel.dialog({
         autoOpen: false,
@@ -110,3 +135,4 @@ function displayComposeDialog() {
 function setMailEditorText(text) {
     editor.setData(text);
 }
+

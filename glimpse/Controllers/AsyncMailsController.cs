@@ -172,14 +172,16 @@ namespace Glimpse.Controllers
             try
             {
                 MailAccount mailAccount = this.GetMailAccount(mailAccountId);
-                List<HttpPostedFile> uploadedFiles = new List<HttpPostedFile>();
-                foreach (HttpPostedFile file in this.Request.Files)
-                {
-                    if (file.ContentType == "application/octet-stream" || file.ContentType == "application/exe")
-                        throw new GlimpseException("No se pueden enviar archivos adjuntos del tipo ejecutable.");
-                    else if (file.ContentLength > 0)
-                        uploadedFiles.Add(file);
-                }
+                List<HttpPostedFileBase> uploadedFiles = new List<HttpPostedFileBase>();
+                //foreach (HttpPostedFile file in this.Request.Files)
+                //{
+                //    if (file.ContentType == "application/octet-stream" || file.ContentType == "application/exe")
+                //        throw new GlimpseException("No se pueden enviar archivos adjuntos del tipo ejecutable.");
+                //    else if (file.ContentLength > 0)
+                //        uploadedFiles.Add(file);
+                //}
+                if (Session["attachment"] != null)
+                    uploadedFiles.Add((HttpPostedFileBase)Session["attachment"]);
 
                 mailAccount.SendMail(sendInfo.ToAddress, sendInfo.Body, sendInfo.Subject, uploadedFiles);
                 return Json(new { success = true, address = sendInfo.ToAddress }, JsonRequestBehavior.AllowGet);
@@ -521,6 +523,11 @@ namespace Glimpse.Controllers
             {
                 Log.LogException(exc);
             }
+        }
+        [HttpPost]
+        public void UploadFile(HttpPostedFileBase file)
+        {
+            Session["attachment"] = file;
         }
         #endregion
 
