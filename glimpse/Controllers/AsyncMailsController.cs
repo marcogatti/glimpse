@@ -520,13 +520,14 @@ namespace Glimpse.Controllers
 
             foreach (MailEntity mail in mails)
             {
-                Int64 currentAge = DateTime.Now.Ticks - mail.Date.Ticks;
+                DateTime mailDate = DateTimeHelper.changeToUtc(mail.Date);
+                Int64 currentAge = DateTime.Now.Ticks - mailDate.ToLocalTime().Ticks;
                 List<Object> currentLabels = PrepareLabels(mail.Labels);
                 Object anEmail = new
                 {
                     id = mail.Id,
                     subject = mail.Subject,
-                    date = DateTimeHelper.changeToUtc(mail.Date),
+                    date = mailDate,
                     age = currentAge,
                     from = new
                     {

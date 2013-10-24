@@ -375,8 +375,8 @@ function calculateEmailColor(circle) {
 
 function calculateEmailPosition(circle) {
 
-    var left = (circle.attr('data-age') - minAge) / currentPeriodShown(),
-        top = (circle.attr('data-from').charCodeAt(0) - "a".charCodeAt(0) + 2) / alphabetSize();
+    var left = (circle.data('age') - minAge) / currentPeriodShown(),
+        top = (circle.data('from').charCodeAt(0) - "a".charCodeAt(0)) / alphabetSize();
 
     circle.css('top', function () {
         return top * containerHeight() + 'px';
