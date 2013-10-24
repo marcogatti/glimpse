@@ -100,7 +100,7 @@ namespace Glimpse.MailInterfaces
             //if (DateTime.TryParseExact(dateString, formatStrings, new CultureInfo("en-US"), DateTimeStyles.None, out returnDateTime))
             //    return returnDateTime;
             //else
-                return DateTime.Today.AddYears(-1);
+            return DateTime.Today.AddYears(-1);
         }
 
         #region Mail Retrieving Methods
@@ -160,7 +160,7 @@ namespace Glimpse.MailInterfaces
             Mail retrievedMail;
 
             mailsUIDs = this.CleanSearchResponse(this.Receiver.Command("SEARCH UID " + firstUID + ":" + lastUID));
-         
+
             foreach (Int32 currentMailOrdinal in mailsUIDs)
             {
                 retrievedMail = this.FetchMail(targetMailbox, currentMailOrdinal);
@@ -307,21 +307,13 @@ namespace Glimpse.MailInterfaces
         private Mailbox GetMailbox(String targetMailboxName)
         {
             if (this.CurrentOpenedMailbox == null)
-            {
                 return this.OpenMailbox(targetMailboxName);
-            }
-            else
-            {
-                if (this.CurrentOpenedMailbox.Name == targetMailboxName)
-                {
-                    return this.CurrentOpenedMailbox;
-                }
-                else
-                {
-                    this.CloseMailbox();
-                    return this.OpenMailbox(targetMailboxName);
-                }
-            }
+
+            if (this.CurrentOpenedMailbox.Name == targetMailboxName)
+                return this.CurrentOpenedMailbox;
+
+            this.CloseMailbox();
+            return this.OpenMailbox(targetMailboxName);
         }
         private Mailbox OpenMailbox(String mailbox)
         {
@@ -525,7 +517,7 @@ namespace Glimpse.MailInterfaces
         {
             if (this.AccountMailboxesBySpecialProperty["Tags"] == "")
                 this.AccountMailboxesBySpecialProperty["Tags"] = labelName;
-            else if(!this.AccountMailboxesBySpecialProperty["Tags"].Split(',').Any(x => x == labelName))
+            else if (!this.AccountMailboxesBySpecialProperty["Tags"].Split(',').Any(x => x == labelName))
                 this.AccountMailboxesBySpecialProperty["Tags"] += "," + labelName;
 
             if (!this.AccountLabels.Any(x => x.Name == labelName))
@@ -540,9 +532,10 @@ namespace Glimpse.MailInterfaces
         private void RemoveLabel(String labelName)
         {
             String tags = this.AccountMailboxesBySpecialProperty["Tags"];
-            if (tags == null || tags == "")
-                return;
-            else if (tags == labelName)
+
+            if (tags == null || tags == "") return;
+
+            if (tags == labelName)
                 this.AccountMailboxesBySpecialProperty["Tags"] = String.Empty;
             else
             {
@@ -600,7 +593,7 @@ namespace Glimpse.MailInterfaces
                 mailLabel = (from accountLabel in this.AccountLabels
                              where (accountLabel.Name == labelName || accountLabel.SystemName == labelName)
                              select accountLabel).SingleOrDefault<LabelEntity>();
-                
+
                 if (mailLabel != null)
                     mail.Labels.Add(mailLabel);
             }
@@ -669,10 +662,10 @@ namespace Glimpse.MailInterfaces
             //"130926123033355 OK SEARCH completed (Success)\r\n* SEARCH 5 6 19 151 251\r\n"
             imapResponse = imapResponse.Remove(0, imapResponse.LastIndexOf("SEARCH") + 7);
             imapResponse = imapResponse.Replace("\r\n", String.Empty);
-            if(imapResponse == "\n") //si no devolvio numeros
+            if (imapResponse == "\n") //si no devolvio numeros
                 return new Int32[0];
             String[] numbersStrings = imapResponse.Split(new String[] { " " }, StringSplitOptions.RemoveEmptyEntries);
-            Int32[] returnNumbers =  numbersStrings.Select(x => Int32.Parse(x)).ToArray();
+            Int32[] returnNumbers = numbersStrings.Select(x => Int32.Parse(x)).ToArray();
             return returnNumbers;
         }
         #endregion

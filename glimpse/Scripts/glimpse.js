@@ -8,7 +8,6 @@ $(document).ready(function () {
     setAutomaticFetching();
     setDragging();
     configureZoom();
-    setRefreshButtonBehaviour();
     setRefreshOnResize();
     prepareComposeDialog();
     setTransitionsCheckbox();

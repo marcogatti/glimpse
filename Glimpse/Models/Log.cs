@@ -1,12 +1,6 @@
 ﻿using Elmah;
-using Glimpse.DataAccessLayer;
-using Glimpse.DataAccessLayer.Entities;
 using Glimpse.Exceptions;
-using NHibernate;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
 namespace Glimpse.Models
 {

@@ -24,78 +24,15 @@
         <h2 class="form-signin-heading">Bienvenido a Glimpse</h2>
         
         @Html.ValidationSummary()
-        @Html.TextBoxFor(m => m.Username, new { placeholder = "Tu usuario o dirección de correo", @class = "input-block-level", id="username", autofocus="autofocus" })
+        @Html.TextBoxFor(m => m.Username, new { placeholder = "Tu usuario o dirección de correo", @class = "input-block-level", id = "username", autofocus = "autofocus" })
         @Html.PasswordFor(m => m.Password, new { placeholder = "Tu contraseña", @class = "input-block-level" })
         
         <input class="btn btn-primary btn-success" type="submit" value="Entrar" />
         <a class="btn btn-default" id="registration-link">Crear nueva cuenta Glimpse</a>
-        <a class="btn btn-link" id="forgot-password" style="margin-left:-4%">Olvidé mi contraseña...</a>
+        <a class="btn btn-link" id="forgot-password" style="margin-left: -4%">Olvidé mi contraseña...</a>
     }
 
-    @*<div id="registration-view" class="modal hide fade in">*@
-
-        @{Html.RenderPartial("register_view");}
-    @*    <div id="first-screen">
-
-            @using (Ajax.BeginForm("ValidateUserFields", "Account", null, new AjaxOptions { OnSuccess = "registrationNext", OnFailure = "registrationFailure" }, new { @class = "registration-modal" }))
-            {
-                @Html.AntiForgeryToken()
-                <h3 class="form-signin-heading" id="registration-view-title">Creá tu usuario Glimpse</h3>
-
-                @Html.ValidationSummary()
-
-                <div id="first-validations"></div>
-                
-                @Html.TextBoxFor(m => m.Firstname, new { maxlenght = 16, placeholder = "Escribí tu nombre...", @class = "input-block-level", id="firstname" })
-                @Html.TextBoxFor(m => m.Lastname, new { maxlenght = 16, placeholder = "Escribí tu apellido...", @class = "input-block-level", id="lastname" })
-                @Html.TextBoxFor(m => m.Username, new { maxlenght = 20, placeholder = "Elegí un nombre de usuario...", @class = "input-block-level", id="username" })
-                @Html.PasswordFor(m => m.Password, new { maxlenght = 20, placeholder = "Ingresá tu contraseña...", @class = "input-block-level", id="password" })
-                @Html.PasswordFor(m => m.ConfirmationPassword, new { maxlenght = 20, placeholder = "Confirmá tu contraseña...", @class = "input-block-level", id="confirmation" })
-            
-                <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
-                <input class="btn btn-default" id="registration-next-btn" type="submit" value="Siguiente" />
-            }
-        </div>
-
-        <div id="second-screen" class="hidden">
-
-            @using (Html.BeginForm("CreateUser", "Account", FormMethod.Post, new { @class = "registration-modal-2" }))
-            {
-                @Html.AntiForgeryToken()
-
-                <h3 class="form-signin-heading">Integrá tus cuentas de correo</h3>
-                <div hidden>
-                @Html.TextBoxFor(m => m.Firstname, new { maxlenght = 16, placeholder = "Escribí tu nombre...", @class = "input-block-level", id="createFirstname" })
-                @Html.TextBoxFor(m => m.Lastname, new { maxlenght = 16, placeholder = "Escribí tu apellido...", @class = "input-block-level", id="createLastname" })
-                @Html.TextBoxFor(m => m.Username, new { maxlenght = 20, placeholder = "Elegí un nombre de usuario...", @class = "input-block-level", id="createUsername" })
-                @Html.PasswordFor(m => m.Password, new { maxlenght = 20, placeholder = "Ingresá tu contraseña...", @class = "input-block-level", id="createPassword" })
-                @Html.PasswordFor(m => m.ConfirmationPassword, new { maxlenght = 20, placeholder = "Confirmá tu contraseña...", @class = "input-block-level", id="createConfirmation" })
-                </div>
-                
-                <table>
-                    <tr class="mail-register-row">
-                        <td>@Html.TextBoxFor(m => m.ListMailAccounts[0].Address, new { maxlenght = 16, placeholder = "Primer cuenta de correo...", type="email", @class = "input-large" })</td>
-                        <td>@Html.PasswordFor(m => m.ListMailAccounts[0].Password, new { maxlenght = 20, placeholder = "Contraseña de la cuenta...", @class = "input-large" })</td>
-                        <td>@Html.CheckBoxFor(m => m.ListMailAccounts[0].IsMainAccount, new { id = "check1", @checked="checked", onchange="checkbox1Changed()" })</td>
-                    </tr>
-                    <tr class="mail-register-row">
-                        <td>@Html.TextBoxFor(m => m.ListMailAccounts[1].Address, new { maxlenght = 16, placeholder = "Segunda cuenta de correo...", type="email", @class = "input-large" })</td>
-                        <td>@Html.PasswordFor(m => m.ListMailAccounts[1].Password, new { maxlenght = 20, placeholder = "Contraseña de la cuenta...", @class = "input-large" })</td>
-                        <td>@Html.CheckBoxFor(m => m.ListMailAccounts[1].IsMainAccount, new { id="check2", onchange="checkbox2Changed()" })</td>
-                    </tr>
-                    <tr class="mail-register-row">
-                        <td>@Html.TextBoxFor(m => m.ListMailAccounts[2].Address, new { maxlenght = 20, placeholder = "Tercer cuenta de correo...", type="email", @class = "input-large" })</td>
-                        <td>@Html.PasswordFor(m => m.ListMailAccounts[2].Password, new { maxlenght = 20, placeholder = "Contraseña de la cuenta...", @class = "input-large" })</td>
-                        <td>@Html.CheckBoxFor(m => m.ListMailAccounts[2].IsMainAccount, new { id="check3", onchange="checkbox3Changed()" })</td>
-                    </tr>
-                </table>
-                <input class="btn btn-default" id="registration-back-btn" type="button" value="Volver" />
-                <input class="btn btn-primary" id="registration-register-btn" type="submit" value="Registrar usuario" />
-            }
-        </div>
-    </div>*@
-
-    
+    @{Html.RenderPartial("register_view");}
 
 </div>
 

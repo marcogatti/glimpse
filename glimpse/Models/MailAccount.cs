@@ -58,10 +58,8 @@ namespace Glimpse.Models
                 this.Entity.OldestMailDate = DateTime.Now.AddYears(-1);
                 return;
             }
-            else
-            {
-                this.Entity.OldestMailDate = this.MyFetcher.GetOldestMailDate(250);
-            }
+
+            this.Entity.OldestMailDate = this.MyFetcher.GetOldestMailDate(250);
         }
         public void Dispose()
         {
@@ -106,7 +104,7 @@ namespace Glimpse.Models
 
                 //eliminar labels que no esten en Gmail
                 var namesLookUp = labelsName.ToLookup(x => x);
-                var removedLabels = databaseLabels.Where(x => x.SystemName == null &&!namesLookUp.Contains(x.Name));
+                var removedLabels = databaseLabels.Where(x => x.SystemName == null && !namesLookUp.Contains(x.Name));
                 foreach (LabelEntity removedLabel in removedLabels)
                 {
                     Label label = new Label(removedLabel);
@@ -356,7 +354,7 @@ namespace Glimpse.Models
         {
             if (labelName == null || databaseLabels.Any(x => x.Name == labelName))
                 return;
-            
+
             LabelEntity labelEntity = new LabelEntity();
             labelEntity.Name = labelName;
             labelEntity.MailAccountEntity = this.Entity;
