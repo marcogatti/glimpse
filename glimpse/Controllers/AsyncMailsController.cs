@@ -12,6 +12,7 @@ using NHibernate.Criterion;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 
@@ -490,8 +491,7 @@ namespace Glimpse.Controllers
                 currentMailAccount.ArchiveMail(mail);
                 tran.Commit();
 
-                JsonResult result = Json(new { success = true }, JsonRequestBehavior.AllowGet);
-                return result;
+                return Json(new { success = true }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception exc)
             {
@@ -503,6 +503,23 @@ namespace Glimpse.Controllers
             finally
             {
                 session.Close();
+            }
+        }
+        [HttpPost]
+        [AjaxOnly]
+        public void SynchronizeAccount()
+        {
+            try
+            {
+                User sessionUser = (User)Session[AccountController.USER_NAME];
+                if (sessionUser == null)
+                    throw new GlimpseException("No se encontró el usuario.");
+                foreach (MailAccount userMailAccount in sessionUser.GetAccounts())
+                    Task.Factory.StartNew(() => MailsTasksHandler.StartSynchronization(userMailAccount.Entity.Address));
+            }
+            catch (Exception exc)
+            {
+                Log.LogException(exc);
             }
         }
         #endregion

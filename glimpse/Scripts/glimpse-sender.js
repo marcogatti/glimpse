@@ -73,7 +73,11 @@ function prepareComposeDialog() {
             text: "Enviar",
             click: function () {
                 startWorkingWidget(circularProgress);
-                sendEmailAsync($('#email-from').html(), $("#email-to").val(), $("#email-subject").val(), editor.getData(), circularProgress);
+                sendEmailAsync($('#email-from').html(),
+                               $("#email-to").val(),
+                               $("#email-subject").val(),
+                               editor.getData(),
+                               circularProgress);
             }
         }
         ]
@@ -85,7 +89,7 @@ function prepareComposeDialog() {
 
     $("#compose").on("click", function () {
         var compose_panel = $("#compose_pannel"),
-            mainMailAccountId = getMainAccount(user_mailAccounts);
+            mainMailAccountId = user_mailAccounts[getMainAccount(user_mailAccounts)].mailAccountId;
 
         compose_panel.find('#email-from').html(mainMailAccountId);
 
