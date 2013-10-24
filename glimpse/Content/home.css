@@ -170,15 +170,15 @@ div.field-group {
 .radial-button {
     padding: 0;
     position: absolute;
-    top: 150px;
-    left: 0;
+    top: 75px;
+    left: -15px;
     cursor: pointer;
     border-radius: 50%;
     height: 15px;
     width: 15px;
-    box-shadow: 0 0 4px 4px white;
+    box-shadow: 0 0 2px 2px white;
     transition: all 0.1s;
-    -webkit-transform-origin: 75px -75px;
+    -webkit-transform-origin: 90px 0;
     transform-origin: 75px -75px;
 
 }

@@ -12,12 +12,22 @@ namespace Glimpse.Models
     public class Label
     {
         public LabelEntity Entity { get; private set; }
-        private static String DefaultColor = "defaultColor";
+        private static String DefaultColor = "#91BCD5";
         private static IList<String> LabelColors =
              new String[] 
-                {"color1",
-                 "color2",
-                 "color3",
+                {
+                    "#FFA500",
+                    "#0059FF",
+                     "#FF8040",
+                     "#40BFFF",
+                     "#40FF80",
+                     "#FF40BF",
+                     "#7F40FF",
+                     "#BFFF40",
+                     "#FF3300",
+                     "#00CC00",
+                     "#6666FF",
+                     "#E7E01F",
                 }
             ;
 

@@ -16,41 +16,11 @@ var unwantedSystemLabels = [label_important, label_flagged, label_draft],
 
 function populateLabelColors() {
 
-    var glimpseColors = [
-
-    //  algunos de los colores de Gmail
-    "rgb(251, 76, 47)",   //  rojo
-    "rgb(22, 167, 101)",  //  verde
-    "rgb(255, 173, 70)",  //  naranja
-    "rgb(73, 134, 231)",  //  azul
-
-    //  otros
-    "LimeGreen",
-    "LightSeaGreen",
-    "Crimson",
-    "Indigo",
-    'aqua',
-    'blue',
-    'fuchsia',
-    'green',
-    'gray',
-    'lime',
-    'maroon',
-    'navy',
-    'olive',
-    'purple',
-    'red',
-    'silver',
-    'teal',
-    'yellow'];
-
     var i = 0;
     $(".custom-label:not(.custom-label[data-name^='others'])").each(function () {
 
-        var currentColor = glimpseColors[i];
-
         if ($(this).data("name") !== "others") {
-            paintLabel($(this), currentColor);
+            paintLabel($(this), $(this).data("color"));
             i++;
         }
     });
@@ -59,8 +29,9 @@ function populateLabelColors() {
 }
 
 function paintLabel(labelElement, color) {
+    labelElement.data("color", color);
     labelElement.css("background-color", color);
-    labelColors[labelElement.data("name")] = color;;
+    labelColors[labelElement.data("name")] = color;
 }
 
 function labelDrag(ev) {
@@ -379,7 +350,7 @@ function loadLabels() {
 
         var currentLabel = labels[i];
         if (currentLabel.systemName === null) {
-            appendCustomLabel(currentLabel.showName);
+            appendCustomLabel(currentLabel);
             
         } else
             if (validSystemLabel(currentLabel)) {
@@ -395,21 +366,29 @@ function loadLabels() {
 
 }
 
-function appendCustomLabel(name) {
+function appendCustomLabel(label) {
 
+    var name = label.showName;
+    var color = label.Color;
     var labelToAppend = $("<li class='custom-label label label-glimpse' data-name='" + name + "'>" + name +
-        '<span class="pull-right hidden" title="Editar">' +
-        '<i class="icon-edit icon-white"></i><i class="icon-remove icon-white"></i></span></li>');
+        '<span class="pull-right hidden">' +
+        '<i class="icon-pencil icon-white" title="Renombrar"></i>'+
+        '<i class="icon-edit icon-white" title="Cambiar color"></i>'+
+        '<i class="icon-remove icon-white" title="Eliminar"></i>'+
+        '</span></li>'
+        );
 
     labelToAppend.find("span").on('click', function (e) {
         e.stopPropagation();
     });
 
+    paintLabel(labelToAppend, color);
+
     labelToAppend.find(".icon-edit").popover({
         title: 'Color',
         trigger: 'click',
         html: true,
-        content: "<input type='color' class='label-color-picker' value='#808080' id='" + name + "-picker' onchange='changeLabelColor(this);'>"
+        content: "<input type='color' class='label-color-picker' value='" + color + "' id='" + name + "-picker' onchange='changeLabelColor(this);'>"
     });
 
     labelToAppend.find(".icon-remove").on('click', function () {
@@ -438,9 +417,16 @@ function appendCustomLabel(name) {
 }
 
 function changeLabelColor(colorPicker) {
-    var targetLabelName = colorPicker.id.split("-")[0];
+    var targetLabelName = colorPicker.id.split("-")[0],
+        newColor = colorPicker.value;
     var targetLabel = $(".custom-label[data-name='" + targetLabelName + "']");
-    paintLabel(targetLabel, colorPicker.value);
+    paintLabel(targetLabel, newColor);
+
+    $.ajax({
+        type: "POST",
+        url: "async/RecolorLabel",
+        data: { labelName: targetLabelName, color: newColor }
+    });
 
     $(".circle").each(function () {
         if (hasLabel($(this), targetLabelName)) {
@@ -462,7 +448,6 @@ function exists(label) {
 function createCustomLabel(labelName) {
 
     if (!exists(labelName)) {
-        appendCustomLabel(labelName);
 
         $.ajax({
             type: "POST",
@@ -470,8 +455,15 @@ function createCustomLabel(labelName) {
             dataType: 'json',
             data: { labelName: labelName }
 
-        }).fail(function () {
-            alert("No fue posible crear la etiqueta");
+        }).done(function (data) {
+            if (data.success === true) {
+                var newLabel = {};
+                newLabel.showName = labelName;
+                newLabel.Color = data.color;
+                appendCustomLabel(newLabel);
+            } else {
+                alert(data.message);
+            }
         });
     } else {
         alert("Ya hay una etiqueta del mismo nombre");
