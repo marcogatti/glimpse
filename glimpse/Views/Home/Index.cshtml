@@ -30,8 +30,8 @@
                 @{Html.RenderPartial("config_dropdown");}
                 <ul class="nav">
                     <li class="active"><a href="#">Inicio</a></li>
-                    <li><a href="#about">Acerca de</a></li>
-                    <li><a href="#contact">Contacto</a></li>
+                    <li>@Html.ActionLink("Sobre nosotros", "Index","AboutUs")</li>
+                    <li><a href="mailto:glimpseinnovationsystems@gmail.com">Contacto</a></li>
                 </ul>
             </div>
             <!--/.nav-collapse -->

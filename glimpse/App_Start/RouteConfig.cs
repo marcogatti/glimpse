@@ -16,6 +16,12 @@ namespace Glimpse
             routes.IgnoreRoute("errorlog/{*anything}");
 
             routes.MapRoute(
+                name: "AboutUs",
+                url: "AboutUs/{action}",
+                defaults: new { controller = "AboutUs", action = "Index" }
+            );
+
+            routes.MapRoute(
                 name: "MainScreen",
                 url: "{action}",
                 defaults: new { controller = "Home", action = "Index" }
