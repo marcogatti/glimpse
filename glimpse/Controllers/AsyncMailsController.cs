@@ -487,7 +487,7 @@ namespace Glimpse.Controllers
             {
                 MailAccount currentMailAccount = this.GetMailAccount(mailAccountId);
                 Mail mail = new Mail(mailId, session);
-                mail.Archieve(session);
+                mail.Archive(session);
                 currentMailAccount.ArchiveMail(mail);
                 tran.Commit();
 

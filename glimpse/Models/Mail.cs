@@ -71,7 +71,7 @@ namespace Glimpse.Models
                 this.Save(session);
             }
         }
-        public void Archieve(ISession session)
+        public void Archive(ISession session)
         {
             if (this.Entity.Labels.Any(x => x.SystemName == "INBOX"))
             {
@@ -97,12 +97,9 @@ namespace Glimpse.Models
         }
         public String GetSystemFolderName()
         {
-            if (this.Entity.UidTrash > 0)
-                return "Trash";
-            else if (this.Entity.UidSpam > 0)
-                return "Junk";
-            else
-                return "All";
+            if (this.Entity.UidTrash > 0) return "Trash";
+            if (this.Entity.UidSpam > 0) return "Junk";
+            return "All";
         }
 
         public static List<MailEntity> FindByMailAccount(MailAccount mailAccount, ISession session)

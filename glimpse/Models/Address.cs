@@ -37,10 +37,9 @@ namespace Glimpse.Models
             AddressEntity entity = session.CreateCriteria<AddressEntity>()
                                           .Add(Restrictions.Eq("MailAddress", address))
                                           .UniqueResult<AddressEntity>();
-            if (entity == null)
-                return null;
-            else
-                return new Address(entity);
+            if (entity == null) return null;
+
+            return new Address(entity);
         }
         public static AddressCollection ParseAddresses(String toAddresses)
         {

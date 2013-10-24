@@ -41,7 +41,7 @@ namespace Glimpse.Models
                 this.Entity.Name = newName;
             else
             {
-                List<String> labelHierarchy = oldName.Split( new String[] {"/"}, StringSplitOptions.RemoveEmptyEntries).ToList();
+                List<String> labelHierarchy = oldName.Split(new String[] { "/" }, StringSplitOptions.RemoveEmptyEntries).ToList();
                 String newHierarchy = "";
                 foreach (String label in labelHierarchy)
                     if (label == oldName)
@@ -64,15 +64,14 @@ namespace Glimpse.Models
 
         public static void ColorInitialLabels(IList<LabelEntity> labelsToColor)
         {
-            Int16 index;
-            for (index = 0; index < labelsToColor.Count && index < Label.LabelColors.Count; index++)
+            Int16 index = 0;
+            for (; index < labelsToColor.Count && index < Label.LabelColors.Count; index++)
                 labelsToColor[index].Color = Label.LabelColors[index];
 
             //si me quedo sin colores
             if (labelsToColor.Count > LabelColors.Count)
-                for (index = index; index < labelsToColor.Count; index++)
+                for (; index < labelsToColor.Count; index++)
                     labelsToColor[index].Color = Label.DefaultColor;
-
         }
         public static void ColorLabel(LabelEntity labelToColor, MailAccount labelAccount, User currentUser, ISession session)
         {
@@ -91,7 +90,6 @@ namespace Glimpse.Models
                     return;
                 }
             }
-
             labelToColor.Color = Label.GetNextColor(labelAccount.Entity, session);
         }
         public static String GetNextColor(MailAccountEntity labelAccount, ISession session)
@@ -120,13 +118,12 @@ namespace Glimpse.Models
                                           .Add(Restrictions.Eq("SystemName", systemName))
                                           .Add(Restrictions.Eq("Active", true))
                                           .UniqueResult<LabelEntity>();
+                return new Label(labelEntity);
             }
             catch (NHibernate.HibernateException e)
             {
                 throw new NotUniqueResultException(e, "Cuenta: " + account.Entity.Address + " ,SystemName Label: " + systemName);
             }
-
-            return new Label(labelEntity);
         }
         public static Label FindByName(MailAccount mailAcccount, String labelName, ISession session)
         {
@@ -138,10 +135,9 @@ namespace Glimpse.Models
                                           .Add(Restrictions.Eq("Active", true))
                                           .UniqueResult<LabelEntity>();
 
-            if (labelEntity == null)
-                return null;
-            else
-                return new Label(labelEntity);
+            if (labelEntity == null) return null;
+
+            return new Label(labelEntity);
         }
         public static List<LabelEntity> RemoveDuplicates(List<LabelEntity> dupLabels)
         {
@@ -149,7 +145,7 @@ namespace Glimpse.Models
             foreach (LabelEntity label in dupLabels)
             {
                 //TODO limpiar la segunda condicion y probar
-                if (uniqueLabels.Any(x => x.Name == label.Name || 
+                if (uniqueLabels.Any(x => x.Name == label.Name ||
                     (x.SystemName == label.SystemName && x.Name == label.Name)))
                     continue;
                 else
