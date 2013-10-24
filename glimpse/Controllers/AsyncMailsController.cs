@@ -113,13 +113,48 @@ namespace Glimpse.Controllers
                 mails = currentMailAccount.GetMailsByAmount(amountOfMails, session);
                 mailsToReturn = this.PrepareHomeMails(mails);
 
-                JsonResult result = Json(new { success = true, mails = mailsToReturn }, JsonRequestBehavior.AllowGet);
-                return result;
+                return Json(new { success = true, mails = mailsToReturn }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception exc)
             {
                 Log.LogException(exc, "Parametros de la llamada: amountOfMails(" + amountOfMails + ").");
                 return Json(new { success = false, message = "Error al obtener los mails." }, JsonRequestBehavior.AllowGet);
+            }
+            finally
+            {
+                session.Close();
+            }
+        }
+        [AjaxOnly]
+        public ActionResult GetUsedDirections()
+        {
+            ISession session = NHibernateManager.OpenSession();
+            try
+            {
+                User currentUser = (User)Session[AccountController.USER_NAME];
+                if (currentUser == null)
+                    throw new GlimpseException("No se encontró el usuario.");
+                IList<String> directions = new List<string>();
+                String accountIds = "";
+
+                foreach (MailAccount mailAccount in currentUser.GetAccounts())
+                    accountIds += mailAccount.Entity.Id + ',';
+
+                accountIds = accountIds.Trim(',');
+
+                directions = session.CreateQuery(
+                                        "SELECT distinct(A.MailAddress) " +
+                                        "FROM ADDRESS A " +
+                                        "INNER JOIN MAIL M ON M.fromid = A.id " +
+                                        "WHERE M.mailaccountid IN (" + accountIds + ")")
+                                        .List<String>();
+
+                return Json(new { directions = directions }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception exc)
+            {
+                Log.LogException(exc);
+                return Json(new { directions = new String[0] }, JsonRequestBehavior.AllowGet);
             }
             finally
             {
@@ -431,7 +466,8 @@ namespace Glimpse.Controllers
             try
             {
                 MailAccount currentMailAccount = this.GetMailAccount(mailAccountId);
-                Mail theMail = new Mail(mailId, session); ;
+                Mail theMail = new Mail(mailId, session);
+
                 if (isIncrease)
                     theMail.SetImportance((UInt16)(theMail.Entity.Importance + 1), session);
                 else

@@ -101,6 +101,28 @@ function prepareComposeDialog() {
 
 function initializeMailEditor() {
     editor = CKEDITOR.replace('text_editor');
+
+    //$("#email-to").autocomplete('async/getuseddirections',
+    //    {
+    //        dataType: 'json',
+    //        parse: function (data) {
+    //            var rows = new Array();
+    //            for (var i = 0; i < data.length; i++) {
+    //                rows[i] = data[i];
+    //            }
+    //            return rows;
+    //        },
+    //        formatItem: function (row, i, max) {
+    //            return row.Tag;
+    //        },
+    //        width: 300,
+    //        highlight: false,
+    //        multiple: true,
+    //        multipleSeparator: ",",
+    //        autofocus: "true",
+    //        delay: 300,
+    //        minLength: 2
+    //    });
 }
 
 function displayComposeDialog() {
