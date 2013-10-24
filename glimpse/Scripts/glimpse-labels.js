@@ -110,11 +110,15 @@ function prepareToReceiveLabels(circle) {
 );
 }
 
-function addCircleColor(circle, label) {
-
+function addLabelToCircleData(circle, label) {
     var newCustomLabels = getCustomLabels(circle);
     newCustomLabels.push(label);
     circle.data("custom-labels", newCustomLabels);
+}
+
+function addCircleColor(circle, label) {
+
+    addLabelToCircleData(circle, label);
 
     calculateEmailColor(circle);
     if (circle.hasClass("previewed")) {
@@ -155,10 +159,10 @@ function setQuickLabelRemoval() {
     });
 }
 
-function removeLabelFromCircle(circle, label) {
+function removeLabelFromCircleData(circle, label) {
 
     var circleLabels = getCustomLabels(circle),
-        indexOfLabel;
+    indexOfLabel;
 
     indexOfLabel = circleLabels.indexOf(label);
 
@@ -167,6 +171,12 @@ function removeLabelFromCircle(circle, label) {
     }
 
     circle.data("custom-labels", circleLabels);
+}
+
+function removeLabelFromCircle(circle, label) {
+
+    removeLabelFromCircleData(circle, label);
+
     calculateEmailColor(circle);
 
     removeLabelFromCircleInServer(label, circle.data('id'), false, circle.data('mailaccount'));
@@ -191,7 +201,6 @@ function removeSystemLabelFromCircle(circle, label) {
 
 
 function setEverithingRelatedToAddLabelsToAMail() {
-    //setLabelsAdder();
     setLabelPencil();
     preventSelectingSystemLabels();
 }
@@ -373,7 +382,7 @@ function appendCustomLabel(label) {
     var labelToAppend = $("<li class='custom-label label label-glimpse' data-name='" + name + "'>" + name +
         '<span class="pull-right hidden">' +
         '<i class="icon-pencil icon-white" title="Renombrar"></i>'+
-        '<i class="icon-edit icon-white" title="Cambiar color"></i>'+
+        '<i class="icon-edit icon-white" title="Color"></i>'+
         '<i class="icon-remove icon-white" title="Eliminar"></i>'+
         '</span></li>'
         );
@@ -385,8 +394,8 @@ function appendCustomLabel(label) {
     paintLabel(labelToAppend, color);
 
     labelToAppend.find(".icon-edit").popover({
-        title: 'Color',
         trigger: 'click',
+        placement: 'bottom',
         html: true,
         content: "<input type='color' class='label-color-picker' value='" + color + "' id='" + name + "-picker' onchange='changeLabelColor(this);'>"
     });
@@ -407,6 +416,13 @@ function appendCustomLabel(label) {
         currentLabel.remove();
     });
 
+    labelToAppend.find(".icon-pencil").popover({
+        trigger: 'click',
+        placement: 'bottom',
+        html: true,
+        content: "<input type='text' value='" + name + "' id='" + name + "-rename' onchange='renameLabel(this);'>"
+    });
+
     labelToAppend.hover(function () {
         labelToAppend.find("span").toggleClass("hidden");
     });
@@ -414,6 +430,30 @@ function appendCustomLabel(label) {
     setLabelSelection(labelToAppend);
     $(".custom-label:last-of-type").after(labelToAppend);
     setLabelsAdder(labelToAppend);
+}
+
+function renameLabel(input) {
+    var targetLabelName = input.id.split("-")[0],
+        oldName = targetLabelName,
+       newName = input.value;
+    var targetLabel = $(".custom-label[data-name='" + targetLabelName + "']");
+    targetLabel.html(newName);
+    targetLabel.attr("data-name", newName);
+    labelColors[newName] = labelColors[oldName];
+
+    $(".circle").each(function () {
+        
+        if (hasLabel($(this), oldName)) {
+            removeLabelFromCircleData($(this), oldName);
+            addLabelToCircleData($(this), newName);
+        }
+    });
+
+    $.ajax({
+        type: "POST",
+        url: "async/RenameLabel",
+        data: { oldLabelName: oldName, newLabelName: newName }
+    });
 }
 
 function changeLabelColor(colorPicker) {
@@ -466,7 +506,7 @@ function createCustomLabel(labelName) {
             }
         });
     } else {
-        alert("Ya hay una etiqueta del mismo nombre");
+        alert("Ya hay una etiqueta con el mismo nombre");
     }
 }
 

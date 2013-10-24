@@ -73,12 +73,6 @@ function alphabetSize() {
 //    drawBoard();
 //}
 
-function setTransitionsCheckbox() {
-    $("#transitions-check").click(function () {
-        $(".circle").toggleClass("transition");
-    });
-}
-
 function amountOfCirclesShown() {
 
     var circles = [];
