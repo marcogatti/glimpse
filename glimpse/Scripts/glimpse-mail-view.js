@@ -1,5 +1,6 @@
 ﻿var currentCircle,
-    currentBody;
+    currentBody,
+    attachmentIcon = $('<i class="icon-folder-close" title="Este email tiene archivos adjuntos"></i>');
 
 function initializeMailViewModal() {
 
@@ -298,6 +299,11 @@ function setMailViewModalHeadData(view_modal, circle) {
     }
     view_modal.find("#mail-view-subject").html(data.subject);
     view_modal.find("#mail-view-date").html(date.toLocaleString());
+
+    if (circle.data('has-attachments')) {
+        view_modal.find("#mail-view-subject").prepend(' ');
+        view_modal.find("#mail-view-subject").prepend(attachmentIcon);
+    }
 
     setMailViewerLabels(view_modal, circle);
 }

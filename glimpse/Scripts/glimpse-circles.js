@@ -38,7 +38,8 @@ function insertCircle(value) {
             " data-custom-labels=", customLabels,
             " data-system-labels=", systemLabels,
             " data-mailaccount=", value.mailaccount,
-            " data-seen=", value.seen
+            " data-seen=", value.seen,
+            " data-has-attachments=", value.has_attachments
         ];
 
         var newCircle = $("<div class='circle'" + dataAttributes.join("'") + "' title='" + value.from.address + "'>" +

@@ -543,7 +543,8 @@ namespace Glimpse.Controllers
                     flagged = mail.Flagged,
                     labels = currentLabels,
                     importance = mail.Importance,
-                    mailaccount = mail.MailAccountEntity.Id
+                    mailaccount = mail.MailAccountEntity.Id,
+                    has_attachments = mail.HasExtras
                 };
 
                 preparedMails.Add(anEmail);

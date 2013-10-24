@@ -243,7 +243,7 @@ function formChangePasswordCleanup(form, serverData) {
 }
 
 function formEditPersonalDataCleanup(form, serverData) {
-    user_personal_data = getFormData(form);
+    window.location.assign(serverData.url);
 }
 
 function formManageMailAccountsCleanup(form, serverData) {

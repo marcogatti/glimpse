@@ -522,7 +522,7 @@ namespace Glimpse.Controllers
                 sessionUser.SaveOrUpdate(session);
                 session.Flush();
 
-                return Json(new { success = true }, JsonRequestBehavior.AllowGet);
+                return Json(new { success = true, url = Url.Action("Index", "Home") }, JsonRequestBehavior.AllowGet);
             }
             catch (GlimpseException exc)
             {
