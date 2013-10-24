@@ -282,7 +282,8 @@ function isClicked(circle) {
 function configureCircleHover(circle) {
 
     var dateTime = $("#dateTime"),
-        from = $("#from");
+        from = $("#from"),
+        dateTimeWidth = parseInt($("#from").css("width"));
 
     circle.hover(
 
@@ -292,12 +293,14 @@ function configureCircleHover(circle) {
             from.html(circle.data("from").substr(0, 10) + "...");
 
             dateTime.css("left", function () {
-                return parseInt(circle.css("left")) - 25 + 'px';
+                return wrapperLeftPadding + parseInt(circle.css("left")) - (dateTimeWidth/2) + 'px';
             });
 
-            from.css("top", function () {
-                return circle.css("top");
-            });
+            from.css({
+                "top": function () { return parseInt(circle.css("top")) + parseInt(circle.css("height"))/2 + wrapperVerticalPadding; },
+                "left": "0"
+            }
+            );
 
             $(".hidable").removeClass("hidden");
 
