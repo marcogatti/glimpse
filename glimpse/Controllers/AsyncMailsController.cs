@@ -11,6 +11,7 @@ using NHibernate;
 using NHibernate.Criterion;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -21,6 +22,8 @@ namespace Glimpse.Controllers
     [Authorize]
     public class AsyncMailsController : Controller
     {
+        public const String FILES = "Attachments";
+
         #region Action Methods
         public FileResult GetFile(Int64 id, Int64 mailAccountId = 0)
         {
@@ -172,18 +175,24 @@ namespace Glimpse.Controllers
             try
             {
                 MailAccount mailAccount = this.GetMailAccount(mailAccountId);
-                List<HttpPostedFileBase> uploadedFiles = new List<HttpPostedFileBase>();
-                //foreach (HttpPostedFile file in this.Request.Files)
-                //{
-                //    if (file.ContentType == "application/octet-stream" || file.ContentType == "application/exe")
-                //        throw new GlimpseException("No se pueden enviar archivos adjuntos del tipo ejecutable.");
-                //    else if (file.ContentLength > 0)
-                //        uploadedFiles.Add(file);
-                //}
-                if (Session["attachment"] != null)
-                    uploadedFiles.Add((HttpPostedFileBase)Session["attachment"]);
+                List<ExtraFile> uploadedFiles = new List<ExtraFile>();
+                if (Session[AsyncMailsController.FILES] != null &&
+                    ((List<ExtraFile>)Session[AsyncMailsController.FILES]).Count > 0)
+                {
+                    foreach (ExtraFile attachment in (List<ExtraFile>)Session[AsyncMailsController.FILES])
+                    {
+                        //cargar el contenido desde disco
+                        using(FileStream fileStream = System.IO.File.Open(attachment.Path, FileMode.Open, FileAccess.Read))
+                            fileStream.Read(attachment.Content, 0, (int)attachment.Size);
+                        //borrar el archivo
+                        System.IO.File.Delete(attachment.Path);
+                        uploadedFiles.Add(attachment);
+                    }
+                }
 
                 mailAccount.SendMail(sendInfo.ToAddress, sendInfo.Body, sendInfo.Subject, uploadedFiles);
+                Session[AsyncMailsController.FILES] = null;
+
                 return Json(new { success = true, address = sendInfo.ToAddress }, JsonRequestBehavior.AllowGet);
             }
             catch (InvalidRecipientsException exc)
@@ -527,7 +536,25 @@ namespace Glimpse.Controllers
         [HttpPost]
         public void UploadFile(HttpPostedFileBase file)
         {
-            Session["attachment"] = file;
+            if (Extra.IsValidFile(file))
+            {
+                String filePath = Extra.SaveToFS(file); //el contenido va a disco
+
+                ExtraFile attachment = new ExtraFile(); //el resto no
+                attachment.Name = file.FileName;
+                attachment.Size = file.ContentLength;
+                attachment.Type = file.ContentType;
+                attachment.Path = filePath;
+                attachment.Content = new byte[file.ContentLength];
+                //using(BinaryReader reader = new BinaryReader(file.InputStream))
+                //    attachment.fileContent = reader.ReadBytes(file.ContentLength);
+
+                if (Session[AsyncMailsController.FILES] == null)
+                    Session[AsyncMailsController.FILES] = new List<ExtraFile>();
+                ((List<ExtraFile>)Session[AsyncMailsController.FILES]).Add(attachment);
+            }
+            else
+                throw new GlimpseException("El archivo seleccionado es mayor a 5mb o es potencialmente danino.");
         }
         #endregion
 
