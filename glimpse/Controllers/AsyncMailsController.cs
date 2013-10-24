@@ -185,7 +185,15 @@ namespace Glimpse.Controllers
                         using(FileStream fileStream = System.IO.File.Open(attachment.Path, FileMode.Open, FileAccess.Read))
                             fileStream.Read(attachment.Content, 0, (int)attachment.Size);
                         //borrar el archivo
-                        System.IO.File.Delete(attachment.Path);
+                        try
+                        {
+                            System.IO.File.Delete(attachment.Path);
+                        }
+                        catch (Exception exc)
+                        {
+                            if (!(exc is UnauthorizedAccessException) && !(exc is DirectoryNotFoundException))
+                                throw;
+                        }
                         uploadedFiles.Add(attachment);
                     }
                 }
@@ -562,7 +570,17 @@ namespace Glimpse.Controllers
             if (Session[AsyncMailsController.FILES] == null)
                 return;
             foreach (ExtraFile file in (List<ExtraFile>)Session[AsyncMailsController.FILES])
-                System.IO.File.Delete(file.Path);
+                try
+                {
+                    System.IO.File.Delete(file.Path);
+                }
+                catch (Exception exc)
+                {
+                    if (!(exc is UnauthorizedAccessException) && !(exc is DirectoryNotFoundException))
+                        throw;
+                    else
+                        continue;
+                }
             ((List<ExtraFile>)Session[AsyncMailsController.FILES]).Clear();
         }
         #endregion
