@@ -12,5 +12,9 @@ namespace Glimpse.MailInterfaces
             : base(glimpseMessage, inner)
         {
         }
+        public InvalidRecipientsException(String glimpseMessage)
+            : base(glimpseMessage)
+        {
+        }
     }
 }

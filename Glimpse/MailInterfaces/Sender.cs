@@ -32,7 +32,7 @@ namespace Glimpse.MailInterfaces
 
         public void sendMail(AddressCollection recipients, String bodyHTML, String subject = "",
                              AddressCollection CC = null, AddressCollection BCC = null,
-                             List<HttpPostedFile> attachments = null)
+                             List<ExtraFile> attachments = null)
         {
             this.CheckRecipients(recipients);
             SmtpMessage newMail = new SmtpMessage();
@@ -117,20 +117,23 @@ namespace Glimpse.MailInterfaces
             greetingsMail.SendSsl("smtp.gmail.com", 465, "glimpseinnovationsystems@gmail.com", "poiewq123890", SaslMechanism.Login);
         }
 
-        private static void SetMailAttachments(List<HttpPostedFile> attachments, SmtpMessage newMail)
+        private static void SetMailAttachments(List<ExtraFile> attachments, SmtpMessage newMail)
         {
             if (attachments == null) return;
 
-            foreach (HttpPostedFile file in attachments)
+            foreach (ExtraFile file in attachments)
             {
                 Attachment attachment = new Attachment();
-                using (BinaryReader reader = new BinaryReader(file.InputStream))
-                    attachment.BinaryContent = reader.ReadBytes(file.ContentLength);
-                attachment.Filename = file.FileName;
-                attachment.ContentType.Type = file.ContentType;
+                attachment.Filename = file.Name;
+                attachment.BinaryContent = file.Content;
+                attachment.ContentType.Type = file.Type;
+                attachment.ContentTransferEncoding = ContentTransferEncoding.Base64;
+                attachment.ContentDisposition.Disposition = "attachment";
                 attachment.ParentMessage = newMail;
                 newMail.Attachments.Add(attachment);
             }
+
+            newMail.ContentDisposition.Disposition = "multipart/mixed";
         }
 
         private static void SetMailRecipients(AddressCollection recipients, String subject, AddressCollection CC, AddressCollection BCC, SmtpMessage newMail)

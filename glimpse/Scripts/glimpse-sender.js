@@ -3,6 +3,7 @@
     editor.setData("");
     $("#email-to").val("");
     $("#email-subject").val("");
+    $("#compose_pannel").find('input[type="file"]').val('');
 }
 
 function mailSendingConnectionOK(data, textStatus, jqXHR) {
@@ -19,7 +20,7 @@ function mailSendingConnectionFailed(jqXHR, textStatus, errorThrown) {
     alert("Actualmente tenemos problemas para enviar el email, por favor inténtelo de nuevo más tarde");
 }
 
-function sendEmailAsync(fromAccountId, toAddress, subject, body, circularProgress) {
+function sendEmailAsync(fromAccountId, toAddress, subject, body, compose_panel) {
 
     var sendInfo = {
         ToAddress: toAddress,
@@ -39,17 +40,55 @@ function sendEmailAsync(fromAccountId, toAddress, subject, body, circularProgres
             mailSendingConnectionFailed(jqXHR, textStatus, errorThrown)
         },
         complete: function () {
-            stopWorkingWidget(circularProgress);
+            stopWorkingWidget(compose_panel.parent());
         },
         data: sendInfo
     });
+}
+
+function prepareToUploadAttachedFiles(compose_panel) {
+
+    compose_panel.find('.upload-file').click(function () {
+        var formData = new FormData($('#upload-file-form')[0]);
+        $.ajax({
+            url: 'Async/UploadFile',  //Server script to process data
+            type: 'POST',
+            xhr: function () {  // Custom XMLHttpRequest
+                var myXhr = $.ajaxSettings.xhr();
+                return myXhr;
+            },
+            success: function () {
+                /* Creo que nada */
+            },
+            error: function () {
+                alert("Tuvimos problemas para adjuntar el archivo. Por favor intentalo de nuevo más tarde.")
+                /* Remover adjunto del form*/
+            },
+            beforeSend: function () {
+                $(".ui-dialog-buttonpane button:contains('Enviar')").button('disable');
+                startWorkingWidget(compose_panel.parent());
+            },
+            complete: function () {
+                $(".ui-dialog-buttonpane button:contains('Enviar')").button('enable');
+                stopWorkingWidget(compose_panel.parent());
+            },
+            // Form data
+            data: formData,
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+    });
+
 }
 
 function prepareComposeDialog() {
 
     var compose_panel = $("#compose_pannel"),
         circularProgress = compose_panel.find('.progress-circular'),
-        composePanelTitle;;
+        composePanelTitle;
+
+    prepareToUploadAttachedFiles(compose_panel);
 
     compose_panel.dialog({
         autoOpen: false,
@@ -72,12 +111,12 @@ function prepareComposeDialog() {
         {
             text: "Enviar",
             click: function () {
-                startWorkingWidget(circularProgress);
+                startWorkingWidget(compose_panel.parent());
                 sendEmailAsync($('#email-from').html(),
                                $("#email-to").val(),
                                $("#email-subject").val(),
                                editor.getData(),
-                               circularProgress);
+                               compose_panel);
             }
         }
         ]
@@ -132,3 +171,4 @@ function displayComposeDialog() {
 function setMailEditorText(text) {
     editor.setData(text);
 }
+

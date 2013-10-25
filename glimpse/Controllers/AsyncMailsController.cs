@@ -11,6 +11,7 @@ using NHibernate;
 using NHibernate.Criterion;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -21,6 +22,8 @@ namespace Glimpse.Controllers
     [Authorize]
     public class AsyncMailsController : Controller
     {
+        public const String FILES = "Attachments";
+
         #region Action Methods
         public FileResult GetFile(Int64 id, Int64 mailAccountId = 0)
         {
@@ -206,17 +209,36 @@ namespace Glimpse.Controllers
         {
             try
             {
+                if (sendInfo.ToAddress == null)
+                    throw new InvalidRecipientsException("No se escribieron destinatarios");
+
                 MailAccount mailAccount = this.GetMailAccount(mailAccountId);
-                List<HttpPostedFile> uploadedFiles = new List<HttpPostedFile>();
-                foreach (HttpPostedFile file in this.Request.Files)
+                List<ExtraFile> uploadedFiles = new List<ExtraFile>();
+                if (Session[AsyncMailsController.FILES] != null &&
+                    ((List<ExtraFile>)Session[AsyncMailsController.FILES]).Count > 0)
                 {
-                    if (file.ContentType == "application/octet-stream" || file.ContentType == "application/exe")
-                        throw new GlimpseException("No se pueden enviar archivos adjuntos del tipo ejecutable.");
-                    else if (file.ContentLength > 0)
-                        uploadedFiles.Add(file);
+                    foreach (ExtraFile attachment in (List<ExtraFile>)Session[AsyncMailsController.FILES])
+                    {
+                        //cargar el contenido desde disco
+                        using(FileStream fileStream = System.IO.File.Open(attachment.Path, FileMode.Open, FileAccess.Read))
+                            fileStream.Read(attachment.Content, 0, (int)attachment.Size);
+                        //borrar el archivo
+                        try
+                        {
+                            System.IO.File.Delete(attachment.Path);
+                        }
+                        catch (Exception exc)
+                        {
+                            if (!(exc is UnauthorizedAccessException) && !(exc is DirectoryNotFoundException))
+                                throw;
+                        }
+                        uploadedFiles.Add(attachment);
+                    }
                 }
 
                 mailAccount.SendMail(sendInfo.ToAddress, sendInfo.Body, sendInfo.Subject, uploadedFiles);
+                Session.Remove(AsyncMailsController.FILES);
+
                 return Json(new { success = true, address = sendInfo.ToAddress }, JsonRequestBehavior.AllowGet);
             }
             catch (InvalidRecipientsException exc)
@@ -239,6 +261,7 @@ namespace Glimpse.Controllers
             }
             catch (Exception exc)
             {
+                Session.Remove(AsyncMailsController.FILES);
                 Log.LogException(exc, "Parametros de la llamada: subjectMail(" + sendInfo.Subject + "), addressMail(" + sendInfo.ToAddress + ").");
                 return Json(new { success = false, message = "Actualmente tenemos problemas para enviar el email, por favor inténtelo de nuevo más tarde", address = sendInfo.ToAddress }, JsonRequestBehavior.AllowGet);
             }
@@ -551,12 +574,54 @@ namespace Glimpse.Controllers
                 if (sessionUser == null)
                     throw new GlimpseException("No se encontró el usuario.");
                 foreach (MailAccount userMailAccount in sessionUser.GetAccounts())
-                    Task.Factory.StartNew(() => MailsTasksHandler.StartSynchronization(userMailAccount.Entity.Address));
+                    Task.Factory.StartNew(() => MailsTasksHandler.StartSynchronization(userMailAccount.Entity.Address, false));
             }
             catch (Exception exc)
             {
                 Log.LogException(exc);
             }
+        }
+        [HttpPost]
+        public void UploadFile(HttpPostedFileBase file)
+        {
+            if (Extra.IsValidFile(file))
+            {
+                if (Session[AsyncMailsController.FILES] == null)
+                    Session[AsyncMailsController.FILES] = new List<ExtraFile>();
+
+                if (((List<ExtraFile>)Session[AsyncMailsController.FILES]).Any(x => x.Size == file.ContentLength && x.Name == file.FileName))
+                    return;
+
+                ExtraFile attachment = new ExtraFile();
+                attachment.Name = file.FileName;
+                attachment.Size = file.ContentLength;
+                attachment.Type = file.ContentType;
+                attachment.Path = Extra.SaveToFS(file); //el contenido va a disco
+                attachment.Content = new byte[file.ContentLength];
+                ((List<ExtraFile>)Session[AsyncMailsController.FILES]).Add(attachment);
+            }
+            else
+                throw new GlimpseException("El archivo seleccionado es mayor a 5mb o es potencialmente danino.");
+        }
+        [HttpPost]
+        [AjaxOnly]
+        public void ClearFiles()
+        {
+            if (Session[AsyncMailsController.FILES] == null)
+                return;
+            foreach (ExtraFile file in (List<ExtraFile>)Session[AsyncMailsController.FILES])
+                try
+                {
+                    System.IO.File.Delete(file.Path);
+                }
+                catch (Exception exc)
+                {
+                    if (!(exc is UnauthorizedAccessException) && !(exc is DirectoryNotFoundException))
+                        throw;
+                    else
+                        continue;
+                }
+            ((List<ExtraFile>)Session[AsyncMailsController.FILES]).Clear();
         }
         #endregion
 
