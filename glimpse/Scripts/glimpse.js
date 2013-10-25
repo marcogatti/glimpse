@@ -15,5 +15,12 @@ $(document).ready(function () {
     initializeMailViewModal();
     initializeMainDropdownMenuActions();
     initializeMailAccountToggles();
+    initializeAboutUSModal();
 })
 
+function initializeAboutUSModal() {
+
+    $('#about-us-trigger').click(function () {
+        $('#about-us-modal').modal('show');
+    });
+}

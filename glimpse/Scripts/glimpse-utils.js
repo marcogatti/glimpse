@@ -5,7 +5,6 @@
     wrapperVerticalPadding = parseInt($("#container-wrapper").css("padding-top")),
     wrapperLeftPadding = parseInt($("#container-wrapper").css("padding-left"));
 
-
 function preventSelectingNotUsefulThings() {
     //$('body').mousedown(function (downEvent) {
     //    downEvent.preventDefault();

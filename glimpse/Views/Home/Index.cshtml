@@ -30,7 +30,7 @@
                 @{Html.RenderPartial("config_dropdown");}
                 <ul class="nav">
                     <li class="active"><a href="#">Inicio</a></li>
-                    <li>@Html.ActionLink("Sobre nosotros", "Index","AboutUs")</li>
+                    <li><a id="about-us-trigger" href="#">Sobre nosotros</a></li>
                     <li><a href="mailto:glimpseinnovationsystems@gmail.com">Contacto</a></li>
                 </ul>
             </div>
@@ -81,7 +81,6 @@
                 </div>
 
                 <div id="email-container" class="well">
-
                 </div>
                 <div id="date-today" class="coord date-coord"></div>
                 <div id="date-last" class="coord date-coord"></div>
@@ -120,14 +119,15 @@
     var user_telephone = @Html.Raw(Json.Encode(ViewBag.Telephone));
     
     var user_personal_data = {
-                                firstName: user_firstname,
-                                lastName: user_lastname,
-                                country:user_country,
-                                city: user_city,
-                                tel:user_telephone
+        firstName: user_firstname,
+        lastName: user_lastname,
+        country:user_country,
+        city: user_city,
+        tel:user_telephone
     };
 
     var user_mailAccounts = @Html.Raw(Json.Encode(ViewBag.MailAccounts));
 </script>
 
-@{Html.RenderPartial("config_view");}
+@{Html.RenderPartial("config_view");
+  Html.RenderPartial("about_us");}

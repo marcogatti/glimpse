@@ -34,6 +34,11 @@
     font-size: 32px !important;
     font-weight: bold !important;
 }
+.brand.brand-bg {
+    font-family: 'Freestyle Script';
+    font-size: 64px !important;
+    font-weight: bold !important;
+}
 
 .circle {
     width: 75px;

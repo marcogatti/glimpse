@@ -205,7 +205,6 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Attributes\AjaxOnly.cs" />
-    <Compile Include="Controllers\AboutUsController.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AsyncMailsController.cs" />
     <Compile Include="DataAccessLayer\Entities\AddressEntity.cs" />
@@ -533,7 +532,7 @@
     <Content Include="Views\Shared\config_view.cshtml" />
     <Content Include="Views\Shared\register_view.cshtml" />
     <Content Include="Views\Shared\loading_widjet.cshtml" />
-    <Content Include="Views\AboutUs\Index.cshtml" />
+    <Content Include="Views\Shared\about_us.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
