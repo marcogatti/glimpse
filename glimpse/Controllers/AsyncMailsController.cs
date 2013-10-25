@@ -174,6 +174,9 @@ namespace Glimpse.Controllers
         {
             try
             {
+                if (sendInfo.ToAddress == null)
+                    throw new InvalidRecipientsException("No se escribieron destinatarios");
+
                 MailAccount mailAccount = this.GetMailAccount(mailAccountId);
                 List<ExtraFile> uploadedFiles = new List<ExtraFile>();
                 if (Session[AsyncMailsController.FILES] != null &&
@@ -199,7 +202,7 @@ namespace Glimpse.Controllers
                 }
 
                 mailAccount.SendMail(sendInfo.ToAddress, sendInfo.Body, sendInfo.Subject, uploadedFiles);
-                Session[AsyncMailsController.FILES] = null;
+                Session.Remove(AsyncMailsController.FILES);
 
                 return Json(new { success = true, address = sendInfo.ToAddress }, JsonRequestBehavior.AllowGet);
             }
@@ -223,6 +226,7 @@ namespace Glimpse.Controllers
             }
             catch (Exception exc)
             {
+                Session.Remove(AsyncMailsController.FILES);
                 Log.LogException(exc, "Parametros de la llamada: subjectMail(" + sendInfo.Subject + "), addressMail(" + sendInfo.ToAddress + ").");
                 return Json(new { success = false, message = "Actualmente tenemos problemas para enviar el email, por favor inténtelo de nuevo más tarde", address = sendInfo.ToAddress }, JsonRequestBehavior.AllowGet);
             }
