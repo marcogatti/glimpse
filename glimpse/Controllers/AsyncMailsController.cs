@@ -25,14 +25,21 @@ namespace Glimpse.Controllers
         public const String FILES = "Attachments";
 
         #region Action Methods
-        public FileResult GetFile(Int64 id, Int64 mailAccountId = 0)
+        public ActionResult GetFile(Int64 id, Int64 mailAccountId = 0)
         {
             ISession session = NHibernateManager.OpenSession();
             try
             {
-                this.GetMailAccount(mailAccountId); //valida que el mailAccoun pertenezca al User
+                User sessionUser = (User)Session[AccountController.USER_NAME];
+                if (sessionUser == null)
+                    throw new GlimpseException("No se encontró el usuario.");
+
                 Extra extra = Extra.FindByID(id, session);
-                return File(extra.Entity.Data, extra.Entity.FileType, extra.Entity.Name);
+
+                if (extra != null && extra.BelongsToUser(sessionUser))
+                    return File(extra.Entity.Data, extra.Entity.FileType, extra.Entity.Name);
+                else
+                    return new HttpNotFoundResult();
             }
             catch (Exception exc)
             {
@@ -214,30 +221,30 @@ namespace Glimpse.Controllers
 
                 MailAccount mailAccount = this.GetMailAccount(mailAccountId);
                 List<ExtraFile> uploadedFiles = new List<ExtraFile>();
-                if (Session[AsyncMailsController.FILES] != null &&
+                if (sendInfo.AttachmentsIds.Count > 0 && Session[AsyncMailsController.FILES] != null &&
                     ((List<ExtraFile>)Session[AsyncMailsController.FILES]).Count > 0)
                 {
-                    foreach (ExtraFile attachment in (List<ExtraFile>)Session[AsyncMailsController.FILES])
+                    foreach (String attachmentId in sendInfo.AttachmentsIds)
                     {
-                        //cargar el contenido desde disco
-                        using(FileStream fileStream = System.IO.File.Open(attachment.Path, FileMode.Open, FileAccess.Read))
-                            fileStream.Read(attachment.Content, 0, (int)attachment.Size);
-                        //borrar el archivo
+                        ExtraFile file = ((List<ExtraFile>)Session[AsyncMailsController.FILES]).First(x => x.Id == attachmentId);
                         try
                         {
-                            System.IO.File.Delete(attachment.Path);
+                            using (FileStream fileStream = System.IO.File.Open(file.Path, FileMode.Open, FileAccess.Read))
+                                fileStream.Read(file.Content, 0, (int)file.Size);
+                            uploadedFiles.Add(file);
                         }
                         catch (Exception exc)
                         {
                             if (!(exc is UnauthorizedAccessException) && !(exc is DirectoryNotFoundException))
                                 throw;
                         }
-                        uploadedFiles.Add(attachment);
                     }
                 }
 
                 mailAccount.SendMail(sendInfo.ToAddress, sendInfo.Body, sendInfo.Subject, uploadedFiles);
+
                 Session.Remove(AsyncMailsController.FILES);
+                this.ClearTempDirectory();
 
                 return Json(new { success = true, address = sendInfo.ToAddress }, JsonRequestBehavior.AllowGet);
             }
@@ -582,7 +589,7 @@ namespace Glimpse.Controllers
             }
         }
         [HttpPost]
-        public void UploadFile(HttpPostedFileBase file)
+        public ActionResult UploadFile(HttpPostedFileBase file)
         {
             if (Extra.IsValidFile(file))
             {
@@ -590,38 +597,20 @@ namespace Glimpse.Controllers
                     Session[AsyncMailsController.FILES] = new List<ExtraFile>();
 
                 if (((List<ExtraFile>)Session[AsyncMailsController.FILES]).Any(x => x.Size == file.ContentLength && x.Name == file.FileName))
-                    return;
+                    return Json(new { id = "" }, JsonRequestBehavior.AllowGet);
 
                 ExtraFile attachment = new ExtraFile();
                 attachment.Name = file.FileName;
                 attachment.Size = file.ContentLength;
                 attachment.Type = file.ContentType;
                 attachment.Path = Extra.SaveToFS(file); //el contenido va a disco
+                attachment.Id = Path.GetFileName(attachment.Path).Substring(0, 16);
                 attachment.Content = new byte[file.ContentLength];
                 ((List<ExtraFile>)Session[AsyncMailsController.FILES]).Add(attachment);
+                return Json(new { id = attachment.Id }, JsonRequestBehavior.AllowGet);
             }
             else
                 throw new GlimpseException("El archivo seleccionado es mayor a 5mb o es potencialmente danino.");
-        }
-        [HttpPost]
-        [AjaxOnly]
-        public void ClearFiles()
-        {
-            if (Session[AsyncMailsController.FILES] == null)
-                return;
-            foreach (ExtraFile file in (List<ExtraFile>)Session[AsyncMailsController.FILES])
-                try
-                {
-                    System.IO.File.Delete(file.Path);
-                }
-                catch (Exception exc)
-                {
-                    if (!(exc is UnauthorizedAccessException) && !(exc is DirectoryNotFoundException))
-                        throw;
-                    else
-                        continue;
-                }
-            ((List<ExtraFile>)Session[AsyncMailsController.FILES]).Clear();
         }
         #endregion
 
@@ -632,13 +621,19 @@ namespace Glimpse.Controllers
             DateTime date = new DateTime(1970, 1, 1) + new TimeSpan(JSDate * 10000);
             return date;
         }
+        private void ClearTempDirectory()
+        {
+            DirectoryInfo tempDir = new DirectoryInfo(this.HttpContext.Server.MapPath("~") + "temp");
+            foreach (FileInfo file in tempDir.GetFiles().Where(x => x.Name != "empty" && x.CreationTime < DateTime.Now.AddHours(-1)))
+                file.Delete();
+        }
         private List<Object> PrepareHomeMails(MailCollection mails)
         {
             List<Object> preparedMails = new List<Object>();
 
             foreach (MailEntity mail in mails)
             {
-                DateTime mailDate = DateTimeHelper.changeToUtc(mail.Date);
+                DateTime mailDate = DateTimeHelper.ChangeToUtc(mail.Date);
                 Int64 currentAge = DateTime.Now.Ticks - mailDate.ToLocalTime().Ticks;
                 List<Object> currentLabels = PrepareLabels(mail.Labels);
                 Object anEmail = new

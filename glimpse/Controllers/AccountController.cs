@@ -320,7 +320,7 @@ namespace Glimpse.Controllers
                 User user = Glimpse.Models.User.FindByUsername(username, session);
                 if (user == null)
                     throw new GlimpseException("Usuario inexistente: " + username + ".");
-                String newPassword = this.GenerateRandomPassword(16);
+                String newPassword = StringHelper.GenerateRandomString();
                 String newPasswordEnc = CryptoHelper.EncryptDefaultKey(newPassword);
                 user.ChangePassword(user.Entity.Password, newPasswordEnc, session);
                 MailAccount.SendResetPasswordMail(user, newPassword, session);
@@ -576,19 +576,6 @@ namespace Glimpse.Controllers
                 exceptionMessage += "El nombre de usuario elegido ya existe.\n";
             if (exceptionMessage != "")
                 throw new GlimpseException(exceptionMessage);
-        }
-        [NonAction]
-        private String GenerateRandomPassword(Int16 size)
-        {
-            StringBuilder builder = new StringBuilder();
-            Random random = new Random();
-            char ch;
-            for (Int16 i = 0; i < size; i++)
-            {
-                ch = Convert.ToChar(Convert.ToInt32(Math.Floor(26 * random.NextDouble() + 65)));
-                builder.Append(ch);
-            }
-            return builder.ToString();
         }
         [NonAction]
         private IList<MailAccount> ValidateUserMailAccounts(UserViewModel userView, User actualUser, ISession session)
