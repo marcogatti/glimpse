@@ -117,8 +117,13 @@ namespace Glimpse.Controllers
                         return View(userView);
                     }
                     user.UpdateAccounts(session);
-                    user.ConnectLight();
-                    user.UpdateLabels(session);
+                    try
+                    {
+                        user.ConnectLight();
+                        user.UpdateLabels(session);
+                    }
+                    catch (SocketException) { }
+                    
                 }
 
                 new CookieHelper().AddUsernameCookie(user.Entity.Username);
