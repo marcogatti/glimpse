@@ -2,6 +2,8 @@
     $("#compose_pannel").dialog("close");
     editor.setData("");
     $("#email-to").val("");
+    $("#email-from").val("");
+    $("#attachments-ids").val("");
     $("#email-subject").val("");
     $("#compose_pannel").find('input[type="file"]').val('');
 }
@@ -20,19 +22,21 @@ function mailSendingConnectionFailed(jqXHR, textStatus, errorThrown) {
     alert("Actualmente tenemos problemas para enviar el email, por favor inténtelo de nuevo más tarde");
 }
 
-function sendEmailAsync(fromAccountId, toAddress, subject, body, compose_panel) {
+function sendEmailAsync(fromAccountId, toAddress, subject, body, attachmentIds, compose_panel) {
 
     var sendInfo = {
         ToAddress: toAddress,
         Subject: subject,
         Body: body,
-        mailAccountId: fromAccountId
+        mailAccountId: fromAccountId,
+        AttachmentsIds: attachmentIds
     };
 
     $.ajax({
         type: "POST",
         url: "async/sendEmail",
         dataType: 'json',
+        traditional: true,
         success: function (data, textStatus, jqXHR) {
             mailSendingConnectionOK(data, textStatus, jqXHR)
         },
@@ -57,8 +61,11 @@ function prepareToUploadAttachedFiles(compose_panel) {
                 var myXhr = $.ajaxSettings.xhr();
                 return myXhr;
             },
-            success: function () {
-                /* Creo que nada */
+            success: function (data, textStatus, jqXHR) {
+                if (data.success)
+                    saveAttachmentId(data.id);
+                else
+                    alert(data.message);
             },
             error: function () {
                 alert("Tuvimos problemas para adjuntar el archivo. Por favor intentalo de nuevo más tarde.")
@@ -80,6 +87,32 @@ function prepareToUploadAttachedFiles(compose_panel) {
         });
     });
 
+}
+
+function saveAttachmentId(id) {
+
+    var currentIds = getAttachmentIds();
+
+    currentIds.push(id);
+
+    saveAttachmentIds(currentIds);
+}
+
+function saveAttachmentIds(ids) {
+    $('#attachments-ids').data('ids', ids);
+}
+
+function getAttachmentIds() {
+
+    var currentIds = $('#attachments-ids').data('ids').toString(),
+        currentIdsArray;
+
+    currentIdsArray = currentIds.split(',');
+    if (currentIdsArray.length === 1 && currentIdsArray[0] === "") {
+        currentIdsArray = [];
+    }
+
+    return currentIdsArray;
 }
 
 function prepareComposeDialog() {
@@ -116,6 +149,7 @@ function prepareComposeDialog() {
                                $("#email-to").val(),
                                $("#email-subject").val(),
                                editor.getData(),
+                               getAttachmentIds(),
                                compose_panel);
             }
         }

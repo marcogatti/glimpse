@@ -221,7 +221,7 @@ namespace Glimpse.Controllers
 
                 MailAccount mailAccount = this.GetMailAccount(mailAccountId);
                 List<ExtraFile> uploadedFiles = new List<ExtraFile>();
-                if (sendInfo.AttachmentsIds.Count > 0 && Session[AsyncMailsController.FILES] != null &&
+                if (sendInfo.AttachmentsIds != null && sendInfo.AttachmentsIds.Count > 0 && Session[AsyncMailsController.FILES] != null &&
                     ((List<ExtraFile>)Session[AsyncMailsController.FILES]).Count > 0)
                 {
                     foreach (String attachmentId in sendInfo.AttachmentsIds)
@@ -597,7 +597,7 @@ namespace Glimpse.Controllers
                     Session[AsyncMailsController.FILES] = new List<ExtraFile>();
 
                 if (((List<ExtraFile>)Session[AsyncMailsController.FILES]).Any(x => x.Size == file.ContentLength && x.Name == file.FileName))
-                    return Json(new { id = "" }, JsonRequestBehavior.AllowGet);
+                    return Json(new { success = false,  message = "El archivo seleccionado ya se encuentra adjuntado." }, JsonRequestBehavior.AllowGet);
 
                 ExtraFile attachment = new ExtraFile();
                 attachment.Name = file.FileName;
@@ -607,10 +607,10 @@ namespace Glimpse.Controllers
                 attachment.Id = Path.GetFileName(attachment.Path).Substring(0, 16);
                 attachment.Content = new byte[file.ContentLength];
                 ((List<ExtraFile>)Session[AsyncMailsController.FILES]).Add(attachment);
-                return Json(new { id = attachment.Id }, JsonRequestBehavior.AllowGet);
+                return Json(new { success = true, id = attachment.Id }, JsonRequestBehavior.AllowGet);
             }
             else
-                throw new GlimpseException("El archivo seleccionado es mayor a 5mb o es potencialmente danino.");
+                return Json(new { success = false, message = "El archivo seleccionado es mayor a 5mb o es potencialmente danino." }, JsonRequestBehavior.AllowGet);
         }
         #endregion
 
