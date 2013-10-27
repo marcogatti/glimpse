@@ -16,7 +16,7 @@ namespace Glimpse.ViewModels
 
         public String Subject { get; set; }
 
-        public HttpPostedFile Attachment { get; set; }
+        public List<String> AttachmentsIds { get; set; }
 
         public MailSentViewModel() { }
     }

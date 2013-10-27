@@ -1,5 +1,6 @@
 ﻿using Glimpse.DataAccessLayer;
 using Glimpse.DataAccessLayer.Entities;
+using Glimpse.Helpers;
 using NHibernate;
 using NHibernate.Criterion;
 using System;
@@ -19,9 +20,14 @@ namespace Glimpse.Models
             this.Entity = entity;
         }
 
+        public Boolean BelongsToUser(User user)
+        {
+            return user.GetAccounts().Any(x => x.Entity.Id == this.Entity.MailEntity.MailAccountEntity.Id);
+        }
+
         public static String SaveToFS(HttpPostedFileBase file)
         {
-            String filePath = HttpContext.Current.Server.MapPath("~") + "temp\\" + Extra.GenerateRandomString(15) + file.FileName;
+            String filePath = HttpContext.Current.Server.MapPath("~") + "temp\\" + StringHelper.GenerateRandomString() + file.FileName;
             file.SaveAs(filePath);
             return filePath;
         }
@@ -36,7 +42,10 @@ namespace Glimpse.Models
             ExtraEntity extraEntity = session.CreateCriteria<ExtraEntity>()
                                          .Add(Restrictions.Eq("Id", id))
                                          .UniqueResult<ExtraEntity>();
-            return new Extra(extraEntity);
+            if (extraEntity == null)
+                return null;
+            else
+                return new Extra(extraEntity);
         }
         public static IList<ExtraEntity> FindByMailId(Int64 mailID, ISession session)
         {
@@ -46,19 +55,6 @@ namespace Glimpse.Models
                                             .List<ExtraEntity>();
             return mailExtras;
         }
-
-        private static String GenerateRandomString(Int16 size)
-        {
-            StringBuilder builder = new StringBuilder();
-            Random random = new Random();
-            char ch;
-            for (Int16 i = 0; i < size; i++)
-            {
-                ch = Convert.ToChar(Convert.ToInt32(Math.Floor(26 * random.NextDouble() + 65)));
-                builder.Append(ch);
-            }
-            return builder.ToString();
-        }
     }
 
     public class ExtraFile
@@ -67,6 +63,7 @@ namespace Glimpse.Models
         public Int64 Size { get; set; }
         public String Type { get; set; }
         public String Path { get; set; }
+        public String Id { get; set; }
         public byte[] Content { get; set; }
     }
 }

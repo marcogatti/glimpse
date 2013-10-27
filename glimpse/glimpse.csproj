@@ -240,6 +240,7 @@
     <Compile Include="Helpers\CryptoHelper.cs" />
     <Compile Include="Helpers\DateTimeHelper.cs" />
     <Compile Include="Helpers\InternationalizationHelper.cs" />
+    <Compile Include="Helpers\StringHelper.cs" />
     <Compile Include="MailInterfaces\Connector.cs" />
     <Compile Include="Exceptions\MailInterfacesExceptions\CouldNotSelectMailboxException.cs" />
     <Compile Include="MailInterfaces\Fetcher.cs" />

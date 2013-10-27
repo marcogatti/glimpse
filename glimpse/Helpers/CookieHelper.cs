@@ -12,18 +12,18 @@ namespace Glimpse.Helpers
 
         public const String LOGIN_COOKIE = "login-data";
 
-        private HttpCookieCollection responseCookies;
-        private HttpCookieCollection requestCookies;
+        private HttpCookieCollection ResponseCookies;
+        private HttpCookieCollection RequestCookies;
 
         public CookieHelper()
         {
-            responseCookies = HttpContext.Current.Response.Cookies;
-            requestCookies = HttpContext.Current.Request.Cookies;
+            ResponseCookies = HttpContext.Current.Response.Cookies;
+            RequestCookies = HttpContext.Current.Request.Cookies;
         }
         public CookieHelper(HttpCookieCollection requestCookies, HttpCookieCollection responseCookies)
         {
-            this.requestCookies = requestCookies;
-            this.responseCookies = responseCookies;
+            this.RequestCookies = requestCookies;
+            this.ResponseCookies = responseCookies;
         }
 
         public HttpCookie AddUsernameCookie(String username)
@@ -32,16 +32,16 @@ namespace Glimpse.Helpers
         }
         public HttpCookie AddUsernameCookie(String username, DateTime expirationDate)
         {
-            HttpCookie myCookie = this.responseCookies[LOGIN_COOKIE] ?? new HttpCookie(LOGIN_COOKIE);
+            HttpCookie myCookie = this.ResponseCookies[LOGIN_COOKIE] ?? new HttpCookie(LOGIN_COOKIE);
             myCookie.Values["User"] = username;
             myCookie.Expires = expirationDate;
             myCookie.HttpOnly = true;
-            this.responseCookies.Add(myCookie);
+            this.ResponseCookies.Add(myCookie);
             return myCookie;
         }
         public String GetUserFromCookie()
         {
-            HttpCookie myCookie = this.requestCookies[LOGIN_COOKIE];
+            HttpCookie myCookie = this.RequestCookies[LOGIN_COOKIE];
 
             if (myCookie != null)
                 return myCookie.Values["User"];
@@ -53,7 +53,7 @@ namespace Glimpse.Helpers
             try
             {
                 String user = this.GetUserFromCookie();
-                this.responseCookies.Remove(user);
+                this.ResponseCookies.Remove(user);
                 this.AddUsernameCookie(user, DateTime.Now.AddMonths(-1));
             }
             catch (CookieNotFoundException){ /* Cookie already cleared or does not exist*/ }
