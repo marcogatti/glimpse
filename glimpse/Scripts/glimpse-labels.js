@@ -41,37 +41,37 @@ function labelDrag(ev) {
 
 function setLabelsAdder(currentLabel) {
 
-        if (currentLabel.hasClass("custom-label")) {
+    if (currentLabel.hasClass("custom-label")) {
 
-            if (currentLabel.data('name') === 'others') {
-                currentLabel.mousedown(function (event) {
-                    event.preventDefault();
-                });
-                return;
-            }
-
-            currentLabel.attr("draggable", true);
-
-            currentLabel.on('dragstart', { label: currentLabel }, function (ev) {
-
-                ev.data.label.css('opacity', 0.4);
-                ev.originalEvent.dataTransfer.setData("Text", ev.target.id);
-                selectedLabel = ev.data.label.attr('data-name');
-                labelToAddIsSet = true;
-            }
-            );
-
-            currentLabel.on('dragend', { label: currentLabel }, function (ev) {
-                ev.data.label.css('opacity', 1);
-                labelToAddIsSet = false;
-            }
-            );
-
-        } else {
-            $(this).mousedown(function (downEvent) {
-                downEvent.preventDefault();
+        if (currentLabel.data('name') === 'others') {
+            currentLabel.mousedown(function (event) {
+                event.preventDefault();
             });
+            return;
         }
+
+        currentLabel.attr("draggable", true);
+
+        currentLabel.on('dragstart', { label: currentLabel }, function (ev) {
+
+            ev.data.label.css('opacity', 0.4);
+            ev.originalEvent.dataTransfer.setData("Text", ev.target.id);
+            selectedLabel = ev.data.label.attr('data-name');
+            labelToAddIsSet = true;
+        }
+        );
+
+        currentLabel.on('dragend', { label: currentLabel }, function (ev) {
+            ev.data.label.css('opacity', 1);
+            labelToAddIsSet = false;
+        }
+        );
+
+    } else {
+        $(this).mousedown(function (downEvent) {
+            downEvent.preventDefault();
+        });
+    }
 }
 
 function canReceiveThatLabel(label, circle) {
@@ -133,7 +133,7 @@ function addSystemLabel(circle, systemLabel) {
     systemLabels.push(systemLabel);
     circle.data("system-labels", systemLabels);
 
-    chooseCirclesToBeShown();
+    showCircleIfNeedBe(circle);
 }
 
 function addLabelToEmail(label, circle) {
@@ -177,6 +177,8 @@ function removeLabelFromCircle(circle, label) {
 
     removeLabelFromCircleData(circle, label);
 
+    showCircleIfNeedBe(circle);
+
     calculateEmailColor(circle);
 
     removeLabelFromCircleInServer(label, circle.data('id'), false, circle.data('mailaccount'));
@@ -194,7 +196,8 @@ function removeSystemLabelFromCircle(circle, label) {
     }
 
     circle.data("system-labels", circleLabels);
-    calculateEmailColor(circle);
+
+    showCircleIfNeedBe(circle);
 
     removeLabelFromCircleInServer(label, circle.data('id'), true, circle.data('mailaccount'));
 }
@@ -203,6 +206,7 @@ function removeSystemLabelFromCircle(circle, label) {
 function setEverithingRelatedToAddLabelsToAMail() {
     setLabelPencil();
     preventSelectingSystemLabels();
+    setLabelsMarker();
 }
 
 function preventSelectingSystemLabels() {
@@ -242,13 +246,17 @@ function setLabelCreationForm() {
 
 function chooseCirclesToBeShown() {
     $(".circle").each(function () {
-        if (toBeHidden($(this))) {
-            $(this).addClass("hidden");
-        } else {
-            $(this).removeClass("hidden");
-            calculateEmailColor($(this));
-        }
+        showCircleIfNeedBe($(this));
     });
+}
+
+function showCircleIfNeedBe(circle) {
+    if (toBeHidden(circle)) {
+        circle.addClass("hidden");
+    } else {
+        circle.removeClass("hidden");
+        calculateEmailColor(circle);
+    }
 }
 
 function setLabelSelection(label) {
@@ -342,7 +350,15 @@ function isActive(label) {
 }
 
 function hasLabel(circle, label) {
-    return (getCustomLabels(circle).indexOf(label) != -1);
+    return hasGenericLabel(getCustomLabels, circle, label);
+}
+
+function hasSystemLabel(circle, systemLabel) {
+    return hasGenericLabel(getSystemLabels, circle, systemLabel);
+}
+
+function hasGenericLabel(labelsFinder, circle, label) {
+    return (labelsFinder(circle).indexOf(label) != -1);
 }
 
 function validSystemLabel(label) {
@@ -360,7 +376,7 @@ function loadLabels() {
         var currentLabel = labels[i];
         if (currentLabel.systemName === null) {
             appendCustomLabel(currentLabel);
-            
+
         } else
             if (validSystemLabel(currentLabel)) {
 
@@ -381,9 +397,9 @@ function appendCustomLabel(label) {
     var color = label.Color;
     var labelToAppend = $("<li class='custom-label label label-glimpse' data-name='" + name + "'>" + name +
         '<span class="pull-right hidden">' +
-        '<i class="icon-pencil icon-white" title="Renombrar"></i>'+
-        '<i class="icon-edit icon-white" title="Color"></i>'+
-        '<i class="icon-remove icon-white" title="Eliminar"></i>'+
+        '<i class="icon-pencil icon-white" title="Renombrar"></i>' +
+        '<i class="icon-edit icon-white" title="Color"></i>' +
+        '<i class="icon-remove icon-white" title="Eliminar"></i>' +
         '</span></li>'
         );
 
@@ -442,7 +458,7 @@ function renameLabel(input) {
     labelColors[newName] = labelColors[oldName];
 
     $(".circle").each(function () {
-        
+
         if (hasLabel($(this), oldName)) {
             removeLabelFromCircleData($(this), oldName);
             addLabelToCircleData($(this), newName);
@@ -489,7 +505,7 @@ function changeLabelColor(colorPicker) {
 
 function exists(label) {
 
-    for(var i = 0; i<labels.length; i++){
+    for (var i = 0; i < labels.length; i++) {
         if (labels[i].showName === label) {
             return true;
         }
@@ -531,3 +547,28 @@ function removeLabelFromCircleInServer(labelName, mailId, isSystemLabel, mailAcc
     });
 }
 
+function setLabelsMarker() {
+    $('#mark-labels').click(function () {
+
+        var oneLabelIsOn,
+            classAction;
+
+        $('.custom-label').each(function () {
+            if (isActive($(this).data('name'))) {
+                oneLabelIsOn = true;
+                return false;
+            }
+        });
+
+        $('.custom-label').each(function () {
+            var label = $(this);
+
+            if (oneLabelIsOn)
+                label.addClass('label-hidden');
+            else
+                label.removeClass('label-hidden');
+        });
+
+        chooseCirclesToBeShown();
+    });
+}

@@ -431,7 +431,7 @@ function calculateEmailsLeft(containerChunk) {
 
 function archiveCircle(circle) {
     removeSystemLabelFromCircle(circle, label_inbox);
-    chooseCirclesToBeShown();
+    showCircleIfNeedBe(circle);
 }
 
 function deleteCircle(circle) {

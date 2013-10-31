@@ -186,8 +186,41 @@ namespace Glimpse.Controllers
                 if (mail == null)
                     throw new GlimpseException("Mail inexistente: " + id.ToString() + ".");
                 mailAccount.TrashMail(mail, session); //IMAP y BD
-                //if(systemFolder != "Trash")
-                //    MailsTasksHandler.SynchronizeTrash(mailAccount.Entity.Address);
+                tran.Commit();
+
+                JsonResult result = Json(new { success = true }, JsonRequestBehavior.AllowGet);
+                return result;
+            }
+            catch (GlimpseException exc)
+            {
+                tran.Rollback();
+                Log.LogException(exc, "Parametros de la llamada: mailID(" + id.ToString() + ").");
+                return Json(new { success = false, message = exc.GlimpseMessage }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception exc)
+            {
+                tran.Rollback();
+                Log.LogException(exc, "Parametros de la llamada: mailID(" + id.ToString() + ").");
+                return Json(new { success = false, message = exc.Message }, JsonRequestBehavior.AllowGet);
+            }
+            finally
+            {
+                session.Close();
+            }
+        }
+        [HttpPost]
+        [AjaxOnly]
+        public ActionResult UntrashMail(Int64 id, Int64 mailAccountId = 0)
+        {
+            ISession session = NHibernateManager.OpenSession();
+            ITransaction tran = session.BeginTransaction();
+            try
+            {
+                MailAccount mailAccount = this.GetMailAccount(mailAccountId);
+                Mail mail = new Mail(id, session);
+                if (mail == null)
+                    throw new GlimpseException("Mail inexistente: " + id.ToString() + ".");
+                mailAccount.UntrashMail(mail, session); //IMAP y BD
                 tran.Commit();
 
                 JsonResult result = Json(new { success = true }, JsonRequestBehavior.AllowGet);
@@ -565,6 +598,35 @@ namespace Glimpse.Controllers
                 Log.LogException(exc, "Parametros del metodo: mailId(" + mailId.ToString() +
                                       "), mailAccountId(" + mailAccountId.ToString() + ").");
                 return Json(new { success = false, message = "Error al archivar mail." }, JsonRequestBehavior.AllowGet);
+            }
+            finally
+            {
+                session.Close();
+            }
+        }
+        [HttpPost]
+        [AjaxOnly]
+        public ActionResult UnarchiveMail(Int64 mailId, Int64 mailAccountId = 0)
+        {
+            ISession session = NHibernateManager.OpenSession();
+            ITransaction tran = session.BeginTransaction();
+            try
+            {
+                MailAccount currentMailAccount = this.GetMailAccount(mailAccountId);
+                Mail mail = new Mail(mailId, session);
+                Label inboxLabel = Label.FindBySystemName(currentMailAccount, "Inbox", session);
+                mail.Unarchive(inboxLabel, session);
+                currentMailAccount.UnarchiveMail(mail);
+                tran.Commit();
+
+                return Json(new { success = true }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception exc)
+            {
+                tran.Rollback();
+                Log.LogException(exc, "Parametros del metodo: mailId(" + mailId.ToString() +
+                                      "), mailAccountId(" + mailAccountId.ToString() + ").");
+                return Json(new { success = false, message = "Error al desarchivar mail." }, JsonRequestBehavior.AllowGet);
             }
             finally
             {

@@ -265,6 +265,10 @@ namespace Glimpse.Models
         {
             this.MyFetcher.ArchiveMail(mail.Entity.Gm_mid);
         }
+        public void UnarchiveMail(Mail mail)
+        {
+            this.MyFetcher.UnarchiveMail(mail.GetSystemFolderName(), mail.Entity.Gm_mid);
+        }
         public void TrashMail(Mail mail, ISession session)
         {
             if (mail.GetSystemFolderName() == "Trash")
@@ -280,12 +284,31 @@ namespace Glimpse.Models
                 mail.AddLabel(trashLabel, session); //SaveOrUpdate adentro
             }
         }
+        public void UntrashMail(Mail mail, ISession session)
+        {
+            String systemFolder = mail.GetSystemFolderName();
+            if (systemFolder == "Trash")
+            {
+                Label trashLabel = Label.FindBySystemName(this, "Trash", session);
+                Label allLabel = Label.FindBySystemName(this, "All", session);
+                this.MyFetcher.RemoveFromTrash(allLabel.Entity.Name, mail.Entity.Gm_mid);
+                this.UpdateAllUid(mail, allLabel.Entity.Name);
+                mail.RemoveLabel(trashLabel.Entity.SystemName, true, session); //SaveOrUpdate adentro
+            }
+        }
         public void UpdateTrashUid(Mail deletedMail, String imapTrashFolderName)
         {
             Int32 trashUID = this.MyFetcher.GetMailUID(imapTrashFolderName, deletedMail.Entity.Gm_mid);
             deletedMail.Entity.UidAll = 0;
             deletedMail.Entity.UidSpam = 0;
             deletedMail.Entity.UidTrash = trashUID;
+        }
+        public void UpdateAllUid(Mail movedMail, String imapAllFolderName)
+        {
+            Int32 allUID = this.MyFetcher.GetMailUID(imapAllFolderName, movedMail.Entity.Gm_mid);
+            movedMail.Entity.UidAll = allUID;
+            movedMail.Entity.UidSpam = 0;
+            movedMail.Entity.UidTrash = 0;
         }
         public Int32 GetUIDExternalFrom(String mailbox, Boolean max)
         {

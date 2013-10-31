@@ -32,6 +32,10 @@ function initializeMailViewModal() {
         deleteCircleWithConfirmationWindow(currentCircle);
     });
 
+    $("#mail-view-undelete").click(function () {
+        restoreFromTrashCan(currentCircle);
+    });
+
     $('#deletion-confirmed').click(function () {
         deleteCircle(currentCircle);
         $("#mail-view").modal('hide');
@@ -306,6 +310,7 @@ function setMailViewModalHeadData(view_modal, circle) {
     }
 
     setMailViewerLabels(view_modal, circle);
+    setMailViewerFooterButtons(view_modal, circle);
 }
 
 function setMailViewModalBodyData(view_modal, circle) {
@@ -368,4 +373,41 @@ function deleteCircleWithConfirmationWindow(circle) {
     deleteCircleInServer(circle);
 
     $("#mail-view").modal('hide');
+}
+
+function restoreFromTrashCan(circle) {
+
+    removeSystemLabelFromCircle(circle, label_trash);
+
+    restoreFromTrashCanInServer(circle);
+
+    $("#mail-view").modal('hide');
+}
+
+function restoreFromTrashCanInServer(circle) {
+
+    $.ajax({
+        type: "POST",
+        url: "async/UntrashMail",
+        data: { id: circle.data("id"), mailAccountId: circle.data("mailaccount") }
+    });
+}
+
+function setMailViewerFooterButtons(view_modal, circle) {
+
+    view_modal.find('#mail-view-delete').removeClass('hidden');
+
+    if (hasSystemLabel(circle, label_inbox)) {
+        view_modal.find('#mail-view-archive').removeClass('hidden');
+    } else {
+        view_modal.find('#mail-view-archive').addClass('hidden');
+    }
+
+    if (hasSystemLabel(circle, label_trash)) {
+        view_modal.find('#mail-view-undelete').removeClass('hidden');
+        view_modal.find('#mail-view-archive').addClass('hidden');
+    } else {
+        view_modal.find('#mail-view-delete').removeClass('hidden');
+        view_modal.find('#mail-view-undelete').addClass('hidden');
+    }
 }

@@ -10,7 +10,6 @@ namespace Glimpse.DataAccessLayer.Entities
         public virtual Int64 Id { get; set; }
         public virtual String Username { get; set; }
         public virtual String Password { get; set; }
-        public virtual Boolean ShowTutorial { get; set; }
         public virtual String Firstname { get; set; }
         public virtual String Lastname { get; set; }
         public virtual String Country { get; set; }

@@ -194,6 +194,10 @@ namespace Glimpse.MailInterfaces
         {
             this.RemoveMailTag("INBOX", gmMailID);
         }
+        public void UnarchiveMail(String actualMailMailbox, UInt64 gmMailID)
+        {
+            this.AddMailTag(actualMailMailbox, "INBOX", gmMailID);
+        }
         public void RemoveMailTag(String mailbox, UInt64 gmMailID)
         {
             Mailbox targetMailbox = this.GetMailbox(mailbox);
