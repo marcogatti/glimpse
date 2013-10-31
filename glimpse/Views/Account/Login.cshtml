@@ -3,10 +3,17 @@
 
 @section css {
     @Styles.Render("~/Login/css")
+    @Styles.Render("~/Content/ui-lightness/jquery-ui-1.10.3.custom.css")
+}
+
+@section scripts{
+    @Scripts.Render("~/bundles/registration")
+    @Scripts.Render("~/bundles/glimpse")
+    @Scripts.Render("~/bundles/jqueryval")
 }
 
 @{
-    ViewBag.Title = "Login";
+    ViewBag.Title = "Glimpse";
 }
 
 <div class="container">
@@ -14,18 +21,18 @@
     @using (Html.BeginForm("Login", "Account", FormMethod.Post, new { @class = "form-signin" }))
     {
         @Html.AntiForgeryToken()
-        <h2 class="form-signin-heading">Welcome to glimpse</h2>
+        <h2 class="form-signin-heading">Bienvenido a Glimpse</h2>
+        
         @Html.ValidationSummary()
-        @Html.TextBoxFor(m => m.Email, new { type = "email", placeholder = "address@example.com", @class = "input-block-level" })
-        @Html.ValidationMessageFor(m => m.Email)
-        @Html.PasswordFor(m => m.Password, new { placeholder = "Password...", @class = "input-block-level" })
-        @Html.ValidationMessageFor(m => m.Password)
+        @Html.TextBoxFor(m => m.Username, new { placeholder = "Tu usuario o dirección de correo", @class = "input-block-level", id = "username", autofocus = "autofocus" })
+        @Html.PasswordFor(m => m.Password, new { placeholder = "Tu contraseña", @class = "input-block-level" })
         
-        @Html.DisplayTextFor(m => m.rememberMe)
-        @Html.CheckBoxFor(m => m.rememberMe, new { @class = "input-block-level" })
-        
-
-        <input class="btn btn-large btn-primary" type="submit" value="Entrar" />
-    
+        <input class="btn btn-primary btn-success" type="submit" value="Entrar" />
+        <a class="btn btn-default" id="registration-link">Crear nueva cuenta Glimpse</a>
+        <a class="btn btn-link" id="forgot-password" style="margin-left: -4%">Olvidé mi contraseña...</a>
     }
+
+    @{Html.RenderPartial("register_view");}
+
 </div>
+

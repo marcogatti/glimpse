@@ -17,7 +17,7 @@ namespace Glimpse.Tests.MailInterfaces
         [TestFixtureSetUp]
         public void SetUp()
         {
-            this.mySender = new Sender("test.imap.performance@gmail.com", "imaptest", "Simpson Homer");
+            this.mySender = new Sender("test.imap.performance@gmail.com", "EAAAANNt9jTRTqnFOymwLQ6Yy6PsecEBR2l10A677SIjAShr", "Simpson Homer");
         }
 
         [Test]
@@ -59,6 +59,14 @@ namespace Glimpse.Tests.MailInterfaces
             newMail.Attachments.Add(attachmentPath, false);
 
             this.mySender.sendMail(newMail);
+            Assert.Pass();
+        }
+
+        [Test]
+        [Explicit]
+        public void EXP_Send_Reset_Mail_Sends_Correctly()
+        {
+            Sender.SendResetPasswordMail("myGlimpseUsername", "test.imap.506@gmail.com", "myNewPassword");
             Assert.Pass();
         }
     }

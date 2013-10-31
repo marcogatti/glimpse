@@ -1,12 +1,19 @@
 ﻿@using Glimpse.DataAccessLayer.Entities
+@using Glimpse.ViewModels
 
 @section css {
-    @Styles.Render("~/Home/css")}
+    @Styles.Render("~/Home/css")
+    @Styles.Render("~/Content/ui-lightness/jquery-ui-1.10.3.custom.css")
+}
 @section scripts {
-    @Scripts.Render("~/bundles/glimpse")}
+    @Scripts.Render("~/bundles/jquerymousewheel")
+    @Scripts.Render("~/bundles/glimpse")
+    @Scripts.Render("~/Scripts/ckeditor/ckeditor.js")
+    @Scripts.Render("~/Scripts/jquery-ui-1.10.3.custom.js")
+}
 
 @{
-    ViewBag.Title = "Index";        
+    ViewBag.Title = "Glimpse";        
 }
 
 
@@ -20,14 +27,11 @@
             </button>
             <a class="brand" href="#">Glimpse</a>
             <div class="nav-collapse collapse">
-                <p class="navbar-text pull-right">
-                    Logged in as <a href="#" class="navbar-link">@ViewBag.Email</a>
-                    @Html.ActionLink("Logout", "Logout", "Account", null, new { @class= "navbar-link"})
-                </p>
+                @{Html.RenderPartial("config_dropdown");}
                 <ul class="nav">
-                    <li class="active"><a href="#">Home</a></li>
-                    <li><a href="#about">About</a></li>
-                    <li><a href="#contact">Contact</a></li>
+                    <li class="active"><a href="#">Inicio</a></li>
+                    <li><a id="about-us-trigger" href="#">Sobre nosotros</a></li>
+                    <li><a href="mailto:glimpseinnovationsystems@gmail.com">Contacto</a></li>
                 </ul>
             </div>
             <!--/.nav-collapse -->
@@ -35,56 +39,67 @@
     </div>
 </div>
 
-<div id="example" class="modal hide fade in" style="display: none;">
-    <div class="modal-header">
-        <a class="close" data-dismiss="modal">×</a>
-    </div>
-    <div class="modal-body">
-    </div>
-    <div class="modal-footer">
-        <a href="#" class="btn btn-success">Call to action</a>
-        <a href="#" class="btn" data-dismiss="modal">Close</a>
-    </div>
-</div>
+@{Html.RenderPartial("mail_view");}
 
 <div class="container-fluid">
 
     <div class="row-fluid">
-        <div class="span1">
-            <div class="well sidebar-nav">
-                <ul class="nav nav-list">
-                    <li class="nav-header">Sidebar</li>
-                    <li class="active"><a href="#">Link</a></li>
-                    <li><a href="#">Link</a></li>
-                    <li class="nav-header">Sidebar</li>
-                    <li><a href="#">Link</a></li>
-                    <li class="nav-header">Sidebar</li>
-                    <li><a href="#">Link</a></li>
-
-                </ul>
+        <div class="span2" id="main-left-panel">
+            <div id="panel" class="well sidebar-nav">
+                <a href="#compose" id="compose" class="btn btn-block">Redactar</a>
+                <hr />
+                <div id="main-labels-cont" class="scrollable">
+                    <ol id="labels-header" class="nav nav-list">
+                        <li class="nav-header">Carpetas</li>
+                        <li class="nav-header">Etiquetas <span id="create-label" class="pull-right" title="Nueva etiqueta"><i class="icon-pencil"></i></span></li>
+                    </ol>
+                </div>
+                <hr />
+                <div id="circles-progress" class="progress progress-striped active">
+                    <div class="bar" style="width: 100%;">Cargando...</div>
+                </div>
             </div>
             <!--/.well -->
         </div>
         <!--/span-->
 
-        <div id="email-container" class="span11">
+        <script>
+            var labels = @Html.Raw(Json.Encode(ViewBag.Labels));
+            var oldestAge = @ViewBag.OldestAge;
+        </script>
 
-            <canvas id="gridCanvas"></canvas>
+        <div class="span10" style="height: 560px">
+            <div id="mailaccounts-container" class="well well-small">
+                <ul class="nav nav-pills">
+                </ul>
+            </div>
+            <div id="container-wrapper" class="well">
 
-            <div class="progress progress-striped active">
-                <div class="bar" style="width: 100%;"></div>
+                <div class="icons">
+                    <i id="zoom-in" class="icon icon-zoom-in"></i>
+                    <i id="zoom-out" class="icon icon-zoom-out"></i>
+                </div>
+
+                <div id="email-container" class="well">
+                </div>
+                <div id="date-today" class="coord date-coord"></div>
+                <div id="date-last" class="coord date-coord"></div>
+                <div id="dateTime" class="coord date-coord hidable hidden"></div>
+                <div id="from" class="coord hidable hidden"></div>
             </div>
 
-            <div id="dateToday" class="coord dateCoord">Today</div>
-            <div id="dateTime" class="coord dateCoord hidable hidden"></div>
-            <div id="from" class="coord hidable hidden"></div>
-
         </div>
+
+        <form class="form-inline pull-right hidden">
+            <label>Cantidad máxima</label>
+            <input id="max-amount" type="number" min="1" max="100" value="30">
+        </form>
+
 
     </div>
     <!--/row-->
 
-    <hr />
+    @*<hr />*@
 
     <footer>
         <p>&copy; glimpse 2013</p>
@@ -92,5 +107,27 @@
 
 </div>
 
+@{Html.RenderPartial("compose_panel");}
 
-<!--/.fluid-container-->
+<script>
+    var user_isGlimpseUser = @Html.Raw(Json.Encode(ViewBag.IsGlimpseUser));
+
+    var user_firstname = @Html.Raw(Json.Encode(ViewBag.Firstname));
+    var user_lastname = @Html.Raw(Json.Encode(ViewBag.Lastname)); 
+    var user_country = @Html.Raw(Json.Encode(ViewBag.Country));
+    var user_city = @Html.Raw(Json.Encode(ViewBag.City));
+    var user_telephone = @Html.Raw(Json.Encode(ViewBag.Telephone));
+    
+    var user_personal_data = {
+        firstName: user_firstname,
+        lastName: user_lastname,
+        country:user_country,
+        city: user_city,
+        tel:user_telephone
+    };
+
+    var user_mailAccounts = @Html.Raw(Json.Encode(ViewBag.MailAccounts));
+</script>
+
+@{Html.RenderPartial("config_view");
+  Html.RenderPartial("about_us");}

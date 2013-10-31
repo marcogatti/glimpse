@@ -14,16 +14,13 @@ namespace Glimpse.DataAccessLayer.Entities
         public virtual Int64 Id { get; set; }
         public virtual MailAccountEntity MailAccountEntity { get; set; }
         public virtual AddressEntity From { get; set; }
-        public virtual IList<MailPerLabelEntity> LabelsPerMail{ get; set; }
+        public virtual IList<LabelEntity> Labels { get; set; }
         public virtual IList<ExtraEntity> Extras { get; set; }
         public virtual UInt64 Gm_tid { get; set; }
         public virtual UInt64 Gm_mid { get; set; }
         public virtual DateTime Date { get; set; }
         public virtual String Subject { get; set; }
-        public virtual Int64 UidInbox { get; set; }
         public virtual Int64 UidTrash { get; set; }
-        public virtual Int64 UidSent { get; set; }
-        public virtual Int64 UidDraft { get; set; }
         public virtual Int64 UidSpam { get; set; }
         public virtual Int64 UidAll { get; set; }
         public virtual Boolean Answered { get; set; }
@@ -31,15 +28,18 @@ namespace Glimpse.DataAccessLayer.Entities
         public virtual Boolean Seen { get; set; }
         public virtual Boolean Draft { get; set; }
         public virtual Boolean HasExtras { get; set; }
-        public virtual String ToAddr { get; set; }
+        public virtual String ToAddress { get; set; }
         public virtual String CC { get; set; }
         public virtual String BCC { get; set; }
+        public virtual String BodyPeek { get; set; }
         public virtual String Body { get; set; }
-
+        public virtual UInt16 Importance { get; set; }
+        
         public MailEntity()
         {
-            this.LabelsPerMail = new List<MailPerLabelEntity>();
+            this.Labels = new List<LabelEntity>();
             this.Extras = new List<ExtraEntity>();
+            this.Importance = 2;
         }
     }
 }

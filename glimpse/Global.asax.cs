@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Glimpse.ErrorLogging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -22,6 +23,8 @@ namespace Glimpse
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+
+            ControllerBuilder.Current.SetControllerFactory(new ErrorHandlingControllerFactory());
         }
     }
 }

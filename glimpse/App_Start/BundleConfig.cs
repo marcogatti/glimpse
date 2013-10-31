@@ -22,7 +22,21 @@ namespace Glimpse
                         "~/Scripts/bootstrap.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/glimpse").Include(
+                        "~/Scripts/glimpse-utils.js",
+                        "~/Scripts/glimpse-sender.js",
+                        "~/Scripts/glimpse-fetcher.js",
+                        "~/Scripts/glimpse-circles.js",
+                        "~/Scripts/glimpse-mail-view.js",
+                        "~/Scripts/glimpse-labels.js",
+                        "~/Scripts/glimpse-config.js",
+                        "~/Scripts/glimpse-mailaccounts.js",
                         "~/Scripts/glimpse.js"));
+
+            bundles.Add(new ScriptBundle("~/bundles/jquerymousewheel").Include(
+                       "~/Scripts/jquery.mousewheel.js"));
+
+            bundles.Add(new ScriptBundle("~/bundles/registration").Include(
+                        "~/Scripts/glimpse-register.js"));
 
             // Use the development version of Modernizr to develop with and learn from. Then, when you're
             // ready for production, use the build tool at http://modernizr.com to pick only the tests you need.
@@ -32,7 +46,8 @@ namespace Glimpse
             bundles.Add(new StyleBundle("~/Content/css").Include("~/Content/site.css"));
 
             bundles.Add(new StyleBundle("~/bootstrap/css").Include(
-                        "~/Content/bootstrap.css"));
+                        "~/Content/bootstrap.css",
+                        "~/Content/our-bootstrap-new.css"));
 
             bundles.Add(new StyleBundle("~/bootstrap-responsive/css").Include(
                        "~/Content/bootstrap-responsive.css"));

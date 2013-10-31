@@ -1,0 +1,74 @@
+﻿<div id="mail-view" class="modal hide fade in" style="display: none;">
+    <div class="modal-header">
+        <a class="close" data-dismiss="modal">×</a>
+        <div id="mail-view-labels_subject">
+            <div class="lead" id="mail-view-subject">
+                <p>Subject</p>
+            </div>
+            <div id="mail-view-labels">
+            </div>
+        </div>
+        <div id="mail-view-header">
+            <div id="mail-view-from-container" class="pull-left">
+                <p class="mail-view-address">
+                    <span class="label">De:</span>
+                    <span id="mail-view-from"></span>
+                    <span id="mail-view-address-displayer" class="btn btn-link"><i class="icon-chevron-down"></i></span>
+                </p>
+            </div>
+            <div id="mail-view-date-container" class="pull-right">
+                <p id="mail-view-date"></p>
+            </div>
+        </div>
+    </div>
+    <div id="mail-view-body-container" class="modal-body">
+        <div id="mail-view-body" class="well"></div>
+        <div class="panel panel-primary" id="mail-view-attach-container">
+            <div class="panel-heading">
+                <h3 class="panel-title">Adjuntos:</h3>
+            </div>
+            <div class="panel-body" id="mail-view-attachments"></div>
+        </div>
+        <div id="body-progress" class="progress progress-striped active">
+            <div class="bar" style="width: 100%;">Cargando...</div>
+        </div>
+    </div>
+    <div id="mail-view-footer" class="modal-footer">
+        <a href="#" class="btn mail-forward" data-dismiss="modal">Reenviar</a>
+        <a href="#" class="btn mail-replyall" data-dismiss="modal">Responder a todos</a>
+        <a href="#" class="btn btn-info mail-reply" data-dismiss="modal">Responder</a>
+
+        <a id="mail-goback" href="#" class="btn pull-left" title="Ir atrás en la conversación"><i class="icon-chevron-left"></i></a>
+        <a id="mail-goforw" href="#" class="btn pull-left" title="Ir adelante en la conversación"><i class="icon-chevron-right"></i></a>
+        <span class="separator pull-left"></span>
+        <span id="mail-view-archive" class="pull-left btn btn-info" title="Quitar de la Bandeja de Entrada"><i class="icon-check"></i></span>
+        <span id="mail-view-delete" class="pull-left btn btn-danger" title="Eliminar email"><i class="icon-remove-sign"></i></span>
+    </div>
+</div>
+
+<div class="hidden">
+    <div id="addresses-content">
+        <div>
+            <span class="label">Para:</span>
+            <span id="mail-view-to"></span>
+        </div>
+        <div id="mail-view-cc-container">
+            <span class="label">CC:</span>
+            <span id="mail-view-cc"></span>
+        </div>
+    </div>
+</div>
+
+<div id="deletion-confirmation" class="modal hide fade">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>Eliminar mensaje</h3>
+    </div>
+    <div class="modal-body">
+        <p>¿Desea eliminar el mensaje? Una vez eliminado no podrá recuperarlo.</p>
+    </div>
+    <div class="modal-footer">
+        <a class="btn" data-dismiss="modal">Cancelar</a>
+        <a id="deletion-confirmed" class="btn btn-danger" data-dismiss="modal">Eliminar</a>
+    </div>
+</div>

@@ -1,0 +1,37 @@
+﻿<div id="compose_pannel">
+    <div class="ui-dialog-content">
+        <table style="width: 100%;">
+            <tbody>
+                <tr>
+                    <td>
+                        <textarea rows="1" placeholder="Destinatarios..." id="email-to" class="compose-text"></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <textarea rows="1" placeholder="Asunto..." id="email-subject" class="compose-text"></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <textarea cols="100" rows="400" id="text_editor"></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <form id="upload-file-form" enctype="multipart/form-data" style="margin-top: 15px; margin-bottom: 5px;">
+                            <input name="file" type="file" />
+                            <input class="upload-file" type="button" value="Adjuntar" />
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <span class="hidden">
+            <span id="attachments-ids" data-ids=""></span>
+            <span id="email-from"></span>
+        </span>
+    </div>
+    <div class="ui-dialog-buttonpane"></div>
+    <span class="hidden progress-circular">@{Html.RenderPartial("loading_widjet");}</span>
+</div>
