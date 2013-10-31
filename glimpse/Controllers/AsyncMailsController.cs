@@ -606,6 +606,35 @@ namespace Glimpse.Controllers
         }
         [HttpPost]
         [AjaxOnly]
+        public ActionResult UnarchiveMail(Int64 mailId, Int64 mailAccountId = 0)
+        {
+            ISession session = NHibernateManager.OpenSession();
+            ITransaction tran = session.BeginTransaction();
+            try
+            {
+                MailAccount currentMailAccount = this.GetMailAccount(mailAccountId);
+                Mail mail = new Mail(mailId, session);
+                Label inboxLabel = Label.FindBySystemName(currentMailAccount, "Inbox", session);
+                mail.Unarchive(inboxLabel, session);
+                currentMailAccount.UnarchiveMail(mail);
+                tran.Commit();
+
+                return Json(new { success = true }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception exc)
+            {
+                tran.Rollback();
+                Log.LogException(exc, "Parametros del metodo: mailId(" + mailId.ToString() +
+                                      "), mailAccountId(" + mailAccountId.ToString() + ").");
+                return Json(new { success = false, message = "Error al desarchivar mail." }, JsonRequestBehavior.AllowGet);
+            }
+            finally
+            {
+                session.Close();
+            }
+        }
+        [HttpPost]
+        [AjaxOnly]
         public void SynchronizeAccount()
         {
             try

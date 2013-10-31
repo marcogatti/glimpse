@@ -79,6 +79,14 @@ namespace Glimpse.Models
                 this.Save(session);
             }
         }
+        public void Unarchive(Label inboxLabel, ISession session)
+        {
+            if (!this.Entity.Labels.Any(x => x.SystemName == "INBOX"))
+            {
+                this.Entity.Labels.Add(inboxLabel.Entity);
+                this.Save(session);
+            }
+        }
         public void Delete(ISession session)
         {
             session.Delete(this.Entity);

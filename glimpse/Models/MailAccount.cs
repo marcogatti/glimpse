@@ -265,6 +265,10 @@ namespace Glimpse.Models
         {
             this.MyFetcher.ArchiveMail(mail.Entity.Gm_mid);
         }
+        public void UnarchiveMail(Mail mail)
+        {
+            this.MyFetcher.UnarchiveMail(mail.GetSystemFolderName(), mail.Entity.Gm_mid);
+        }
         public void TrashMail(Mail mail, ISession session)
         {
             if (mail.GetSystemFolderName() == "Trash")
