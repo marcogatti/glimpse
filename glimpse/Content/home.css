@@ -29,16 +29,21 @@
     overflow: hidden;
 }
 
+i.clickable {
+    cursor: pointer;
+}
+
 .brand {
     font-family: 'Freestyle Script';
     font-size: 32px !important;
     font-weight: bold !important;
 }
-.brand.brand-bg {
-    font-family: 'Freestyle Script';
-    font-size: 64px !important;
-    font-weight: bold !important;
-}
+
+    .brand.brand-bg {
+        font-family: 'Freestyle Script';
+        font-size: 64px !important;
+        font-weight: bold !important;
+    }
 
 .circle {
     width: 75px;
@@ -95,6 +100,7 @@ div.field-group {
     overflow-y: auto;
     overflow-x: hidden;
 }
+
 #labels-header {
     padding: 2px;
 }
@@ -193,12 +199,11 @@ div.field-group {
     transition: all 0.1s;
     -webkit-transform-origin: 90px 0;
     transform-origin: 75px -75px;
-
 }
 
-        .radial-button:active {
-            box-shadow: 0 0 4px 4px limegreen;
-        }
+    .radial-button:active {
+        box-shadow: 0 0 4px 4px limegreen;
+    }
 
 .label-ball {
     -webkit-transition: all 0.5s ease;
@@ -224,6 +229,7 @@ div.field-group {
         z-index: 10;
         border-radius: 10%;
     }
+
         .coord.hidable.date-coord {
             background-color: #f5f5f5;
         }
@@ -244,7 +250,7 @@ div.field-group {
 #from {
     /*line-height: 75px;*/
     width: 50px;
-    -webkit-transform: rotate(-45deg)
+    -webkit-transform: rotate(-45deg);
 }
 
 .hidden {

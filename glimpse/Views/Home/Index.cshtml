@@ -30,7 +30,7 @@
                 @{Html.RenderPartial("config_dropdown");}
                 <ul class="nav">
                     <li class="active"><a href="#">Inicio</a></li>
-                    <li><a id="about-us-trigger" href="#">Sobre nosotros</a></li>
+                    <li><a id="about-us-trigger" href="#">Acerca de</a></li>
                     <li><a href="mailto:glimpseinnovationsystems@gmail.com">Contacto</a></li>
                 </ul>
             </div>
@@ -51,7 +51,10 @@
                 <div id="main-labels-cont" class="scrollable">
                     <ol id="labels-header" class="nav nav-list">
                         <li class="nav-header">Carpetas</li>
-                        <li class="nav-header">Etiquetas <span id="create-label" class="pull-right" title="Nueva etiqueta"><i class="icon-pencil"></i></span></li>
+                        <li class="nav-header">Etiquetas 
+                            <span id="create-label" class="pull-right" title="Nueva etiqueta"><i class="icon-pencil clickable"></i></span>
+                            <span id="mark-labels" class="pull-right" title="Marcar/Desmarcar todos los labels" style="margin-right: 6px"><i class="icon-tags clickable"></i></span>
+                        </li>
                     </ol>
                 </div>
                 <hr />
