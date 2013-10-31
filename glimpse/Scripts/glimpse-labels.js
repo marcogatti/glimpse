@@ -133,7 +133,7 @@ function addSystemLabel(circle, systemLabel) {
     systemLabels.push(systemLabel);
     circle.data("system-labels", systemLabels);
 
-    chooseCirclesToBeShown();
+    showCircleIfNeedBe(circle);
 }
 
 function addLabelToEmail(label, circle) {
@@ -177,6 +177,8 @@ function removeLabelFromCircle(circle, label) {
 
     removeLabelFromCircleData(circle, label);
 
+    showCircleIfNeedBe(circle);
+
     calculateEmailColor(circle);
 
     removeLabelFromCircleInServer(label, circle.data('id'), false, circle.data('mailaccount'));
@@ -194,7 +196,8 @@ function removeSystemLabelFromCircle(circle, label) {
     }
 
     circle.data("system-labels", circleLabels);
-    calculateEmailColor(circle);
+
+    showCircleIfNeedBe(circle);
 
     removeLabelFromCircleInServer(label, circle.data('id'), true, circle.data('mailaccount'));
 }
@@ -243,13 +246,17 @@ function setLabelCreationForm() {
 
 function chooseCirclesToBeShown() {
     $(".circle").each(function () {
-        if (toBeHidden($(this))) {
-            $(this).addClass("hidden");
-        } else {
-            $(this).removeClass("hidden");
-            calculateEmailColor($(this));
-        }
+        showCircleIfNeedBe($(this));
     });
+}
+
+function showCircleIfNeedBe(circle) {
+    if (toBeHidden(circle)) {
+        circle.addClass("hidden");
+    } else {
+        circle.removeClass("hidden");
+        calculateEmailColor(circle);
+    }
 }
 
 function setLabelSelection(label) {
@@ -343,7 +350,15 @@ function isActive(label) {
 }
 
 function hasLabel(circle, label) {
-    return (getCustomLabels(circle).indexOf(label) != -1);
+    return hasGenericLabel(getCustomLabels, circle, label);
+}
+
+function hasSystemLabel(circle, systemLabel) {
+    return hasGenericLabel(getSystemLabels, circle, systemLabel);
+}
+
+function hasGenericLabel(labelsFinder, circle, label) {
+    return (labelsFinder(circle).indexOf(label) != -1);
 }
 
 function validSystemLabel(label) {
@@ -547,9 +562,6 @@ function setLabelsMarker() {
 
         $('.custom-label').each(function () {
             var label = $(this);
-
-            if (label.data('name') == 'other')
-                return;
 
             if (oneLabelIsOn)
                 label.addClass('label-hidden');
