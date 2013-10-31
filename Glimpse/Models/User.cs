@@ -26,7 +26,6 @@ namespace Glimpse.Models
             this.Entity = new UserEntity();
             this.Entity.Username = username;
             this.Entity.Password = password;
-            this.Entity.ShowTutorial = true;
             this.mailAccounts = new List<MailAccount>();
         }
         public User(String username, String password, String firstName, String lastName) : this(username, password)
