@@ -130,6 +130,7 @@
     };
 
     var user_mailAccounts = @Html.Raw(Json.Encode(ViewBag.MailAccounts));
+    var user_accounts_errors = @Html.Raw(Json.Encode(ViewBag.MailErrors));
 </script>
 
 @{Html.RenderPartial("config_view");

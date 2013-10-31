@@ -117,12 +117,12 @@ namespace Glimpse.Controllers
                         return View(userView);
                     }
                     user.UpdateAccounts(session);
-                    try
-                    {
-                        user.ConnectLight();
-                        user.UpdateLabels(session);
-                    }
-                    catch (SocketException) { }
+                    //try
+                    //{
+                    //    user.ConnectLight();
+                    //    user.UpdateLabels(session);
+                    //}
+                    //catch (SocketException) { }
                     
                 }
 
