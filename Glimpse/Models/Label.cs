@@ -143,14 +143,11 @@ namespace Glimpse.Models
         {
             List<LabelEntity> uniqueLabels = new List<LabelEntity>();
             foreach (LabelEntity label in dupLabels)
-            {
-                //TODO limpiar la segunda condicion y probar
-                if (uniqueLabels.Any(x => x.Name == label.Name ||
+                if (uniqueLabels.Any(x => (x.Name == label.Name && label.SystemName == null) ||
                     (x.SystemName == label.SystemName && x.Name == label.Name)))
                     continue;
                 else
                     uniqueLabels.Add(label);
-            }
             return uniqueLabels;
         }
     }

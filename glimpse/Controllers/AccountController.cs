@@ -110,7 +110,7 @@ namespace Glimpse.Controllers
                         tran.Rollback();
                         return View(userView);
                     }
-                    else if (CryptoHelper.DecryptDefaultKey(user.Entity.Password) != userView.Password)
+                    else if (!CryptoHelper.PasswordsMatch(user.Entity.Password, cipherPassword))
                     {
                         this.ModelState.AddModelError("User", "Contraseña incorrecta.");
                         tran.Rollback();

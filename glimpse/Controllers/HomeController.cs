@@ -54,7 +54,7 @@ namespace Glimpse.Controllers
                     catch (InvalidAuthenticationException exc)
                     {
                         Log.LogException(exc, "No se puede conectar con IMAP, cambio el password de :" + mailAccount.Entity.Address + ".");
-                        ViewBag.MailErrors += "Could not log in with " + mailAccount.Entity.Address + ", password was changed.";
+                        ViewBag.MailErrors += "Glimpse no puede conectarse con la cuenta: " + mailAccount.Entity.Address + ". Por favor reconfigure la contraseña.";
                         //TODO: ver como mostrar los mailAccounts que no se pudieron conectar en la Vista
                     }
                     catch (SocketException exc)
@@ -69,7 +69,6 @@ namespace Glimpse.Controllers
                                                       .Single();
 
                 foreach (LabelEntity label in accountLabels)
-                    //viewLabels.Add(new LabelViewModel(label.Name, label.SystemName));
                     viewLabels.Add(new LabelViewModel(label.Name, label.SystemName, label.Color));
 
                 ViewBag.Username = sessionUser.Entity.Username;
