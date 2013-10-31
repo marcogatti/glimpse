@@ -380,11 +380,11 @@ function appendCustomLabel(label) {
     var name = label.showName;
     var color = label.Color;
     var labelToAppend = $("<li class='custom-label label label-glimpse' data-name='" + name + "'>" + name +
-        '<span class="pull-right hidden">' +
-        '<i class="icon-pencil icon-white" title="Renombrar"></i>'+
-        '<i class="icon-edit icon-white" title="Color"></i>'+
-        '<i class="icon-remove icon-white" title="Eliminar"></i>'+
-        '</span></li>'
+        '<span class="pull-right hidden"><div class="btn-group btn-group-vertical">' +
+    '<button class="btn" title="Renombrar"><i class="icon-pencil"></i></button>' +
+    '<button class="btn" title="Cambiar color"><i class="icon-edit"></i></button>' +
+    '<button class="btn" title="Eliminar"><i class="icon-remove"></i></button>' +
+    '</div></span></li>'
         );
 
     labelToAppend.find("span").on('click', function (e) {
@@ -394,49 +394,34 @@ function appendCustomLabel(label) {
     paintLabel(labelToAppend, color);
 
     setColorPopover(labelToAppend, color);
+    setRenamePopover(labelToAppend);
+    setRemoveButton(labelToAppend);
 
-    labelToAppend.find(".icon-remove").on('click', function () {
-        var currentLabel = $(this).parent().parent();
-        $.ajax({
-            type: "POST",
-            url: "async/DeleteLabel",
-            data: { labelName: currentLabel.data("name") }
-        }).fail(function () {
-            alert("No fue posible eliminar la etiqueta");
-        });
-
-        $(".circle").each(function () {
-            removeLabelFromCircle($(this), currentLabel.text());
-        });
-        currentLabel.remove();
-    });
-
-    labelToAppend.find(".icon-pencil").popover({
-        trigger: 'click',
-        placement: 'bottom',
-        html: true,
-        content: "<input type='text' value='" + name + "' id='" + name + "-rename' onchange='renameLabel(this);'>"
-    });
-
-    labelToAppend.hover(
-        function () {
-            labelToAppend.find("span").removeClass("hidden");
-        },
-        function () {
-            labelToAppend.find("span").addClass("hidden");
-        }
-    );
+    setEditionButton(labelToAppend);
 
     setLabelSelection(labelToAppend);
     $(".custom-label:last-of-type").after(labelToAppend);
     setLabelsAdder(labelToAppend);
 }
 
+function setEditionButton(label) {
+
+    label.hover(
+        function () {
+            label.find("span").removeClass("hidden");
+        },
+        function () {
+            label.find("span").addClass("hidden");
+            //label.find(".btn[title='Cambiar color']").popover("hide");
+            //label.find(".btn[title='Renombrar']").popover("hide");
+        }
+        );
+}
+
 function renameLabel(input) {
-    var targetLabelName = input.id.split("-")[0],
-        oldName = targetLabelName,
+    var oldName = input.id.split("-")[0],
        newName = input.value;
-    var targetLabel = $(".custom-label[data-name='" + targetLabelName + "']");
+    var targetLabel = $(".custom-label[data-name='" + oldName + "']");
     targetLabel.html(newName);
     targetLabel.attr("data-name", newName);
     labelColors[newName] = labelColors[oldName];
@@ -457,13 +442,43 @@ function renameLabel(input) {
 }
 
 function setColorPopover(labelElement, currentColor) {
-    labelElement.find(".icon-edit").popover("destroy");
-    labelElement.find(".icon-edit").popover({
-        trigger: 'click',
-        placement: 'bottom',
+    //labelElement.find(".btn[title='Cambiar color']").popover("destroy");
+    labelElement.find(".btn[title='Cambiar color']").popover({
+        //trigger: 'click',
+        //placement: 'bottom',
         html: true,
         content: "<input type='color' class='label-color-picker' value='" + currentColor +
             "' id='" + labelElement.attr("data-name") + "-picker' onchange='changeLabelColor(this);'>"
+    });
+}
+
+function setRenamePopover(labelElement) {
+    //labelElement.find(".btn[title='Renombrar']").popover("destroy");
+    var name = labelElement.data("name");
+    labelElement.find(".btn[title='Renombrar']").popover({
+        trigger: 'click',
+        placement: 'bottom',
+        html: true,
+        content: "<input type='text' class='label-rename-textbox' value='" + name + "' id='" + name + "-rename' onchange='renameLabel(this);'>"
+    });
+}
+
+function setRemoveButton(labelElement) {
+
+    labelElement.find(".btn[title='Eliminar']").on('click', function () {
+        var currentLabel = $(this).parent().parent().parent();
+        $.ajax({
+            type: "POST",
+            url: "async/DeleteLabel",
+            data: { labelName: currentLabel.data("name") }
+        }).fail(function () {
+            alert("No fue posible eliminar la etiqueta");
+        });
+
+        $(".circle").each(function () {
+            removeLabelFromCircle($(this), currentLabel.text());
+        });
+        currentLabel.remove();
     });
 }
 
@@ -485,6 +500,11 @@ function changeLabelColor(colorPicker) {
             calculateEmailColor($(this));
         }
     });
+
+    $(".circle.previewed").each(
+        function () {
+            putLabelBalls($(this));
+        });
 }
 
 function exists(label) {
