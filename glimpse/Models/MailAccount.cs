@@ -115,14 +115,21 @@ namespace Glimpse.Models
         }
         public void SetReadFlag(Mail mail, Boolean seen, ISession session)
         {
+            String imapFolderName;
+
             if (mail.Entity.Seen != seen)
             {
                 ITransaction tran = session.BeginTransaction();
                 mail.Entity.Seen = seen;
                 mail.Save(session); //DB
-                String imapFolderName = mail.GetImapFolderName();
-                this.MyFetcher.SetSeenFlag(imapFolderName, mail.Entity.Gm_mid, seen); //IMAP
                 tran.Commit();
+
+                imapFolderName = mail.GetImapFolderName();
+
+                if (this.MyFetcher != null)
+                    this.MyFetcher.SetSeenFlag(imapFolderName, mail.Entity.Gm_mid, seen); //IMAP
+                else
+                    Log.LogException(new Exception(), "Error al marcar un mail con leido=" + seen + ", mailId=" + mail.Entity.Id);
             }
         }
         public bool IsConnected()
