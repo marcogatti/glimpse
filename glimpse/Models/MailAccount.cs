@@ -267,11 +267,11 @@ namespace Glimpse.Models
         }
         public void UnarchiveMail(Mail mail)
         {
-            this.MyFetcher.UnarchiveMail(mail.GetSystemFolderName(), mail.Entity.Gm_mid);
+            this.MyFetcher.UnarchiveMail(mail.GetImapFolderName(), mail.Entity.Gm_mid);
         }
         public void TrashMail(Mail mail, ISession session)
         {
-            if (mail.GetSystemFolderName() == "Trash")
+            if (mail.GetSystemFolderProperty() == "Trash")
             {
                 this.MyFetcher.DeleteFromTrash(mail.Entity.Gm_mid); //IMAP
                 mail.Delete(session); //DB
@@ -286,7 +286,7 @@ namespace Glimpse.Models
         }
         public void UntrashMail(Mail mail, ISession session)
         {
-            String systemFolder = mail.GetSystemFolderName();
+            String systemFolder = mail.GetSystemFolderProperty();
             if (systemFolder == "Trash")
             {
                 Label trashLabel = Label.FindBySystemName(this, "Trash", session);

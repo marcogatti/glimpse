@@ -97,13 +97,13 @@ namespace Glimpse.Models
         }
         public String GetImapFolderName()
         {
-            String systemName = this.GetSystemFolderName();
+            String systemName = this.GetSystemFolderProperty();
             return this.Entity.Labels
                        .Where(x => x.SystemName == systemName)
                        .Select(x => x.Name)
                        .Single();
         }
-        public String GetSystemFolderName()
+        public String GetSystemFolderProperty()
         {
             if (this.Entity.UidTrash > 0) return "Trash";
             if (this.Entity.UidSpam > 0) return "Junk";
