@@ -616,8 +616,9 @@ namespace Glimpse.Controllers
                 Mail mail = new Mail(mailId, session);
                 Label inboxLabel = Label.FindBySystemName(currentMailAccount, "Inbox", session);
                 mail.Unarchive(inboxLabel, session);
-                currentMailAccount.UnarchiveMail(mail);
                 tran.Commit();
+
+                currentMailAccount.UnarchiveMail(mail);
 
                 return Json(new { success = true }, JsonRequestBehavior.AllowGet);
             }

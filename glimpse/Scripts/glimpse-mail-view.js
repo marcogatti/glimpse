@@ -28,6 +28,11 @@ function initializeMailViewModal() {
         $("#mail-view").modal('hide');
     });
 
+    $("#mail-view-unarchive").click(function () {
+        moveToInbox(currentCircle);
+        $("#mail-view").modal('hide');
+    });
+
     $("#mail-view-delete").click(function () {
         deleteCircleWithConfirmationWindow(currentCircle);
     });
@@ -384,6 +389,21 @@ function restoreFromTrashCan(circle) {
     $("#mail-view").modal('hide');
 }
 
+function moveToInbox(circle) {
+    addSystemLabel(circle, label_inbox);
+
+    moveToInboxInServer(circle);
+}
+
+function moveToInboxInServer(circle) {
+
+    $.ajax({
+        type: "POST",
+        url: "async/UnarchiveMail",
+        data: { mailId: circle.data("id"), mailAccountId: circle.data("mailaccount") }
+    });
+}
+
 function restoreFromTrashCanInServer(circle) {
 
     $.ajax({
@@ -399,8 +419,10 @@ function setMailViewerFooterButtons(view_modal, circle) {
 
     if (hasSystemLabel(circle, label_inbox)) {
         view_modal.find('#mail-view-archive').removeClass('hidden');
+        view_modal.find('#mail-view-unarchive').addClass('hidden');
     } else {
         view_modal.find('#mail-view-archive').addClass('hidden');
+        view_modal.find('#mail-view-unarchive').removeClass('hidden');
     }
 
     if (hasSystemLabel(circle, label_trash)) {
