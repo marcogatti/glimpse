@@ -324,8 +324,8 @@ namespace Glimpse.Controllers
                     this.CreateLabel(labelName, theMail.Entity.MailAccountEntity.Id); //DB e IMAP
 
                 theMail.AddLabel(theLabel, session); //DB
-                mailAccount.AddLabelFolder(theMail, theLabel); //IMAP
                 tran.Commit();
+                mailAccount.AddLabelFolder(theMail, theLabel); //IMAP
 
                 return Json(new { success = true }, JsonRequestBehavior.AllowGet);
             }
@@ -356,8 +356,8 @@ namespace Glimpse.Controllers
                     return Json(new { success = false, message = "El mail indicado no pertenece a la cuenta indicada." }, JsonRequestBehavior.AllowGet);
 
                 mail.RemoveLabel(labelName, isSystemLabel, session); //DB
-                currentMailAccount.RemoveMailLabel(labelName, mail.Entity.Gm_mid); //IMAP
                 tran.Commit();
+                currentMailAccount.RemoveMailLabel(labelName, mail.Entity.Gm_mid); //IMAP
 
                 return Json(new { success = true }, JsonRequestBehavior.AllowGet);
             }
@@ -385,8 +385,8 @@ namespace Glimpse.Controllers
                 labels = labels.Where(x => x.Name.Contains(oldLabelName) && x.SystemName == null).ToList();
                 foreach (LabelEntity label in labels)
                     new Label(label).Rename(oldLabelName, newLabelName, session); //BD
-                currentMailAccount.RenameLabel(oldLabelName, newLabelName); //IMAP
                 tran.Commit();
+                currentMailAccount.RenameLabel(oldLabelName, newLabelName); //IMAP
 
                 return Json(new { success = true }, JsonRequestBehavior.AllowGet);
             }
@@ -468,8 +468,8 @@ namespace Glimpse.Controllers
                 newLabel.Entity.MailAccountEntity = labelAccount.Entity;
                 Label.ColorLabel(newLabel.Entity, labelAccount, sessionUser, session);
                 newLabel.SaveOrUpdate(session); //BD
-                labelAccount.CreateLabel(labelName); //IMAP
                 tran.Commit();
+                labelAccount.CreateLabel(labelName); //IMAP
 
                 return Json(new { success = true, color = newLabel.Entity.Color }, JsonRequestBehavior.AllowGet);
             }
@@ -502,7 +502,11 @@ namespace Glimpse.Controllers
                     if (labelToDelete != null)
                     {
                         labelToDelete.Delete(session); //BD
-                        currentMailAccount.DeleteLabel(labelName); //IMAP
+                        try
+                        {
+                            currentMailAccount.DeleteLabel(labelName); //IMAP
+                        }
+                        catch (Exception) { }
                     }
                 }
                 tran.Commit();
@@ -586,9 +590,9 @@ namespace Glimpse.Controllers
             {
                 MailAccount currentMailAccount = this.GetMailAccount(mailAccountId);
                 Mail mail = new Mail(mailId, session);
-                mail.Archive(session);
-                currentMailAccount.ArchiveMail(mail);
+                mail.Archive(session); //DB
                 tran.Commit();
+                currentMailAccount.ArchiveMail(mail); //IMAP
 
                 return Json(new { success = true }, JsonRequestBehavior.AllowGet);
             }
@@ -615,10 +619,9 @@ namespace Glimpse.Controllers
                 MailAccount currentMailAccount = this.GetMailAccount(mailAccountId);
                 Mail mail = new Mail(mailId, session);
                 Label inboxLabel = Label.FindBySystemName(currentMailAccount, "Inbox", session);
-                mail.Unarchive(inboxLabel, session);
+                mail.Unarchive(inboxLabel, session); //DB
                 tran.Commit();
-
-                currentMailAccount.UnarchiveMail(mail);
+                currentMailAccount.UnarchiveMail(mail); //IMAP
 
                 return Json(new { success = true }, JsonRequestBehavior.AllowGet);
             }

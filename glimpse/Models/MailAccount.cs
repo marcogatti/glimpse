@@ -10,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Web;
 
 namespace Glimpse.Models
 {
@@ -27,21 +26,7 @@ namespace Glimpse.Models
             this.Entity = accountEntity;
             this.MySender = new Sender(this.Entity.Address, this.Entity.Password);
         }
-        public MailAccount Clone()
-        {
-            MailAccount mailAccountClone;
-            MailAccountEntity entity;
-            using (ISession session = NHibernateManager.OpenSession())
-            {
-                entity = MailAccount.FindByAddress(this.Entity.Address, session, false).Entity;
-                mailAccountClone = new MailAccount(entity);
-
-                if (this.IsConnected())
-                    mailAccountClone.ConnectFull(session);
-                session.Close();
-            }
-            return mailAccountClone;
-        }
+        
 
         public void SetAsMainAccount(Boolean isMain)
         {
@@ -50,16 +35,6 @@ namespace Glimpse.Models
         public void SetUser(User user)
         {
             this.Entity.User = user.Entity;
-        }
-        public void SetOldestMailDate()
-        {
-            if (this.MyFetcher == null)
-            {
-                this.Entity.OldestMailDate = DateTime.Now.AddYears(-1);
-                return;
-            }
-
-            this.Entity.OldestMailDate = this.MyFetcher.GetOldestMailDate(250);
         }
         public void Dispose()
         {
@@ -112,25 +87,6 @@ namespace Glimpse.Models
                 }
             }
             this.SetFetcherLabels(session);
-        }
-        public void SetReadFlag(Mail mail, Boolean seen, ISession session)
-        {
-            String imapFolderName;
-
-            if (mail.Entity.Seen != seen)
-            {
-                ITransaction tran = session.BeginTransaction();
-                mail.Entity.Seen = seen;
-                mail.Save(session); //DB
-                tran.Commit();
-
-                imapFolderName = mail.GetImapFolderName();
-
-                if (this.MyFetcher != null)
-                    this.MyFetcher.SetSeenFlag(imapFolderName, mail.Entity.Gm_mid, seen); //IMAP
-                else
-                    Log.LogException(new Exception(), "Error al marcar un mail con leido=" + seen + ", mailId=" + mail.Entity.Id);
-            }
         }
         public bool IsConnected()
         {
@@ -208,6 +164,21 @@ namespace Glimpse.Models
         }
 
         #region External Email Interface Methods
+        public MailAccount Clone()
+        {
+            MailAccount mailAccountClone;
+            MailAccountEntity entity;
+            using (ISession session = NHibernateManager.OpenSession())
+            {
+                entity = MailAccount.FindByAddress(this.Entity.Address, session, false).Entity;
+                mailAccountClone = new MailAccount(entity);
+
+                if (this.IsConnected())
+                    mailAccountClone.ConnectFull(session);
+                session.Close();
+            }
+            return mailAccountClone;
+        }
         public void ConnectLight()
         {
             if (this.MyFetcher == null || !this.MyFetcher.IsConnected())
@@ -225,9 +196,40 @@ namespace Glimpse.Models
                 if (this.MyFetcher != null)
                     this.MyFetcher.CloseClient();
             }
-            catch (ActiveUp.Net.Mail.Imap4Exception e) { Log.LogException(e, "Error al cerrar mailAccount"); }
-            catch (System.Net.Sockets.SocketException e) { Log.LogException(e, "Error al cerrar mailAccount"); }
+            catch (Exception e) { Log.LogException(e, "Error al cerrar mailAccount"); }
         }
+        public void SetOldestMailDate()
+        {
+            if (this.MyFetcher == null)
+            {
+                this.Entity.OldestMailDate = DateTime.Now.AddYears(-1);
+                return;
+            }
+
+            this.Entity.OldestMailDate = this.MyFetcher.GetOldestMailDate(250);
+        }
+        public void SetReadFlag(Mail mail, Boolean seen, ISession session)
+        {
+            String imapFolderName;
+            if (mail.Entity.Seen != seen)
+            {
+                ITransaction tran = session.BeginTransaction();
+                mail.Entity.Seen = seen;
+                mail.Save(session); //DB
+                tran.Commit();
+
+                imapFolderName = mail.GetImapFolderName();
+
+                try
+                {
+                    if (this.MyFetcher != null)
+                        this.MyFetcher.SetSeenFlag(imapFolderName, mail.Entity.Gm_mid, seen); //IMAP
+                    else
+                        Log.LogException(new Exception(), "Error al marcar un mail con leido=" + seen + ", mailId=" + mail.Entity.Id);
+                }
+                catch (Exception) { }
+            }
+        } //Safe
         public void FetchAndSaveMails(Label label, Int64 fromUid, Int64 toUid, ref Int32 amountOfMails)
         {
             List<Mail> mails = this.MyFetcher.GetMailsBetweenUID(label.Entity.Name, (int)fromUid, (int)toUid);
@@ -243,47 +245,87 @@ namespace Glimpse.Models
         }
         public void AddLabelFolder(Mail theMail, Label theLabel)
         {
-            this.MyFetcher.AddMailTag(theMail.GetImapFolderName(), theLabel.Entity.Name, theMail.Entity.Gm_mid);
-        }
+            try
+            {
+                this.MyFetcher.AddMailTag(theMail.GetImapFolderName(), theLabel.Entity.Name, theMail.Entity.Gm_mid);
+            }
+            catch (Exception) { }
+        } //Safe
         public void RemoveMailLabel(String label, UInt64 gmID)
         {
-            this.MyFetcher.RemoveMailTag(label, gmID);
-        }
+            try
+            {
+                this.MyFetcher.RemoveMailTag(label, gmID);
+            }
+            catch (Exception) { }
+        } //Safe
         public void CreateLabel(String labelName)
         {
-            this.MyFetcher.CreateLabel(labelName);
-        }
+            try
+            {
+                this.MyFetcher.CreateLabel(labelName);
+            }
+            catch (Exception) { }
+        } //Safe
         public void RenameLabel(String oldLabelName, String newLabelName)
         {
-            this.MyFetcher.RenameLabel(oldLabelName, newLabelName);
-        }
+            try
+            {
+                this.MyFetcher.RenameLabel(oldLabelName, newLabelName);
+            }
+            catch (Exception) { }
+        } //Safe
         public void DeleteLabel(String labelName)
         {
-            this.MyFetcher.DeleteLabel(labelName);
-        }
+            try
+            {
+                this.MyFetcher.DeleteLabel(labelName);
+            }
+            catch (Exception) { }
+        } //Safe
         public void ArchiveMail(Mail mail)
         {
-            this.MyFetcher.ArchiveMail(mail.Entity.Gm_mid);
-        }
+            try
+            {
+                this.MyFetcher.ArchiveMail(mail.Entity.Gm_mid);
+            }
+            catch (Exception) { }
+        } //Safe
         public void UnarchiveMail(Mail mail)
         {
-            this.MyFetcher.UnarchiveMail(mail.GetImapFolderName(), mail.Entity.Gm_mid);
-        }
+            try
+            {
+                this.MyFetcher.UnarchiveMail(mail.GetImapFolderName(), mail.Entity.Gm_mid);
+            }
+            catch (Exception) { }
+        } //Safe
         public void TrashMail(Mail mail, ISession session)
         {
             if (mail.GetSystemFolderProperty() == "Trash")
             {
-                this.MyFetcher.DeleteFromTrash(mail.Entity.Gm_mid); //IMAP
                 mail.Delete(session); //DB
+                try
+                {
+                    this.MyFetcher.DeleteFromTrash(mail.Entity.Gm_mid); //IMAP
+                }
+                catch (Exception) { }
             }
             else
             {
-                this.MyFetcher.MoveToTrash(mail.GetImapFolderName(), mail.Entity.Gm_mid);
                 Label trashLabel = Label.FindBySystemName(this, "Trash", session);
-                this.UpdateTrashUid(mail, trashLabel.Entity.Name);
+                try
+                {
+                    this.MyFetcher.MoveToTrash(mail.GetImapFolderName(), mail.Entity.Gm_mid);
+                    this.UpdateTrashUid(mail, trashLabel.Entity.Name);
+                }
+                catch (Exception)
+                {
+                    mail.Entity.UidAll = 0;
+                    mail.Entity.UidTrash = 1;
+                }
                 mail.AddLabel(trashLabel, session); //SaveOrUpdate adentro
             }
-        }
+        } //Safe
         public void UntrashMail(Mail mail, ISession session)
         {
             String systemFolder = mail.GetSystemFolderProperty();
@@ -291,11 +333,19 @@ namespace Glimpse.Models
             {
                 Label trashLabel = Label.FindBySystemName(this, "Trash", session);
                 Label allLabel = Label.FindBySystemName(this, "All", session);
-                this.MyFetcher.RemoveFromTrash(allLabel.Entity.Name, mail.Entity.Gm_mid);
-                this.UpdateAllUid(mail, allLabel.Entity.Name);
+                try
+                {
+                    this.MyFetcher.RemoveFromTrash(allLabel.Entity.Name, mail.Entity.Gm_mid);
+                    this.UpdateAllUid(mail, allLabel.Entity.Name);
+                }
+                catch (Exception)
+                {
+                    mail.Entity.UidTrash = 0;
+                    mail.Entity.UidAll = 1;
+                }
                 mail.RemoveLabel(trashLabel.Entity.SystemName, true, session); //SaveOrUpdate adentro
             }
-        }
+        } //Safe
         public void UpdateTrashUid(Mail deletedMail, String imapTrashFolderName)
         {
             Int32 trashUID = this.MyFetcher.GetMailUID(imapTrashFolderName, deletedMail.Entity.Gm_mid);
@@ -314,6 +364,13 @@ namespace Glimpse.Models
         {
             return this.MyFetcher.GetLimitUIDFrom(mailbox, max);
         }
+        public static void SendResetPasswordMail(User user, String newPassword, ISession session)
+        {
+            MailAccount mailAccount = MailAccount.FindMainMailAccount(user.Entity.Username, session);
+            if (mailAccount == null)
+                throw new Exception("Usuario: " + user.Entity.Username + " no posee cuenta primaria.");
+            Sender.SendResetPasswordMail(user.Entity.Username, mailAccount.Entity.Address, newPassword);
+        }
         #endregion
 
         public virtual void SaveOrUpdate(ISession session)
@@ -329,13 +386,6 @@ namespace Glimpse.Models
                 this.Entity = oldAccount.Entity;
             }
             session.SaveOrUpdate(this.Entity);
-        }
-        public static void SendResetPasswordMail(User user, String newPassword, ISession session)
-        {
-            MailAccount mailAccount = MailAccount.FindMainMailAccount(user.Entity.Username, session);
-            if (mailAccount == null)
-                throw new Exception("Usuario: " + user.Entity.Username + " no posee cuenta primaria.");
-            Sender.SendResetPasswordMail(user.Entity.Username, mailAccount.Entity.Address, newPassword);
         }
         public static MailAccount FindByAddress(String emailAddress, ISession session, Boolean activeRequired = true)
         {
