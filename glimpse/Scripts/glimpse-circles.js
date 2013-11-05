@@ -1,4 +1,5 @@
-﻿var ownedCircles = [];
+﻿var ownedCircles = [], // Aca estan los IDs
+    reallyOwnedCircles = []; // Aca estan los circulos en serio, hay que mergear esto.
 
 function insertCircle(value) {
 
@@ -64,6 +65,8 @@ function insertCircle(value) {
         setPreviewDisplay(newCircle);
         setFullDisplay(newCircle);
         configureCircleHover(newCircle);
+
+        addToOwnedList(newCircle);
     }
 }
 
@@ -182,11 +185,11 @@ function putButtons(circle) {
         changeImportance($(this).parent(), false);
     });
 
-   circle.find(".icon-eye-open").on('click', function () {
+    circle.find(".icon-eye-open").on('click', function () {
         markAsRead(circle, true);
         $(this).attr("title", "Marcar como no leído");
         toggleEye($(this));
-   });
+    });
 
     $(".circle > .icon-eye-close").on('click', function () {
         markAsRead(circle, false);
@@ -207,7 +210,7 @@ function putButtons(circle) {
 function toggleEye(eyeIcon) {
     eyeIcon.toggleClass("icon-eye-close icon-eye-open");
 }
-    
+
 function checkIconHide(currentImportance, limit, iconToHide) {
     if (currentImportance === limit) {
         iconToHide.addClass("hidden");
@@ -299,11 +302,11 @@ function configureCircleHover(circle) {
             from.html(circle.data("from").substr(0, 10) + "...");
 
             dateTime.css("left", function () {
-                return wrapperLeftPadding + parseInt(circle.css("left")) - (dateTimeWidth/2) + 'px';
+                return wrapperLeftPadding + parseInt(circle.css("left")) - (dateTimeWidth / 2) + 'px';
             });
 
             from.css({
-                "top": function () { return parseInt(circle.css("top")) + parseInt(circle.css("height"))/2 + wrapperVerticalPadding; },
+                "top": function () { return parseInt(circle.css("top")) + parseInt(circle.css("height")) / 2 + wrapperVerticalPadding; },
                 "left": "0"
             }
             );
@@ -354,10 +357,10 @@ function calculateEmailColor(circle) {
         filteredLabels = [];
 
     for (var i = 0; i < customLabels.length; i++) {
-        if (isActive(customLabels[i])){
+        if (isActive(customLabels[i])) {
             filteredLabels.push(customLabels[i]);
         }
-    }    
+    }
 
     var fill = "",
         i;
@@ -399,14 +402,22 @@ function calculateEmailPosition(circle) {
 function surroundingCircles(factor, whatToDo) {
     var containerChunk = parseInt(currentPeriodShown() * factor),
       furthestAgeRight = maxAge + containerChunk,
-      furthestAgeLeft = minAge - containerChunk;
+      furthestAgeLeft = minAge - containerChunk,
+      circles = getOwnedCircles(),
+      circesProcessed = [];
 
-    $(".circle").each(function () {
-        var currentAge = $(this).attr('data-age');
+    for (var index in circles) {
+
+        var circle = circles[index];
+
+        var currentAge = circle.attr('data-age');
         if ((currentAge < furthestAgeRight) && (currentAge > furthestAgeLeft)) {
-            whatToDo($(this));
+            whatToDo(circle);
+            circesProcessed.push(circle);
         }
-    });
+    }
+
+    return circesProcessed;
 }
 
 function calculateEmailsLeft(containerChunk) {
@@ -440,11 +451,19 @@ function deleteCircle(circle) {
     deleteCircleInServer(circle);
 }
 
-function deleteCircleInServer(circle){
+function deleteCircleInServer(circle) {
     $.ajax({
         type: "POST",
         url: "async/TrashMail",
         dataType: 'json',
         data: { id: circle.data('id'), mailAccountId: circle.data('mailaccount') }
     });
+}
+
+function addToOwnedList(circle) {
+    reallyOwnedCircles.push(circle);
+}
+
+function getOwnedCircles() {
+    return reallyOwnedCircles;
 }

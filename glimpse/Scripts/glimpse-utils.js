@@ -110,11 +110,18 @@ function zoom(factor, zoomPoint) {
             setDateCoords();
             fetchMailsWithinActualPeriod();
 
-            surroundingCircles(0.5, function (circle) {
+            var circlesProcessed;
+
+            circlesProcessed = surroundingCircles(0.5, function (circle) {
                 circle.addClass("transition");
             });
-            calculateEmailsLeft(2).done(function () {
-                $(".circle.transition").removeClass("transition");
+            calculateEmailsLeft(0.5).done(function () {
+
+                for (index in circlesProcessed) {
+                    var circle = circlesProcessed[index];
+
+                    circle.removeClass("transition");
+                }
             });
         }
     }
@@ -183,7 +190,7 @@ function setDragging() {
         $(window).unbind("mousemove");
         if (wasDragging) {
             setDateCoords();
-            calculateEmailsLeft(15);       //Emparchau
+            calculateEmailsLeft(1.1);       //Emparchau
             fetchMailsWithinActualPeriod();
             wasDragging = false;
         }
