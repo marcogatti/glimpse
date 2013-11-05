@@ -245,13 +245,24 @@ function setLabelCreationForm() {
 }
 
 function chooseCirclesToBeShown() {
+
+    var currentMailbox = getCurrentMailbox();
+
     $(".circle").each(function () {
-        showCircleIfNeedBe($(this));
+        showCircleIfNeedBe($(this), currentMailbox);
     });
 }
 
-function showCircleIfNeedBe(circle) {
-    if (toBeHidden(circle)) {
+function getCurrentMailbox(){
+    return $(".mailbox:not(.label-hidden)").data("name");
+}
+
+function showCircleIfNeedBe(circle, currentMailbox) {
+
+    if (currentMailbox == null)
+        currentMailbox = getCurrentMailbox();
+
+    if (toBeHidden(circle, currentMailbox)) {
         circle.addClass("hidden");
     } else {
         circle.removeClass("hidden");
@@ -297,11 +308,11 @@ function getLabels(circle, labelsString) {
     return labelsArray;
 }
 
-function toBeHidden(circle) {
+function toBeHidden(circle, currentMailbox) {
 
     var customLabels = getCustomLabels(circle),
         systemLabels = getSystemLabels(circle),
-        activeMailBox = $(".mailbox:not(.label-hidden)").data("name"),
+        activeMailBox = currentMailbox,
         circleMailAccountIsActive = activeMailAccounts[circle.data('mailaccount')];
 
 

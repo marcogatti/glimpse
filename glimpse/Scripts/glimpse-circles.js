@@ -50,7 +50,7 @@ function insertCircle(value) {
         newCircle.css("opacity", 0);
         $("#email-container").append(newCircle);
 
-        if (toBeHidden(newCircle)) {
+        if (toBeHidden(newCircle, getCurrentMailbox())) {
             newCircle.addClass("hidden");
         }
 
