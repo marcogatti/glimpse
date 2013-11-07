@@ -374,19 +374,26 @@ namespace Glimpse.Controllers
         }
         [HttpPost]
         [AjaxOnly]
-        public ActionResult RenameLabel(String oldLabelName, String newLabelName, Int64 mailAccountId = 0)
+        public ActionResult RenameLabel(String oldLabelName, String newLabelName)
         {
             ISession session = NHibernateManager.OpenSession();
             ITransaction tran = session.BeginTransaction();
             try
             {
-                MailAccount currentMailAccount = this.GetMailAccount(mailAccountId);
-                IList<LabelEntity> labels = Label.FindByAccount(currentMailAccount.Entity, session);
-                labels = labels.Where(x => x.Name.Contains(oldLabelName) && x.SystemName == null).ToList();
-                foreach (LabelEntity label in labels)
-                    new Label(label).Rename(oldLabelName, newLabelName, session); //BD
+                User sessionUser = (User)Session[AccountController.USER_NAME];
+                if (sessionUser == null)
+                    throw new GlimpseException("No se encontró el usuario.");
+
+                foreach (MailAccount userMailAccount in sessionUser.GetAccounts())
+                {
+                    IList<LabelEntity> labels = Label.FindByAccount(userMailAccount.Entity, session);
+                    labels = labels.Where(x => x.Name.Contains(oldLabelName) && x.SystemName == null).ToList();
+                    foreach (LabelEntity label in labels)
+                        new Label(label).Rename(oldLabelName, newLabelName, session); //BD
+                    if(labels.Count > 0)
+                        userMailAccount.RenameLabel(oldLabelName, newLabelName); //IMAP
+                }
                 tran.Commit();
-                currentMailAccount.RenameLabel(oldLabelName, newLabelName); //IMAP
 
                 return Json(new { success = true }, JsonRequestBehavior.AllowGet);
             }
@@ -394,7 +401,7 @@ namespace Glimpse.Controllers
             {
                 tran.Rollback();
                 Log.LogException(exc, "Parametros del metodo: oldLabelName(" + oldLabelName +
-                                      "), newLabelName(" + newLabelName + "), mailAccountId(" + mailAccountId.ToString() + ").");
+                                      "), newLabelName(" + newLabelName + ").");
                 return Json(new { success = false, message = "Error al renombrar label." }, JsonRequestBehavior.AllowGet);
             }
             finally
@@ -502,11 +509,7 @@ namespace Glimpse.Controllers
                     if (labelToDelete != null)
                     {
                         labelToDelete.Delete(session); //BD
-                        try
-                        {
                             currentMailAccount.DeleteLabel(labelName); //IMAP
-                        }
-                        catch (Exception) { }
                     }
                 }
                 tran.Commit();
