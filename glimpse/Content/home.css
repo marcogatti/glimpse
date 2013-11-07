@@ -29,6 +29,9 @@
     overflow: hidden;
 }
 
+#vertical-lines {
+}
+
 i.clickable {
     cursor: pointer;
 }
@@ -128,7 +131,7 @@ div.field-group {
     }
 
 .circle.new {
-    border-color: rgba(0, 0, 0, 0.2);
+    border-color: rgba(127, 127, 127, 0.5);
     border-style: double;
     border-width: 5px;
 }

@@ -3,7 +3,10 @@
     labelColors = {},
     editor,
     wrapperVerticalPadding = parseInt($("#container-wrapper").css("padding-top")),
-    wrapperLeftPadding = parseInt($("#container-wrapper").css("padding-left"));
+    wrapperLeftPadding = parseInt($("#container-wrapper").css("padding-left")),
+    cw = containerWidth(),
+    ch = containerHeight(),
+    historyOffset = 0;
 
 function preventSelectingNotUsefulThings() {
     //$('body').mousedown(function (downEvent) {
@@ -24,53 +27,29 @@ function alphabetSize() {
     return "z".charCodeAt(0) - "a".charCodeAt(0) + 2;
 }
 
-//function clearCanvas() {
-//    document.getElementById('gridCanvas').getContext('2d').clearRect(0, 0, containerWidth(), containerHeight());
-//}
+function clearCanvas() {
+    document.getElementById('vertical-lines').getContext('2d').clearRect(0, 0, containerWidth(), containerHeight());
+}
 
-//function drawGrid() {
+function drawLines(offset) {
 
-//    clearCanvas();
+    historyOffset -= offset;
+    clearCanvas();
 
-//    var containerBorder = parseInt($("#email-container").css("border-width"), 10),
-//    //grid width and height
-//        bw = containerWidth() - containerBorder,
-//        bh = containerHeight() - containerBorder,
+    var
+     canvas = $('canvas').attr({ width: cw, height: ch }),
+     context = canvas.get(0).getContext("2d");
 
-//    //padding around grid
-//     p = 0,
+    var padding = 150;
+    context.moveTo(padding + historyOffset, 0);
+    context.lineTo(padding + historyOffset, ch);
+    context.moveTo(cw - padding + historyOffset, 0);
+    context.lineTo(cw - padding + historyOffset, ch);
+    context.lineWidth = 2;
+    context.strokeStyle = "#CDCDCD";
+    context.stroke();
 
-//    //size of canvas
-//     cw = bw,
-//     ch = bh,
-
-//     canvas = $('canvas').attr({ width: cw, height: ch }),
-
-//     context = canvas.get(0).getContext("2d");
-
-//    function squareSize() {
-//        return containerHeight() / alphabetSize();
-//    }
-
-//    function drawBoard() {
-//        var x = 0;
-
-//        for (x = 0; x <= bw; x += squareSize()) {
-//            context.moveTo(0.5 + x + p, p);
-//            context.lineTo(0.5 + x + p, bh + p);
-//        }
-
-//        for (x = 0; x <= bh; x += squareSize()) {
-//            context.moveTo(p, 0.5 + x + p);
-//            context.lineTo(bw + p, 0.5 + x + p);
-//        }
-
-//        context.strokeStyle = "#CDCDCD";
-//        context.stroke();
-//    }
-
-//    drawBoard();
-//}
+}
 
 function amountOfCirclesShown() {
 
@@ -166,6 +145,8 @@ function movePeriodShown(offset) {
         minAge += offset;
         maxAge += offset;
         calculateEmailsLeft(0.3);
+    } else {
+        clearCanvas();
     }
 }
 
@@ -178,8 +159,9 @@ function setDragging() {
         downEvent.preventDefault();
         startX = downEvent.pageX;
         $(window).mousemove(function (dragEvent) {
-            var offset = (startX - dragEvent.pageX) * currentPeriodShown() / 1000;
-            movePeriodShown(offset);
+            var offset = (startX - dragEvent.pageX);
+            drawLines(offset);
+            movePeriodShown(offset * currentPeriodShown() / 1000);
             startX = dragEvent.pageX;
             wasDragging = true;
         });
@@ -193,6 +175,12 @@ function setDragging() {
             calculateEmailsLeft(1.1);       //Emparchau
             fetchMailsWithinActualPeriod();
             wasDragging = false;
+
+            //  para lineas motion
+            historyOffset = 0;
+            clearCanvas();
+            cw = containerWidth();
+            ch = containerHeight();
         }
     });
 }
