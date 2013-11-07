@@ -62,7 +62,7 @@
                 <hr />
                 <div id="label-edition" style="display: none;"></div>
             </div>
-            <div id="circles-progress" class="progress progress-striped active">
+            <div id="circles-progress" class="progress progress-striped active" style="display: none;">
                 <div class="bar" style="width: 100%;">Cargando...</div>
             </div>
             <!--/.well -->
@@ -111,6 +111,20 @@
         <p>&copy; glimpse 2013</p>
     </footer>
 
+</div>
+
+<div id="confirmation-modal" class="modal hide fade">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3 class="title">Confirmar acción</h3>
+    </div>
+    <div class="modal-body">
+        <p class="question">¿Desea continuar?</p>
+    </div>
+    <div class="modal-footer">
+        <a class="btn" data-action-name="cancel" data-dismiss="modal">Cancelar</a>
+        <a class="btn btn-danger" data-action-name="confirm" data-dismiss="modal">Continuar</a>
+    </div>
 </div>
 
 @{Html.RenderPartial("compose_panel");}

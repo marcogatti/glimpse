@@ -499,23 +499,59 @@ function setDialogConfig(dialogElement, title, actionClose, actionSave) {
     });
 }
 
+function showConfirmationModal(title, question, cancelText, confirmText, confirmAction) {
+
+    var modal = $('#confirmation-modal'),
+        cancelButton = modal.find('[data-action-name="cancel"]'),
+        confirmButton = modal.find('[data-action-name="confirm"]');
+
+    if (title != null)
+        modal.find('.title').html(title);
+
+    if (question != null)
+        modal.find('p.question').html(question);
+
+    if (cancelText != null) {
+        cancelButton.html(cancelText);
+    }
+
+    if (confirmText != null)
+        modal.find('[data-action-name="confirm"]').html(confirmText);
+
+    
+    confirmButton.unbind('click');
+    confirmButton.one('click', null, confirmAction);
+
+    modal.modal('show');
+}
+
+
 function setRemoveButton(labelElement) {
 
     labelElement.find(".btn[title='Eliminar']").on('click', function () {
-        var currentLabel = $(this).parent().parent().parent();
-        $.ajax({
-            type: "POST",
-            url: "async/DeleteLabel",
-            data: { labelName: currentLabel.data("name") }
-        }).fail(function () {
-            alert("No fue posible eliminar la etiqueta");
-        });
 
-        $(".circle").each(function () {
-            removeLabelFromCircle($(this), currentLabel.text());
-        });
-        currentLabel.remove();
+        var currentLabel = $(this).parent().parent().parent();
+
+        showConfirmationModal('Eliminar etiqueta',
+            '¿Estás seguro que querés eliminar la etiqueta "' + currentLabel.attr("data-name") + '"?',
+            'Cancelar',
+            'Eliminar',
+            function () {
+                $.ajax({
+                    type: "POST",
+                    url: "async/DeleteLabel",
+                    data: { labelName: currentLabel.attr("data-name") }
+                }).fail(function () {
+                    alert("No fue posible eliminar la etiqueta");
+                });
+
+                $(".circle").each(function () {
+                    removeLabelFromCircle($(this), currentLabel.text());
+                });
+                currentLabel.remove();
+            });
     });
+
 }
 
 function changeLabelColor(dialogElement) {

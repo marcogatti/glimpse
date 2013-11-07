@@ -18,6 +18,7 @@ $(document).ready(function () {
     initializeAboutUSModal();
     checkMailAccountCredentials();
     prepareLabelsEditor();
+    initializeGenericConfirmationModal();
 })
 
 function initializeAboutUSModal() {
@@ -49,4 +50,11 @@ function checkMailAccountCredentials() {
         alert('Atencion: ' + user_accounts_errors);
     }
 
+}
+
+function initializeGenericConfirmationModal() {
+    $('#confirmation-modal').modal({
+        backdrop: 'static',
+        show: false
+    });
 }

@@ -390,7 +390,7 @@ namespace Glimpse.Controllers
                     labels = labels.Where(x => x.Name.Contains(oldLabelName) && x.SystemName == null).ToList();
                     foreach (LabelEntity label in labels)
                         new Label(label).Rename(oldLabelName, newLabelName, session); //BD
-                    if(labels.Count > 0)
+                    if (labels.Count > 0)
                         userMailAccount.RenameLabel(oldLabelName, newLabelName); //IMAP
                 }
                 tran.Commit();
@@ -509,7 +509,7 @@ namespace Glimpse.Controllers
                     if (labelToDelete != null)
                     {
                         labelToDelete.Delete(session); //BD
-                            currentMailAccount.DeleteLabel(labelName); //IMAP
+                        currentMailAccount.DeleteLabel(labelName); //IMAP
                     }
                 }
                 tran.Commit();
@@ -666,7 +666,7 @@ namespace Glimpse.Controllers
                     Session[AsyncMailsController.FILES] = new List<ExtraFile>();
 
                 if (((List<ExtraFile>)Session[AsyncMailsController.FILES]).Any(x => x.Size == file.ContentLength && x.Name == file.FileName))
-                    return Json(new { success = false,  message = "El archivo seleccionado ya se encuentra adjuntado." }, JsonRequestBehavior.AllowGet);
+                    return Json(new { success = false, message = "El archivo seleccionado ya se encuentra adjuntado." }, JsonRequestBehavior.AllowGet);
 
                 ExtraFile attachment = new ExtraFile();
                 attachment.Name = file.FileName;
