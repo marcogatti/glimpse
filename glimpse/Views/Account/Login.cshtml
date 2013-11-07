@@ -15,13 +15,22 @@
 @{
     ViewBag.Title = "Glimpse";
 }
+<div id="upper"></div>
+
+<div id="info" class="span3 offset1">
+    <div>
+        <p id="glimpse-brand">Glimpse</p>
+        <p id="slogan">estilo en tu correo</p>
+    </div>
+    <div id="glimpse-balls" class="well"></div>
+</div>
 
 <div class="container">
 
     @using (Html.BeginForm("Login", "Account", FormMethod.Post, new { @class = "form-signin" }))
     {
         @Html.AntiForgeryToken()
-        <h2 class="form-signin-heading">Bienvenido a Glimpse</h2>
+        <h2 class="form-signin-heading">Ingresar</h2>
         
         @Html.ValidationSummary()
         @Html.TextBoxFor(m => m.Username, new { placeholder = "Tu usuario o dirección de correo", @class = "input-block-level", id = "username", autofocus = "autofocus" })

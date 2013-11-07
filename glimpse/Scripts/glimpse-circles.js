@@ -344,10 +344,10 @@ function markAsRead(circle, seenFlag) {
 function setSeenStatus(circle) {
     unsetMailClicked(circle);
     if (!circle.data("seen")) {
-        var spinner = '<div class="loading"><div class="spinner"><div class="mask"><div class="maskedCircle"></div></div></div></div>';
-        circle.prepend(spinner);
+        circle.addClass("new");
+        //circle.append("<div class='icon-fire' title='No leído'></div>");
     } else {
-        circle.find(".loading").remove();
+        circle.removeClass("new");
     }
 }
 
