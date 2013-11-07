@@ -447,7 +447,7 @@ function setColorButton(labelElement, currentColor) {
 
     labelElement.find(".btn[title='Cambiar color']").on('click', function (e) {
 
-        var name = labelElement.data("name"),
+        var name = labelElement.attr("data-name"),
             edition_panel = $("#label-edition");
 
         $("#label-edition").html("</br>Color:  <input type='color' class='label-color-picker label-edition' value='" + currentColor +
