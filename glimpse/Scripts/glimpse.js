@@ -17,6 +17,7 @@ $(document).ready(function () {
     initializeMailAccountToggles();
     initializeAboutUSModal();
     checkMailAccountCredentials();
+    prepareLabelsEditor();
 })
 
 function initializeAboutUSModal() {

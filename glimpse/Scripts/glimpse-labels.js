@@ -253,7 +253,7 @@ function chooseCirclesToBeShown() {
     });
 }
 
-function getCurrentMailbox(){
+function getCurrentMailbox() {
     return $(".mailbox:not(.label-hidden)").data("name");
 }
 
@@ -406,8 +406,8 @@ function appendCustomLabel(label) {
 
     var name = label.showName;
     var color = label.Color;
-    var labelToAppend = $("<li class='custom-label label label-glimpse' data-name='" + name + "'>" + name +
-        '<span class="pull-right hidden"><div class="btn-group">' +
+    var labelToAppend = $("<li class='custom-label label label-glimpse' data-name='" + name + "'><p>" + name +
+        '</p><span class="pull-right hidden"><div class="btn-group">' +
     '<button class="btn" title="Renombrar"><i class="icon-pencil"></i></button>' +
     '<button class="btn" title="Cambiar color"><i class="icon-edit"></i></button>' +
     '<button class="btn" title="Eliminar"><i class="icon-remove"></i></button>' +
@@ -421,7 +421,7 @@ function appendCustomLabel(label) {
     paintLabel(labelToAppend, color);
 
     setColorButton(labelToAppend, color);
-    setRenameButton(labelToAppend);
+    setRenameButton(labelToAppend, color);
     setRemoveButton(labelToAppend);
 
     setEditionButtonGroup(labelToAppend);
@@ -443,48 +443,59 @@ function setEditionButtonGroup(label) {
         );
 }
 
-function renameLabel(input) {
-    var oldName = input.id.split("-")[0],
-       newName = input.value;
-    var targetLabel = $(".custom-label[data-name='" + oldName + "']");
-    targetLabel.html(newName);
-    targetLabel.attr("data-name", newName);
-    labelColors[newName] = labelColors[oldName];
-
-    $(".circle").each(function () {
-
-        if (hasLabel($(this), oldName)) {
-            removeLabelFromCircleData($(this), oldName);
-            addLabelToCircleData($(this), newName);
-        }
-    });
-
-    $.ajax({
-        type: "POST",
-        url: "async/RenameLabel",
-        data: { oldLabelName: oldName, newLabelName: newName }
-    });
-
-    $("#label-edition").empty();
-}
-
 function setColorButton(labelElement, currentColor) {
 
     labelElement.find(".btn[title='Cambiar color']").on('click', function (e) {
-        //e.stopPropagation();
-        $("#label-edition").html("<p>Cambiar color</p><input type='color' class='label-color-picker label-edition' value='" + currentColor +
-            "' id='" + labelElement.attr("data-name") + "-picker' onchange='changeLabelColor(this);'>");
+
+        var name = labelElement.attr("data-name"),
+            edition_panel = $("#label-edition");
+
+        $("#label-edition").html("</br>Color:  <input type='color' class='label-color-picker label-edition' value='" + currentColor +
+            "' data-current-label='" + name + "'>");
+
+        setDialogConfig(edition_panel, "Cambiar color", function () { }, changeLabelColor)
+
+        edition_panel.dialog("open");
     });
 }
 
 function setRenameButton(labelElement) {
 
-    var name = labelElement.data("name");
-
     labelElement.find(".btn[title='Renombrar']").on('click', function (e) {
-        //e.stopPropagation();
-        $("#label-edition").html("<p>Renombrar</p><input type='text' class='label-rename-textbox label-edition' value='" + name +
-            "' id='" + name + "-rename' onchange='renameLabel(this);'>");
+
+        var name = labelElement.attr("data-name"),
+            edition_panel = $("#label-edition");
+
+        edition_panel.html("</br>Nombre:  <input type='text' class='label-rename-textbox label-edition' value='" + name +
+            "' data-oldname='" + name + "'>");
+
+        setDialogConfig(edition_panel, "Cambiar nombre", function () { }, renameLabel)
+
+        edition_panel.dialog("open");
+    });
+}
+
+function setDialogConfig(dialogElement, title, actionClose, actionSave) {
+
+    dialogElement.dialog({
+        title: title,
+        buttons: [
+        {
+            text: "Cerrar",
+            click: function (element) {
+                actionClose(dialogElement);
+                dialogElement.dialog("close");
+            },
+        },
+        {
+            id: 'label-editor-save',
+            text: "Guardar",
+            click: function () {
+                actionSave(dialogElement);
+                dialogElement.dialog("close");
+            }
+        }
+        ]
     });
 }
 
@@ -507,9 +518,9 @@ function setRemoveButton(labelElement) {
     });
 }
 
-function changeLabelColor(colorPicker) {
-    var targetLabelName = colorPicker.id.split("-")[0],
-        newColor = colorPicker.value;
+function changeLabelColor(dialogElement) {
+    var targetLabelName = dialogElement.find('input').attr('data-current-label'),
+        newColor = dialogElement.find('input').val();
     var targetLabel = $(".custom-label[data-name='" + targetLabelName + "']");
     paintLabel(targetLabel, newColor);
 
@@ -529,8 +540,33 @@ function changeLabelColor(colorPicker) {
         function () {
             putLabelBalls($(this));
         });
+}
 
-    $("#label-edition").empty();
+function renameLabel(dialogElement) {
+    var oldName = dialogElement.find('input').attr('data-oldname'),
+       newName = dialogElement.find('input').val();
+
+    if (oldName === newName)
+        return;
+
+    var targetLabel = $(".custom-label[data-name='" + oldName + "']");
+    targetLabel.find('p').html(newName);
+    targetLabel.attr("data-name", newName);
+    labelColors[newName] = labelColors[oldName];
+
+    $(getOwnedCircles()).each(function () {
+
+        if (hasLabel($(this), oldName)) {
+            removeLabelFromCircleData($(this), oldName);
+            addLabelToCircleData($(this), newName);
+        }
+    });
+
+    $.ajax({
+        type: "POST",
+        url: "async/RenameLabel",
+        data: { oldLabelName: oldName, newLabelName: newName }
+    });
 }
 
 function exists(label) {
@@ -600,5 +636,37 @@ function setLabelsMarker() {
         });
 
         chooseCirclesToBeShown();
+    });
+}
+
+function prepareLabelsEditor() {
+    var edition_panel = $("#label-edition");
+
+    edition_panel.dialog({
+        autoOpen: false,
+        closeOnEscape: true,
+        draggable: true,
+        height: 200,
+        width: 250,
+        minWidth: 250,
+        minHeight: 200,
+        resizable: false,
+        title: "Modifica tu label",
+        position: { my: "center center", at: "center center", of: window },
+        buttons: [
+        {
+            text: "Cerrar",
+            click: function () {
+                $(this).dialog("close");
+            }
+        },
+        {
+            text: "Guardar",
+            click: function () {
+                $(this).dialog("close");
+                alert("se guardo");
+            }
+        }
+        ]
     });
 }
