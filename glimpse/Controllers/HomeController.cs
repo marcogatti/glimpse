@@ -71,11 +71,9 @@ namespace Glimpse.Controllers
                 foreach (LabelEntity label in accountLabels)
                     viewLabels.Add(new LabelViewModel(label.Name, label.SystemName, label.Color));
 
-                TimeSpan elapsedSpan = new TimeSpan(DateTime.Now.Ticks - oldestMailDate.Ticks);
-
                 ViewBag.Username = sessionUser.Entity.Username;
                 ViewBag.Labels = viewLabels;
-                ViewBag.OldestAge = Math.Truncate(elapsedSpan.TotalSeconds);
+                ViewBag.OldestAge = DateTimeHelper.GetAgeInSeconds(oldestMailDate);
                 ViewBag.Firstname = sessionUser.Entity.Firstname ?? "";
                 ViewBag.Lastname = sessionUser.Entity.Lastname ?? "";
                 ViewBag.Country = sessionUser.Entity.Country ?? "";

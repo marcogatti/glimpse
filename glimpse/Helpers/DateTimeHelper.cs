@@ -12,5 +12,12 @@ namespace Glimpse.Helpers
         {
             return TimeZoneInfo.ConvertTimeFromUtc(date, TimeZoneInfo.Utc);
         }
+        public static Double GetAgeInSeconds(DateTime date)
+        {
+            TimeSpan elapsedSpan = new TimeSpan(DateTime.Now.Ticks - date.ToLocalTime().Ticks);
+            Double age = Math.Truncate(elapsedSpan.TotalSeconds);
+
+            return age;
+        }
     }
 }
