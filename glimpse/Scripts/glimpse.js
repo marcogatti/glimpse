@@ -74,6 +74,13 @@ function setSincronizeAccountsCaller() {
             reallyOwnedCircles[i].data()["age"] += 10;
         }
 
-    }, 10000);
+    }, 15000);
+
+    window.setInterval(function () {
+        fetchRecentMails();
+    }, 5000);
+
+
+
 
 }
