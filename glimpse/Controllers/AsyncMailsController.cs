@@ -703,7 +703,8 @@ namespace Glimpse.Controllers
             foreach (MailEntity mail in mails)
             {
                 DateTime mailDate = DateTimeHelper.ChangeToUtc(mail.Date);
-                Int64 currentAge = DateTime.Now.Ticks - mailDate.ToLocalTime().Ticks;
+                TimeSpan elapsedSpan = new TimeSpan(DateTime.Now.Ticks - mailDate.ToLocalTime().Ticks);
+                Double currentAge = Math.Truncate(elapsedSpan.TotalSeconds);
                 List<Object> currentLabels = PrepareLabels(mail.Labels);
                 Object anEmail = new
                 {

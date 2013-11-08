@@ -1,11 +1,12 @@
 ﻿
 function fetchMailsAsync(initialDate, finalDate) {
+    
+    $.getJSON("async/GetMailsByDate", {
 
-    showProgressBar("#circles-progress");
+            initial: initialDate.getTime(),
+            final: finalDate.getTime()
 
-    $.getJSON("async/GetMailsByDate?initial=" + initialDate.getTime() + "&final=" + finalDate.getTime(), function (data) {
-
-        hideProgressBar("#circles-progress");
+        }, function (data) {
 
         if (data.success === true) {
 
@@ -21,14 +22,15 @@ function fetchMailsAsync(initialDate, finalDate) {
 
 function fetchRecentMails() {
 
-    showProgressBar("#circles-progress");
+    $.getJSON("async/GetMailsByAmount", {
 
-    $.getJSON("async/GetMailsByAmount?amountOfMails=10", function (data) {
+        amountOfMails: 10
 
-        hideProgressBar("#circles-progress");
+    }, function (data) {
 
         if (data.mails.length === 0) {
-            maxAge = minAge + 10000000000000;
+            //  dos semanas (en segundos)
+            maxAge = minAge + 1209600;
         }
 
         if (data.success === true) {

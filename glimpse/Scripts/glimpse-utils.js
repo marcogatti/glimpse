@@ -200,7 +200,8 @@ function setDateCoordsPosition() {
 
 function ageToDate(age) {
     var now = new Date().getTime(),
-        jsAge = Math.floor(age / 10000);
+        //jsAge = Math.floor(age / 10000),
+        jsAge = age * 1000;
     return new Date(now - jsAge);
 }
 
