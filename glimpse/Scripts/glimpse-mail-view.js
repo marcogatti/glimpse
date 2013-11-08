@@ -190,6 +190,7 @@ function prepareLabelForMailView(labelElement) {
     labelElement.addClass('mail-view-labels');
     labelElement.removeAttr('draggable');
     labelElement.attr('title', labelElement.data('name'));
+    labelElement.removeClass('label-hidden');
 
     labelElement.mousedown(function (ev) {
         ev.preventDefault();

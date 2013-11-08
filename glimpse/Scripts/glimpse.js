@@ -19,6 +19,7 @@ $(document).ready(function () {
     checkMailAccountCredentials();
     prepareLabelsEditor();
     initializeGenericConfirmationModal();
+    setSincronizeAccountsCaller();
 })
 
 function initializeAboutUSModal() {
@@ -57,4 +58,17 @@ function initializeGenericConfirmationModal() {
         backdrop: 'static',
         show: false
     });
+}
+
+function setSincronizeAccountsCaller() {
+
+    window.setInterval(function () { // Horrible, solo para la presentacion en la facu
+
+        $.ajax({
+            type: "POST",
+            url: "async/SynchronizeAccount",
+        });
+
+    }, 15000);
+
 }
