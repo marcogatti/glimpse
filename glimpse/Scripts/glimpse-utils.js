@@ -74,8 +74,8 @@ function zoom(factor, zoomPoint) {
 
         var movement = currentPeriodShown() * factor * 0.0001;
 
-        var offsetRight = (containerWidth() - zoomPoint) * movement;
-        var offsetLeft = zoomPoint * movement;
+        var offsetRight = Math.round((containerWidth() - zoomPoint) * movement);
+        var offsetLeft = Math.round(zoomPoint * movement);
 
         if (maxAge - offsetRight > minAge + offsetLeft) {
 
@@ -161,7 +161,8 @@ function setDragging() {
         $(window).mousemove(function (dragEvent) {
             var offset = (startX - dragEvent.pageX);
             drawLines(offset);
-            movePeriodShown(offset * currentPeriodShown() / 1000);
+            var ageOffset = Math.round(offset * currentPeriodShown() / 1000);
+            movePeriodShown(ageOffset);
             startX = dragEvent.pageX;
             wasDragging = true;
         });

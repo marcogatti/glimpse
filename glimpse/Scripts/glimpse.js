@@ -5,7 +5,6 @@ $(document).ready(function () {
     setDateCoordsPosition();
     populateLabelColors();
     fetchRecentMails();
-    setAutomaticFetching();
     setDragging();
     configureZoom();
     setRefreshOnResize();
@@ -69,6 +68,12 @@ function setSincronizeAccountsCaller() {
             url: "async/SynchronizeAccount",
         });
 
-    }, 15000);
+        fetchMailsWithinActualPeriod();
+        var i = 0;
+        for (i = 0; i < reallyOwnedCircles.length; i++) {
+            reallyOwnedCircles[i].data()["age"] += 10;
+        }
+
+    }, 10000);
 
 }
