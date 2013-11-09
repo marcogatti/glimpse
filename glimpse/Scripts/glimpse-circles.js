@@ -410,7 +410,7 @@ function surroundingCircles(factor, whatToDo) {
 
         var circle = circles[index];
 
-        var currentAge = circle.attr('data-age');
+        var currentAge = circle.data('age');
         if ((currentAge < furthestAgeRight) && (currentAge > furthestAgeLeft)) {
             whatToDo(circle);
             circesProcessed.push(circle);
@@ -422,14 +422,15 @@ function surroundingCircles(factor, whatToDo) {
 
 function calculateEmailsLeft(containerChunk) {
 
-    var r = $.Deferred();
-    periodShown = currentPeriodShown();
+    var r = $.Deferred(),
+        periodShown = currentPeriodShown(),
+        left = 0;
 
     surroundingCircles(containerChunk, function (circle) {
 
-        var left = (circle.data("age") - minAge) / periodShown;
+        left = (circle.data("age") - minAge) / periodShown;
         circle.css('left', function () {
-            return left * containerWidth() + 'px';
+            return left * cw + 'px';
         });
     });
 

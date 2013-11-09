@@ -71,7 +71,7 @@ function currentPeriodShown() {
 function zoom(factor, zoomPoint) {
 
     var maxAmountInScreen = 30,
-        smallestPeriod = 60 * 5;
+        smallestPeriod = 60 * 2;
 
     if ((factor > 0 && currentPeriodShown() < smallestPeriod) || (factor < 0 && amountOfCirclesShown() > maxAmountInScreen)) {
         return;

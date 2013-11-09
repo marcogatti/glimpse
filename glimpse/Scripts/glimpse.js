@@ -77,10 +77,12 @@ function setSincronizeAccountsCaller() {
             reallyOwnedCircles[i].data()["age"] += freqInSeconds;
         }
 
+        calculateEmailsLeft(0.5);
+
     }, freqInSeconds * 1000);
 
-    window.setInterval(function () {
-        fetchRecentMails();
-    }, 5000);
+    //window.setInterval(function () {
+    //    fetchRecentMails();
+    //}, 5000);
 
 }
