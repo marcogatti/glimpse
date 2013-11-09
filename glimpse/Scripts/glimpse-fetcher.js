@@ -30,7 +30,7 @@ function fetchRecentMails() {
 
         if (data.mails.length === 0) {
             //  dos semanas (en segundos)
-            maxAge = minAge + 1209600;
+            maxAge = minAge + 60*60*24*14;
         }
 
         if (data.success === true) {

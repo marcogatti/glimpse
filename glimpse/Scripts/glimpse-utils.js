@@ -70,39 +70,43 @@ function currentPeriodShown() {
 
 function zoom(factor, zoomPoint) {
 
-    if (amountOfCirclesShown() < $("#max-amount").val() || (factor > 0)) {
+    var maxAmountInScreen = 30,
+        smallestPeriod = 60 * 5;
 
-        var movement = currentPeriodShown() * factor * 0.0001;
+    if ((factor > 0 && currentPeriodShown() < smallestPeriod) || (factor < 0 && amountOfCirclesShown() > maxAmountInScreen)) {
+        return;
+    }
 
-        var offsetRight = Math.round((containerWidth() - zoomPoint) * movement);
-        var offsetLeft = Math.round(zoomPoint * movement);
+    var movement = currentPeriodShown() * factor * 0.0001;
 
-        if (maxAge - offsetRight > minAge + offsetLeft) {
+    var offsetRight = Math.round((containerWidth() - zoomPoint) * movement);
+    var offsetLeft = Math.round(zoomPoint * movement);
 
-            if (allowedMovementRight(-offsetRight)) {
-                maxAge -= offsetRight;
-            }
-            if (allowedMovementLeft(offsetLeft)) {
-                minAge += offsetLeft;
-            }
+    if (maxAge - offsetRight > minAge + offsetLeft) {
 
-            setDateCoords();
-            fetchMailsWithinActualPeriod();
-
-            var circlesProcessed;
-
-            circlesProcessed = surroundingCircles(0.5, function (circle) {
-                circle.addClass("transition");
-            });
-            calculateEmailsLeft(0.5).done(function () {
-
-                for (index in circlesProcessed) {
-                    var circle = circlesProcessed[index];
-
-                    circle.removeClass("transition");
-                }
-            });
+        if (allowedMovementRight(-offsetRight)) {
+            maxAge -= offsetRight;
         }
+        if (allowedMovementLeft(offsetLeft)) {
+            minAge += offsetLeft;
+        }
+
+        setDateCoords();
+        fetchMailsWithinActualPeriod();
+
+        var circlesProcessed;
+
+        circlesProcessed = surroundingCircles(0.5, function (circle) {
+            circle.addClass("transition");
+        });
+        calculateEmailsLeft(0.5).done(function () {
+
+            for (index in circlesProcessed) {
+                var circle = circlesProcessed[index];
+
+                circle.removeClass("transition");
+            }
+        });
     }
 
 }
