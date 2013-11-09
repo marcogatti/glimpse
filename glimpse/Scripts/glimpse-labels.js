@@ -31,7 +31,7 @@ function populateLabelColors() {
 function paintLabel(labelElement, color) {
     labelElement.data("color", color);
     labelElement.css("background-color", color);
-    labelColors[labelElement.data("name")] = color;
+    labelColors[labelElement.attr("data-name")] = color;
 }
 
 function labelDrag(ev) {
@@ -428,7 +428,8 @@ function appendCustomLabel(label) {
     var labelToAppend = $("<li class='custom-label label label-glimpse' data-name='" + name + "'><p>" + name +
         '</p><span class="pull-right hidden"><div class="btn-group">' +
     '<button class="btn" title="Renombrar"><i class="icon-pencil"></i></button>' +
-    '<button class="btn" title="Cambiar color"><i class="icon-edit"></i></button>' +
+    '<button class="btn" title="Cambiar color">' + "<input type='color' class='label-color-picker label-edition' value='" + color +
+            "' data-current-label='" + name + "'>" + '</button>' +
     '<button class="btn" title="Eliminar"><i class="icon-remove"></i></button>' +
     '</div></span></li>'
         );
@@ -464,18 +465,9 @@ function setEditionButtonGroup(label) {
 
 function setColorButton(labelElement, currentColor) {
 
-    labelElement.find(".btn[title='Cambiar color']").on('click', function (e) {
-
-        var name = labelElement.attr("data-name"),
-            edition_panel = $("#label-edition");
-
-        $("#label-edition").html("</br>Color:  <input type='color' class='label-color-picker label-edition' value='" + currentColor +
-            "' data-current-label='" + name + "'>");
-
-        setDialogConfig(edition_panel, "Cambiar color", function () { }, changeLabelColor)
-
-        edition_panel.dialog("open");
-    });
+    labelElement.find('input.label-color-picker').change(function () {
+        changeLabelColor($(this));
+    })
 }
 
 function setRenameButton(labelElement) {
@@ -576,9 +568,9 @@ function setRemoveButton(labelElement) {
 
 }
 
-function changeLabelColor(dialogElement) {
-    var targetLabelName = dialogElement.find('input').attr('data-current-label'),
-        newColor = dialogElement.find('input').val();
+function changeLabelColor(inputElement) {
+    var targetLabelName = inputElement.attr('data-current-label'),
+        newColor = inputElement.val();
     var targetLabel = $(".custom-label[data-name='" + targetLabelName + "']");
     paintLabel(targetLabel, newColor);
 
@@ -607,23 +599,32 @@ function renameLabel(dialogElement) {
     if (oldName === newName)
         return;
 
-    var targetLabel = $(".custom-label[data-name='" + oldName + "']");
-    targetLabel.find('p').html(newName);
-    targetLabel.attr("data-name", newName);
-    labelColors[newName] = labelColors[oldName];
-
-    $(getOwnedCircles()).each(function () {
-
-        if (hasLabel($(this), oldName)) {
-            removeLabelFromCircleData($(this), oldName);
-            addLabelToCircleData($(this), newName);
-        }
-    });
-
     $.ajax({
         type: "POST",
         url: "async/RenameLabel",
         data: { oldLabelName: oldName, newLabelName: newName }
+    }).done(function (data) {
+
+        var targetLabel = $(".custom-label[data-name='" + oldName + "']");
+
+        if (data.success === true) {
+
+            targetLabel.find('p').html(newName);
+            targetLabel.attr("data-name", newName);
+            targetLabel.find('input.label-color-picker').attr('data-current-label', newName);
+            labelColors[newName] = labelColors[oldName];
+            labelColors[oldName] = "FFFFFF";
+
+            $(getOwnedCircles()).each(function () {
+
+                if (hasLabel($(this), oldName)) {
+                    removeLabelFromCircleData($(this), oldName);
+                    addLabelToCircleData($(this), newName);
+                }
+            });
+        } else {
+            alert(data.message);
+        }
     });
 }
 
