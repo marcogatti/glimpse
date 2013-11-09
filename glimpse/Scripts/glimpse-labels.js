@@ -216,14 +216,29 @@ function preventSelectingSystemLabels() {
 }
 
 function setLabelPencil() {
-    $("#create-label").popover({
+
+    var labelCreationIcon = $("#create-label");
+
+    labelCreationIcon.popover({
         html: true,
-        content: "<div class='form-inline'><input type='text' id='create-label-textbox' class='input-small'>" +
+        content: "<div id='label-creation-form' class='form-inline'><input type='text' id='create-label-textbox' class='input-small'>" +
             "<div id='create-label-submit' class='btn'>Crear</div></div>"
     });
 
-    $("#create-label").on('click', function () {
+    labelCreationIcon.on('click', function (event) {
+        event.stopPropagation();
         setLabelCreationForm();
+        $('#label-creation-form').parent().parent().parent().click(function (event) {
+            event.stopPropagation();
+        });
+    });
+
+    $('#label-creation-form').click(function (event) {
+        event.stopPropagation();
+    });
+
+    $(document).click(function () {
+        labelCreationIcon.popover('hide');
     });
 
 }
@@ -239,8 +254,12 @@ function setLabelCreationForm() {
 
     $('#create-label-submit').on('click', function () {
         var newLabel = $("#create-label-textbox").val();
-        createCustomLabel(newLabel);
-        $("#create-label").popover('hide');
+        if (newLabel == null || newLabel == '')
+            alert("La etiqueta debe tener un nombre.");
+        else {
+            createCustomLabel(newLabel);
+            $("#create-label").popover('hide');
+        }
     });
 }
 
@@ -518,7 +537,7 @@ function showConfirmationModal(title, question, cancelText, confirmText, confirm
     if (confirmText != null)
         modal.find('[data-action-name="confirm"]').html(confirmText);
 
-    
+
     confirmButton.unbind('click');
     confirmButton.one('click', null, confirmAction);
 
