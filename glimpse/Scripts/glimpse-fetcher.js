@@ -53,13 +53,3 @@ function fetchRecentMails() {
 function fetchMailsWithinActualPeriod() {
     fetchMailsAsync(ageToDate(maxAge), ageToDate(minAge));
 }
-
-//function setAutomaticFetching() {
-//    setInterval(function () {
-//        fetchMailsWithinActualPeriod();
-//        var i = 0;
-//        for(i = 0; i< reallyOwnedCircles.length; i++){
-//            reallyOwnedCircles[0].data()["age"] += 1;
-//        }
-//    }, 10000);
-//}

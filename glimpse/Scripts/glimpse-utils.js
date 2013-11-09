@@ -153,15 +153,16 @@ function movePeriodShown(offset) {
 function setDragging() {
 
     var startX, endX = 0,
+        offset, ageOffset = 0,
         wasDragging = false;
 
     $("#email-container").mousedown(function (downEvent) {
         downEvent.preventDefault();
         startX = downEvent.pageX;
         $(window).mousemove(function (dragEvent) {
-            var offset = (startX - dragEvent.pageX);
+            offset = (startX - dragEvent.pageX);
             drawLines(offset);
-            var ageOffset = Math.round(offset * currentPeriodShown() / 1000);
+            ageOffset = Math.round(offset * currentPeriodShown() / 1000);
             movePeriodShown(ageOffset);
             startX = dragEvent.pageX;
             wasDragging = true;
@@ -180,8 +181,6 @@ function setDragging() {
             //  para lineas motion
             historyOffset = 0;
             clearCanvas();
-            cw = containerWidth();
-            ch = containerHeight();
         }
     });
 }
@@ -201,7 +200,6 @@ function setDateCoordsPosition() {
 
 function ageToDate(age) {
     var now = new Date().getTime(),
-        //jsAge = Math.floor(age / 10000),
         jsAge = age * 1000;
     return new Date(now - jsAge);
 }
@@ -255,6 +253,8 @@ function setRefreshOnResize() {
     $(window).resize(function () {
         $(".circle").each(function () {
             calculateEmailPosition($(this));
+            cw = containerWidth();
+            ch = containerHeight();
         });
     });
 

@@ -61,6 +61,8 @@ function initializeGenericConfirmationModal() {
 
 function setSincronizeAccountsCaller() {
 
+    var freqInSeconds = 15;
+
     window.setInterval(function () { // Horrible, solo para la presentacion en la facu
 
         $.ajax({
@@ -70,17 +72,15 @@ function setSincronizeAccountsCaller() {
 
         fetchMailsWithinActualPeriod();
         var i = 0;
+
         for (i = 0; i < reallyOwnedCircles.length; i++) {
-            reallyOwnedCircles[i].data()["age"] += 10;
+            reallyOwnedCircles[i].data()["age"] += freqInSeconds;
         }
 
-    }, 15000);
+    }, freqInSeconds * 1000);
 
     window.setInterval(function () {
         fetchRecentMails();
     }, 5000);
-
-
-
 
 }
