@@ -108,6 +108,14 @@ div.field-group {
     padding: 2px;
 }
 
+.label-color-picker {
+    height: 18px !important;
+    width: 16px !important;
+    margin: 0 1px 0 1px !important;
+    padding: 0 !important;
+    border: 0 !important;
+}
+
 #main-labels-cont {
     height: 401px;
 }

@@ -384,18 +384,33 @@ namespace Glimpse.Controllers
                 if (sessionUser == null)
                     throw new GlimpseException("No se encontró el usuario.");
 
-                foreach (MailAccount userMailAccount in sessionUser.GetAccounts())
+                List<LabelEntity> userLabels = new List<LabelEntity>();
+                IList<MailAccount> userMailAccounts = sessionUser.GetAccounts();
+                foreach (MailAccount userMailAccount in userMailAccounts)
+                    userLabels.AddRange(Label.FindByAccount(userMailAccount.Entity, session));
+
+                if (userLabels.Any(x => x.Name == newLabelName && x.SystemName == null))
+                    throw new GlimpseException("No se puede renombrar la etiqueta con un nombre de una etiqueta existente.");
+
+                foreach (MailAccount userMailAccount in userMailAccounts)
                 {
-                    IList<LabelEntity> labels = Label.FindByAccount(userMailAccount.Entity, session);
-                    labels = labels.Where(x => x.Name.Contains(oldLabelName) && x.SystemName == null).ToList();
-                    foreach (LabelEntity label in labels)
+                    IEnumerable<LabelEntity> accountLabelsToRename = userLabels.Where(x => x.Name == oldLabelName &&
+                                                                              x.MailAccountEntity.Id == userMailAccount.Entity.Id && 
+                                                                              x.SystemName == null);
+                    foreach (LabelEntity label in accountLabelsToRename)
+                    {
                         new Label(label).Rename(oldLabelName, newLabelName, session); //BD
-                    if (labels.Count > 0)
                         userMailAccount.RenameLabel(oldLabelName, newLabelName); //IMAP
+                    }
                 }
                 tran.Commit();
 
                 return Json(new { success = true }, JsonRequestBehavior.AllowGet);
+            }
+            catch (GlimpseException exc)
+            {
+                tran.Rollback();
+                return Json(new { success = false, message = exc.GlimpseMessage }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception exc)
             {
