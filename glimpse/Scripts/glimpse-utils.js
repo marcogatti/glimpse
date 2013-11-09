@@ -190,15 +190,19 @@ function setDragging() {
 }
 
 function setDateCoordsPosition() {
-    var 
+    var
         coordLineHeight = parseInt($(".date-coord").css("line-height"), 10),
-        dateLastWidth = parseInt($("#date-last").css("width"));
+        dateLastWidth = parseInt($("#date-last").css("width")),
+        dateLastPosition = containerWidth() - wrapperLeftPadding;
 
     $(".date-coord").css("top", function () {
         return containerHeight() + (2 * wrapperVerticalPadding) + coordLineHeight + 'px';
     });
+    $("#date-mid").css("left", function () {
+        return dateLastPosition / 2 + 'px';
+    });
     $("#date-last").css("left", function () {
-        return containerWidth() - wrapperLeftPadding + 'px';
+        return dateLastPosition + 'px';
     });
 }
 
@@ -218,15 +222,24 @@ function setDateCoords() {
 
     var newMinDate = ageToDate(minAge),
         newMaxDate = ageToDate(maxAge),
-        diff = newMinDate - newMaxDate,
-        diffString;
+        newMidDate = ageToDate(maxAge - Math.round(currentPeriodShown() / 2)),
+        midString = elapsedTime(newMinDate, newMidDate),
+        lastString = elapsedTime(newMinDate, newMaxDate);
 
     newMinDate = newMinDate.toLocaleDateString();
     if (newMinDate === new Date().toLocaleDateString()) {
         newMinDate = "Hoy";
     }
 
-    var effectiveDiff = Math.round(diff / 1000 / 60 / 60 / 24);
+    $("#date-today").html(newMinDate);
+    $("#date-mid").html(midString);
+    $("#date-last").html(lastString);
+}
+
+function elapsedTime(recentDate, oldDate) {
+
+    var diff = recentDate - oldDate,
+        effectiveDiff = Math.round(diff / 1000 / 60 / 60 / 24);
 
     if (effectiveDiff !== 0) {
         diffString = getDiffString(effectiveDiff, "día");
@@ -239,9 +252,7 @@ function setDateCoords() {
             diffString = getDiffString(effectiveDiff, "minuto");
         }
     }
-
-    $("#date-today").html(newMinDate);
-    $("#date-last").html(effectiveDiff.toString() + diffString + " atrás");
+    return effectiveDiff.toString() + diffString + " atrás";
 }
 
 function hideProgressBar(bar) {

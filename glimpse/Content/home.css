@@ -139,9 +139,9 @@ div.field-group {
     }
 
 .circle.new {
-    border-color: rgba(127, 127, 127, 0.5);
+    border-color: rgba(255, 255, 255, 1);
     border-style: double;
-    border-width: 5px;
+    border-width: 8px;
 }
 
 .circle.focused {
@@ -222,13 +222,13 @@ div.field-group {
     font-size: initial;
     font-family: 'Open Sans', Arial, sans-serif;
     width: 150px;
-    color: white;
-    text-shadow: 0 0 6px #000;
+    color: darkslateblue;
+    text-shadow: 0 0 4px;
 }
 
     .coord.hidable {
         text-align: center;
-        font-size: smaller;
+        font-size: small;
         opacity: 0.95;
         z-index: 10;
         border-radius: 10%;
