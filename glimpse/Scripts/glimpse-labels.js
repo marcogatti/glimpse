@@ -599,25 +599,32 @@ function renameLabel(dialogElement) {
     if (oldName === newName)
         return;
 
-    var targetLabel = $(".custom-label[data-name='" + oldName + "']");
-    targetLabel.find('p').html(newName);
-    targetLabel.attr("data-name", newName);
-    targetLabel.find('input.label-color-picker').attr('data-current-label', newName);
-    labelColors[newName] = labelColors[oldName];
-    labelColors[oldName] = "FFFFFF";
-
-    $(getOwnedCircles()).each(function () {
-
-        if (hasLabel($(this), oldName)) {
-            removeLabelFromCircleData($(this), oldName);
-            addLabelToCircleData($(this), newName);
-        }
-    });
-
     $.ajax({
         type: "POST",
         url: "async/RenameLabel",
         data: { oldLabelName: oldName, newLabelName: newName }
+    }).done(function (data) {
+
+        var targetLabel = $(".custom-label[data-name='" + oldName + "']");
+
+        if (data.success === true) {
+
+            targetLabel.find('p').html(newName);
+            targetLabel.attr("data-name", newName);
+            targetLabel.find('input.label-color-picker').attr('data-current-label', newName);
+            labelColors[newName] = labelColors[oldName];
+            labelColors[oldName] = "FFFFFF";
+
+            $(getOwnedCircles()).each(function () {
+
+                if (hasLabel($(this), oldName)) {
+                    removeLabelFromCircleData($(this), oldName);
+                    addLabelToCircleData($(this), newName);
+                }
+            });
+        } else {
+            alert(data.message);
+        }
     });
 }
 
