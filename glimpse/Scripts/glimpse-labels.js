@@ -537,6 +537,9 @@ function setRemoveButton(labelElement) {
             'Cancelar',
             'Eliminar',
             function () {
+
+                $("#label-edition").dialog('close');
+
                 $.ajax({
                     type: "POST",
                     url: "async/DeleteLabel",
@@ -700,7 +703,6 @@ function prepareLabelsEditor() {
             text: "Guardar",
             click: function () {
                 $(this).dialog("close");
-                alert("se guardo");
             }
         }
         ]
