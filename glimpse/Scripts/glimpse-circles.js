@@ -298,7 +298,8 @@ function configureCircleHover(circle) {
 
         function () {
 
-            dateTime.html(circle.data("date"));
+            var currentDate = new Date(circle.data("date")).toLocaleString();
+            dateTime.html(currentDate);
             from.html(circle.data("from").substr(0, 10) + "...");
 
             dateTime.css("left", function () {

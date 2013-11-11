@@ -239,7 +239,8 @@ div.field-group {
         }
 
 #dateTime {
-    width: 125px;
+    width: 75px;
+    text-align: center;
 }
 
 #date-last {
@@ -248,9 +249,9 @@ div.field-group {
 
 #date-today {
     text-align: start;
+    width: 75px;
 }
 
-/*  Para alineacion vertical de la coordenada "from"    */
 #from {
     /*line-height: 75px;*/
     width: 50px;

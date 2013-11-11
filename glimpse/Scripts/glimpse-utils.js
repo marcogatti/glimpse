@@ -196,7 +196,7 @@ function setDateCoordsPosition() {
         dateLastPosition = containerWidth() - wrapperLeftPadding;
 
     $(".date-coord").css("top", function () {
-        return containerHeight() + (2 * wrapperVerticalPadding) + coordLineHeight + 'px';
+        return containerHeight() + (2 * wrapperVerticalPadding) + 'px';
     });
     $("#date-mid").css("left", function () {
         return dateLastPosition / 2 + 'px';
@@ -218,20 +218,48 @@ function getDiffString(diff, singular) {
     else { return " " + singular + "s"; }
 }
 
+function sameDay(date1, date2) {
+    return date1.toLocaleDateString() === date2.toLocaleDateString();
+}
+
 function setDateCoords() {
 
     var newMinDate = ageToDate(minAge),
         newMaxDate = ageToDate(maxAge),
         newMidDate = ageToDate(maxAge - Math.round(currentPeriodShown() / 2)),
         midString = elapsedTime(newMinDate, newMidDate),
-        lastString = elapsedTime(newMinDate, newMaxDate);
+        lastString = elapsedTime(newMinDate, newMaxDate),
+        now = new Date(),
+        dateToShow;
 
-    newMinDate = newMinDate.toLocaleDateString();
-    if (newMinDate === new Date().toLocaleDateString()) {
-        newMinDate = "Hoy";
+    if (currentPeriodShown() > 60 * 60 * 24 * 2) {
+
+        if (sameDay(now, newMinDate)) {
+            dateToShow = "Hoy";
+        } else {
+            dateToShow = newMinDate.toLocaleDateString();
+        }
+
+    } else {
+
+        dateToShow = newMinDate.toLocaleString();
+
+        if (currentPeriodShown() > 60 * 60 * 2) {
+
+            if (sameDay(now, newMinDate) && now.getHours() === newMinDate.getHours()) {
+                dateToShow = "Ahora";
+            }
+        }
+        else {
+
+            if (sameDay(now, newMinDate) && now.getHours() === newMinDate.getHours() && now.getMinutes() === newMinDate.getMinutes()) {
+                dateToShow = "Ahora";
+            }
+        }
     }
 
-    $("#date-today").html(newMinDate);
+
+    $("#date-today").html(dateToShow);
     $("#date-mid").html(midString);
     $("#date-last").html(lastString);
 }
