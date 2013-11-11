@@ -171,15 +171,15 @@ function removeLabelFromCircleData(circle, label) {
     }
 
     circle.data("custom-labels", circleLabels);
+
+    showCircleIfNeedBe(circle);
+
+    calculateEmailColor(circle);
 }
 
 function removeLabelFromCircle(circle, label) {
 
     removeLabelFromCircleData(circle, label);
-
-    showCircleIfNeedBe(circle);
-
-    calculateEmailColor(circle);
 
     removeLabelFromCircleInServer(label, circle.data('id'), false, circle.data('mailaccount'));
 }
@@ -559,9 +559,10 @@ function setRemoveButton(labelElement) {
                     alert("No fue posible eliminar la etiqueta");
                 });
 
-                $(".circle").each(function () {
-                    removeLabelFromCircle($(this), currentLabel.text());
-                });
+                for (var i = 0; i < reallyOwnedCircles.length; i++) {
+
+                    removeLabelFromCircleData(reallyOwnedCircles[i], currentLabel.text());
+                }
                 currentLabel.remove();
             });
     });
