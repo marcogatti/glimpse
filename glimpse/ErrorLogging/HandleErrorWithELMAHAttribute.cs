@@ -13,13 +13,18 @@ namespace Glimpse.ErrorLogging
         {
             base.OnException(context);
 
-            var e = context.Exception;
+            var exc = context.Exception;
             if (!context.ExceptionHandled   // if unhandled, will be logged anyhow
-                    || RaiseErrorSignal(e)      // prefer signaling, if possible
+                    || RaiseErrorSignal(exc)      // prefer signaling, if possible
                     || IsFiltered(context))     // filtered?
-                return;
+            {
+                context.ExceptionHandled = true;
+                context.Result = new ViewResult { ViewName = "Error" };
 
-            LogException(e);
+                return;
+            }
+
+            LogException(exc);
         }
 
         private static bool RaiseErrorSignal(Exception e)
