@@ -458,3 +458,7 @@ a.disabled {
     color: #333333;
     cursor: default;
 }
+
+a {
+    cursor: pointer;
+}
