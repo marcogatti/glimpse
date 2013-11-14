@@ -1,14 +1,9 @@
-﻿body {
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    padding-bottom: 40px;
-}
-
-#upper {
+﻿#upper {
     width: 100%;
     position: fixed;
-    height: 280px;
-    background-color: rgb(81, 127, 164);
+    height: 300px;
+    /*background-color: rgb(81, 127, 164);*/
+    background: linear-gradient(rgb(81, 127, 164), white);
 }
 
 #info {
@@ -93,3 +88,39 @@
 #registration-view .input-block-level {
     margin-bottom: 20px;
 }
+
+ html,
+      body {
+        height: 100%;
+        /* The html and body elements cannot have any padding or margin. */
+      }
+
+      /* Wrapper for page content to push down footer */
+      #wrap {
+        min-height: 100%;
+        height: auto !important;
+        height: 100%;
+        /* Negative indent footer by it's height */
+        margin: 0 auto -40px;
+      }
+
+      /* Set the fixed height of the footer here */
+      #push,
+      #footer {
+          line-height: 30px;
+          text-shadow: 0 0 2px #000;
+        height: 40px;
+      }
+      #footer {
+        background-color: #f5f5f5;
+      }
+
+      /* Lastly, apply responsive CSS fixes as necessary */
+      @media (max-width: 767px) {
+        #footer {
+          margin-left: -20px;
+          margin-right: -20px;
+          padding-left: 20px;
+          padding-right: 20px;
+        }
+      }

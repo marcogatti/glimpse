@@ -16,14 +16,16 @@ namespace Glimpse.Models
         private static IList<String> LabelColors =
              new String[] 
                 {
-                    "#FFA500",
-                    "#0059FF",
-                    "#FF8040",
-                    "#40BFFF",
-                    "#40FF80",
-                    "#FF40BF",
-                    "#7F40FF",
-                    "#BFFF40",
+                    "#00C90D",
+                    "#057D9F",
+                    "#ABF000",
+                    "#FF0700",
+
+                    "#C10087",
+                    "#FF7100",
+                    "#6A0AAB",
+                    "#00A480",
+                   
                     "#FF3300",
                     "#00CC00",
                     "#6666FF",
