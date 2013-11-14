@@ -1,7 +1,6 @@
 ﻿body {
     padding-top: 60px;
-    background: rgb(154, 230, 164);
-    background: -webkit-linear-gradient(top, rgb(154, 230, 164), rgb(65, 161, 78));
+    background: #00A480;
 }
 
 #account-dropdown {
