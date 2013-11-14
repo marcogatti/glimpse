@@ -198,9 +198,6 @@ function setDateCoordsPosition() {
     $(".date-coord").css("top", function () {
         return containerHeight() + (2 * wrapperVerticalPadding) + 'px';
     });
-    $("#date-mid").css("left", function () {
-        return dateLastPosition / 2 + 'px';
-    });
     $("#date-last").css("left", function () {
         return dateLastPosition + 'px';
     });
@@ -226,8 +223,6 @@ function setDateCoords() {
 
     var newMinDate = ageToDate(minAge),
         newMaxDate = ageToDate(maxAge),
-        newMidDate = ageToDate(maxAge - Math.round(currentPeriodShown() / 2)),
-        midString = elapsedTime(newMinDate, newMidDate),
         lastString = elapsedTime(newMinDate, newMaxDate),
         now = new Date(),
         dateToShow;
@@ -258,9 +253,7 @@ function setDateCoords() {
         }
     }
 
-
     $("#date-today").html(dateToShow);
-    $("#date-mid").html(midString);
     $("#date-last").html(lastString);
 }
 
