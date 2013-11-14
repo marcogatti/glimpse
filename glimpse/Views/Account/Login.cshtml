@@ -17,7 +17,7 @@
 }
 
 <div id="upper"></div>
-
+<div id="wrap">
 <div class="container">
 
     <div class="row">
@@ -30,7 +30,7 @@
             <div id="glimpse-balls"></div>
         </div>
 
-        <div class="span3"></div>
+        <div class="span2"></div>
 
         <div class="span4">
             @using (Html.BeginForm("Login", "Account", FormMethod.Post, new { @class = "form-signin" }))
@@ -50,6 +50,14 @@
             @{Html.RenderPartial("register_view");}
         </div>
 
+        <div class="span1"></div>
+
     </div>
 </div>
+</div>
 
+<div id="footer">
+    <div class="container">
+        <p class="pull-right">&copy; glimpse 2013</p>
+    </div>
+</div>
