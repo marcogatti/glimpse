@@ -58,7 +58,6 @@ i.clickable {
     cursor: pointer;
     /*  Color de emails sin etiqueta    */
     background-color: rgb(159, 182, 205);
-    -webkit-box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.2) inset;
     box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.2) inset;
     /*  Habilitar aceleracion por hardware  */
     transform: translate3d(0,0,0);
@@ -138,9 +137,8 @@ div.field-group {
     }
 
 .circle.new {
-    border-color: rgba(255, 255, 255, 1);
-    border-style: double;
-    border-width: 8px;
+    z-index: +1;
+        box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.5) inset, 4px 4px 16px 4px rgba(0, 0, 0, 0.7);
 }
 
 .circle.focused {
