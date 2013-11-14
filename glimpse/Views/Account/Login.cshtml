@@ -15,33 +15,41 @@
 @{
     ViewBag.Title = "Glimpse";
 }
-<div id="upper"></div>
 
-<div id="info" class="span3 offset1">
-    <div>
-        <p id="glimpse-brand">Glimpse</p>
-        <p id="slogan">estilo en tu correo</p>
-    </div>
-    <div id="glimpse-balls"></div>
-</div>
+<div id="upper"></div>
 
 <div class="container">
 
-    @using (Html.BeginForm("Login", "Account", FormMethod.Post, new { @class = "form-signin" }))
-    {
-        @Html.AntiForgeryToken()
-        <h2 class="form-signin-heading">Ingresar</h2>
-        
-        @Html.ValidationSummary()
-        @Html.TextBoxFor(m => m.Username, new { placeholder = "Tu usuario o dirección de correo", @class = "input-block-level", id = "username", autofocus = "autofocus" })
-        @Html.PasswordFor(m => m.Password, new { placeholder = "Tu contraseña", @class = "input-block-level" })
-        
-        <input class="btn btn-primary btn-success" type="submit" value="Entrar" />
-        <a class="btn btn-default" id="registration-link">Crear nueva cuenta Glimpse</a>
-        <a class="btn btn-link" id="forgot-password" style="margin-left: -4%">Olvidé mi contraseña...</a>
-    }
+    <div class="row">
 
-    @{Html.RenderPartial("register_view");}
+        <div id="info" class="span5">
+            <div>
+                <p id="glimpse-brand">Glimpse</p>
+                <p id="slogan">estilo en tu correo</p>
+            </div>
+            <div id="glimpse-balls"></div>
+        </div>
 
+        <div class="span3"></div>
+
+        <div class="span4">
+            @using (Html.BeginForm("Login", "Account", FormMethod.Post, new { @class = "form-signin" }))
+            {
+                @Html.AntiForgeryToken()
+                <h2 class="form-signin-heading">Ingresar</h2>
+        
+                @Html.ValidationSummary()
+                @Html.TextBoxFor(m => m.Username, new { placeholder = "Tu usuario o dirección de correo", @class = "input-block-level", id = "username", autofocus = "autofocus" })
+                @Html.PasswordFor(m => m.Password, new { placeholder = "Tu contraseña", @class = "input-block-level" })
+        
+                <input class="btn btn-primary btn-success" type="submit" value="Entrar" />
+                <a class="btn btn-default" id="registration-link">Crear nueva cuenta Glimpse</a>
+                <a class="btn btn-link" id="forgot-password" style="margin-left: -4%">Olvidé mi contraseña...</a>
+            }
+
+            @{Html.RenderPartial("register_view");}
+        </div>
+
+    </div>
 </div>
 
