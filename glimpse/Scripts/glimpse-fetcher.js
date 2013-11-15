@@ -46,6 +46,7 @@ function fetchRecentMails() {
 
         setDateCoords();
         calculateEmailsLeft(1);
+        defaultZoom = currentPeriodShown();
 
     });
 }

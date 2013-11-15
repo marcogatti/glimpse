@@ -266,10 +266,7 @@ div.icons {
 .icon {
     top: 10px;
     position: absolute;
-}
-
-.icon-refresh {
-    left: 70px;
+    z-index: +1;
 }
 
 .icon-zoom-out {
@@ -278,6 +275,9 @@ div.icons {
 
 .icon-zoom-in {
     left: 10px;
+}
+.icon-resize-small {
+    left: 50px;
 }
 
 .label-edition {

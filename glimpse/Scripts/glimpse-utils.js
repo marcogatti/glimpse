@@ -6,7 +6,8 @@
     wrapperLeftPadding = parseInt($("#container-wrapper").css("padding-left")),
     cw = containerWidth(),
     ch = containerHeight(),
-    historyOffset = 0;
+    historyOffset = 0,
+    defaultZoom;
 
 function preventSelectingNotUsefulThings() {
     //$('body').mousedown(function (downEvent) {
@@ -122,6 +123,18 @@ function setButtonZoom() {
     var zoomPoint = containerWidth() / 2;
     $('#zoom-in').click(function () { zoom(1, zoomPoint); return false; });
     $('#zoom-out').click(function () { zoom(-1, zoomPoint); return false; });
+    $('#zoom-restore').click(function () { restoreZoom(); });
+}
+
+function restoreZoom() {
+    var halfDiff = parseInt((currentPeriodShown() - defaultZoom) / 2);
+    if (allowedMovementLeft(halfDiff)) {
+        minAge += halfDiff;
+    }
+    if (allowedMovementRight(halfDiff)) {
+        maxAge -= halfDiff;
+    }
+    calculateEmailsLeft(0.5);
 }
 
 function setWheelZoom() {
