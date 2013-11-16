@@ -72,7 +72,7 @@ function currentPeriodShown() {
 function zoom(factor, zoomPoint) {
 
     var maxAmountInScreen = 30,
-        smallestPeriod = 60 * 2;
+        smallestPeriod = 60;
 
     if ((factor > 0 && currentPeriodShown() < smallestPeriod) || (factor < 0 && amountOfCirclesShown() > maxAmountInScreen)) {
         return;
@@ -134,7 +134,10 @@ function restoreZoom() {
     if (allowedMovementRight(halfDiff)) {
         maxAge -= halfDiff;
     }
-    calculateEmailsLeft(0.5);
+    maxAge -= minAge;
+    minAge -= minAge;
+    calculateEmailsLeft(null);
+    setDateCoords();
 }
 
 function setWheelZoom() {
@@ -158,7 +161,7 @@ function allowedMovementLeft(offset) {
 }
 
 function movePeriodShown(offset) {
-    if (allowedMovementLeft(offset) && allowedMovementRight(offset)) {
+    if (allowedMovementLeft(offset)) {
         minAge += offset;
         maxAge += offset;
         calculateEmailsLeft(0.3);
@@ -302,9 +305,13 @@ function setRefreshOnResize() {
     $(window).resize(function () {
         $(".circle").each(function () {
             calculateEmailPosition($(this));
-            cw = containerWidth();
-            ch = containerHeight();
         });
+
+        cw = containerWidth();
+        ch = containerHeight();
+        setDateCoords();
+        setDateCoordsPosition();
+
     });
 
 }

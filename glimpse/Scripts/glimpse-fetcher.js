@@ -15,12 +15,12 @@ function fetchMailsAsync(initialDate, finalDate) {
                 insertCircle(value);
             });
 
-        } else alert(data.message);
+        } else console.log(data.message);
 
     });
 }
 
-function fetchRecentMails() {
+function fetchRecentMails(onComplete) {
 
     $.getJSON("async/GetMailsByAmount", {
 
@@ -40,17 +40,23 @@ function fetchRecentMails() {
                 insertCircle(value);
             });
 
-        } else alert(data.message);
+        } else console.log(data.message);
 
     }).done(function () {
 
-        setDateCoords();
-        calculateEmailsLeft(1);
-        defaultZoom = currentPeriodShown();
-
+        if (onComplete != null) {
+            onComplete();
+        }
     });
 }
 
 function fetchMailsWithinActualPeriod() {
     fetchMailsAsync(ageToDate(maxAge), ageToDate(minAge));
+}
+
+function firstTimeFetching() {
+
+    setDateCoords();
+    calculateEmailsLeft(1);
+    defaultZoom = currentPeriodShown();
 }

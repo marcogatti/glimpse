@@ -4,7 +4,7 @@ $(document).ready(function () {
     loadLabels();
     setDateCoordsPosition();
     populateLabelColors();
-    fetchRecentMails();
+    fetchRecentMails(firstTimeFetching);
     setDragging();
     configureZoom();
     setRefreshOnResize();
@@ -19,6 +19,7 @@ $(document).ready(function () {
     prepareLabelsEditor();
     initializeGenericConfirmationModal();
     setSincronizeAccountsCaller();
+    setAging();
 })
 
 function initializeAboutUSModal() {
@@ -61,7 +62,7 @@ function initializeGenericConfirmationModal() {
 
 function setSincronizeAccountsCaller() {
 
-    var freqInSeconds = 15;
+    var freqInSeconds = 5;
 
     window.setInterval(function () { // Horrible, solo para la presentacion en la facu
 
@@ -71,7 +72,18 @@ function setSincronizeAccountsCaller() {
         });
 
         fetchMailsWithinActualPeriod();
-        var i = 0;
+        fetchRecentMails();
+
+    }, freqInSeconds * 1000);
+
+}
+
+function setAging() {
+
+    var i = 0,
+        freqInSeconds = 15;
+
+    window.setInterval(function () {
 
         for (i = 0; i < reallyOwnedCircles.length; i++) {
             reallyOwnedCircles[i].data()["age"] += freqInSeconds;
@@ -80,9 +92,5 @@ function setSincronizeAccountsCaller() {
         calculateEmailsLeft(0.5);
 
     }, freqInSeconds * 1000);
-
-    //window.setInterval(function () {
-    //    fetchRecentMails();
-    //}, 5000);
 
 }

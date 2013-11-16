@@ -15,6 +15,8 @@ namespace Glimpse
 
             routes.IgnoreRoute("errorlog/{*anything}");
 
+            routes.IgnoreRoute("Content/img");
+
             routes.MapRoute(
                 name: "AboutUs",
                 url: "AboutUs/{action}",

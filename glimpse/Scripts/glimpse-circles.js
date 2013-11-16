@@ -427,12 +427,18 @@ function calculateEmailsLeft(containerChunk) {
         periodShown = currentPeriodShown(),
         left = 0;
 
+    if (containerChunk == null) {
+        for (var index in reallyOwnedCircles) {
+            calculateEmailLeft(reallyOwnedCircles[index], periodShown);
+        }
+
+        return;
+    }
+
     surroundingCircles(containerChunk, function (circle) {
 
-        left = (circle.data("age") - minAge) / periodShown;
-        circle.css('left', function () {
-            return left * cw + 'px';
-        });
+        calculateEmailLeft(circle, periodShown);
+
     });
 
     setTimeout(function () {
@@ -440,6 +446,14 @@ function calculateEmailsLeft(containerChunk) {
     }, 300);
 
     return r;
+}
+
+function calculateEmailLeft(circle, currentPeriod) {
+
+    circle.css('left', function () {
+        return ((circle.data("age") - minAge) / currentPeriod) * cw + 'px';
+    });
+
 }
 
 function archiveCircle(circle) {
