@@ -95,21 +95,27 @@ function zoom(factor, zoomPoint) {
         setDateCoords();
         fetchMailsWithinActualPeriod();
 
-        var circlesProcessed;
+        moveSoftly(0.5);
 
-        circlesProcessed = surroundingCircles(0.5, function (circle) {
-            circle.addClass("transition");
-        });
-        calculateEmailsLeft(0.5).done(function () {
-
-            for (index in circlesProcessed) {
-                var circle = circlesProcessed[index];
-
-                circle.removeClass("transition");
-            }
-        });
     }
 
+}
+
+function moveSoftly(chunk) {
+
+    var circlesProcessed;
+
+    circlesProcessed = surroundingCircles(chunk, function (circle) {
+        circle.addClass("transition");
+    });
+    calculateEmailsLeft(chunk).done(function () {
+
+        for (index in circlesProcessed) {
+            var circle = circlesProcessed[index];
+
+            circle.removeClass("transition");
+        }
+    });
 }
 
 function configureZoom() {
