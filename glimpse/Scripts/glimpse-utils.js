@@ -10,10 +10,6 @@
     defaultZoom;
 
 function preventSelectingNotUsefulThings() {
-    //$('body').mousedown(function (downEvent) {
-    //    downEvent.preventDefault();
-    //}
-    //);
 }
 
 function containerHeight() {
