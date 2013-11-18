@@ -459,3 +459,30 @@ a.disabled {
 a {
     cursor: pointer;
 }
+
+.arrow-left {
+      border-style: dashed;
+  border-color: transparent;
+  border-width: 0.53em;
+  display: inline-block;
+  /* Use font-size to control the size of the arrow. */
+  font-size: 50px;
+  height: 0;
+  line-height: 0;
+  position: absolute;
+  left: 0;
+  vertical-align: middle;
+  width: 0;
+  border-right-width: 1em;
+  border-right-style: solid;
+  border-right-color: #666;
+  right: 0.25em;
+
+      -webkit-animation: blink 1s infinite alternate;
+}
+
+@-webkit-keyframes blink
+{
+from {opacity: 0}
+to {opacity: 1}
+}

@@ -249,6 +249,7 @@ function setDateCoords() {
 
         if (sameDay(now, newMinDate)) {
             dateToShow = "Hoy";
+            $("#new-mail-arrow").addClass("hidden");
         } else {
             dateToShow = newMinDate.toLocaleDateString();
         }
@@ -261,12 +262,14 @@ function setDateCoords() {
 
             if (sameDay(now, newMinDate) && now.getHours() === newMinDate.getHours()) {
                 dateToShow = "Ahora";
+                $("#new-mail-arrow").addClass("hidden");
             }
         }
         else {
 
             if (sameDay(now, newMinDate) && now.getHours() === newMinDate.getHours() && now.getMinutes() === newMinDate.getMinutes()) {
                 dateToShow = "Ahora";
+                $("#new-mail-arrow").addClass("hidden");
             }
         }
     }
