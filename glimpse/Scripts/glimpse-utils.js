@@ -125,7 +125,7 @@ function setButtonZoom() {
     var zoomPoint = containerWidth() / 2;
     $('#zoom-in').click(function () { zoom(1, zoomPoint); return false; });
     $('#zoom-out').click(function () { zoom(-1, zoomPoint); return false; });
-    $('#zoom-restore').click(function () { restoreZoom(); });
+    $('#zoom-restore,#new-mail-arrow').click(function () { restoreZoom(); });
 }
 
 function restoreZoom() {

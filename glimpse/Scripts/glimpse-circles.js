@@ -73,9 +73,14 @@ function insertCircle(value) {
 }
 
 function notifyNewMail(circle) {
-    if (!isInside(circle, minAge, maxAge)) {
+    if (isNewer(circle)) {
         $("#new-mail-arrow").removeClass("hidden");
     }
+}
+
+function isNewer(circle) {
+    var currentAge = circle.data("age");
+    return currentAge < minAge;
 }
 
 function getCircleData(circle) {
