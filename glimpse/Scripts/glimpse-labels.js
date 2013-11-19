@@ -175,6 +175,10 @@ function removeLabelFromCircleData(circle, label) {
     showCircleIfNeedBe(circle);
 
     calculateEmailColor(circle);
+
+    if (circle.hasClass("previewed")) {
+        putLabelBalls(circle);
+    }
 }
 
 function removeLabelFromCircle(circle, label) {
