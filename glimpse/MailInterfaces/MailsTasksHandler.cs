@@ -12,7 +12,7 @@ namespace Glimpse.MailInterfaces
 {
     public class MailsTasksHandler
     {
-        private static Boolean forceContinueOnError = false;
+        private static Boolean forceContinueOnError = true;
         private static Dictionary<string, MailsTask> TasksList = new Dictionary<string, MailsTask>();
         private static Mutex TasksListLock = new Mutex(false);
 
@@ -182,7 +182,6 @@ namespace Glimpse.MailInterfaces
             }
             catch (Exception exc)
             {
-                MailsTasksHandler.EndSynchronization(task);
                 Log.LogException(exc, "Error sincronizando cuenta, parametros: mailAccount:" +
                                              task.MailAccount.Entity.Address + " lowestUidLocal:" +
                                              task.LowestUidLocal.ToString() + " lowestUidExternal:"+
@@ -202,8 +201,7 @@ namespace Glimpse.MailInterfaces
                 }
                 else
                 {
-                    task.Working = false;
-                    task.MailAccount.Disconnect();
+                    MailsTasksHandler.EndSynchronization(task);
                     throw;
                 }
             }
