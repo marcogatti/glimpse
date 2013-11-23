@@ -33,7 +33,7 @@
 }
 
 #glimpse-balls {
-    background-image: url('img/balls.png');
+    background-image: url('../Content/img/balls.png');
     background-size: 100% 100%;
     width: 410px;
     height: 380px;

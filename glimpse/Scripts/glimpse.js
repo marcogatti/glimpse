@@ -89,7 +89,7 @@ function setAging() {
             reallyOwnedCircles[i].data()["age"] += freqInSeconds;
         }
 
-        calculateEmailsLeft(0.5);
+        moveSoftly(0.5);
 
     }, freqInSeconds * 1000);
 

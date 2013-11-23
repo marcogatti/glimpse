@@ -175,6 +175,10 @@ function removeLabelFromCircleData(circle, label) {
     showCircleIfNeedBe(circle);
 
     calculateEmailColor(circle);
+
+    if (circle.hasClass("previewed")) {
+        putLabelBalls(circle);
+    }
 }
 
 function removeLabelFromCircle(circle, label) {
@@ -219,48 +223,22 @@ function setLabelPencil() {
 
     var labelCreationIcon = $("#create-label");
 
-    labelCreationIcon.popover({
-        html: true,
-        content: "<div id='label-creation-form' class='form-inline'><input type='text' id='create-label-textbox' class='input-small'>" +
-            "<div id='create-label-submit' class='btn'>Crear</div></div>"
+
+    labelCreationIcon.on('click', function (e) {
+
+        var edition_panel = $("#label-edition");
+
+        edition_panel.html("</br>Nombre:  <input type='text' class='label-rename-textbox label-edition' value='" + name + "'>");
+
+        setDialogConfig(edition_panel, "Crear etiqueta", function () { }, createCustomLabel,
+            {
+                validation: labelNameValidation,
+                enableEnter: true
+            });
+
+        edition_panel.dialog("open");
     });
 
-    labelCreationIcon.on('click', function (event) {
-        event.stopPropagation();
-        setLabelCreationForm();
-        $('#label-creation-form').parent().parent().parent().click(function (event) {
-            event.stopPropagation();
-        });
-    });
-
-    $('#label-creation-form').click(function (event) {
-        event.stopPropagation();
-    });
-
-    $(document).click(function () {
-        labelCreationIcon.popover('hide');
-    });
-
-}
-
-function setLabelCreationForm() {
-
-    $("#create-label-textbox").on('keyup', function (e) {
-        e.preventDefault();
-        if (e.keyCode === 13) {
-            $('#create-label-submit').click();
-        }
-    });
-
-    $('#create-label-submit').on('click', function () {
-        var newLabel = $("#create-label-textbox").val();
-        if (newLabel == null || newLabel == '')
-            alert("La etiqueta debe tener un nombre.");
-        else {
-            createCustomLabel(newLabel);
-            $("#create-label").popover('hide');
-        }
-    });
 }
 
 function chooseCirclesToBeShown() {
@@ -480,13 +458,44 @@ function setRenameButton(labelElement) {
         edition_panel.html("</br>Nombre:  <input type='text' class='label-rename-textbox label-edition' value='" + name +
             "' data-oldname='" + name + "'>");
 
-        setDialogConfig(edition_panel, "Cambiar nombre", function () { }, renameLabel)
+        setDialogConfig(edition_panel, 'Renombrar etiqueta', function () { }, renameLabel,
+            {
+                validation: labelNameValidation,
+                enableEnter: true
+            })
 
         edition_panel.dialog("open");
     });
 }
 
-function setDialogConfig(dialogElement, title, actionClose, actionSave) {
+function setDialogConfig(dialogElement, title, actionClose, actionSave, options) {
+
+    $('#label-editor-save').unbind('click');
+    dialogElement.unbind('keypress');
+
+    var validationIsOk = function () { return true; },
+        realActionSave = function () {
+            if (validationIsOk(dialogElement)) {
+                actionSave(dialogElement);
+                dialogElement.dialog("close");
+            }
+        }
+
+
+    if (options != null) {
+
+        if (options.validation != null)
+            validationIsOk = options.validation;
+
+        if (options.enableEnter) {
+            dialogElement.keypress(function (e) {
+                if (e.keyCode == $.ui.keyCode.ENTER) {
+                    realActionSave();
+                }
+            });
+        }
+    }
+
 
     dialogElement.dialog({
         title: title,
@@ -501,10 +510,7 @@ function setDialogConfig(dialogElement, title, actionClose, actionSave) {
         {
             id: 'label-editor-save',
             text: "Guardar",
-            click: function () {
-                actionSave(dialogElement);
-                dialogElement.dialog("close");
-            }
+            click: realActionSave
         }
         ]
     });
@@ -639,7 +645,14 @@ function exists(label) {
     return false;
 }
 
-function createCustomLabel(labelName) {
+function createCustomLabel(dialogElement) {
+
+    var labelName = dialogElement.find('input').val();
+
+    if (labelName == null || labelName == '') {
+        alert("La etiqueta debe tener un nombre.");
+        return;
+    }
 
     if (!exists(labelName)) {
 
@@ -708,7 +721,6 @@ function prepareLabelsEditor() {
         draggable: true,
         height: 200,
         width: 250,
-        minWidth: 250,
         minHeight: 200,
         resizable: false,
         title: "Modifica tu label",
@@ -728,4 +740,24 @@ function prepareLabelsEditor() {
         }
         ]
     });
+}
+
+function labelExists(labelName) {
+    return $('.custom-label[data-name="' + labelName + '"]').length > 0;
+}
+
+function labelNameValidation(dialog) {
+    var newName = dialog.find('input').val();
+
+    if (newName == null || newName == '') {
+        alert('La etiqueta debe tener un nombre.');
+        return false;
+    }
+
+    if (labelExists(newName)) {
+        alert('Ya existe una etiqueta con ese nombre. Por favor escriba uno diferente.');
+        return false;
+    }
+
+    return true;
 }

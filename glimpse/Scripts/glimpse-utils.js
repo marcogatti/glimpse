@@ -10,10 +10,6 @@
     defaultZoom;
 
 function preventSelectingNotUsefulThings() {
-    //$('body').mousedown(function (downEvent) {
-    //    downEvent.preventDefault();
-    //}
-    //);
 }
 
 function containerHeight() {
@@ -95,21 +91,27 @@ function zoom(factor, zoomPoint) {
         setDateCoords();
         fetchMailsWithinActualPeriod();
 
-        var circlesProcessed;
+        moveSoftly(0.5);
 
-        circlesProcessed = surroundingCircles(0.5, function (circle) {
-            circle.addClass("transition");
-        });
-        calculateEmailsLeft(0.5).done(function () {
-
-            for (index in circlesProcessed) {
-                var circle = circlesProcessed[index];
-
-                circle.removeClass("transition");
-            }
-        });
     }
 
+}
+
+function moveSoftly(chunk) {
+
+    var circlesProcessed;
+
+    circlesProcessed = surroundingCircles(chunk, function (circle) {
+        circle.addClass("transition");
+    });
+    calculateEmailsLeft(chunk).done(function () {
+
+        for (index in circlesProcessed) {
+            var circle = circlesProcessed[index];
+
+            circle.removeClass("transition");
+        }
+    });
 }
 
 function configureZoom() {
@@ -123,7 +125,7 @@ function setButtonZoom() {
     var zoomPoint = containerWidth() / 2;
     $('#zoom-in').click(function () { zoom(1, zoomPoint); return false; });
     $('#zoom-out').click(function () { zoom(-1, zoomPoint); return false; });
-    $('#zoom-restore').click(function () { restoreZoom(); });
+    $('#zoom-restore,#new-mail-arrow').click(function () { restoreZoom(); });
 }
 
 function restoreZoom() {
@@ -247,6 +249,7 @@ function setDateCoords() {
 
         if (sameDay(now, newMinDate)) {
             dateToShow = "Hoy";
+            $("#new-mail-arrow").addClass("hidden");
         } else {
             dateToShow = newMinDate.toLocaleDateString();
         }
@@ -259,12 +262,14 @@ function setDateCoords() {
 
             if (sameDay(now, newMinDate) && now.getHours() === newMinDate.getHours()) {
                 dateToShow = "Ahora";
+                $("#new-mail-arrow").addClass("hidden");
             }
         }
         else {
 
             if (sameDay(now, newMinDate) && now.getHours() === newMinDate.getHours() && now.getMinutes() === newMinDate.getMinutes()) {
                 dateToShow = "Ahora";
+                $("#new-mail-arrow").addClass("hidden");
             }
         }
     }

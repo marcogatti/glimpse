@@ -67,7 +67,20 @@ function insertCircle(value) {
         configureCircleHover(newCircle);
 
         addToOwnedList(newCircle);
+
+        notifyNewMail(newCircle);
     }
+}
+
+function notifyNewMail(circle) {
+    if (isNewer(circle)) {
+        $("#new-mail-arrow").removeClass("hidden");
+    }
+}
+
+function isNewer(circle) {
+    var currentAge = circle.data("age");
+    return currentAge < minAge;
 }
 
 function getCircleData(circle) {
@@ -411,14 +424,18 @@ function surroundingCircles(factor, whatToDo) {
 
         var circle = circles[index];
 
-        var currentAge = circle.data('age');
-        if ((currentAge < furthestAgeRight) && (currentAge > furthestAgeLeft)) {
+        if (isInside(circle, furthestAgeLeft, furthestAgeRight)) {
             whatToDo(circle);
             circesProcessed.push(circle);
         }
     }
 
     return circesProcessed;
+}
+
+function isInside(circle, leftLimit, rightLimit) {
+    var currentAge = circle.data('age');
+    return (currentAge < rightLimit) && (currentAge > leftLimit);
 }
 
 function calculateEmailsLeft(containerChunk) {
